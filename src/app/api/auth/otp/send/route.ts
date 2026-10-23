@@ -4,11 +4,10 @@ import { requestOtpSchema } from "@/lib/auth/validation";
 import {
   generateNumericOtp,
   hashOtp,
-  checkPhoneRateLimit,
-  checkIpRateLimit,
-  deliverOtp,
   OTP_VALIDITY_MINUTES,
 } from "@/lib/auth/otp";
+import { checkDbRateLimit, getClientIp } from "@/lib/rateLimit";
+import { getSmsProvider } from "@/lib/sms";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,14 +23,16 @@ export async function POST(request: NextRequest) {
 
     const { phone } = parsed.data;
 
-    // Rate-limiting by client IP
-    const clientIp =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      request.headers.get("x-real-ip") ||
-      "127.0.0.1";
+    // 1. IP rate limiting via Database (10 requests per hour)
+    const clientIp = getClientIp(request.headers);
+    const ipLimit = await checkDbRateLimit({
+      scope: "OTP_IP",
+      identifier: clientIp,
+      windowSeconds: 3600,
+      maxAllowed: 10,
+    });
 
-    const ipLimit = checkIpRateLimit(clientIp);
-    if (!ipLimit.isAllowed) {
+    if (!ipLimit.allowed) {
       return NextResponse.json(
         {
           error: `Too many requests from this network. Please retry in ${ipLimit.retryAfterSeconds} seconds.`,
@@ -40,18 +41,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Rate-limiting by Phone number
-    const phoneLimit = checkPhoneRateLimit(phone);
-    if (!phoneLimit.isAllowed) {
+    // 2. Phone rate limiting via Database (5 requests per hour)
+    const phoneLimit = await checkDbRateLimit({
+      scope: "OTP_PHONE",
+      identifier: phone,
+      windowSeconds: 3600,
+      maxAllowed: 5,
+    });
+
+    if (!phoneLimit.allowed) {
       return NextResponse.json(
         {
-          error: `Too many OTP requests for this number. Please retry in ${phoneLimit.retryAfterSeconds} seconds.`,
+          error: `Too many OTP requests for this mobile number. Please retry in ${phoneLimit.retryAfterSeconds} seconds.`,
         },
         { status: 429 }
       );
     }
 
-    // Generate secure 6-digit numeric OTP and hash
+    // 3. Generate 6-digit OTP and store hash
     const otp = generateNumericOtp(6);
     const otpHash = hashOtp(otp);
     const expiresAt = new Date(Date.now() + OTP_VALIDITY_MINUTES * 60 * 1000);
@@ -67,7 +74,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Store hashed OTP in database
     await prisma.otpVerification.create({
       data: {
         phone,
@@ -77,8 +83,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Deliver OTP (console logged in dev only, never in production)
-    deliverOtp(phone, otp);
+    // 4. Dispatch via configured SmsProvider (fails loudly in production if unconfigured)
+    const smsProvider = getSmsProvider();
+    const sendResult = await smsProvider.sendSms({
+      phone,
+      message: `Your Maharshi Kanad Jyotish Kendra verification code is ${otp}. Valid for 10 minutes.`,
+      otp,
+    });
+
+    if (!sendResult.success) {
+      return NextResponse.json(
+        { error: sendResult.error || "Failed to dispatch SMS" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -87,7 +105,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error in OTP send route:", error);
     return NextResponse.json(
-      { error: "Failed to dispatch OTP. Please try again." },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to dispatch OTP. Please try again.",
+      },
       { status: 500 }
     );
   }

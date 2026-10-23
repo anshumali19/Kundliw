@@ -20,12 +20,19 @@ async function main() {
   });
 
   // 2. Admin User
+  const defaultDevPassword = "ChangeMeInAdminSettings@2026";
   const initialAdminPassword =
-    process.env.INITIAL_ADMIN_PASSWORD || "ChangeMeInAdminSettings@2026";
-  if (!process.env.INITIAL_ADMIN_PASSWORD && process.env.NODE_ENV === "production") {
-    throw new Error(
-      "INITIAL_ADMIN_PASSWORD environment variable must be set in production before seeding."
-    );
+    process.env.INITIAL_ADMIN_PASSWORD || defaultDevPassword;
+
+  if (process.env.NODE_ENV === "production") {
+    if (
+      !process.env.INITIAL_ADMIN_PASSWORD ||
+      process.env.INITIAL_ADMIN_PASSWORD === defaultDevPassword
+    ) {
+      throw new Error(
+        "CRITICAL SECURITY ERROR: INITIAL_ADMIN_PASSWORD must be explicitly provided in production and cannot be the default development password."
+      );
+    }
   }
 
   const adminPasswordHash = await bcrypt.hash(initialAdminPassword, 10);

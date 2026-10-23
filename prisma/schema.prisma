@@ -277,6 +277,19 @@ model VaultFile {
   @@index([userId])
 }
 
+model RateLimit {
+  id         String   @id @default(cuid())
+  scope      String   // e.g. "OTP_PHONE", "OTP_IP", "ADMIN_LOGIN_EMAIL", "ADMIN_LOGIN_IP"
+  identifier String   // e.g. Phone number, IP address, or email
+  count      Int      @default(1)
+  windowEnd  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([scope, identifier])
+  @@index([scope, identifier, windowEnd])
+}
+
 model AdminSettings {
   id                String   @id @default("default")
   siteNameEn        String?

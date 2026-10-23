@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./authOptions";
+import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -13,14 +14,31 @@ export interface AuthenticatedUser {
 }
 
 /**
- * Returns currently authenticated user from session, or null if unauthenticated.
+ * Returns currently authenticated user by validating session and re-verifying against database.
  */
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
   const session = await getServerSession(authOptions);
   if (!session || !session.user || !session.user.id) {
     return null;
   }
-  return session.user as AuthenticatedUser;
+
+  // Re-read active user record from database to prevent stale JWT privilege escalation
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      role: true,
+    },
+  });
+
+  if (!dbUser) {
+    return null;
+  }
+
+  return dbUser as AuthenticatedUser;
 }
 
 /**
@@ -43,7 +61,7 @@ export async function requireUser(
 
 /**
  * Server Component / Server Action guard requiring ADMIN role.
- * Redirects to localized sign-in if unauthenticated or not an admin.
+ * Re-reads user role from database, never trusting JWT claim alone.
  */
 export async function requireAdmin(
   callbackUrl?: string,
@@ -61,7 +79,6 @@ export async function requireAdmin(
 
 /**
  * Route handler guard for APIs requiring an authenticated user.
- * Returns either user or NextResponse (401).
  */
 export async function guardApiUser(): Promise<
   { user: AuthenticatedUser; errorResponse?: never } | { user?: never; errorResponse: NextResponse }
@@ -80,7 +97,7 @@ export async function guardApiUser(): Promise<
 
 /**
  * Route handler guard for APIs requiring ADMIN role.
- * Returns either user or NextResponse (401/403).
+ * Re-reads user role directly from database.
  */
 export async function guardApiAdmin(): Promise<
   { user: AuthenticatedUser; errorResponse?: never } | { user?: never; errorResponse: NextResponse }

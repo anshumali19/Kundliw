@@ -5,28 +5,30 @@ import * as bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { verifyOtpHash, isOtpExpired, canAttemptOtpVerification } from "./otp";
 import { verifyOtpSchema, emailPasswordLoginSchema } from "./validation";
+import { checkDbRateLimit, resetDbRateLimit } from "@/lib/rateLimit";
 import { Role } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 24 * 60 * 60, // Short maxAge: 24 hours
   },
   pages: {
     signIn: "/hi/auth/signin",
   },
   providers: [
-    // 1. Google OAuth Provider (Optional in dev if env variables are not present)
+    // 1. Google OAuth Provider with explicit dangerous linking disabled
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
           GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            allowDangerousEmailAccountLinking: false, // Explicitly disabled
           }),
         ]
       : []),
 
-    // 2. Mobile OTP Credentials Provider (for Android WebView & Mobile Users)
+    // 2. Mobile OTP Provider
     CredentialsProvider({
       id: "mobile-otp",
       name: "Mobile OTP",
@@ -42,7 +44,7 @@ export const authOptions: NextAuthOptions = {
 
         const { phone, otp } = parsed.data;
 
-        // Find the latest active OTP record for this phone
+        // Check active OTP record
         const record = await prisma.otpVerification.findFirst({
           where: {
             phone,
@@ -65,7 +67,6 @@ export const authOptions: NextAuthOptions = {
 
         const isMatch = verifyOtpHash(otp, record.otpHash);
         if (!isMatch) {
-          // Increment attempts
           await prisma.otpVerification.update({
             where: { id: record.id },
             data: { attempts: { increment: 1 } },
@@ -73,17 +74,16 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Incorrect OTP. Please try again.");
         }
 
-        // Mark OTP as consumed
+        // Consume OTP
         await prisma.otpVerification.update({
           where: { id: record.id },
           data: { consumedAt: new Date() },
         });
 
-        // Find or create User with this phone
-        let user = await prisma.user.findUnique({
-          where: { phone },
-        });
+        // Reset rate limits on success
+        await resetDbRateLimit("OTP_PHONE", phone);
 
+        let user = await prisma.user.findUnique({ where: { phone } });
         if (!user) {
           user = await prisma.user.create({
             data: {
@@ -104,7 +104,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
 
-    // 3. Email & Password Provider (for Admins)
+    // 3. Email & Password Provider for Administrative login
     CredentialsProvider({
       id: "email-password",
       name: "Email and Password",
@@ -112,13 +112,27 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         const parsed = emailPasswordLoginSchema.safeParse(credentials);
         if (!parsed.success) {
           throw new Error("Invalid email or password format");
         }
 
         const { email, password } = parsed.data;
+
+        // Rate limit by email (max 5 failed attempts per 15 minutes)
+        const emailRate = await checkDbRateLimit({
+          scope: "ADMIN_LOGIN_EMAIL",
+          identifier: email,
+          windowSeconds: 15 * 60,
+          maxAllowed: 5,
+        });
+
+        if (!emailRate.allowed) {
+          throw new Error(
+            `Account locked due to consecutive failed attempts. Retry in ${emailRate.retryAfterSeconds} seconds.`
+          );
+        }
 
         const user = await prisma.user.findUnique({
           where: { email },
@@ -132,6 +146,9 @@ export const authOptions: NextAuthOptions = {
         if (!isPasswordValid) {
           throw new Error("Invalid email or password");
         }
+
+        // Success: clear rate limits
+        await resetDbRateLimit("ADMIN_LOGIN_EMAIL", email);
 
         return {
           id: user.id,
