@@ -64,42 +64,84 @@ export default async function AdminLayout({
         <div className="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto">
           <Link
             href="/admin/services"
-            className="min-h-[40px] px-3.5 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-secondary bg-surface border border-secondary/30 hover:border-secondary transition-colors shrink-0"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-secondary hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
             <Layers className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "सेवाएँ एवं संस्करण (Services & Plans)" : "Services & Plans"}</span>
+            <span>{isHindi ? "सेवाएँ (Services)" : "Services"}</span>
           </Link>
 
           <Link
             href="/admin/offers"
-            className="min-h-[40px] px-3.5 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
             <Tag className="w-3.5 h-3.5 text-tertiary" />
-            <span>{isHindi ? "विशेष छूट व कूपन (Offers & Coupons)" : "Offers & Coupons"}</span>
+            <span>{isHindi ? "कूपन (Offers)" : "Offers"}</span>
           </Link>
 
           <Link
             href="/admin/orders"
-            className="min-h-[40px] px-3.5 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
             <ShoppingBag className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "आदेश सूची (Orders)" : "Orders"}</span>
+            <span>{isHindi ? "आदेश (Orders)" : "Orders"}</span>
           </Link>
 
           <Link
-            href="/admin/users"
-            className="min-h-[40px] px-3.5 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+            href="/admin/vault"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
-            <Users className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "उपयोगकर्ता (Users)" : "Users"}</span>
+            <ShieldAlert className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "वॉल्ट (Vault)" : "Vault"}</span>
+          </Link>
+
+          <Link
+            href="/admin/banners"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <span>{isHindi ? "बैनर (Banners)" : "Banners"}</span>
+          </Link>
+
+          <Link
+            href="/admin/marquee"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <span>{isHindi ? "मार्की (Marquee)" : "Marquee"}</span>
+          </Link>
+
+          <Link
+            href="/admin/pages"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <span>{isHindi ? "स्थैतिक पृष्ठ (Pages)" : "Pages"}</span>
+          </Link>
+
+          <Link
+            href="/admin/blogs"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <span>{isHindi ? "लेख (Articles)" : "Articles"}</span>
+          </Link>
+
+          <Link
+            href="/admin/testimonials"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <span>{isHindi ? "संस्तुतियाँ (Reviews)" : "Testimonials"}</span>
+          </Link>
+
+          <Link
+            href="/admin/gallery"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <span>{isHindi ? "दीर्घा (Gallery)" : "Gallery"}</span>
           </Link>
 
           <Link
             href="/admin/settings"
-            className="min-h-[40px] px-3.5 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
             <Settings className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "व्यवस्था सेटिंग्स (Admin Settings)" : "Settings"}</span>
+            <span>{isHindi ? "सेटिंग्स (Settings)" : "Settings"}</span>
           </Link>
         </div>
       </div>

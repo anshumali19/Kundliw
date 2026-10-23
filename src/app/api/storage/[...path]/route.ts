@@ -11,32 +11,48 @@ export async function GET(
   { params }: { params: { path: string[] } }
 ) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-    }
-
     const storageKey = params.path.join("/");
 
-    // Strict access guard on payment proof files:
-    // Only accessible by administrators or the customer who placed the order
-    if (storageKey.startsWith("payment-proofs/")) {
+    // Strict access guard on private files (payment proofs and customer vault):
+    // Only accessible by administrators or the customer who owns the document
+    if (storageKey.startsWith("payment-proofs/") || storageKey.startsWith("vault/")) {
+      const user = await getCurrentUser();
+      if (!user) {
+        return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      }
+
       const isAdmin = user.role === Role.ADMIN;
       if (!isAdmin) {
-        const order = await prisma.order.findFirst({
-          where: {
-            userId: user.id,
-            manualPaymentProof: {
-              contains: storageKey,
+        if (storageKey.startsWith("payment-proofs/")) {
+          const order = await prisma.order.findFirst({
+            where: {
+              userId: user.id,
+              manualPaymentProof: {
+                contains: storageKey,
+              },
             },
-          },
-        });
+          });
 
-        if (!order) {
-          return NextResponse.json(
-            { error: "Forbidden: Access to this payment proof is restricted to the order owner." },
-            { status: 403 }
-          );
+          if (!order) {
+            return NextResponse.json(
+              { error: "Forbidden: Access to this payment proof is restricted to the order owner." },
+              { status: 403 }
+            );
+          }
+        } else if (storageKey.startsWith("vault/")) {
+          const vaultFile = await prisma.vaultFile.findFirst({
+            where: {
+              userId: user.id,
+              storageKey,
+            },
+          });
+
+          if (!vaultFile) {
+            return NextResponse.json(
+              { error: "Forbidden: Access to this vault document is restricted to the document owner." },
+              { status: 403 }
+            );
+          }
         }
       }
     }
@@ -49,7 +65,7 @@ export async function GET(
       headers: {
         "Content-Type": mimeType,
         "Content-Length": buffer.length.toString(),
-        "Cache-Control": "private, max-age=3600",
+        "Cache-Control": storageKey.startsWith("payment-proofs/") ? "private, max-age=3600" : "public, max-age=86400",
       },
     });
   } catch (error) {

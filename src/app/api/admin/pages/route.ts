@@ -1,0 +1,55 @@
+import { NextRequest, NextResponse } from "next/server";
+import { guardApiAdmin } from "@/lib/auth/guards";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+export const dynamic = "force-dynamic";
+
+const pageSchema = z.object({
+  slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+  titleEn: z.string().min(2),
+  titleHi: z.string().min(2),
+  contentEn: z.string().min(10),
+  contentHi: z.string().min(10),
+});
+
+export async function GET() {
+  try {
+    const pages = await prisma.staticPage.findMany({
+      orderBy: { slug: "asc" },
+    });
+    return NextResponse.json({ success: true, pages });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Failed to fetch pages";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const admin = await guardApiAdmin();
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const parsed = pageSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const page = await prisma.staticPage.upsert({
+      where: { slug: parsed.data.slug },
+      create: parsed.data,
+      update: parsed.data,
+    });
+
+    return NextResponse.json({ success: true, page });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Failed to save page";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
