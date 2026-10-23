@@ -20,7 +20,7 @@ export function Header() {
     { href: "/kundli/matching", label: tNav("kundliMatching") },
     { href: "/kundli/prashna", label: tNav("prashna") },
     { href: "/vault", label: tNav("vault") },
-    { href: "/tracker", label: tNav("tracker") },
+    { href: "/track", label: tNav("tracker") },
     { href: "/about", label: tNav("about") },
   ];
 
@@ -109,7 +109,7 @@ export function Header() {
             </Link>
 
             <Link
-              href="/auth/signin"
+              href="/account"
               aria-label={tHeader("profileAria")}
               className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 transition-opacity min-h-[44px] min-w-[44px]"
             >

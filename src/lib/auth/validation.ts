@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+/**
+ * Normalizes any Indian phone input to pure 10 digits for matching.
+ */
+export function normalizePhoneNumber(val: string): string {
+  const digits = val.replace(/\D/g, "");
+  if (digits.length === 10) return digits;
+  if (digits.length === 12 && digits.startsWith("91")) return digits.slice(2);
+  if (digits.length === 11 && digits.startsWith("0")) return digits.slice(1);
+  return digits.slice(-10);
+}
+
 export const phoneSchema = z
   .string()
   .trim()
