@@ -458,98 +458,69 @@ export function PlanSelectorInteractive({
 
       {/* 3. Server-Verified Coupon Promotion Section */}
       <div className="bg-surface-container p-6 rounded-lg border border-outline-variant/40 shadow-sm text-left">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          <div className="lg:col-span-6 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-secondary">
-              <Tag className="w-4 h-4 text-primary" />
-              <span>{isHindi ? "वैदिक दक्षिणा कूपन कोड (Promo Voucher)" : "Vedic Dakshina Promo Code"}</span>
-            </div>
-            <p className="text-xs text-on-surface-variant leading-relaxed">
-              {isHindi
-                ? "विशेष पर्व व अनुष्ठान छूट हेतु कूपन दर्ज करें। छूट का सत्यापन सर्वर द्वारा तत्काल परिकलित होगा।"
-                : "Apply an authorized promotional voucher code to verify discounts before proceeding to payment."}
-            </p>
+        <div className="max-w-2xl space-y-2">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-secondary">
+            <Tag className="w-4 h-4 text-primary" />
+            <span>{isHindi ? "विशेष छूट कूपन कोड (Promo Voucher)" : "Promo Voucher Code"}</span>
+          </div>
+          <p className="text-xs text-on-surface-variant leading-relaxed">
+            {isHindi
+              ? "यदि आपके पास वैध कूपन कोड है, तो दर्ज करें। छूट का सत्यापन सर्वर द्वारा तत्काल परिकलित होगा।"
+              : "Enter your promotional code to preview verified savings before checkout."}
+          </p>
 
-            {/* Input & Apply Button */}
-            <div className="flex items-center gap-2 pt-1 max-w-md">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                  placeholder={isHindi ? "कूपन कोड (उदा. VEDIC2025)" : "Promo code (e.g. VEDIC2025)"}
-                  disabled={couponLoading || appliedCoupon !== null}
-                  className="w-full bg-surface text-secondary font-mono text-sm font-bold uppercase tracking-widest px-3 py-2.5 rounded border border-dashed border-secondary focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
-                />
-              </div>
-
-              {appliedCoupon ? (
-                <button
-                  type="button"
-                  onClick={handleRemoveCoupon}
-                  className="min-h-[44px] px-3 py-2 bg-surface hover:bg-surface-container-high border border-outline-variant text-error text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-1"
-                >
-                  <X className="w-3.5 h-3.5" />
-                  <span>{isHindi ? "हटाएँ" : "Remove"}</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleApplyCoupon()}
-                  disabled={couponLoading || !couponInput.trim()}
-                  className="min-h-[44px] px-4 py-2 bg-secondary hover:bg-primary text-on-secondary font-medium text-xs uppercase tracking-wider rounded transition-colors disabled:opacity-50"
-                >
-                  {couponLoading ? (isHindi ? "जाँच..." : "Checking...") : isHindi ? "लागू करें" : "Apply"}
-                </button>
-              )}
+          {/* Input & Apply Button */}
+          <div className="flex items-center gap-2 pt-1 max-w-md">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                placeholder={isHindi ? "कूपन कोड" : "Promo code"}
+                disabled={couponLoading || appliedCoupon !== null}
+                className="w-full bg-surface text-secondary font-mono text-sm font-bold uppercase tracking-widest px-3 py-2.5 rounded border border-dashed border-secondary focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+              />
             </div>
 
-            {/* Coupon Feedback Alerts */}
-            {couponError && (
-              <div className="flex items-center gap-1.5 text-xs text-error font-medium pt-1">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{couponError}</span>
-              </div>
-            )}
-
-            {appliedCoupon && (
-              <div className="flex items-center gap-1.5 text-xs text-secondary font-medium pt-1">
-                <CheckCircle2 className="w-4 h-4 text-tertiary shrink-0" />
-                <span>
-                  {isHindi
-                    ? `कूपन '${appliedCoupon.code}' सक्रिय! ${appliedCoupon.discountFormatted} दक्षिणा छूट प्राप्त हुई।`
-                    : `Coupon '${appliedCoupon.code}' applied! Saved ${appliedCoupon.discountFormatted} on this booking.`}
-                </span>
-              </div>
+            {appliedCoupon ? (
+              <button
+                type="button"
+                onClick={handleRemoveCoupon}
+                className="min-h-[44px] px-3 py-2 bg-surface hover:bg-surface-container-high border border-outline-variant text-error text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-1"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>{isHindi ? "हटाएँ" : "Remove"}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleApplyCoupon()}
+                disabled={couponLoading || !couponInput.trim()}
+                className="min-h-[44px] px-4 py-2 bg-secondary hover:bg-primary text-on-secondary font-medium text-xs uppercase tracking-wider rounded transition-colors disabled:opacity-50"
+              >
+                {couponLoading ? (isHindi ? "जाँच..." : "Checking...") : isHindi ? "लागू करें" : "Apply"}
+              </button>
             )}
           </div>
 
-          {/* Quick Trust Highlights */}
-          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="p-3 bg-surface rounded border border-outline-variant/40 flex items-start gap-2.5">
-              <ShieldCheck className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
-              <div>
-                <div className="text-xs font-bold text-secondary uppercase tracking-wider">
-                  {isHindi ? "गोपनीय जन्म विवरण" : "100% Confidential"}
-                </div>
-                <div className="text-[11px] text-on-surface-variant mt-0.5">
-                  {isHindi ? "वैदिक मर्यादा व सुरक्षा नियमावली।" : "Private archival storage only."}
-                </div>
-              </div>
+          {/* Coupon Feedback Alerts */}
+          {couponError && (
+            <div className="flex items-center gap-1.5 text-xs text-error font-medium pt-1">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{couponError}</span>
             </div>
+          )}
 
-            <div className="p-3 bg-surface rounded border border-outline-variant/40 flex items-start gap-2.5">
-              <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <div>
-                <div className="text-xs font-bold text-secondary uppercase tracking-wider">
-                  {isHindi ? "काशी विद्वत् परम्परा" : "Varanasi Lineage"}
-                </div>
-                <div className="text-[11px] text-on-surface-variant mt-0.5">
-                  {isHindi ? "दशाश्वमेध पीठ के मूर्धन्य दैवज्ञ।" : "Strict Surya Siddhanta norms."}
-                </div>
-              </div>
+          {appliedCoupon && (
+            <div className="flex items-center gap-1.5 text-xs text-secondary font-medium pt-1">
+              <CheckCircle2 className="w-4 h-4 text-tertiary shrink-0" />
+              <span>
+                {isHindi
+                  ? `कूपन '${appliedCoupon.code}' सक्रिय! ${appliedCoupon.discountFormatted} छूट प्राप्त हुई।`
+                  : `Coupon '${appliedCoupon.code}' applied! Saved ${appliedCoupon.discountFormatted} on this booking.`}
+              </span>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

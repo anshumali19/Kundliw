@@ -5,7 +5,7 @@ import * as bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { verifyOtpHash, isOtpExpired, canAttemptOtpVerification } from "./otp";
 import { verifyOtpSchema, emailPasswordLoginSchema } from "./validation";
-import { checkDbRateLimit, resetDbRateLimit } from "@/lib/rateLimit";
+import { checkDbRateLimit, resetDbRateLimit, getClientIp } from "@/lib/rateLimit";
 import { Role } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
@@ -120,7 +120,31 @@ export const authOptions: NextAuthOptions = {
 
         const { email, password } = parsed.data;
 
-        // Rate limit by email (max 5 failed attempts per 15 minutes)
+        // Extract client IP from req headers
+        const headersObj = new Headers();
+        if (req && req.headers) {
+          Object.entries(req.headers).forEach(([k, v]) => {
+            if (typeof v === "string") headersObj.set(k, v);
+            else if (Array.isArray(v) && v.length > 0) headersObj.set(k, v[0]);
+          });
+        }
+        const clientIp = getClientIp(headersObj);
+
+        // 1. Rate limit by IP (max 10 attempts per 15 minutes)
+        const ipRate = await checkDbRateLimit({
+          scope: "ADMIN_LOGIN_IP",
+          identifier: clientIp,
+          windowSeconds: 15 * 60,
+          maxAllowed: 10,
+        });
+
+        if (!ipRate.allowed) {
+          throw new Error(
+            `Too many login attempts from this network. Retry in ${ipRate.retryAfterSeconds} seconds.`
+          );
+        }
+
+        // 2. Rate limit by email (max 5 failed attempts per 15 minutes)
         const emailRate = await checkDbRateLimit({
           scope: "ADMIN_LOGIN_EMAIL",
           identifier: email,
@@ -147,8 +171,9 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        // Success: clear rate limits
+        // Success: clear rate limits for both email and IP
         await resetDbRateLimit("ADMIN_LOGIN_EMAIL", email);
+        await resetDbRateLimit("ADMIN_LOGIN_IP", clientIp);
 
         return {
           id: user.id,

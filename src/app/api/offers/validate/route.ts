@@ -3,17 +3,36 @@ import { prisma } from "@/lib/prisma";
 import { validateOfferQuerySchema } from "@/features/services/validation";
 import { applyOffer } from "@/lib/offers/apply";
 import { calculateGst, formatPaiseToInr } from "@/lib/billing/gst";
+import { getClientIp, checkDbRateLimit } from "@/lib/rateLimit";
+
+const GENERIC_UNAVAILABLE_MESSAGE = "Invalid or unavailable coupon code.";
 
 export async function POST(request: NextRequest) {
   try {
+    // 1. Rate-limit coupon validation per IP to prevent code brute-forcing
+    const clientIp = getClientIp(request.headers);
+    const ipRate = await checkDbRateLimit({
+      scope: "OFFER_VALIDATE_IP",
+      identifier: clientIp,
+      windowSeconds: 60,
+      maxAllowed: 20, // Max 20 attempts per minute per IP
+    });
+
+    if (!ipRate.allowed) {
+      return NextResponse.json(
+        { error: `Too many attempts. Retry in ${ipRate.retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const parsed = validateOfferQuerySchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid coupon code or plan request." },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        isValid: false,
+        reason: GENERIC_UNAVAILABLE_MESSAGE,
+      });
     }
 
     const { code, planId } = parsed.data;
@@ -30,10 +49,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!plan) {
-      return NextResponse.json(
-        { error: "Requested plan is not found or is currently unavailable." },
-        { status: 404 }
-      );
+      return NextResponse.json({
+        isValid: false,
+        reason: GENERIC_UNAVAILABLE_MESSAGE,
+      });
     }
 
     // Fetch offer from database
@@ -44,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (!offer) {
       return NextResponse.json({
         isValid: false,
-        reason: "Coupon code does not exist.",
+        reason: GENERIC_UNAVAILABLE_MESSAGE,
       });
     }
 
@@ -54,7 +73,7 @@ export async function POST(request: NextRequest) {
     if (!evalResult.isValid) {
       return NextResponse.json({
         isValid: false,
-        reason: evalResult.reason || "Coupon is not applicable to this plan.",
+        reason: GENERIC_UNAVAILABLE_MESSAGE,
       });
     }
 
@@ -79,9 +98,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Coupon validation error:", error);
-    return NextResponse.json(
-      { error: "Failed to validate coupon code." },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      isValid: false,
+      reason: GENERIC_UNAVAILABLE_MESSAGE,
+    });
   }
 }

@@ -48,6 +48,10 @@ export interface AdminServiceItem {
   taglineHi?: string | null;
   descriptionEn: string;
   descriptionHi: string;
+  highlightsEn: string[];
+  highlightsHi: string[];
+  notesEn?: string | null;
+  notesHi?: string | null;
   icon?: string | null;
   orderIndex: number;
   isActive: boolean;
@@ -83,6 +87,10 @@ export function AdminServicesManager({
     taglineHi: "",
     descriptionEn: "",
     descriptionHi: "",
+    highlightsEnText: "",
+    highlightsHiText: "",
+    notesEn: "",
+    notesHi: "",
     icon: "auto_stories",
     orderIndex: 0,
     isActive: true,
@@ -129,6 +137,10 @@ export function AdminServicesManager({
         taglineHi: service.taglineHi || "",
         descriptionEn: service.descriptionEn,
         descriptionHi: service.descriptionHi,
+        highlightsEnText: (service.highlightsEn || []).join("\n"),
+        highlightsHiText: (service.highlightsHi || []).join("\n"),
+        notesEn: service.notesEn || "",
+        notesHi: service.notesHi || "",
         icon: service.icon || "auto_stories",
         orderIndex: service.orderIndex,
         isActive: service.isActive,
@@ -143,6 +155,10 @@ export function AdminServicesManager({
         taglineHi: "",
         descriptionEn: "",
         descriptionHi: "",
+        highlightsEnText: "",
+        highlightsHiText: "",
+        notesEn: "",
+        notesHi: "",
         icon: "auto_stories",
         orderIndex: services.length + 1,
         isActive: true,
@@ -159,6 +175,29 @@ export function AdminServicesManager({
     setSuccessMsg(null);
 
     try {
+      const payload = {
+        slug: serviceForm.slug,
+        titleEn: serviceForm.titleEn,
+        titleHi: serviceForm.titleHi,
+        taglineEn: serviceForm.taglineEn || undefined,
+        taglineHi: serviceForm.taglineHi || undefined,
+        descriptionEn: serviceForm.descriptionEn,
+        descriptionHi: serviceForm.descriptionHi,
+        highlightsEn: serviceForm.highlightsEnText
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        highlightsHi: serviceForm.highlightsHiText
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        notesEn: serviceForm.notesEn ? serviceForm.notesEn.trim() : null,
+        notesHi: serviceForm.notesHi ? serviceForm.notesHi.trim() : null,
+        icon: serviceForm.icon || "auto_stories",
+        orderIndex: Number(serviceForm.orderIndex),
+        isActive: Boolean(serviceForm.isActive),
+      };
+
       const url = editingService
         ? `/api/admin/services/${editingService.id}`
         : `/api/admin/services`;
@@ -167,7 +206,7 @@ export function AdminServicesManager({
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(serviceForm),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -719,6 +758,64 @@ export function AdminServicesManager({
                   onChange={(e) => setServiceForm({ ...serviceForm, descriptionHi: e.target.value })}
                   className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
                 />
+              </div>
+
+              {/* Bilingual Highlights */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Highlights (English, one per line)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={serviceForm.highlightsEnText}
+                    onChange={(e) => setServiceForm({ ...serviceForm, highlightsEnText: e.target.value })}
+                    placeholder="Natal chart audit&#10;Dasha transition timeline"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    मुख्य सेवा विशेषताएँ (हिन्दी, प्रति पंक्ति एक)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={serviceForm.highlightsHiText}
+                    onChange={(e) => setServiceForm({ ...serviceForm, highlightsHiText: e.target.value })}
+                    placeholder="लग्न एवं नवम भाव सूक्ष्म विचार&#10;दशा महादशा क्रम"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Optional Editorial / Scriptural Notes Block */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Editorial Notes / Sanskrit Verse (English)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={serviceForm.notesEn}
+                    onChange={(e) => setServiceForm({ ...serviceForm, notesEn: e.target.value })}
+                    placeholder="Optional editorial notes or quote..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    संपादकीय टिप्पणी / श्लोक (हिन्दी)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={serviceForm.notesHi}
+                    onChange={(e) => setServiceForm({ ...serviceForm, notesHi: e.target.value })}
+                    placeholder="वैकल्पिक शास्त्रीय सूत्र अथवा टिप्पणी..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center gap-2">

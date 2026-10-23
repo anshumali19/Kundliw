@@ -119,6 +119,24 @@ describe("Admin Login Attempt Limiting Logic", () => {
     expect(lockedCheck.isAllowed).toBe(false);
     expect(lockedCheck.retryAfterSeconds).toBeGreaterThan(0);
   });
+
+  it("locks out client IP when 10 failed login attempts occur within window", () => {
+    const ip = "192.168.1.100";
+    const now = 3000000;
+    const windowMs = 15 * 60 * 1000; // 15 mins
+    let record = { timestamps: [] as number[] };
+
+    for (let i = 0; i < 10; i++) {
+      const check = checkSlidingWindowRateLimit(record, now + i * 1000, windowMs, 10);
+      expect(check.isAllowed).toBe(true);
+      record = check.updatedRecord;
+    }
+
+    // 11th attempt should lock out
+    const lockedCheck = checkSlidingWindowRateLimit(record, now + 11000, windowMs, 10);
+    expect(lockedCheck.isAllowed).toBe(false);
+    expect(lockedCheck.retryAfterSeconds).toBeGreaterThan(0);
+  });
 });
 
 describe("SMS Provider Factory & Production Loud Failure", () => {

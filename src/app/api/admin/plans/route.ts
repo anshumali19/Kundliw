@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { planInputSchema } from "@/features/services/validation";
 import { rupeesToPaise } from "@/lib/billing/money";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
 export async function POST(request: NextRequest) {
   const guard = await guardApiAdmin();
   if (guard.errorResponse) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(request);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await request.json();

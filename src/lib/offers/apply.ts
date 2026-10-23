@@ -76,3 +76,49 @@ export function applyOffer(
     discountPaise: calculatedDiscount,
   };
 }
+
+export interface PrismaOfferTxLike {
+  offer: {
+    findUnique: (args: { where: { code: string } }) => Promise<OfferDefinition | null>;
+    update: (args: {
+      where: { code: string };
+      data: { usedCount: { increment: number } };
+    }) => Promise<unknown>;
+  };
+}
+
+/**
+ * Validates offer inside a database transaction, re-checking usageLimit and validity,
+ * increments usedCount, and returns computed discount in paise.
+ * Throws an error on invalid or exhausted coupons to abort the transaction.
+ */
+export async function claimOfferInTransaction(
+  tx: PrismaOfferTxLike,
+  code: string,
+  orderAmountPaise: number,
+  now: Date = new Date()
+): Promise<{ offer: OfferDefinition; discountPaise: number }> {
+  const offer = await tx.offer.findUnique({
+    where: { code },
+  });
+
+  if (!offer) {
+    throw new Error("Invalid or unavailable coupon code.");
+  }
+
+  const evalResult = applyOffer(offer, orderAmountPaise, now);
+  if (!evalResult.isValid) {
+    throw new Error(evalResult.reason || "Invalid or unavailable coupon code.");
+  }
+
+  // Increment used count inside the active transaction
+  await tx.offer.update({
+    where: { code },
+    data: { usedCount: { increment: 1 } },
+  });
+
+  return {
+    offer,
+    discountPaise: evalResult.discountPaise,
+  };
+}

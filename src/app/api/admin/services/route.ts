@@ -2,29 +2,51 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { serviceInputSchema } from "@/features/services/validation";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const guard = await guardApiAdmin();
   if (guard.errorResponse) return guard.errorResponse;
 
-  const services = await prisma.service.findMany({
-    include: {
-      plans: {
-        orderBy: { orderIndex: "asc" },
-      },
-      _count: {
-        select: { orders: true },
-      },
-    },
-    orderBy: { orderIndex: "asc" },
-  });
+  const { searchParams } = new URL(request.url);
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
+  const skip = (page - 1) * limit;
 
-  return NextResponse.json({ services });
+  const [total, services] = await Promise.all([
+    prisma.service.count(),
+    prisma.service.findMany({
+      include: {
+        plans: {
+          orderBy: { orderIndex: "asc" },
+        },
+        _count: {
+          select: { orders: true },
+        },
+      },
+      orderBy: { orderIndex: "asc" },
+      skip,
+      take: limit,
+    }),
+  ]);
+
+  return NextResponse.json({
+    services,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  });
 }
 
 export async function POST(request: NextRequest) {
   const guard = await guardApiAdmin();
   if (guard.errorResponse) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(request);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await request.json();

@@ -4,6 +4,7 @@ import { guardApiAdmin } from "@/lib/auth/guards";
 import { updateOfferInputSchema } from "@/features/services/validation";
 import { rupeesToPaise } from "@/lib/billing/money";
 import { DiscountType } from "@prisma/client";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
 export async function PUT(
   request: NextRequest,
@@ -11,6 +12,9 @@ export async function PUT(
 ) {
   const guard = await guardApiAdmin();
   if (guard.errorResponse) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(request);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await request.json();
@@ -68,11 +72,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const guard = await guardApiAdmin();
   if (guard.errorResponse) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(request);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     await prisma.offer.update({

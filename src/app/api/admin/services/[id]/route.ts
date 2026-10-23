@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { serviceInputSchema } from "@/features/services/validation";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
 export async function PUT(
   request: NextRequest,
@@ -9,6 +10,9 @@ export async function PUT(
 ) {
   const guard = await guardApiAdmin();
   if (guard.errorResponse) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(request);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await request.json();
@@ -37,11 +41,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const guard = await guardApiAdmin();
   if (guard.errorResponse) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(request);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const ordersCount = await prisma.order.count({

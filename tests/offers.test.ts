@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { applyOffer, OfferDefinition } from "../src/lib/offers/apply";
+import {
+  applyOffer,
+  claimOfferInTransaction,
+  OfferDefinition,
+  PrismaOfferTxLike,
+} from "../src/lib/offers/apply";
 
 describe("Offer Application Logic", () => {
   const flatOffer: OfferDefinition = {
@@ -66,5 +71,53 @@ describe("Offer Application Logic", () => {
     const result = applyOffer(exhaustedOffer, 210000);
     expect(result.isValid).toBe(false);
     expect(result.reason).toContain("usage limit exceeded");
+  });
+});
+
+describe("Transactional Offer Claiming (claimOfferInTransaction)", () => {
+  it("atomically verifies offer and increments usedCount in active transaction", async () => {
+    let currentUsedCount = 5;
+    const mockTx: PrismaOfferTxLike = {
+      offer: {
+        findUnique: async () => ({
+          code: "FESTIVE500",
+          discountType: "FLAT",
+          discountValuePaise: 50000,
+          minOrderValuePaise: 150000,
+          usageLimit: 10,
+          usedCount: currentUsedCount,
+          isActive: true,
+        }),
+        update: async ({ data }) => {
+          currentUsedCount += data.usedCount.increment;
+          return {};
+        },
+      },
+    };
+
+    const res = await claimOfferInTransaction(mockTx, "FESTIVE500", 210000);
+    expect(res.discountPaise).toBe(50000);
+    expect(currentUsedCount).toBe(6);
+  });
+
+  it("throws loudly inside transaction if offer usageLimit has been reached", async () => {
+    const mockTx: PrismaOfferTxLike = {
+      offer: {
+        findUnique: async () => ({
+          code: "LIMITED1",
+          discountType: "FLAT",
+          discountValuePaise: 50000,
+          minOrderValuePaise: 100000,
+          usageLimit: 1,
+          usedCount: 1, // Already reached limit
+          isActive: true,
+        }),
+        update: async () => ({}),
+      },
+    };
+
+    await expect(
+      claimOfferInTransaction(mockTx, "LIMITED1", 200000)
+    ).rejects.toThrow("usage limit exceeded");
   });
 });

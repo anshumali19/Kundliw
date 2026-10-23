@@ -129,6 +129,10 @@ model Service {
   taglineHi     String?
   descriptionEn String   @db.Text
   descriptionHi String   @db.Text
+  highlightsEn  String[]
+  highlightsHi  String[]
+  notesEn       String?  @db.Text
+  notesHi       String?  @db.Text
   icon          String?
   orderIndex    Int      @default(0)
   isActive      Boolean  @default(true)
@@ -197,6 +201,8 @@ model Order {
   offerId             String?
   offer               Offer?             @relation(fields: [offerId], references: [id])
   offerCode           String?            // Snapshot of coupon used
+  slotId              String?
+  slot                Slot?              @relation(fields: [slotId], references: [id])
   requestType         RequestType        @default(SERVICE_BOOKING)
 
   status              OrderStatus        @default(ORDER_RECEIVED)
@@ -246,6 +252,22 @@ model OrderStatusEvent {
   createdAt   DateTime    @default(now())
 
   @@index([orderId])
+}
+
+model Slot {
+  id          String   @id @default(cuid())
+  date        DateTime // Slot calendar date
+  startTime   String   // e.g. "10:00"
+  endTime     String   // e.g. "10:30"
+  capacity    Int      @default(1)
+  bookedCount Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders      Order[]
+
+  @@index([date, isActive])
 }
 
 model Counter {
