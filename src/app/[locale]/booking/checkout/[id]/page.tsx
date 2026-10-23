@@ -49,7 +49,7 @@ export default async function CheckoutPage({
   })) || {};
 
   const jataka = (order.jatakaDetails as Record<string, unknown>) || {};
-  const jatakaName = String(jataka.name || "Yajman");
+  const jatakaName = String(jataka.name || "Customer");
 
   let slotTime: string | null = null;
   if (order.slot) {
@@ -73,6 +73,7 @@ export default async function CheckoutPage({
     serviceTitle: isHindi ? order.service?.titleHi || "" : order.service?.titleEn || "",
     planTitle: isHindi ? order.plan?.titleHi || "" : order.plan?.titleEn || "",
     jatakaName,
+    rejectionReason: order.rejectionReason,
     slotTime,
   };
 

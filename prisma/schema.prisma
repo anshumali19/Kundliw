@@ -224,12 +224,16 @@ model Order {
   // Payment
   paymentMode         PaymentMode        @default(RAZORPAY)
   paymentStatus       PaymentStatus      @default(PENDING)
+  idempotencyKey      String?            @unique
+  expiresAt           DateTime?
+  rejectionReason     String?            @db.Text
   razorpayOrderId     String?
   razorpayPaymentId   String?
   razorpaySignature   String?
   manualPaymentProof  String?
   manualPaymentRef    String?
 
+  courierName         String?
   trackingNumber      String?
   adminNotes          String?            @db.Text
   createdAt           DateTime           @default(now())

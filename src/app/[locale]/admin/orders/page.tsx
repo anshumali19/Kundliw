@@ -53,8 +53,9 @@ export default async function AdminOrdersPage({
       discountAmountPaise: o.discountAmountPaise,
       netAmountPaise: o.netAmountPaise,
       invoiceNumber: o.invoiceNumber,
+      courierName: o.courierName,
       trackingNumber: o.trackingNumber,
-      jatakaName: String(j.name || o.user?.name || "Yajman"),
+      jatakaName: String(j.name || o.user?.name || "Customer"),
       jatakaPhone: String(j.phone || o.user?.phone || ""),
       serviceTitle: isHindi
         ? o.service?.titleHi || "Vedic Service"

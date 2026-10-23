@@ -30,6 +30,7 @@ export interface SerializedOrder {
   discountAmountPaise: number;
   netAmountPaise: number;
   invoiceNumber?: string | null;
+  courierName?: string | null;
   trackingNumber?: string | null;
   jatakaName: string;
   jatakaPhone: string;
@@ -70,6 +71,7 @@ export function AdminOrdersManager({
   const [selectedOrder, setSelectedOrder] = useState<SerializedOrder | null>(null);
   const [nextStatus, setNextStatus] = useState<CanonicalOrderStatus>("KUNDLI_IN_PROGRESS");
   const [statusNote, setStatusNote] = useState("");
+  const [courierName, setCourierName] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -164,6 +166,7 @@ export function AdminOrdersManager({
         body: JSON.stringify({
           nextStatus,
           note: statusNote.trim(),
+          courierName: courierName.trim() || undefined,
           trackingNumber: trackingNumber.trim() || undefined,
         }),
       });
@@ -179,6 +182,7 @@ export function AdminOrdersManager({
             ? {
                 ...o,
                 status: nextStatus,
+                courierName: courierName.trim() || o.courierName,
                 trackingNumber: trackingNumber.trim() || o.trackingNumber,
               }
             : o
@@ -190,6 +194,7 @@ export function AdminOrdersManager({
           ? {
               ...prev,
               status: nextStatus,
+              courierName: courierName.trim() || prev.courierName,
               trackingNumber: trackingNumber.trim() || prev.trackingNumber,
               statusEvents: [
                 {
@@ -470,17 +475,31 @@ export function AdminOrdersManager({
                 </div>
 
                 {nextStatus === "DISPATCHED" && (
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                      {isHindi ? "स्पीड पोस्ट ट्रैकिंग संख्या" : "Speed Post Tracking ID"}
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. ED123456789IN"
-                      value={trackingNumber}
-                      onChange={(e) => setTrackingNumber(e.target.value)}
-                      className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs font-mono"
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
+                        {isHindi ? "कूरियर / सेवा प्रदाता नाम" : "Courier / Carrier Name"}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. India Post, Blue Dart, DTDC"
+                        value={courierName}
+                        onChange={(e) => setCourierName(e.target.value)}
+                        className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
+                        {isHindi ? "कूरियर ट्रैकिंग / कंसाइनमेंट संख्या" : "Tracking / Consignment ID"}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. ED123456789IN"
+                        value={trackingNumber}
+                        onChange={(e) => setTrackingNumber(e.target.value)}
+                        className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs font-mono"
+                      />
+                    </div>
                   </div>
                 )}
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStorageProvider } from "@/lib/storage";
 import { getCurrentUser } from "@/lib/auth/guards";
+import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +17,30 @@ export async function GET(
     }
 
     const storageKey = params.path.join("/");
+
+    // Strict access guard on payment proof files:
+    // Only accessible by administrators or the customer who placed the order
+    if (storageKey.startsWith("payment-proofs/")) {
+      const isAdmin = user.role === Role.ADMIN;
+      if (!isAdmin) {
+        const order = await prisma.order.findFirst({
+          where: {
+            userId: user.id,
+            manualPaymentProof: {
+              contains: storageKey,
+            },
+          },
+        });
+
+        if (!order) {
+          return NextResponse.json(
+            { error: "Forbidden: Access to this payment proof is restricted to the order owner." },
+            { status: 403 }
+          );
+        }
+      }
+    }
+
     const storage = getStorageProvider();
     const { buffer, mimeType } = await storage.getFile(storageKey);
 

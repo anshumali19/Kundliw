@@ -88,7 +88,7 @@ export const authOptions: NextAuthOptions = {
           user = await prisma.user.create({
             data: {
               phone,
-              name: `Yajman ${phone.slice(-4)}`,
+              name: `Customer ${phone.slice(-4)}`,
               role: Role.USER,
             },
           });

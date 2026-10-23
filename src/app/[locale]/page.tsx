@@ -545,7 +545,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. YAJMAN TESTIMONIALS (3-Column Asymmetric Row) */}
+      {/* 5. CUSTOMER TESTIMONIALS (3-Column Asymmetric Row) */}
       <section className="w-full bg-surface py-12 border-b border-secondary/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-left">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
@@ -643,7 +643,7 @@ export default async function HomePage() {
               <div className="pt-3 border-t border-outline-variant/40 flex items-center justify-between">
                 <div>
                   <div className="font-serif text-sm font-bold text-secondary">
-                    यजमान
+                    परामर्शार्थी (ग्राहक)
                   </div>
                   <div className="text-[11px] text-on-surface-variant">
                     अष्टकूट मिलान

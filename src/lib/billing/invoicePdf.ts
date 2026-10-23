@@ -76,7 +76,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       if (data.gstin) {
         doc.text(`GSTIN: ${data.gstin} (Composite / Regulated Astrology Service)`, 40, 87);
       } else {
-        doc.text("GST: Not Applicable (Unregistered / Direct Ashram Consultation)", 40, 87);
+        doc.text("GST: Not Applicable (Unregistered / Direct Kendra Consultation)", 40, 87);
       }
 
       // Horizontal Hairline
@@ -95,7 +95,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.text(`Payment Mode: ${data.paymentMode} (Status: CONFIRMED / PAID)`, 40, 166);
 
       // Customer Details (Right column)
-      doc.font("Helvetica-Bold").text("BILLED TO (YAJMAN):", 330, 115);
+      doc.font("Helvetica-Bold").text("BILLED TO (CUSTOMER):", 330, 115);
       doc.font("Helvetica");
       doc.text(`Name: ${data.customerName}`, 330, 130);
       doc.text(`Phone: ${data.customerPhone}`, 330, 142);

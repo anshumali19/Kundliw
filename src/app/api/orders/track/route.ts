@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { normalizePhoneNumber } from "@/lib/auth/validation";
+import { checkDbRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -10,26 +11,52 @@ const trackLookupSchema = z.object({
   phone: z.string().min(10, "10-digit mobile number is required"),
 });
 
+const GENERIC_ERROR = "No consultation order found matching this order number and mobile combination.";
+
 /**
  * Public Order Tracker API.
  * Strict Security Guard:
  * Must provide BOTH orderNumber and phone.
+ * Rate-limited per IP and per orderNumber to prevent brute-force attacks.
  * Lookup by orderNumber alone is prohibited to prevent customer data leakage.
  */
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request.headers);
+
+    // 1. Rate-limit per IP (15 lookups per 60 seconds)
+    const ipLimit = await checkDbRateLimit({
+      scope: "TRACK_IP",
+      identifier: ip,
+      windowSeconds: 60,
+      maxAllowed: 15,
+    });
+
+    if (!ipLimit.allowed) {
+      return NextResponse.json({ error: GENERIC_ERROR }, { status: 429 });
+    }
+
     const body = await request.json();
     const parsed = trackLookupSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.errors[0]?.message || "Invalid tracking payload" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: GENERIC_ERROR }, { status: 400 });
     }
 
     const { orderNumber, phone } = parsed.data;
     const cleanSearchOrder = orderNumber.trim().toUpperCase();
     const cleanSearchPhone = normalizePhoneNumber(phone);
+
+    // 2. Rate-limit per order number (5 lookups per 60 seconds)
+    const orderLimit = await checkDbRateLimit({
+      scope: "TRACK_ORDER",
+      identifier: cleanSearchOrder,
+      windowSeconds: 60,
+      maxAllowed: 5,
+    });
+
+    if (!orderLimit.allowed) {
+      return NextResponse.json({ error: GENERIC_ERROR }, { status: 429 });
+    }
 
     const order = await prisma.order.findFirst({
       where: {
@@ -55,10 +82,7 @@ export async function POST(request: NextRequest) {
 
     // Generic rejection if order does not exist
     if (!order) {
-      return NextResponse.json(
-        { error: "No consultation order found matching this order number and mobile combination." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: GENERIC_ERROR }, { status: 404 });
     }
 
     // Extract phone from Jataka details or User record
@@ -74,10 +98,7 @@ export async function POST(request: NextRequest) {
 
     const phoneMatches = candidatePhones.some((p) => p === cleanSearchPhone);
     if (!phoneMatches) {
-      return NextResponse.json(
-        { error: "No consultation order found matching this order number and mobile combination." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: GENERIC_ERROR }, { status: 404 });
     }
 
     // Return sanitized tracking payload
@@ -88,13 +109,14 @@ export async function POST(request: NextRequest) {
         orderNumber: order.orderNumber,
         createdAt: order.createdAt.toISOString(),
         status: order.status,
+        courierName: order.courierName,
         trackingNumber: order.trackingNumber,
         paymentStatus: order.paymentStatus,
         serviceTitleEn: order.service?.titleEn || "Vedic Service",
         serviceTitleHi: order.service?.titleHi || "Vedic Service",
         planTitleEn: order.plan?.titleEn || "Standard",
         planTitleHi: order.plan?.titleHi || "Standard",
-        jatakaName: String(jataka.name || order.user?.name || "Yajman"),
+        jatakaName: String(jataka.name || order.user?.name || "Customer"),
         statusEvents: order.statusEvents.map((e) => ({
           id: e.id,
           status: e.status,
@@ -105,7 +127,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Tracking lookup failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: GENERIC_ERROR }, { status: 500 });
   }
 }

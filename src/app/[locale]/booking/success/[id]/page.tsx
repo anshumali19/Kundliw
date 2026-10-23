@@ -127,8 +127,8 @@ export default async function BookingSuccessPage({
 
           <p className="text-xs sm:text-sm text-amber-900 leading-relaxed">
             {isHindi
-              ? `आपका मैनुअल भुगतान संदर्भ (${order.manualPaymentRef || "Ref"}) प्राप्त हो गया है। आश्रम लेखा विभाग द्वारा पुष्टि होते ही आदेश स्वतः स्वीकृत हो जाएगा।`
-              : `Your manual payment reference (${order.manualPaymentRef || "Submitted"}) is pending confirmation by our temple administration. Calculations will begin as soon as verified.`}
+              ? `आपका मैनुअल भुगतान संदर्भ (${order.manualPaymentRef || "Ref"}) प्राप्त हो गया है। केंद्र लेखा विभाग द्वारा पुष्टि होते ही आदेश स्वतः स्वीकृत हो जाएगा।`
+              : `Your manual payment reference (${order.manualPaymentRef || "Submitted"}) is pending confirmation by our Kendra administration. Calculations will begin as soon as verified.`}
           </p>
         </div>
       ) : (

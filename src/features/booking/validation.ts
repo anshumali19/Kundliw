@@ -31,6 +31,7 @@ export const createBookingOrderSchema = z.object({
   planSlug: z.string().min(1, "Plan tier is required"),
   offerCode: z.string().trim().toUpperCase().optional().or(z.literal("")),
   slotId: z.string().optional().or(z.literal("")),
+  idempotencyKey: z.string().trim().optional(),
   jatakaDetails: jatakaDetailsSchema,
   // Note: Client cannot provide prices or discounts. Any price passed is ignored!
 });

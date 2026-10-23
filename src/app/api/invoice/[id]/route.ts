@@ -43,7 +43,7 @@ export async function GET(
     });
 
     const jataka = (order.jatakaDetails as Record<string, unknown>) || {};
-    const customerName = String(jataka.name || order.user?.name || "Yajman");
+    const customerName = String(jataka.name || order.user?.name || "Customer");
     const customerPhone = String(jataka.phone || order.user?.phone || "");
     const customerEmail = (jataka.email as string) || order.user?.email || null;
 
@@ -114,7 +114,7 @@ export async function GET(
       <h1 class="title">${invoiceData.siteName}</h1>
       <div class="subtitle">Vedic Astrological Heritage & Mathematical Computation Centre</div>
       <div style="font-size: 11px; color: #574237;">${invoiceData.siteAddress} | Phone: ${invoiceData.sitePhone} | Email: ${invoiceData.siteEmail}</div>
-      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${invoiceData.gstin ? `GSTIN: ${invoiceData.gstin}` : "GST: Not Applicable (Unregistered Ashram)"}</div>
+      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${invoiceData.gstin ? `GSTIN: ${invoiceData.gstin}` : "GST: Not Applicable (Unregistered Kendra)"}</div>
     </div>
 
     <div class="meta-grid">
@@ -126,7 +126,7 @@ export async function GET(
         Payment Mode: ${invoiceData.paymentMode} (PAID)
       </div>
       <div class="meta-col">
-        <strong>BILLED TO (YAJMAN):</strong><br>
+        <strong>BILLED TO (CUSTOMER):</strong><br>
         Name: <strong>${invoiceData.customerName}</strong><br>
         Phone: ${invoiceData.customerPhone}<br>
         ${invoiceData.customerEmail ? `Email: ${invoiceData.customerEmail}<br>` : ""}

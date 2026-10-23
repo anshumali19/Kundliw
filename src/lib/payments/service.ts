@@ -103,6 +103,7 @@ export async function submitManualPayment(
         paymentMode: details.paymentMode,
         manualPaymentRef: details.manualPaymentRef,
         manualPaymentProof: details.manualPaymentProofUrl || order.manualPaymentProof,
+        rejectionReason: null,
       },
     });
 
@@ -201,10 +202,16 @@ export async function rejectManualPayment(
       throw new Error(`Order not found: ${orderId}`);
     }
 
+    const isExpired = order.expiresAt ? new Date() > order.expiresAt : false;
+    const nextPaymentStatus = isExpired ? PaymentStatus.FAILED : PaymentStatus.PENDING;
+
     const updatedOrder = await tx.order.update({
       where: { id: orderId },
       data: {
-        paymentStatus: PaymentStatus.FAILED,
+        paymentStatus: nextPaymentStatus,
+        rejectionReason: reason,
+        manualPaymentRef: null,
+        manualPaymentProof: null,
       },
     });
 
@@ -212,7 +219,9 @@ export async function rejectManualPayment(
       data: {
         orderId,
         status: order.status,
-        note: `Manual payment rejected by admin. Reason: ${reason}`,
+        note: `Manual payment rejected by admin. Reason: ${reason}.${
+          isExpired ? " Order reservation expired." : " Returned to retry state for Yajman resubmission."
+        }`,
         changedById: adminUserId,
       },
     });

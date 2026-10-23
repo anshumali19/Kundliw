@@ -20,6 +20,7 @@ interface TrackedOrderData {
   orderNumber: string;
   createdAt: string;
   status: CanonicalOrderStatus;
+  courierName?: string | null;
   trackingNumber?: string | null;
   paymentStatus: string;
   serviceTitleEn: string;
@@ -205,7 +206,7 @@ export function TrackOrderClient({
                 {isHindi ? orderResult.serviceTitleHi : orderResult.serviceTitleEn}
               </h2>
               <p className="text-xs text-primary font-medium">
-                {isHindi ? orderResult.planTitleHi : orderResult.planTitleEn} • Yajman: {orderResult.jatakaName}
+                {isHindi ? orderResult.planTitleHi : orderResult.planTitleEn} • {isHindi ? "जातक:" : "Customer:"} {orderResult.jatakaName}
               </p>
             </div>
 
@@ -224,6 +225,7 @@ export function TrackOrderClient({
             <OrderStatusStepper
               currentStatus={orderResult.status}
               events={orderResult.statusEvents}
+              courierName={orderResult.courierName}
               trackingNumber={orderResult.trackingNumber}
               locale={locale}
             />

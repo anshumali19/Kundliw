@@ -60,7 +60,7 @@ export default async function AccountPage({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-serif text-xl sm:text-2xl font-bold text-secondary">
-                {user.name || (isHindi ? "सम्मानित यजमान" : "Respected Yajman")}
+                {user.name || (isHindi ? "सम्मानित ग्राहक" : "Valued Customer")}
               </h1>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface">
                 {user.role}
@@ -197,6 +197,7 @@ export default async function AccountPage({
                         createdAt: e.createdAt.toISOString(),
                         changedByName: e.changedBy?.name || e.changedBy?.email || null,
                       }))}
+                      courierName={order.courierName}
                       trackingNumber={order.trackingNumber}
                       locale={locale}
                     />

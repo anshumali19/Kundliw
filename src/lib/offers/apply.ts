@@ -84,12 +84,16 @@ export interface PrismaOfferTxLike {
       where: { code: string };
       data: { usedCount: { increment: number } };
     }) => Promise<unknown>;
+    updateMany?: (args: {
+      where: { code: string; isActive?: boolean; usedCount?: { lt: number } };
+      data: { usedCount: { increment: number } };
+    }) => Promise<{ count: number }>;
   };
 }
 
 /**
  * Validates offer inside a database transaction, re-checking usageLimit and validity,
- * increments usedCount, and returns computed discount in paise.
+ * increments usedCount conditionally, and returns computed discount in paise.
  * Throws an error on invalid or exhausted coupons to abort the transaction.
  */
 export async function claimOfferInTransaction(
@@ -111,11 +115,25 @@ export async function claimOfferInTransaction(
     throw new Error(evalResult.reason || "Invalid or unavailable coupon code.");
   }
 
-  // Increment used count inside the active transaction
-  await tx.offer.update({
-    where: { code },
-    data: { usedCount: { increment: 1 } },
-  });
+  // Atomic conditional increment if usageLimit is enforced
+  if (offer.usageLimit !== null && offer.usageLimit !== undefined && tx.offer.updateMany) {
+    const res = await tx.offer.updateMany({
+      where: {
+        code,
+        isActive: true,
+        usedCount: { lt: offer.usageLimit },
+      },
+      data: { usedCount: { increment: 1 } },
+    });
+    if (res.count === 0) {
+      throw new Error("Invalid or unavailable coupon code.");
+    }
+  } else {
+    await tx.offer.update({
+      where: { code },
+      data: { usedCount: { increment: 1 } },
+    });
+  }
 
   return {
     offer,

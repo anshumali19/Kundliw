@@ -21,6 +21,7 @@ interface StatusEventItem {
 interface OrderStatusStepperProps {
   currentStatus: CanonicalOrderStatus;
   events?: StatusEventItem[];
+  courierName?: string | null;
   trackingNumber?: string | null;
   locale: string;
 }
@@ -38,7 +39,7 @@ const STEP_DEFINITIONS: Array<{
     labelEn: "Order Received",
     labelHi: "आदेश प्राप्त",
     descEn: "Dakshina confirmed and registered in Kendra ledger.",
-    descHi: "दक्षिणा प्राप्त एवं आश्रम बही में सुरक्षित दर्ज।",
+    descHi: "दक्षिणा प्राप्त एवं केंद्र बही में सुरक्षित दर्ज।",
     icon: Clock,
   },
   {
@@ -61,16 +62,16 @@ const STEP_DEFINITIONS: Array<{
     status: "DISPATCHED",
     labelEn: "Dispatched",
     labelHi: "सुरक्षित प्रेषित",
-    descEn: "Dispatched via Speed Post / Vault upload initiated.",
-    descHi: "डाक द्वारा प्रेषित अथवा डिजिटल वॉल्ट में अपलोड।",
+    descEn: "Dispatched via carrier / Vault upload initiated.",
+    descHi: "कूरियर/डाक द्वारा प्रेषित अथवा डिजिटल वॉल्ट में अपलोड।",
     icon: Truck,
   },
   {
     status: "DELIVERED",
     labelEn: "Delivered",
-    labelHi: "यजमान को प्राप्त",
-    descEn: "Pothi received by Yajman / Vault dossier ready.",
-    descHi: "पत्रिका यजमान को ससम्मान प्राप्त।",
+    labelHi: "ग्राहक को प्राप्त",
+    descEn: "Pothi received by Customer / Vault dossier ready.",
+    descHi: "पत्रिका ग्राहक को ससम्मान प्राप्त।",
     icon: Package,
   },
   {
@@ -86,6 +87,7 @@ const STEP_DEFINITIONS: Array<{
 export function OrderStatusStepper({
   currentStatus,
   events = [],
+  courierName,
   trackingNumber,
   locale,
 }: OrderStatusStepperProps) {
@@ -155,18 +157,19 @@ export function OrderStatusStepper({
           <div className="flex items-center gap-2">
             <Truck className="w-4 h-4 text-secondary shrink-0" />
             <span>
-              <strong>{isHindi ? "स्पीड पोस्ट ट्रैकिंग:" : "Speed Post Tracking:"}</strong>{" "}
+              <strong>
+                {courierName
+                  ? `${courierName}:`
+                  : isHindi
+                  ? "कूरियर / डाक ट्रैकिंग:"
+                  : "Courier Tracking:"}
+              </strong>{" "}
               <span className="font-mono font-bold text-primary">{trackingNumber}</span>
             </span>
           </div>
-          <a
-            href={`https://www.indiapost.gov.in/_layouts/15/dop.portal.tracking/trackconsignment.aspx`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-[11px] font-bold text-secondary underline hover:text-primary"
-          >
-            {isHindi ? "इंडिया पोस्ट पर ट्रैक करें" : "Track on India Post"}
-          </a>
+          <span className="text-[11px] text-on-surface-variant font-medium">
+            {isHindi ? "पार्सल मार्गस्थ है" : "Consignment In Transit"}
+          </span>
         </div>
       )}
 

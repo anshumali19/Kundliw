@@ -43,6 +43,20 @@ export async function createBookingOrder(
   input: CreateBookingOrderInput
 ): Promise<CreateOrderResult> {
   return await prisma.$transaction(async (tx) => {
+    // 0. Idempotency Key check: if already processed, return existing order
+    if (input.idempotencyKey && input.idempotencyKey.trim()) {
+      const existing = await tx.order.findUnique({
+        where: { idempotencyKey: input.idempotencyKey.trim() },
+      });
+      if (existing) {
+        return {
+          orderId: existing.id,
+          orderNumber: existing.orderNumber,
+          netAmountPaise: existing.netAmountPaise,
+        };
+      }
+    }
+
     // 1. Fetch active service
     const service = await tx.service.findUnique({
       where: { slug: input.serviceSlug, isActive: true },
@@ -81,16 +95,19 @@ export async function createBookingOrder(
         throw new Error("Selected appointment slot does not exist.");
       }
 
-      // Check slot capacity atomically
-      if (slot.bookedCount >= slot.capacity) {
-        throw new Error("Selected appointment slot is fully booked. Please choose another time.");
-      }
-
-      // Reserve slot by incrementing bookedCount
-      await tx.slot.update({
-        where: { id: slot.id },
+      // Atomic conditional reservation: increment only if bookedCount < capacity
+      const reservationResult = await tx.slot.updateMany({
+        where: {
+          id: slot.id,
+          isActive: true,
+          bookedCount: { lt: slot.capacity },
+        },
         data: { bookedCount: { increment: 1 } },
       });
+
+      if (reservationResult.count === 0) {
+        throw new Error("Selected appointment slot is fully booked. Please choose another time.");
+      }
 
       reservedSlotId = slot.id;
     }
@@ -156,6 +173,8 @@ export async function createBookingOrder(
         slotId: reservedSlotId,
         offerId: claimedOfferId,
         offerCode: claimedOfferCode,
+        idempotencyKey: input.idempotencyKey?.trim() || null,
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30-minute reservation window
         requestType,
         status: OrderStatus.ORDER_RECEIVED,
         paymentStatus: PaymentStatus.PENDING,
@@ -186,5 +205,57 @@ export async function createBookingOrder(
       orderNumber: order.orderNumber,
       netAmountPaise: order.netAmountPaise,
     };
+  });
+}
+
+/**
+ * Checks if an order has exceeded its expiry window and releases its reserved slot and offer claim.
+ */
+export async function expireUnpaidOrder(orderId: string): Promise<boolean> {
+  return await prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order || order.paymentStatus !== PaymentStatus.PENDING) {
+      return false;
+    }
+
+    if (order.expiresAt && new Date() <= order.expiresAt) {
+      return false; // Order has not expired yet
+    }
+
+    await tx.order.update({
+      where: { id: orderId },
+      data: {
+        paymentStatus: PaymentStatus.FAILED,
+      },
+    });
+
+    // Release slot bookedCount
+    if (order.slotId) {
+      await tx.slot.update({
+        where: { id: order.slotId },
+        data: { bookedCount: { decrement: 1 } },
+      });
+    }
+
+    // Release coupon usedCount
+    if (order.offerId) {
+      await tx.offer.update({
+        where: { id: order.offerId },
+        data: { usedCount: { decrement: 1 } },
+      });
+    }
+
+    await tx.orderStatusEvent.create({
+      data: {
+        orderId,
+        status: order.status,
+        note: "Reservation expired. Appointment slot and coupon claim released.",
+      },
+    });
+
+    return true;
   });
 }

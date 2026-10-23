@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 const updateStatusSchema = z.object({
   nextStatus: z.nativeEnum(OrderStatus),
   note: z.string().min(2, "Note is required for every status transition"),
+  courierName: z.string().optional(),
   trackingNumber: z.string().optional(),
 });
 
@@ -33,7 +34,7 @@ export async function POST(
       );
     }
 
-    const { nextStatus, note, trackingNumber } = parsed.data;
+    const { nextStatus, note, courierName, trackingNumber } = parsed.data;
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -61,6 +62,7 @@ export async function POST(
         where: { id: orderId },
         data: {
           status: nextStatus,
+          courierName: courierName || order.courierName,
           trackingNumber: trackingNumber || order.trackingNumber,
         },
       });

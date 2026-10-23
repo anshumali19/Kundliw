@@ -28,6 +28,7 @@ interface CheckoutClientProps {
     serviceTitle: string;
     planTitle: string;
     jatakaName: string;
+    rejectionReason?: string | null;
     slotTime?: string | null;
   };
   adminSettings: {
@@ -157,6 +158,25 @@ export function CheckoutClient({
         </div>
       </div>
 
+      {order.rejectionReason && (
+        <div className="mb-6 p-4 rounded-lg bg-amber-50 border-2 border-amber-400 text-amber-950 flex items-start gap-3 text-left">
+          <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-amber-900">
+              {isHindi ? "पूर्व मैनुअल भुगतान अस्वीकृत किया गया" : "Previous Manual Payment Verification Failed"}
+            </h4>
+            <p className="text-xs text-amber-900 mt-0.5">
+              <strong>{isHindi ? "कारण:" : "Reason:"}</strong> {order.rejectionReason}
+            </p>
+            <p className="text-[11px] text-amber-800 mt-1">
+              {isHindi
+                ? "कृपया सही संदर्भ (UTR) दर्ज कर पुनः विवरण भेजें अथवा ऑनलाइन गेटवे का उपयोग करें।"
+                : "Please resubmit with a valid UTR transaction reference, or complete your contribution via the online gateway."}
+            </p>
+          </div>
+        </div>
+      )}
+
       {errorMessage && (
         <div className="mb-6 p-4 rounded-lg bg-error-container/20 border border-error text-error flex items-start gap-3">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
@@ -239,7 +259,7 @@ export function CheckoutClient({
             <ShieldCheck className="w-5 h-5 text-secondary shrink-0" />
             <span>
               {isHindi
-                ? "२५६-बिट सुरक्षित भुगतान प्रणाली। सम्पूर्ण दक्षिणा वैदिक आश्रम न्यास के अधिकृत खाते में संचित होती है।"
+                ? "२५६-बिट सुरक्षित भुगतान प्रणाली। सम्पूर्ण दक्षिणा वैदिक केंद्र न्यास के अधिकृत खाते में संचित होती है।"
                 : "256-bit secure transaction. All auspicious contributions flow directly to the official Kendra Trust."}
             </span>
           </div>
@@ -343,8 +363,8 @@ export function CheckoutClient({
                   <div className="flex items-center gap-2">
                     <span className="font-serif font-bold text-sm sm:text-base text-on-surface">
                       {isHindi
-                        ? "प्रत्यक्ष आश्रम यूपीआई (Direct Ashram UPI VPA)"
-                        : "Direct Ashram UPI VPA"}
+                        ? "प्रत्यक्ष केंद्र यूपीआई (Direct Kendra UPI VPA)"
+                        : "Direct Kendra UPI VPA"}
                     </span>
                     <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[10px] font-bold uppercase tracking-wider">
                       Demo
@@ -352,8 +372,8 @@ export function CheckoutClient({
                   </div>
                   <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
                     {isHindi
-                      ? "आश्रम के अधिकृत यूपीआई पते पर सीधे दक्षिणा प्रेषित कर संदर्भ संख्या दर्ज करें।"
-                      : "Send auspicious dakshina directly to the Ashram UPI address and submit the UTR."}
+                      ? "केंद्र के अधिकृत यूपीआई पते पर सीधे दक्षिणा प्रेषित कर संदर्भ संख्या दर्ज करें।"
+                      : "Send auspicious dakshina directly to the Kendra UPI address and submit the UTR."}
                   </p>
                 </div>
               </div>
@@ -365,7 +385,7 @@ export function CheckoutClient({
                 <div className="bg-surface-container p-3 rounded flex items-center justify-between">
                   <div>
                     <span className="text-[10px] uppercase font-bold text-outline block">
-                      {isHindi ? "आश्रम यूपीआई आईडी" : "Ashram UPI VPA"}
+                      {isHindi ? "केंद्र यूपीआई आईडी" : "Kendra UPI VPA"}
                     </span>
                     <span className="font-mono font-bold text-sm text-primary select-all">
                       {adminSettings.upiVpa || "kanadjyotish@sbi"}
@@ -468,8 +488,8 @@ export function CheckoutClient({
                   </div>
                   <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
                     {isHindi
-                      ? "बृहद अनुष्ठान अथवा प्रवासी यजमानों हेतु आश्रम का बैंक खाता।"
-                      : "Direct bank transfer for major Vedic ceremonies and overseas clients."}
+                      ? "बृहद परामर्श अथवा प्रवासी ग्राहकों हेतु केंद्र का बैंक खाता।"
+                      : "Direct bank transfer for major Vedic consultations and overseas clients."}
                   </p>
                 </div>
               </div>
