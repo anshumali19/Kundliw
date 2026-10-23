@@ -123,26 +123,28 @@ describe("Admin Login Attempt Limiting Logic", () => {
 
 describe("SMS Provider Factory & Production Loud Failure", () => {
   it("returns DevConsoleSmsProvider in development", () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
+    const envObj = process.env as Record<string, string | undefined>;
+    const originalEnv = envObj.NODE_ENV;
+    envObj.NODE_ENV = "development";
 
     const provider = getSmsProvider();
     expect(provider).toBeInstanceOf(DevConsoleSmsProvider);
     expect(provider.name).toBe("DevConsoleSmsProvider");
 
-    process.env.NODE_ENV = originalEnv;
+    envObj.NODE_ENV = originalEnv;
   });
 
   it("throws loudly in production if no SMS provider credentials exist", () => {
-    const originalEnv = process.env.NODE_ENV;
-    const originalKey = process.env.MSG91_AUTH_KEY;
-    process.env.NODE_ENV = "production";
-    delete process.env.MSG91_AUTH_KEY;
+    const envObj = process.env as Record<string, string | undefined>;
+    const originalEnv = envObj.NODE_ENV;
+    const originalKey = envObj.MSG91_AUTH_KEY;
+    envObj.NODE_ENV = "production";
+    delete envObj.MSG91_AUTH_KEY;
 
     expect(() => getSmsProvider()).toThrow("CRITICAL CONFIGURATION ERROR: No SMS provider configured");
 
-    process.env.NODE_ENV = originalEnv;
-    if (originalKey) process.env.MSG91_AUTH_KEY = originalKey;
+    envObj.NODE_ENV = originalEnv;
+    if (originalKey) envObj.MSG91_AUTH_KEY = originalKey;
   });
 });
 

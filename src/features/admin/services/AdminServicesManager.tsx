@@ -1,0 +1,993 @@
+"use client";
+
+import { useState } from "react";
+import { formatPaiseToInr } from "@/lib/billing/gst";
+import { paiseToRupees } from "@/lib/billing/money";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Layers,
+  ChevronDown,
+  ChevronRight,
+  Sparkles,
+  Check,
+  AlertCircle,
+  X,
+  Clock,
+  PhoneCall,
+  FileText,
+} from "lucide-react";
+
+export interface AdminPlanItem {
+  id: string;
+  slug: string;
+  titleEn: string;
+  titleHi: string;
+  descriptionEn: string;
+  descriptionHi: string;
+  pricePaise: number;
+  originalPricePaise: number | null;
+  deliveryDays: number;
+  pages: number | null;
+  hasCall: boolean;
+  callDurationMinutes: number | null;
+  featuresEn: string[];
+  featuresHi: string[];
+  isPopular: boolean;
+  orderIndex: number;
+  isActive: boolean;
+}
+
+export interface AdminServiceItem {
+  id: string;
+  slug: string;
+  titleEn: string;
+  titleHi: string;
+  taglineEn?: string | null;
+  taglineHi?: string | null;
+  descriptionEn: string;
+  descriptionHi: string;
+  icon?: string | null;
+  orderIndex: number;
+  isActive: boolean;
+  plans: AdminPlanItem[];
+  _count?: {
+    orders: number;
+  };
+}
+
+interface AdminServicesManagerProps {
+  initialServices: AdminServiceItem[];
+  locale: string;
+}
+
+export function AdminServicesManager({
+  initialServices,
+  locale,
+}: AdminServicesManagerProps) {
+  const isHindi = locale === "hi";
+  const [services, setServices] = useState<AdminServiceItem[]>(initialServices);
+  const [expandedServiceId, setExpandedServiceId] = useState<string | null>(
+    services[0]?.id || null
+  );
+
+  // Service Modal state
+  const [serviceModalOpen, setServiceModalOpen] = useState(false);
+  const [editingService, setEditingService] = useState<AdminServiceItem | null>(null);
+  const [serviceForm, setServiceForm] = useState({
+    slug: "",
+    titleEn: "",
+    titleHi: "",
+    taglineEn: "",
+    taglineHi: "",
+    descriptionEn: "",
+    descriptionHi: "",
+    icon: "auto_stories",
+    orderIndex: 0,
+    isActive: true,
+  });
+
+  // Plan Modal state
+  const [planModalOpen, setPlanModalOpen] = useState(false);
+  const [selectedServiceForPlan, setSelectedServiceForPlan] = useState<string | null>(null);
+  const [editingPlan, setEditingPlan] = useState<AdminPlanItem | null>(null);
+  const [planForm, setPlanForm] = useState({
+    slug: "",
+    titleEn: "",
+    titleHi: "",
+    descriptionEn: "",
+    descriptionHi: "",
+    priceRupees: 1100,
+    originalPriceRupees: "" as string | number,
+    deliveryDays: 3,
+    pages: "" as string | number,
+    hasCall: false,
+    callDurationMinutes: "" as string | number,
+    featuresEnText: "",
+    featuresHiText: "",
+    isPopular: false,
+    orderIndex: 0,
+    isActive: true,
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Open Service Modal
+  const handleOpenServiceModal = (service?: AdminServiceItem) => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    if (service) {
+      setEditingService(service);
+      setServiceForm({
+        slug: service.slug,
+        titleEn: service.titleEn,
+        titleHi: service.titleHi,
+        taglineEn: service.taglineEn || "",
+        taglineHi: service.taglineHi || "",
+        descriptionEn: service.descriptionEn,
+        descriptionHi: service.descriptionHi,
+        icon: service.icon || "auto_stories",
+        orderIndex: service.orderIndex,
+        isActive: service.isActive,
+      });
+    } else {
+      setEditingService(null);
+      setServiceForm({
+        slug: "",
+        titleEn: "",
+        titleHi: "",
+        taglineEn: "",
+        taglineHi: "",
+        descriptionEn: "",
+        descriptionHi: "",
+        icon: "auto_stories",
+        orderIndex: services.length + 1,
+        isActive: true,
+      });
+    }
+    setServiceModalOpen(true);
+  };
+
+  // Save Service
+  const handleSaveService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    try {
+      const url = editingService
+        ? `/api/admin/services/${editingService.id}`
+        : `/api/admin/services`;
+      const method = editingService ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(serviceForm),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save service");
+      }
+
+      if (editingService) {
+        setServices((prev) =>
+          prev.map((s) => (s.id === editingService.id ? { ...s, ...data.service } : s))
+        );
+        setSuccessMsg("Service updated successfully.");
+      } else {
+        setServices((prev) => [...prev, { ...data.service, plans: [] }]);
+        setSuccessMsg("Service created successfully.");
+      }
+      setServiceModalOpen(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error saving service";
+      setErrorMsg(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Toggle Service active status
+  const handleToggleServiceActive = async (service: AdminServiceItem) => {
+    try {
+      const res = await fetch(`/api/admin/services/${service.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !service.isActive }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setServices((prev) =>
+          prev.map((s) => (s.id === service.id ? { ...s, isActive: !s.isActive } : s))
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Open Plan Modal
+  const handleOpenPlanModal = (serviceId: string, plan?: AdminPlanItem) => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setSelectedServiceForPlan(serviceId);
+    if (plan) {
+      setEditingPlan(plan);
+      setPlanForm({
+        slug: plan.slug,
+        titleEn: plan.titleEn,
+        titleHi: plan.titleHi,
+        descriptionEn: plan.descriptionEn,
+        descriptionHi: plan.descriptionHi,
+        priceRupees: paiseToRupees(plan.pricePaise),
+        originalPriceRupees: plan.originalPricePaise ? paiseToRupees(plan.originalPricePaise) : "",
+        deliveryDays: plan.deliveryDays,
+        pages: plan.pages || "",
+        hasCall: plan.hasCall,
+        callDurationMinutes: plan.callDurationMinutes || "",
+        featuresEnText: plan.featuresEn.join("\n"),
+        featuresHiText: plan.featuresHi.join("\n"),
+        isPopular: plan.isPopular,
+        orderIndex: plan.orderIndex,
+        isActive: plan.isActive,
+      });
+    } else {
+      setEditingPlan(null);
+      const parent = services.find((s) => s.id === serviceId);
+      setPlanForm({
+        slug: "",
+        titleEn: "",
+        titleHi: "",
+        descriptionEn: "",
+        descriptionHi: "",
+        priceRupees: 1100,
+        originalPriceRupees: "",
+        deliveryDays: 3,
+        pages: "",
+        hasCall: false,
+        callDurationMinutes: "",
+        featuresEnText: "",
+        featuresHiText: "",
+        isPopular: false,
+        orderIndex: (parent?.plans.length || 0) + 1,
+        isActive: true,
+      });
+    }
+    setPlanModalOpen(true);
+  };
+
+  // Save Plan
+  const handleSavePlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedServiceForPlan) return;
+
+    setLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    try {
+      const payload = {
+        serviceId: selectedServiceForPlan,
+        slug: planForm.slug,
+        titleEn: planForm.titleEn,
+        titleHi: planForm.titleHi,
+        descriptionEn: planForm.descriptionEn,
+        descriptionHi: planForm.descriptionHi,
+        priceRupees: Number(planForm.priceRupees),
+        originalPriceRupees: planForm.originalPriceRupees
+          ? Number(planForm.originalPriceRupees)
+          : null,
+        deliveryDays: Number(planForm.deliveryDays),
+        pages: planForm.pages ? Number(planForm.pages) : null,
+        hasCall: Boolean(planForm.hasCall),
+        callDurationMinutes: planForm.callDurationMinutes
+          ? Number(planForm.callDurationMinutes)
+          : null,
+        featuresEn: planForm.featuresEnText
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        featuresHi: planForm.featuresHiText
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        isPopular: Boolean(planForm.isPopular),
+        orderIndex: Number(planForm.orderIndex),
+        isActive: Boolean(planForm.isActive),
+      };
+
+      const url = editingPlan
+        ? `/api/admin/plans/${editingPlan.id}`
+        : `/api/admin/plans`;
+      const method = editingPlan ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save plan");
+      }
+
+      setServices((prev) =>
+        prev.map((s) => {
+          if (s.id !== selectedServiceForPlan) return s;
+          const updatedPlans = editingPlan
+            ? s.plans.map((p) => (p.id === editingPlan.id ? data.plan : p))
+            : [...s.plans, data.plan];
+          return { ...s, plans: updatedPlans };
+        })
+      );
+
+      setSuccessMsg(editingPlan ? "Plan updated." : "Plan added.");
+      setPlanModalOpen(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error saving plan";
+      setErrorMsg(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Toggle Plan active status
+  const handleTogglePlanActive = async (serviceId: string, plan: AdminPlanItem) => {
+    try {
+      const res = await fetch(`/api/admin/plans/${plan.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !plan.isActive }),
+      });
+      if (res.ok) {
+        setServices((prev) =>
+          prev.map((s) => {
+            if (s.id !== serviceId) return s;
+            return {
+              ...s,
+              plans: s.plans.map((p) =>
+                p.id === plan.id ? { ...p, isActive: !p.isActive } : p
+              ),
+            };
+          })
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="w-full flex flex-col text-left space-y-6">
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/40 pb-4">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-secondary">
+            {isHindi ? "वैदिक सेवा एवं संस्करण प्रबंधन" : "Services & Plans Catalog"}
+          </h1>
+          <p className="text-xs text-on-surface-variant mt-1">
+            {isHindi
+              ? "शास्त्रसम्मत सेवाएँ, परामर्श योजनाएँ एवं दक्षिणा दरें नियंत्रित करें। (रुपये में प्रविष्टि, पैसे में संग्रहण)"
+              : "Manage bilingual services, consultation plans, and dakshina rates. (Entered in Rupees, saved in Paise)"}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => handleOpenServiceModal()}
+          className="min-h-[44px] px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
+        >
+          <Plus className="w-4 h-4" />
+          <span>{isHindi ? "नई सेवा जोड़ें" : "Add Service"}</span>
+        </button>
+      </div>
+
+      {/* Global Alerts */}
+      {successMsg && (
+        <div className="p-3 bg-surface rounded border border-tertiary-fixed text-xs text-secondary font-medium flex items-center gap-2">
+          <Check className="w-4 h-4 text-tertiary" />
+          <span>{successMsg}</span>
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="p-3 bg-surface rounded border border-error text-xs text-error font-medium flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      {/* Services List Accordion */}
+      <div className="space-y-4">
+        {services.length === 0 ? (
+          <div className="p-8 text-center bg-surface-container-low rounded border border-outline-variant/50 text-on-surface-variant text-sm">
+            {isHindi ? "कोई सेवा प्रविष्टि उपलब्ध नहीं है।" : "No services created yet."}
+          </div>
+        ) : (
+          services.map((service) => {
+            const isExpanded = expandedServiceId === service.id;
+            return (
+              <div
+                key={service.id}
+                className="rounded-lg border border-outline-variant/60 bg-surface overflow-hidden shadow-sm"
+              >
+                {/* Service Row Header */}
+                <div
+                  onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                  className="p-4 bg-surface-container-low/70 hover:bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      className="p-1 text-secondary"
+                      aria-label="Toggle plans"
+                    >
+                      {isExpanded ? (
+                        <ChevronDown className="w-5 h-5" />
+                      ) : (
+                        <ChevronRight className="w-5 h-5" />
+                      )}
+                    </button>
+
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-serif font-bold text-base text-secondary">
+                          {isHindi ? service.titleHi : service.titleEn}
+                        </span>
+                        <span className="text-xs font-mono text-on-surface-variant bg-surface px-2 py-0.5 rounded border border-outline-variant/40">
+                          /{service.slug}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                            service.isActive
+                              ? "bg-tertiary-fixed text-on-tertiary-fixed"
+                              : "bg-surface-container-high text-outline"
+                          }`}
+                        >
+                          {service.isActive ? (isHindi ? "सक्रिय" : "Active") : isHindi ? "निष्क्रिय" : "Inactive"}
+                        </span>
+                      </div>
+                      <div className="text-xs text-on-surface-variant mt-0.5">
+                        {service.plans.length} {isHindi ? "संस्करण योजनाएँ" : "Plans"} • {service._count?.orders ?? 0} {isHindi ? "ऐतिहासिक आदेश" : "Orders"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div
+                    className="flex items-center gap-2 shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleToggleServiceActive(service)}
+                      className="min-h-[38px] px-2.5 py-1 text-xs border border-outline-variant rounded hover:bg-surface transition-colors"
+                    >
+                      {service.isActive ? (isHindi ? "अक्षम करें" : "Deactivate") : isHindi ? "सक्रिय करें" : "Activate"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenServiceModal(service)}
+                      className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-secondary hover:text-on-secondary transition-colors flex items-center gap-1"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>{isHindi ? "संपादित करें" : "Edit"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenPlanModal(service.id)}
+                      className="min-h-[38px] px-3 py-1 text-xs bg-primary hover:bg-primary-container text-on-primary font-semibold rounded transition-colors flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>{isHindi ? "संस्करण जोड़ें" : "Add Plan"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Service Plans Details (Nested) */}
+                {isExpanded && (
+                  <div className="p-4 border-t border-outline-variant/30 space-y-4 bg-surface">
+                    <div className="text-xs font-bold uppercase tracking-wider text-primary">
+                      {isHindi ? "इस सेवा के अंतर्गत उपलब्ध संस्करण (Plans)" : "Available Consultation Tiers"}
+                    </div>
+
+                    {service.plans.length === 0 ? (
+                      <div className="p-4 text-center bg-surface-container-low rounded border border-dashed border-outline-variant text-xs text-on-surface-variant">
+                        {isHindi
+                          ? "इस सेवा में अभी कोई संस्करण नहीं है। 'संस्करण जोड़ें' पर क्लिक करें।"
+                          : "No plans under this service. Click 'Add Plan' to create one."}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {service.plans.map((plan) => (
+                          <div
+                            key={plan.id}
+                            className={`p-4 rounded-lg border flex flex-col justify-between ${
+                              plan.isActive
+                                ? "border-outline-variant/60 bg-surface"
+                                : "border-outline-variant/30 bg-surface-container-low opacity-60"
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+                                <span className="text-xs font-serif font-bold text-secondary">
+                                  {isHindi ? plan.titleHi : plan.titleEn}
+                                </span>
+                                {plan.isPopular && (
+                                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-container text-on-primary">
+                                    {isHindi ? "लोकप्रिय" : "Popular"}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="mt-3 flex items-baseline gap-2">
+                                <span className="font-serif text-2xl font-bold text-secondary">
+                                  {formatPaiseToInr(plan.pricePaise)}
+                                </span>
+                                {plan.originalPricePaise && (
+                                  <span className="text-xs line-through text-outline">
+                                    {formatPaiseToInr(plan.originalPricePaise)}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="mt-3 space-y-1.5 text-xs text-on-surface-variant">
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="w-3.5 h-3.5 text-secondary" />
+                                  <span>{plan.deliveryDays} {isHindi ? "कार्यदिवस" : "days delivery"}</span>
+                                </div>
+                                {plan.pages && (
+                                  <div className="flex items-center gap-1.5">
+                                    <FileText className="w-3.5 h-3.5 text-secondary" />
+                                    <span>{plan.pages} {isHindi ? "पृष्ठ" : "Pages"}</span>
+                                  </div>
+                                )}
+                                {plan.hasCall && (
+                                  <div className="flex items-center gap-1.5 text-primary font-medium">
+                                    <PhoneCall className="w-3.5 h-3.5" />
+                                    <span>{plan.callDurationMinutes} {isHindi ? "मिनट परामर्श" : "mins call"}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-outline-variant/30 flex items-center justify-between gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleTogglePlanActive(service.id, plan)}
+                                className="min-h-[36px] text-xs px-2 py-1 border border-outline-variant rounded hover:bg-surface-container"
+                              >
+                                {plan.isActive ? (isHindi ? "अक्षम करें" : "Deactivate") : isHindi ? "सक्रिय करें" : "Activate"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleOpenPlanModal(service.id, plan)}
+                                className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary font-medium rounded hover:bg-secondary hover:text-on-secondary transition-colors"
+                              >
+                                {isHindi ? "संपादित करें" : "Edit Plan"}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Modal: Service Form */}
+      {serviceModalOpen && (
+        <div className="fixed inset-0 z-50 bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-2xl w-full p-6 text-left my-8">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/40">
+              <h2 className="font-serif text-lg font-bold text-secondary">
+                {editingService
+                  ? isHindi
+                    ? "सेवा संपादित करें"
+                    : "Edit Service"
+                  : isHindi
+                  ? "नई सेवा जोड़ें"
+                  : "Add New Service"}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setServiceModalOpen(false)}
+                className="p-1 text-on-surface-variant hover:text-secondary"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveService} className="mt-4 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Slug (URL Key) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={serviceForm.slug}
+                    onChange={(e) => setServiceForm({ ...serviceForm, slug: e.target.value })}
+                    placeholder="e.g. complete-janampatri"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Order Index (क्रम)
+                  </label>
+                  <input
+                    type="number"
+                    value={serviceForm.orderIndex}
+                    onChange={(e) => setServiceForm({ ...serviceForm, orderIndex: Number(e.target.value) })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Title (English) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={serviceForm.titleEn}
+                    onChange={(e) => setServiceForm({ ...serviceForm, titleEn: e.target.value })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    शीर्षक (हिन्दी) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={serviceForm.titleHi}
+                    onChange={(e) => setServiceForm({ ...serviceForm, titleHi: e.target.value })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Tagline (English)
+                  </label>
+                  <input
+                    type="text"
+                    value={serviceForm.taglineEn}
+                    onChange={(e) => setServiceForm({ ...serviceForm, taglineEn: e.target.value })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    टैगलाइन (हिन्दी)
+                  </label>
+                  <input
+                    type="text"
+                    value={serviceForm.taglineHi}
+                    onChange={(e) => setServiceForm({ ...serviceForm, taglineHi: e.target.value })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                  Description (English) *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={serviceForm.descriptionEn}
+                  onChange={(e) => setServiceForm({ ...serviceForm, descriptionEn: e.target.value })}
+                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                  विवरण (हिन्दी) *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={serviceForm.descriptionHi}
+                  onChange={(e) => setServiceForm({ ...serviceForm, descriptionHi: e.target.value })}
+                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="serviceActive"
+                  checked={serviceForm.isActive}
+                  onChange={(e) => setServiceForm({ ...serviceForm, isActive: e.target.checked })}
+                  className="w-4 h-4 text-primary rounded"
+                />
+                <label htmlFor="serviceActive" className="text-xs font-medium text-secondary">
+                  {isHindi ? "सेवा सक्रिय रखें (Is Active)" : "Service is Active"}
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-outline-variant/40 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setServiceModalOpen(false)}
+                  className="min-h-[44px] px-4 py-2 border border-outline-variant rounded text-xs font-medium uppercase tracking-wider"
+                >
+                  {isHindi ? "रद्द करें" : "Cancel"}
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="min-h-[44px] px-6 py-2 bg-primary hover:bg-primary-container text-on-primary rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                >
+                  {loading ? (isHindi ? "सहेज रहे हैं..." : "Saving...") : isHindi ? "सहेजें" : "Save Service"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Plan Form */}
+      {planModalOpen && (
+        <div className="fixed inset-0 z-50 bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-2xl w-full p-6 text-left my-8">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/40">
+              <h2 className="font-serif text-lg font-bold text-secondary">
+                {editingPlan
+                  ? isHindi
+                    ? "संस्करण संपादित करें"
+                    : "Edit Plan"
+                  : isHindi
+                  ? "नया संस्करण जोड़ें"
+                  : "Add New Plan Tier"}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setPlanModalOpen(false)}
+                className="p-1 text-on-surface-variant hover:text-secondary"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePlan} className="mt-4 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Slug (URL Key) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={planForm.slug}
+                    onChange={(e) => setPlanForm({ ...planForm, slug: e.target.value })}
+                    placeholder="e.g. samanya, vishesh, rajasi"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Order Index (क्रम)
+                  </label>
+                  <input
+                    type="number"
+                    value={planForm.orderIndex}
+                    onChange={(e) => setPlanForm({ ...planForm, orderIndex: Number(e.target.value) })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Plan Title (English) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={planForm.titleEn}
+                    onChange={(e) => setPlanForm({ ...planForm, titleEn: e.target.value })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    संस्करण शीर्षक (हिन्दी) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={planForm.titleHi}
+                    onChange={(e) => setPlanForm({ ...planForm, titleHi: e.target.value })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              {/* Price fields (Entered in Rupees, converted to paise at boundary) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-surface-container-low p-3 rounded border border-outline-variant/40">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    दक्षिणा दर (₹ Rupees) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    value={planForm.priceRupees}
+                    onChange={(e) => setPlanForm({ ...planForm, priceRupees: Number(e.target.value) })}
+                    placeholder="e.g. 1100"
+                    className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs font-bold text-secondary focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                  <span className="text-[10px] text-on-surface-variant">
+                    = {(Number(planForm.priceRupees) * 100).toLocaleString()} paise
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Original Price (₹ Cut-off)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={planForm.originalPriceRupees}
+                    onChange={(e) => setPlanForm({ ...planForm, originalPriceRupees: e.target.value })}
+                    placeholder="e.g. 1500"
+                    className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Delivery Days (दिन) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={planForm.deliveryDays}
+                    onChange={(e) => setPlanForm({ ...planForm, deliveryDays: Number(e.target.value) })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Pages (कुल पृष्ठ)
+                  </label>
+                  <input
+                    type="number"
+                    value={planForm.pages}
+                    onChange={(e) => setPlanForm({ ...planForm, pages: e.target.value })}
+                    placeholder="e.g. 45"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Call Duration (मिनट)
+                  </label>
+                  <input
+                    type="number"
+                    value={planForm.callDurationMinutes}
+                    onChange={(e) => setPlanForm({ ...planForm, callDurationMinutes: e.target.value, hasCall: Number(e.target.value) > 0 })}
+                    placeholder="e.g. 30"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Features (English, one per line)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={planForm.featuresEnText}
+                    onChange={(e) => setPlanForm({ ...planForm, featuresEnText: e.target.value })}
+                    placeholder="18-Page PDF&#10;D1 + D9 Charts"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    विशेषताएँ (हिन्दी, प्रति पंक्ति एक)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={planForm.featuresHiText}
+                    onChange={(e) => setPlanForm({ ...planForm, featuresHiText: e.target.value })}
+                    placeholder="१८ पृष्ठ PDF&#10;D1 + D9 चक्र"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="planPopular"
+                    checked={planForm.isPopular}
+                    onChange={(e) => setPlanForm({ ...planForm, isPopular: e.target.checked })}
+                    className="w-4 h-4 text-primary rounded"
+                  />
+                  <label htmlFor="planPopular" className="text-xs font-medium text-secondary">
+                    {isHindi ? "सर्वाधिक लोकप्रिय (Most Popular)" : "Mark as Popular Tier"}
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="planActive"
+                    checked={planForm.isActive}
+                    onChange={(e) => setPlanForm({ ...planForm, isActive: e.target.checked })}
+                    className="w-4 h-4 text-primary rounded"
+                  />
+                  <label htmlFor="planActive" className="text-xs font-medium text-secondary">
+                    {isHindi ? "सक्रिय रखें (Is Active)" : "Plan is Active"}
+                  </label>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-outline-variant/40 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPlanModalOpen(false)}
+                  className="min-h-[44px] px-4 py-2 border border-outline-variant rounded text-xs font-medium uppercase tracking-wider"
+                >
+                  {isHindi ? "रद्द करें" : "Cancel"}
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="min-h-[44px] px-6 py-2 bg-primary hover:bg-primary-container text-on-primary rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                >
+                  {loading ? (isHindi ? "सहेज रहे हैं..." : "Saving...") : isHindi ? "सहेजें" : "Save Plan"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
