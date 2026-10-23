@@ -1,0 +1,79 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { registerSchema } from "@/lib/auth/validation";
+import * as bcrypt from "bcryptjs";
+import { Role } from "@prisma/client";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const parsed = registerSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          error: "Validation failed",
+          details: parsed.error.flatten().fieldErrors,
+        },
+        { status: 400 }
+      );
+    }
+
+    const { name, phone, email, password } = parsed.data;
+
+    // Check if email or phone already registered
+    const existingEmail = await prisma.user.findUnique({ where: { email } });
+    if (existingEmail) {
+      return NextResponse.json(
+        { error: "A user with this email address already exists." },
+        { status: 409 }
+      );
+    }
+
+    const existingPhone = await prisma.user.findUnique({ where: { phone } });
+    if (existingPhone) {
+      return NextResponse.json(
+        { error: "A user with this mobile number already exists." },
+        { status: 409 }
+      );
+    }
+
+    let passwordHash: string | undefined = undefined;
+    if (password) {
+      passwordHash = await bcrypt.hash(password, 10);
+    }
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        phone,
+        email,
+        passwordHash,
+        role: Role.USER,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Registration completed successfully.",
+        user,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Registration error:", error);
+    return NextResponse.json(
+      { error: "Failed to create account. Please try again." },
+      { status: 500 }
+    );
+  }
+}

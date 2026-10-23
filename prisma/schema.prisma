@@ -286,6 +286,10 @@ model AdminSettings {
   email             String?
   addressEn         String?  @db.Text
   addressHi         String?  @db.Text
+  city              String?
+  latitude          Float?
+  longitude         Float?
+  timezone          String?
   upiVpa            String?
   bankAccountName   String?
   bankAccountNumber String?

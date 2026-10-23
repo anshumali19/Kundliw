@@ -95,46 +95,23 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col w-full text-on-surface">
-      {/* 1. LIVE DRIK PANCHANG EPHEMERIS STRIP */}
+      {/* 1. EPHEMERIS STRIP (Neutral placeholder until Phase 11 live adapter) */}
       <section className="w-full bg-surface-container-high border-b border-secondary/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-left">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-              <div className="flex items-center gap-1.5 text-secondary font-bold">
-                <Calendar className="w-4 h-4 text-primary shrink-0" />
-                <span>विक्रम संवत् २०८१ • वैशाख शुक्ल एकादशी</span>
-              </div>
-              <span className="text-outline-variant hidden sm:inline">|</span>
-              <div className="flex items-center gap-1">
-                <span className="text-on-surface-variant font-medium">नक्षत्र:</span>
-                <span className="font-semibold text-primary">रोहिणी (Rohini till 16:42)</span>
-              </div>
-              <span className="text-outline-variant hidden md:inline">|</span>
-              <div className="flex items-center gap-1">
-                <span className="text-on-surface-variant font-medium">योग:</span>
-                <span className="font-semibold">वृद्धि</span>
-                <span className="text-outline-variant mx-0.5">•</span>
-                <span className="text-on-surface-variant font-medium">करण:</span>
-                <span className="font-semibold">वणिज</span>
-              </div>
-              <span className="text-outline-variant hidden lg:inline">|</span>
-              <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2 py-0.5 rounded border border-secondary/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
-                <span className="text-secondary font-bold uppercase text-[10px]">
-                  अभिजीत मुहूर्त:
-                </span>
-                <span className="font-semibold">11:45 AM – 12:35 PM</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-error-container/60 px-2 py-0.5 rounded border border-error/30 text-error">
-                <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
-                <span className="font-bold uppercase text-[10px]">राहु काल:</span>
-                <span className="font-semibold">01:30 PM – 03:00 PM</span>
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-left">
+            <div className="flex items-center gap-2 text-xs">
+              <Calendar className="w-4 h-4 text-primary shrink-0" />
+              <span className="text-secondary font-bold font-serif">
+                {tCommon("siteNameHi")}
+              </span>
+              <span className="text-outline-variant">•</span>
+              <span className="text-on-surface-variant">
+                {tCommon("tagline")}
+              </span>
             </div>
-
-            <div className="flex items-center gap-2 self-start lg:self-auto text-xs text-on-surface-variant">
+            <div className="flex items-center gap-2 text-xs text-on-surface-variant">
               <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-              <span className="font-medium">वाराणसी • Varanasi (25.31°N, 82.97°E)</span>
+              <span>{tCommon("varanasiLineage")}</span>
             </div>
           </div>
         </div>
@@ -602,19 +579,19 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <p className="text-xs sm:text-sm text-on-surface mb-4 italic leading-relaxed">
-                  &ldquo;Most commercial astrologers sell gemstone solutions within 5 minutes. Pandit ji at Kanad Kendra spent 40 minutes explaining my 10th lord debilitation cancellation (Neechabhanga) and advised me against an expensive sapphire. The timing of my tech turnaround aligned to the exact month.&rdquo;
+                  &ldquo;[Sample Feedback] Detailed analysis of natal charts and planetary periods provided clear perspective on vocational timing and karmic considerations.&rdquo;
                 </p>
               </div>
               <div className="pt-3 border-t border-outline-variant/40 flex items-center justify-between">
                 <div>
                   <div className="font-serif text-sm font-bold text-secondary">
-                    Raghavan N. Sivasundaram
+                    Sample Client
                   </div>
                   <div className="text-[11px] text-on-surface-variant">
-                    VP Engineering • Raj Yoga Analysis
+                    Career Consultation
                   </div>
                 </div>
-                <ShieldCheck className="w-5 h-5 text-secondary shrink-0" />
+                <ShieldCheck className="w-5 h-5 text-outline-variant shrink-0" />
               </div>
             </div>
 
@@ -631,19 +608,19 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <p className="text-xs sm:text-sm text-on-surface mb-4 italic leading-relaxed">
-                  &ldquo;The Birth-Time Rectification service was mind-boggling. With only a 3-hour window given by hospital records from 1982, the Acharya reverse-calculated the D60 chart matching past relocations and surgery to within 42 seconds of accuracy. Truly scientific rigor.&rdquo;
+                  &ldquo;[Sample Feedback] The mathematical rectification methodology provided structured and clear astrological milestones for past events.&rdquo;
                 </p>
               </div>
               <div className="pt-3 border-t border-outline-variant/40 flex items-center justify-between">
                 <div>
                   <div className="font-serif text-sm font-bold text-secondary">
-                    Dr. Meera G. Patel
+                    Sample Client
                   </div>
                   <div className="text-[11px] text-on-surface-variant">
-                    Consultant Surgeon • BTR & Kundli
+                    Birth-Time Rectification
                   </div>
                 </div>
-                <ShieldCheck className="w-5 h-5 text-secondary shrink-0" />
+                <ShieldCheck className="w-5 h-5 text-outline-variant shrink-0" />
               </div>
             </div>
 
@@ -660,19 +637,19 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <p className="text-xs sm:text-sm text-on-surface mb-4 italic leading-relaxed">
-                  &ldquo;तीन पीढ़ियों से हमारा परिवार कणाद ज्योतिष केंद्र से विवाह व प्रतिष्ठा मुहूर्त लेता आ रहा है। यहाँ का पंचांग गणित काशी हिन्दू विश्वविद्यालय के मूर्धन्य विद्वानों द्वारा मान्य है। अष्टकूट मिलान में नाड़ी दोष के शास्त्रीय अपवादों का जो स्पष्ट समाधान मिला, वह अद्वितीय है।&rdquo;
+                  &ldquo;[नमूना अनुभव] अष्टकूट गुण मिलान में नाड़ी दोष के शास्त्रीय अपवादों व परिहार का स्पष्ट विवरण प्राप्त हुआ।&rdquo;
                 </p>
               </div>
               <div className="pt-3 border-t border-outline-variant/40 flex items-center justify-between">
                 <div>
                   <div className="font-serif text-sm font-bold text-secondary">
-                    पं. सूर्यनारायण उपाध्याय
+                    यजमान
                   </div>
                   <div className="text-[11px] text-on-surface-variant">
-                    व्यापारी, दशाश्वमेध • अष्टकूट मिलान
+                    अष्टकूट मिलान
                   </div>
                 </div>
-                <ShieldCheck className="w-5 h-5 text-secondary shrink-0" />
+                <ShieldCheck className="w-5 h-5 text-outline-variant shrink-0" />
               </div>
             </div>
           </div>

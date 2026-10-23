@@ -38,16 +38,9 @@ export function Header() {
               <span className="text-primary font-semibold uppercase tracking-wider">
                 {tHeader("panchangLabel")}
               </span>
-              <span>वैशाख शुक्ल नवमी</span>
-              <span className="text-outline-variant">•</span>
-              <span>पुष्य नक्षत्र</span>
-              <span className="text-outline-variant">•</span>
-              <span className="text-secondary font-medium">राहु काल: 10:38 - 12:14</span>
-            </div>
-            <span className="hidden xl:inline-block w-px h-3 bg-outline-variant"></span>
-            <div className="hidden xl:flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-              <span>{tHeader("locationVaranasi")}</span>
+              <span className="text-on-surface-variant italic">
+                {tCommon("tagline")}
+              </span>
             </div>
           </div>
 

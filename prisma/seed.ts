@@ -20,8 +20,16 @@ async function main() {
   });
 
   // 2. Admin User
-  const adminPasswordHash = await bcrypt.hash("AdminKanad@2026", 10);
-  const adminUser = await prisma.user.upsert({
+  const initialAdminPassword =
+    process.env.INITIAL_ADMIN_PASSWORD || "ChangeMeInAdminSettings@2026";
+  if (!process.env.INITIAL_ADMIN_PASSWORD && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "INITIAL_ADMIN_PASSWORD environment variable must be set in production before seeding."
+    );
+  }
+
+  const adminPasswordHash = await bcrypt.hash(initialAdminPassword, 10);
+  await prisma.user.upsert({
     where: { email: "admin@kanad-jyotish.in" },
     update: { role: Role.ADMIN },
     create: {
@@ -40,7 +48,7 @@ async function main() {
     update: {},
     create: {
       email: "aditya.sharma@example.com",
-      name: "Aditya Narayan Sharma (आदित्य शर्मा)",
+      name: "Aditya Narayan Sharma",
       phone: "+917509124672",
       passwordHash: userPasswordHash,
       role: Role.USER,
@@ -48,8 +56,8 @@ async function main() {
   });
 
   // 3. Admin Settings
-  // Note: Phone numbers are real contact numbers from the SRS.
-  // Bank details and GSTIN are marked as placeholder seeds and should be updated in Admin CMS.
+  // Real contact numbers from SRS: +91-9827991224 and +91-7509124672.
+  // Location, Bank details and GSTIN are marked as sample seeds.
   await prisma.adminSettings.upsert({
     where: { id: "default" },
     update: {
@@ -65,13 +73,17 @@ async function main() {
       email: "vedic@kanad-jyotish.in",
       addressEn: "Kanad Bhavan, Dashashwamedh Ghat Marg, Varanasi, Uttar Pradesh 221001",
       addressHi: "कणाद भवन, दशाश्वमेध घाट मार्ग, वाराणसी, उत्तर प्रदेश २२१००१",
+      city: "Varanasi",
+      latitude: 25.3176,
+      longitude: 82.9739,
+      timezone: "Asia/Kolkata",
       // --- PLACEHOLDER BANK & GST DETAILS (Update via Admin Settings) ---
       upiVpa: "kanadjyotish@sbi",
-      bankAccountName: "Maharshi Kanad Jyotish Trust [SEED PLACEHOLDER]",
+      bankAccountName: "Maharshi Kanad Jyotish Trust [SAMPLE PLACEHOLDER]",
       bankAccountNumber: "389201928410",
       bankIfsc: "SBIN0000201",
       bankName: "State Bank of India, Main Branch Varanasi",
-      gstin: "09AAATM1234F1Z5", // PLACEHOLDER GSTIN
+      gstin: "09AAATM1234F1Z5", // SAMPLE PLACEHOLDER
       defaultGstRateBps: 1800, // 18.00%
     },
   });
@@ -382,47 +394,47 @@ async function main() {
     ],
   });
 
-  // 7. Testimonials
+  // 7. Sample Testimonials (Unverified sample seed data)
   await prisma.testimonial.deleteMany({});
   await prisma.testimonial.createMany({
     data: [
       {
-        authorNameEn: "Raghavan N. Sivasundaram",
-        authorNameHi: "राघवन एन. शिवसुंदरम",
-        authorTitleEn: "VP Engineering",
-        authorTitleHi: "उपाध्यक्ष (इंजीनियरिंग)",
+        authorNameEn: "Sample Client (Bengaluru)",
+        authorNameHi: "यजमान (बेंगलुरु)",
+        authorTitleEn: "Client • Career Analysis",
+        authorTitleHi: "यजमान • कर्मभाव विश्लेषण",
         cityEn: "Bengaluru",
         cityHi: "बेंगलुरु",
-        quoteEn: "Most commercial astrologers sell gemstone solutions within 5 minutes. Pandit ji at Kanad Kendra spent 40 minutes explaining my 10th lord debilitation cancellation (Neechabhanga) and advised me against an expensive sapphire. The timing of my venture turnaround aligned to the exact month.",
-        quoteHi: "अधिकांश व्यावसायिक ज्योतिषी ५ मिनट में रत्न बेचने लगते हैं। कणाद केंद्र के आचार्य जी ने ४० मिनट तक मेरे दशमेश के नीचभंग राजयोग की व्याख्या की और नीलम पहनने से मना किया। व्यापारिक परिवर्तन का समय सटीक महीने पर घटा।",
+        quoteEn: "[Sample Testimonial] Detailed analysis of natal charts and planetary periods provided clarity on vocational transitions.",
+        quoteHi: "[नमूना अनुभव] कुण्डली चक्रों और दशा क्रम का विस्तृत शास्त्रीय विश्लेषण प्राप्त हुआ।",
         rating: 5,
-        isVerified: true,
+        isVerified: false, // Explicitly false per instruction
         orderIndex: 1,
       },
       {
-        authorNameEn: "Dr. Meera G. Patel",
-        authorNameHi: "डॉ. मीरा जी. पटेल",
-        authorTitleEn: "Consultant Surgeon",
-        authorTitleHi: "वरिष्ठ शल्य चिकित्सक",
+        authorNameEn: "Sample Client (London)",
+        authorNameHi: "यजमान (लंदन)",
+        authorTitleEn: "Client • Birth Time Rectification",
+        authorTitleHi: "यजमान • जन्म समय शोधन",
         cityEn: "London, UK",
-        cityHi: "लंदन, यूके",
-        quoteEn: "The Birth-Time Rectification service was mind-boggling. With only a 3-hour window from hospital records from 1982, the Acharya reverse-calculated the D60 chart matching past life milestones to within 42 seconds of accuracy. Truly scientific rigor.",
-        quoteHi: "जन्म समय परिशोधन (BTR) सेवा अत्यंत वैज्ञानिक थी। केवल ३ घंटे की अनुमानित समयावधि से आचार्य जी ने D60 षष्ट्यंश गणना द्वारा मेरे जीवन की पिछली घटनाओं का मिलान ४२ सेकंड की शुद्धता तक कर दिया।",
+        cityHi: "लंदन",
+        quoteEn: "[Sample Testimonial] The mathematical rectification methodology provided structured and clear astrological milestones.",
+        quoteHi: "[नमूना अनुभव] सूक्ष्म गणितीय गणना द्वारा शोधन प्रक्रिया अत्यंत स्पष्ट रही।",
         rating: 5,
-        isVerified: true,
+        isVerified: false, // Explicitly false per instruction
         orderIndex: 2,
       },
       {
-        authorNameEn: "Pt. Suryanarayan Upadhyay",
-        authorNameHi: "पं. सूर्यनारायण उपाध्याय",
-        authorTitleEn: "Merchant, Dashashwamedh",
-        authorTitleHi: "व्यापारी, दशाश्वमेध",
+        authorNameEn: "Sample Client (Varanasi)",
+        authorNameHi: "यजमान (काशी)",
+        authorTitleEn: "Client • Kundli Matching",
+        authorTitleHi: "यजमान • कुण्डली मिलान",
         cityEn: "Varanasi",
         cityHi: "वाराणसी",
-        quoteEn: "Our family has trusted Kanad Kendra for three generations for marriage and commercial muhurats. Their ephemeris is revered by the foremost scholars of Banaras Hindu University.",
-        quoteHi: "तीन पीढ़ियों से हमारा परिवार कणाद ज्योतिष केंद्र से विवाह व प्रतिष्ठा मुहूर्त लेता आ रहा है। यहाँ का पंचांग गणित काशी हिन्दू विश्वविद्यालय के मूर्धन्य विद्वानों द्वारा मान्य है। अष्टकूट मिलान में नाड़ी दोष के शास्त्रीय समाधान यहाँ अप्रतिम हैं।",
+        quoteEn: "[Sample Testimonial] Thorough Ashtakoot compatibility examination based on classical canons.",
+        quoteHi: "[नमूना अनुभव] शास्त्रों सम्मत अष्टकूट गुण मिलान विचार प्राप्त हुआ।",
         rating: 5,
-        isVerified: true,
+        isVerified: false, // Explicitly false per instruction
         orderIndex: 3,
       },
     ],

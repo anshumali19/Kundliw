@@ -8,7 +8,7 @@ const handleI18nRouting = createIntlMiddleware(routing);
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Let API and static files pass untouched
+  // Let API, static files, and Next.js internals pass untouched
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
@@ -17,7 +17,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Admin route protection: check if pathname contains /admin
+  const locale = pathname.startsWith("/en") ? "en" : "hi";
+
+  // 1. Role Guard: Admin route protection
   const isAdminRoute =
     pathname.includes("/admin") && !pathname.includes("/admin/login");
 
@@ -28,7 +30,21 @@ export async function middleware(request: NextRequest) {
     });
 
     if (!token || token.role !== "ADMIN") {
-      const locale = pathname.startsWith("/en") ? "en" : "hi";
+      const signInUrl = new URL(`/${locale}/auth/signin`, request.url);
+      signInUrl.searchParams.set("callbackUrl", request.url);
+      return NextResponse.redirect(signInUrl);
+    }
+  }
+
+  // 2. Booking Guard: Login required before booking per SRS
+  const isBookingRoute = pathname.includes("/booking");
+  if (isBookingRoute) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token) {
       const signInUrl = new URL(`/${locale}/auth/signin`, request.url);
       signInUrl.searchParams.set("callbackUrl", request.url);
       return NextResponse.redirect(signInUrl);

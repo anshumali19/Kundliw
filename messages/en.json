@@ -27,7 +27,7 @@
     "verified": "Verified",
     "active": "Active",
     "inactive": "Inactive",
-    "allRightsReserved": "All rights reserved. Drig-Ganita Astronomical Ephemeris Standard."
+    "allRightsReserved": "All rights reserved."
   },
   "nav": {
     "home": "Home",
@@ -63,7 +63,7 @@
     "cta": "Register Now"
   },
   "hero": {
-    "badgeStandard": "Drik-Ganita Ephemeris Standard",
+    "badgeStandard": "Canonical Vedic Jyotish",
     "title": "Ancient Jyotish Rigor for Modern Crossroads",
     "subtitle": "High-precision spherical mathematical calculations and canonical Vedic predictions",
     "lineage": "Rooted in 42+ years of unbroken lineage at Dashashwamedh Ghat, Varanasi. We compute planetary degrees down to arc-seconds using pure Surya Siddhanta mathematics—dispelling superstitious fear and unlocking actionable Vedic timing (Kala Nirnaya) for life, commerce, and dharma.",
@@ -114,7 +114,7 @@
   "pipelineSection": {
     "eyebrow": "Step-by-Step Rigor",
     "heading": "5-Stage Vedic Consultation & Delivery Pipeline",
-    "badgeCouncil": "Audited by Varanasi Scholars Council",
+    "badgeCouncil": "Two-Tier Acharya Review",
     "stage1Num": "Stage 01",
     "stage1Title": "Order & Data Verification",
     "stage1Sub": "Ephemeris Locking",
@@ -170,7 +170,7 @@
     "termsLink": "Terms of Service & Dakshina",
     "ephemerisLink": "Drig-Ganita Ephemeris Sources",
     "copyright": "© 2026 Maharshi Kanad Jyotish Kendra. All rights reserved.",
-    "standardBadge": "Drig-Ganita Astronomical Ephemeris Standard"
+    "standardBadge": "Surya Siddhanta & Vedic Astrology"
   },
   "panchangWidget": {
     "title": "Daily Panchang",
