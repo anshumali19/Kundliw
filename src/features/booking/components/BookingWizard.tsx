@@ -59,6 +59,17 @@ interface BookingWizardProps {
   userName?: string | null;
   userEmail?: string | null;
   locale: string;
+  initialJataka?: {
+    name?: string;
+    gender?: "MALE" | "FEMALE" | "OTHER";
+    dob?: string;
+    tob?: string;
+    pob?: string;
+    partnerName?: string;
+    partnerDob?: string;
+    partnerTob?: string;
+    partnerPob?: string;
+  };
 }
 
 const STORAGE_KEY = "mkjk_booking_draft_v1";
@@ -73,6 +84,7 @@ export function BookingWizard({
   userName = "",
   userEmail = "",
   locale,
+  initialJataka,
 }: BookingWizardProps) {
   const router = useRouter();
   const isHindi = locale === "hi";
@@ -113,22 +125,22 @@ export function BookingWizard({
 
   // Jataka Details Form
   const [formData, setFormData] = useState({
-    name: userName || "",
-    gender: "MALE" as "MALE" | "FEMALE" | "OTHER",
-    dob: "1995-01-01",
-    tob: "10:30",
+    name: initialJataka?.name || userName || "",
+    gender: (initialJataka?.gender || "MALE") as "MALE" | "FEMALE" | "OTHER",
+    dob: initialJataka?.dob || "1995-01-01",
+    tob: initialJataka?.tob || "10:30",
     isTimeUnknown: false,
-    pob: "Varanasi",
+    pob: initialJataka?.pob || "Varanasi",
     phone: userPhone || "",
     email: userEmail || "",
     language: (locale === "en" ? "en" : "hi") as "hi" | "en",
     queries: "",
-    partnerName: "",
+    partnerName: initialJataka?.partnerName || "",
     partnerGender: "FEMALE" as "MALE" | "FEMALE" | "OTHER",
-    partnerDob: "1996-01-01",
-    partnerTob: "11:30",
+    partnerDob: initialJataka?.partnerDob || "1996-01-01",
+    partnerTob: initialJataka?.partnerTob || "11:30",
     partnerIsTimeUnknown: false,
-    partnerPob: "",
+    partnerPob: initialJataka?.partnerPob || "",
   });
 
   const [submitting, setSubmitting] = useState(false);

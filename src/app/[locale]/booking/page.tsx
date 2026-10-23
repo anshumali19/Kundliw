@@ -10,6 +10,15 @@ interface BookingPageProps {
     service?: string;
     plan?: string;
     offer?: string;
+    name?: string;
+    gender?: "MALE" | "FEMALE" | "OTHER";
+    dob?: string;
+    tob?: string;
+    pob?: string;
+    partnerName?: string;
+    partnerDob?: string;
+    partnerTob?: string;
+    partnerPob?: string;
   };
 }
 
@@ -98,6 +107,17 @@ export default async function BookingPage({
         userName={user.name}
         userEmail={user.email}
         locale={locale}
+        initialJataka={{
+          name: searchParams?.name,
+          gender: searchParams?.gender,
+          dob: searchParams?.dob,
+          tob: searchParams?.tob,
+          pob: searchParams?.pob,
+          partnerName: searchParams?.partnerName,
+          partnerDob: searchParams?.partnerDob,
+          partnerTob: searchParams?.partnerTob,
+          partnerPob: searchParams?.partnerPob,
+        }}
       />
     </div>
   );

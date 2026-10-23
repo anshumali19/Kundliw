@@ -17,6 +17,7 @@ export function Header() {
     { href: "/", label: tNav("home") },
     { href: "/panchang", label: tNav("panchang") },
     { href: "/services", label: tNav("services") },
+    { href: "/kundli", label: tNav("kundli") },
     { href: "/kundli/matching", label: tNav("kundliMatching") },
     { href: "/kundli/prashna", label: tNav("prashna") },
     { href: "/vault", label: tNav("vault") },
