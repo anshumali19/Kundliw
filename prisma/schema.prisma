@@ -1,0 +1,391 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FLAT
+}
+
+enum OrderStatus {
+  ORDER_RECEIVED
+  KUNDLI_IN_PROGRESS
+  KUNDLI_COMPLETE
+  DISPATCHED
+  DELIVERED
+  EXECUTION_COMPLETE
+}
+
+enum PaymentMode {
+  RAZORPAY
+  MANUAL_UPI
+  MANUAL_BANK
+  MANUAL_QR
+}
+
+enum PaymentStatus {
+  PENDING
+  AWAITING_VERIFICATION
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum RequestType {
+  SERVICE_BOOKING
+  KUNDLI_REQUEST
+  KUNDLI_MATCHING
+  PRASHNA_KUNDLI
+}
+
+enum BannerPosition {
+  TOP
+  BOTTOM
+  LEFT
+  RIGHT
+}
+
+enum BannerType {
+  STATIC
+  CAROUSEL
+}
+
+enum MarqueePosition {
+  TOP
+  BOTTOM
+}
+
+model User {
+  id            String             @id @default(cuid())
+  name          String?
+  email         String?            @unique
+  phone         String?            @unique
+  passwordHash  String?
+  emailVerified DateTime?
+  image         String?
+  role          Role               @default(USER)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  accounts      Account[]
+  orders        Order[]
+  vaultFiles    VaultFile[]
+  statusChanges OrderStatusEvent[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model OtpVerification {
+  id         String    @id @default(cuid())
+  phone      String
+  otpHash    String
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+}
+
+model Service {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  titleEn       String
+  titleHi       String
+  taglineEn     String?
+  taglineHi     String?
+  descriptionEn String   @db.Text
+  descriptionHi String   @db.Text
+  icon          String?
+  orderIndex    Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  plans         Plan[]
+  orders        Order[]
+}
+
+model Plan {
+  id                  String   @id @default(cuid())
+  serviceId           String
+  service             Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  slug                String
+  titleEn             String
+  titleHi             String
+  descriptionEn       String   @db.Text
+  descriptionHi       String   @db.Text
+  pricePaise          Int      // Price in paise (e.g. 110000 = Rs 1100.00)
+  originalPricePaise  Int?     // Strike-through original price in paise
+  deliveryDays        Int      @default(3)
+  pages               Int?
+  hasCall             Boolean  @default(false)
+  callDurationMinutes Int?
+  featuresEn          String[]
+  featuresHi          String[]
+  isPopular           Boolean  @default(false)
+  orderIndex          Int      @default(0)
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  orders              Order[]
+  @@unique([serviceId, slug])
+}
+
+model Offer {
+  id                 String       @id @default(cuid())
+  code               String       @unique
+  titleEn            String
+  titleHi            String
+  discountType       DiscountType @default(FLAT)
+  discountValuePaise Int          // Amount in paise for FLAT (e.g. 50000 for Rs 500) or integer percent for PERCENTAGE (e.g. 25)
+  maxDiscountPaise   Int?         // Max discount ceiling in paise
+  minOrderValuePaise Int          @default(0)
+  usageLimit         Int?
+  usedCount          Int          @default(0)
+  validFrom          DateTime     @default(now())
+  validUntil         DateTime?
+  isActive           Boolean      @default(true)
+  createdAt          DateTime     @default(now())
+
+  orders             Order[]
+}
+
+model Order {
+  id                  String             @id @default(cuid())
+  orderNumber         String             @unique // Sequential e.g. "MKJK-2026-0001"
+  userId              String?
+  user                User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  serviceId           String?
+  service             Service?           @relation(fields: [serviceId], references: [id])
+  planId              String?
+  plan                Plan?              @relation(fields: [planId], references: [id])
+  offerId             String?
+  offer               Offer?             @relation(fields: [offerId], references: [id])
+  offerCode           String?            // Snapshot of coupon used
+  requestType         RequestType        @default(SERVICE_BOOKING)
+
+  status              OrderStatus        @default(ORDER_RECEIVED)
+  statusEvents        OrderStatusEvent[]
+
+  // Astrological / Jataka details
+  jatakaDetails       Json               // { name, phone, email, gender, dob, tob, pob, lat, lng, gotra, nakshatra, gemstones, language, queries, partnerDetails }
+
+  // Billing & GST (all in paise)
+  baseAmountPaise     Int
+  discountAmountPaise Int                @default(0)
+  taxableAmountPaise  Int
+  gstRateBasisPoints  Int                @default(1800) // 18.00% = 1800 bps
+  gstAmountPaise      Int
+  netAmountPaise      Int
+  invoiceNumber       String?            @unique // Sequential e.g. "INV-2026-0001"
+  gstin               String?            // Snapshot of Kendra GSTIN at order time
+
+  // Payment
+  paymentMode         PaymentMode        @default(RAZORPAY)
+  paymentStatus       PaymentStatus      @default(PENDING)
+  razorpayOrderId     String?
+  razorpayPaymentId   String?
+  razorpaySignature   String?
+  manualPaymentProof  String?
+  manualPaymentRef    String?
+
+  trackingNumber      String?
+  adminNotes          String?            @db.Text
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  vaultFiles          VaultFile[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderStatusEvent {
+  id          String      @id @default(cuid())
+  orderId     String
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status      OrderStatus
+  note        String?
+  changedById String?
+  changedBy   User?       @relation(fields: [changedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+model Counter {
+  id  String @id // e.g. "ORDER_SEQ", "INVOICE_SEQ"
+  seq Int    @default(0)
+}
+
+model ProcessedWebhookEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  eventType   String
+  processedAt DateTime @default(now())
+}
+
+model VaultFile {
+  id          String   @id @default(cuid())
+  orderId     String?
+  order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  titleEn     String
+  titleHi     String
+  fileName    String
+  storageKey  String   // Internal private storage path
+  fileSize    Int
+  mimeType    String   @default("application/pdf")
+  uploadedAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AdminSettings {
+  id                String   @id @default("default")
+  siteNameEn        String?
+  siteNameHi        String?
+  phone1            String?
+  phone2            String?
+  email             String?
+  addressEn         String?  @db.Text
+  addressHi         String?  @db.Text
+  upiVpa            String?
+  bankAccountName   String?
+  bankAccountNumber String?
+  bankIfsc          String?
+  bankName          String?
+  qrCodeUrl         String?
+  gstin             String?
+  defaultGstRateBps Int?     @default(1800)
+  updatedAt         DateTime @updatedAt
+}
+
+model MarqueeItem {
+  id         String          @id @default(cuid())
+  textEn     String
+  textHi     String
+  speedSec   Int             @default(30)
+  fontSize   Int             @default(13) // px
+  bgColor    String          @default("var(--secondary)")
+  textColor  String          @default("var(--on-secondary)")
+  position   MarqueePosition @default(BOTTOM)
+  isActive   Boolean         @default(true)
+  orderIndex Int             @default(0)
+  createdAt  DateTime        @default(now())
+}
+
+model Banner {
+  id         String         @id @default(cuid())
+  titleEn    String
+  titleHi    String
+  subtitleEn String?
+  subtitleHi String?
+  imageUrl   String
+  linkUrl    String?
+  position   BannerPosition @default(RIGHT)
+  type       BannerType     @default(STATIC)
+  isActive   Boolean        @default(true)
+  orderIndex Int            @default(0)
+  createdAt  DateTime       @default(now())
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  titleEn     String
+  titleHi     String
+  excerptEn   String?   @db.Text
+  excerptHi   String?   @db.Text
+  contentEn   String    @db.Text
+  contentHi   String    @db.Text
+  coverImage  String?
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Testimonial {
+  id            String   @id @default(cuid())
+  authorNameEn  String
+  authorNameHi  String
+  authorTitleEn String
+  authorTitleHi String
+  cityEn        String
+  cityHi        String
+  quoteEn       String   @db.Text
+  quoteHi       String   @db.Text
+  rating        Int      @default(5)
+  isVerified    Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  orderIndex    Int      @default(0)
+  createdAt     DateTime @default(now())
+}
+
+model MediaGalleryItem {
+  id         String   @id @default(cuid())
+  titleEn    String
+  titleHi    String
+  captionEn  String?
+  captionHi  String?
+  imageUrl   String
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model StaticPage {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  titleEn   String
+  titleHi   String
+  contentEn String   @db.Text
+  contentHi String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model PanchangCache {
+  id         String   @id @default(cuid())
+  dateString String   // e.g. "2026-10-23"
+  city       String   // e.g. "varanasi"
+  dataJson   Json
+  cachedAt   DateTime @default(now())
+
+  @@unique([dateString, city])
+}
