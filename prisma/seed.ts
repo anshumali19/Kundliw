@@ -54,14 +54,14 @@ async function main() {
     update: { role: Role.ADMIN },
     create: {
       email: "admin@kanad-jyotish.in",
-      name: "Acharya Admin (महर्षि कणाद पीठ)",
-      phone: "+919827991224",
+      name: "Kendra Administrator (महर्षि कणाद केंद्र)",
+      phone: "+919999900001",
       passwordHash: adminPasswordHash,
       role: Role.ADMIN,
     },
   });
 
-  // Demo standard customer user
+  // Demo standard customer user (uses fake demo phone, not SRS phone)
   const userPasswordHash = await bcrypt.hash("UserKanad@2026", 10);
   const demoCustomer = await prisma.user.upsert({
     where: { email: "aditya.sharma@example.com" },
@@ -69,7 +69,7 @@ async function main() {
     create: {
       email: "aditya.sharma@example.com",
       name: "Aditya Narayan Sharma",
-      phone: "+917509124672",
+      phone: "+919999900002",
       passwordHash: userPasswordHash,
       role: Role.USER,
     },
@@ -77,11 +77,16 @@ async function main() {
 
   // 3. Admin Settings
   // Real contact numbers from SRS: +91-9827991224 and +91-7509124672.
+  // City, coordinates and timezone are kept nullable per specification.
   await prisma.adminSettings.upsert({
     where: { id: "default" },
     update: {
       phone1: "+91-9827991224",
       phone2: "+91-7509124672",
+      city: null,
+      latitude: null,
+      longitude: null,
+      timezone: null,
     },
     create: {
       id: "default",
@@ -92,10 +97,10 @@ async function main() {
       email: "contact@kanadastro.org",
       addressEn: "Kanad Bhavan, Dashashwamedh Ghat Marg, Varanasi, Uttar Pradesh 221001",
       addressHi: "कणाद भवन, दशाश्वमेध घाट मार्ग, वाराणसी, उत्तर प्रदेश २२१००१",
-      city: "Varanasi",
-      latitude: 25.3176,
-      longitude: 82.9739,
-      timezone: "Asia/Kolkata",
+      city: null,
+      latitude: null,
+      longitude: null,
+      timezone: null,
       // --- DEMO BANK & GST DETAILS ---
       upiVpa: "kanadjyotish@sbi",
       bankAccountName: "Maharshi Kanad Jyotish Kendra [Demo Account]",
@@ -155,7 +160,7 @@ async function main() {
       slug: "handcrafted-pothi",
       titleEn: "Archival Bound Pothi Dossier",
       titleHi: "हस्तनिर्मित पोथी संस्करण",
-      descriptionEn: "Handcrafted bound Janampatri manual with 30-min one-on-one Acharya consultation.",
+      descriptionEn: "Handcrafted bound Janampatri manual with 30-min one-on-one Kendra team consultation.",
       descriptionHi: "हस्तनिर्मित जिल्दबंद कुण्डली एवं वरिष्ठ दैवज्ञ के साथ ३० मिनट का परामर्श।",
       pricePaise: 250000, // ₹2,500
       originalPricePaise: 310000,
@@ -180,7 +185,7 @@ async function main() {
       taglineHi: "दशम भाव, दशमांश चक्र एवं अमात्यकारक के आधार पर आजीविका परीक्षा",
       descriptionEn: "Deep diagnostic analysis of vocational transits, promotions, business crossroads, and Sade Sati mitigation.",
       descriptionHi: "व्यवसाय वृद्धि, पदोन्नति एवं आर्थिक संशयों के समाधान हेतु वरिष्ठ दैवज्ञ परामर्श।",
-      highlightsEn: ["D10 Dashamsha audit", "Sade Sati mitigation", "Direct 1-on-1 Acharya call"],
+      highlightsEn: ["D10 Dashamsha audit", "Sade Sati mitigation", "Direct 1-on-1 Kendra team consultation"],
       highlightsHi: ["दशमांश सूक्ष्म विश्लेषण", "साढ़ेसाती शांति उपाय", "वरिष्ठ ज्योतिषी से सीधा वार्तालाप"],
       orderIndex: 2,
       isActive: true,
@@ -302,7 +307,7 @@ async function main() {
   // 7. Orders across all 6 Canonical Statuses (Linked to Aditya Sharma)
   const defaultJataka: Prisma.InputJsonValue = {
     name: "Aditya Narayan Sharma",
-    phone: "+917509124672",
+    phone: "+919999900002",
     email: "aditya.sharma@example.com",
     gender: "MALE",
     dob: "1994-08-22",
@@ -334,7 +339,7 @@ async function main() {
       orderNumber: "MKJK-2026-1003",
       invoiceNumber: "INV-2026-0503",
       status: OrderStatus.KUNDLI_COMPLETE,
-      note: "Two-tier Acharya review complete. Final chart signed and uploaded to customer vault.",
+      note: "Two-tier Kendra team review complete. Final chart signed and uploaded to customer vault.",
       plan: plan1_2,
       serviceId: srv1.id,
     },
@@ -362,7 +367,7 @@ async function main() {
       orderNumber: "MKJK-2026-1006",
       invoiceNumber: "INV-2026-0506",
       status: OrderStatus.EXECUTION_COMPLETE,
-      note: "One-on-one telephonic Acharya consultation session successfully completed.",
+      note: "One-on-one telephonic Kendra team consultation session successfully completed.",
       courierName: "BlueDart Express",
       trackingNumber: "BD982741920IN",
       plan: plan2_1,
@@ -469,10 +474,34 @@ startxref
     },
   });
 
-  // 9. Promotional Banners
+  // 9. Promotional Banners (Across TOP, BOTTOM, LEFT, RIGHT slots)
   await prisma.banner.deleteMany({});
   await prisma.banner.createMany({
     data: [
+      {
+        titleEn: "Samvat 2083 Surya Siddhanta Muhurat Tables",
+        titleHi: "सम्वत् २०८३ सूर्य सिद्धान्त शुभ मुहूर्त पंचांग",
+        subtitleEn: "Authentic Vivah & Griha Pravesh Almanac",
+        subtitleHi: "विवाह एवं गृह प्रवेश शुभ कालनिर्णय",
+        imageUrl: "/images/banner-top.jpg",
+        linkUrl: "/panchang",
+        position: BannerPosition.TOP,
+        type: BannerType.CAROUSEL,
+        isActive: true,
+        orderIndex: 1,
+      },
+      {
+        titleEn: "Kendra Archival Kundli Dossier Bookings Open",
+        titleHi: "हस्तनिर्मित पोथी संस्करण अग्रिम पंजीकरण",
+        subtitleEn: "Limited monthly allocations for physical bound Janampatri",
+        subtitleHi: "मासिक हस्तनिर्मित पोथी प्रतियों हेतु सीमित स्थान",
+        imageUrl: "/images/banner-top-2.jpg",
+        linkUrl: "/services",
+        position: BannerPosition.TOP,
+        type: BannerType.CAROUSEL,
+        isActive: true,
+        orderIndex: 2,
+      },
       {
         titleEn: "Guru-Shani Transit Maha-Yajna",
         titleHi: "गुरु-शनि राशि परिवर्तन विशेष अनुष्ठान",
@@ -486,16 +515,28 @@ startxref
         orderIndex: 1,
       },
       {
-        titleEn: "Samvat 2083 Surya Siddhanta Muhurat Tables",
-        titleHi: "सम्वत् २०८३ सूर्य सिद्धान्त शुभ मुहूर्त पंचांग",
-        subtitleEn: "Authentic Vivah & Griha Pravesh Almanac",
-        subtitleHi: "विवाह एवं गृह प्रवेश शुभ कालनिर्णय",
-        imageUrl: "/images/banner-top.jpg",
-        linkUrl: "/panchang",
-        position: BannerPosition.TOP,
+        titleEn: "Vedic Matchmaking & Kundli Milan Scrutiny",
+        titleHi: "अष्टकूट गुण मिलान एवं मांगलिक विचार",
+        subtitleEn: "Parashari Bhanga metric analysis by Kendra team",
+        subtitleHi: "केंद्र दल द्वारा परिहार एवं सूक्ष्म गुण परीक्षण",
+        imageUrl: "/images/banner-left.jpg",
+        linkUrl: "/kundli/matching",
+        position: BannerPosition.LEFT,
         type: BannerType.STATIC,
         isActive: true,
-        orderIndex: 2,
+        orderIndex: 1,
+      },
+      {
+        titleEn: "Surya Siddhanta Ephemeris Calibration Update",
+        titleHi: "सूर्य सिद्धान्त पंचांग गणितीय परिशोधन",
+        subtitleEn: "High-precision Chitrapaksha Ayanamsha calculations",
+        subtitleHi: "चित्रापक्षीय अयनांश पर आधारित शुद्ध खगोलीय तालिकायें",
+        imageUrl: "/images/banner-bottom.jpg",
+        linkUrl: "/panchang",
+        position: BannerPosition.BOTTOM,
+        type: BannerType.STATIC,
+        isActive: true,
+        orderIndex: 1,
       },
     ],
   });
@@ -699,7 +740,7 @@ startxref
       {
         titleEn: "Vedic Scholar Conclave",
         titleHi: "काशी विद्वत् संगोष्ठी एवं कालनिर्णय",
-        captionEn: "Senior Acharyas determining festival tithis and eclipse timings.",
+        captionEn: "Senior Kendra team determining festival tithis and eclipse timings.",
         captionHi: "वरिष्ठ दैवज्ञों द्वारा ग्रहण एवं पर्व काल का सूक्ष्म निर्धारण।",
         imageUrl: "/images/gallery-3.jpg",
         orderIndex: 3,

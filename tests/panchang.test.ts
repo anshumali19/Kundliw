@@ -15,7 +15,7 @@ describe("Phase 11 - Panchang Subsystem & Database Caching", () => {
     vi.restoreAllMocks();
   });
 
-  it("calculates Panchang with certified demo data carrying isDemo flag", async () => {
+  it("calculates Panchang with sample demo data carrying isDemo flag", async () => {
     vi.spyOn(prisma.panchangCache, "findUnique").mockResolvedValue(null as any);
     vi.spyOn(prisma.panchangCache, "upsert").mockResolvedValue({} as any);
 

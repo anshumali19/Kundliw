@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         data: {
           orderId: order.id,
           status: OrderStatus.ORDER_RECEIVED,
-          note: `Vedic request form submitted (${requestType.replace(/_/g, " ")}). Awaiting Acharya examination.`,
+          note: `Vedic request form submitted (${requestType.replace(/_/g, " ")}). Awaiting Kendra team examination.`,
           changedById: user?.id || null,
         },
       });

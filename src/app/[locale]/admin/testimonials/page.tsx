@@ -298,7 +298,7 @@ export default function AdminTestimonialsPage() {
                 rows={2}
                 value={quoteEn}
                 onChange={(e) => setQuoteEn(e.target.value)}
-                placeholder="The Acharya identified the timing of my promotion with remarkable mathematical accuracy..."
+                placeholder="The Kendra team identified the timing of my promotion with remarkable mathematical accuracy..."
                 className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
               />
             </div>
@@ -312,7 +312,7 @@ export default function AdminTestimonialsPage() {
                 rows={2}
                 value={quoteHi}
                 onChange={(e) => setQuoteHi(e.target.value)}
-                placeholder="आचार्य जी ने सूर्य सिद्धान्त गणना से मेरे व्यापारिक निर्णय की अनुकूलता स्पष्ट की..."
+                placeholder="केंद्र ज्योतिषी दल ने सूर्य सिद्धान्त गणना से मेरे व्यापारिक निर्णय की अनुकूलता स्पष्ट की..."
                 className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
               />
             </div>

@@ -33,6 +33,7 @@
     "home": "Home",
     "panchang": "Panchang",
     "services": "Vedic Services",
+    "pricingPlans": "Pricing Plans",
     "kundli": "Kundli Calculator",
     "kundliMatching": "Kundli Matching",
     "prashna": "Prashna Kundli",
@@ -76,7 +77,7 @@
     "stat2Desc": "Mathematical Rigor",
     "stat3Value": "From ₹1,100",
     "stat3Title": "Consultation Dakshina",
-    "stat3Desc": "Includes Senior Acharya Discussion",
+    "stat3Desc": "Includes Kendra Team Discussion",
     "bookCta": "Book Vedic Consultation",
     "panchangCta": "Explore Panchang",
     "slotsNotice": "3 consultation slots remaining today"
@@ -106,7 +107,7 @@
   "servicesSection": {
     "eyebrow": "Authentic Vedic Calculations",
     "heading": "Authentic Vedic Services",
-    "subheading": "Every calculation is verified through Parashara, Jaimini, and Tajik canons with certified mathematical tables.",
+    "subheading": "Every calculation is verified through Parashara, Jaimini, and Tajik canons with traditional mathematical tables.",
     "badgeAvailable": "Both Hand-Annotated & Digital Editions Available",
     "timelineLabel": "Dakshina • Delivery Timeline",
     "popular": "Most Popular",
@@ -115,7 +116,7 @@
   "pipelineSection": {
     "eyebrow": "Step-by-Step Rigor",
     "heading": "5-Stage Vedic Consultation & Delivery Pipeline",
-    "badgeCouncil": "Two-Tier Acharya Review",
+    "badgeCouncil": "Two-Tier Kendra Team Review",
     "stage1Num": "Stage 01",
     "stage1Title": "Order & Data Verification",
     "stage1Sub": "Ephemeris Locking",
@@ -127,7 +128,7 @@
     "stage2Desc": "Lahiri Ayanamsha spherical computation of Shodashvarga, Ashtakavarga bindus & Shadbala strengths.",
     "stage2Time": "Day 1–2",
     "stage3Num": "Stage 03",
-    "stage3Title": "Two-Tier Acharya Review",
+    "stage3Title": "Two-Tier Kendra Team Review",
     "stage3Sub": "Scholarly Audit",
     "stage3Desc": "Dual manual audit by senior Kashi Jyotishis. Cross-referencing classical texts to eliminate software anomalies.",
     "stage3Time": "Peer Reviewed",
@@ -219,14 +220,14 @@
     "payButton": "Pay Auspicious Dakshina",
     "securityNotice": "256-Bit SSL Encrypted • Income Tax 80G Receipt Available",
     "successTitle": "Consultation Order Confirmed",
-    "successSubtitle": "Calculation in progress by Senior Acharya",
+    "successSubtitle": "Calculation in progress by Kendra consultation team",
     "orderToken": "Order Reference Token:",
     "downloadReceipt": "Download Invoice (PDF)"
   },
   "vault": {
     "title": "Customer Kundli Vault",
     "subtitle": "Your authenticated repository of handcrafted horoscopes, charts, and analysis dossiers.",
-    "empty": "No Kundli documents uploaded yet. Documents will appear here once Acharya completes your horoscope analysis.",
+    "empty": "No Kundli documents uploaded yet. Documents will appear here once the Kendra team completes your horoscope analysis.",
     "download": "Download Dossier (PDF)",
     "uploadedOn": "Uploaded on"
   },
@@ -238,7 +239,7 @@
     "trackButton": "Track Progress",
     "orderReceived": "Order Received & Ephemeris Locked",
     "kundliInProgress": "Planetary Computation in Progress",
-    "kundliComplete": "Two-Tier Acharya Review Complete",
+    "kundliComplete": "Two-Tier Kendra Team Review Complete",
     "dispatched": "Printed Dossier Dispatched",
     "delivered": "Delivered / Received",
     "executionComplete": "Consultation & Execution Complete",
@@ -257,5 +258,13 @@
     "orDivider": "OR",
     "haveAccount": "Already have an account? Sign In",
     "noAccount": "Need an account? Register"
+  },
+  "demoGate": {
+    "title": "Kendra Demo Portal Access",
+    "subtitle": "Enter the demo passkey to explore the astrological portal.",
+    "passwordPlaceholder": "Enter demo password...",
+    "submit": "Unlock Portal",
+    "invalidPassword": "The demo passkey entered is incorrect.",
+    "helper": "Contact Kendra administrator if you require demo access credentials."
   }
 }

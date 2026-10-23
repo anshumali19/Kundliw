@@ -6,6 +6,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { BannerSlot } from "@/components/banners/BannerSlot";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import "@/app/globals.css";
 
 const notoSerif = Noto_Serif({
@@ -40,11 +42,16 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable}`}>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen">
+        <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Header />
-          <main className="flex-1 w-full pt-[116px] pb-16 xl:pb-0">
+          <div className="pt-[116px]">
+            <BannerSlot position="TOP" />
+          </div>
+          <main className="flex-1 w-full pb-16 xl:pb-0">
             {children}
           </main>
+          <BannerSlot position="BOTTOM" />
           <MarqueeStrip />
           <Footer />
           <MobileNav />

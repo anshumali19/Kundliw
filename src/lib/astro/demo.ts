@@ -10,7 +10,7 @@ import {
 } from "./types";
 
 /**
- * Demo Astro Provider returning certified Vedic sample data.
+ * Demo Astro Provider returning sample Vedic data.
  * All responses carry a visible `isDemo: true` flag and demo disclaimer.
  */
 export class DemoAstroProvider implements AstroProvider {
@@ -46,7 +46,7 @@ export class DemoAstroProvider implements AstroProvider {
         currentAntardasha: "Saturn (शनि)",
         endsAt: "Nov 2027",
       },
-      sampleDisclaimer: "Simulated calculation for demonstration purposes. Official Kundlis are audited by senior Jyotishis.",
+      sampleDisclaimer: "Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं",
     };
   }
 
@@ -60,10 +60,10 @@ export class DemoAstroProvider implements AstroProvider {
       totalScore: 28,
       maxScore: 36,
       kootas: [
-        { name: "Varna", nameHi: "वर्ण", score: 1, maxScore: 1, description: "Spiritual and ego alignment" },
-        { name: "Vashya", nameHi: "वश्य", score: 2, maxScore: 2, description: "Mutual dominance and harmony" },
+        { name: "Varna", nameHi: "वर्ण", score: 1, maxScore: 1, description: "Spiritual alignment" },
+        { name: "Vashya", nameHi: "वश्य", score: 2, maxScore: 2, description: "Mutual harmony" },
         { name: "Tara", nameHi: "तारा", score: 1.5, maxScore: 3, description: "Destiny and health compatibility" },
-        { name: "Yoni", nameHi: "योनि", score: 4, maxScore: 4, description: "Physical intimacy and disposition" },
+        { name: "Yoni", nameHi: "योनि", score: 4, maxScore: 4, description: "Disposition and vitality" },
         { name: "Graha Maitri", nameHi: "ग्रह मैत्री", score: 5, maxScore: 5, description: "Psychological friendship" },
         { name: "Gana", nameHi: "गण", score: 6, maxScore: 6, description: "Temperament compatibility" },
         { name: "Bhakoot", nameHi: "भकूट", score: 0.5, maxScore: 7, description: "Family welfare and growth" },
@@ -75,9 +75,9 @@ export class DemoAstroProvider implements AstroProvider {
         compatibility: "Shubh (Auspicious Compatibility)",
       },
       nadiDosha: false,
-      verdictEn: "Highly auspicious match (28 / 36 points). Mutual Graha Maitri and Shubh Nadi scores provide auspicious matrimonial prospects.",
-      verdictHi: "अत्यंत शुभ मिलान (२८ / ३६ गुण)। ग्रह मैत्री एवं शुद्ध नाड़ी गुण सुखद दांपत्य जीवन के योग दर्शाते हैं।",
-      sampleDisclaimer: "Simulated Ashtakoot analysis. Final marriage decisions require senior Acharya manual review.",
+      verdictEn: "Auspicious match (28 / 36 points). Mutual Graha Maitri and Shubh Nadi scores provide auspicious matrimonial prospects.",
+      verdictHi: "शुभ मिलान (२८ / ३६ गुण)। ग्रह मैत्री एवं शुद्ध नाड़ी गुण सुखद दांपत्य जीवन के योग दर्शाते हैं।",
+      sampleDisclaimer: "Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं",
     };
   }
 

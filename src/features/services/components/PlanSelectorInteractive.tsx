@@ -178,8 +178,8 @@ export function PlanSelectorInteractive({
             </h2>
             <p className="text-xs sm:text-sm text-on-surface-variant mt-1 max-w-2xl">
               {isHindi
-                ? "डिजिटल फलित प्रतिवेदन से लेकर प्रत्यक्ष आचार्य परामर्श एवं हस्तनिर्मित पोथी ग्रंथ तक — प्रमाणिक वैदिक विकल्प।"
-                : "From digital computational dossiers to live Acharya dialogues and handcrafted archival manuscript books."}
+                ? "डिजिटल फलित प्रतिवेदन से लेकर प्रत्यक्ष केंद्र परामर्श एवं हस्तनिर्मित पोथी ग्रंथ तक — प्रमाणिक वैदिक विकल्प।"
+                : "From digital computational dossiers to live Kendra team dialogues and handcrafted archival manuscript books."}
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs text-secondary bg-surface-container-low px-3 py-1.5 rounded border border-secondary/20 shrink-0 self-start md:self-auto">
@@ -292,7 +292,7 @@ export function PlanSelectorInteractive({
                         <PhoneCall className="w-4 h-4 text-primary shrink-0" />
                         <span>
                           <strong>{plan.callDurationMinutes} {isHindi ? "मिनट" : "Mins"}</strong>{" "}
-                          {isHindi ? "प्रत्यक्ष आचार्य संवाद" : "Direct Live Acharya Consultation"}
+                          {isHindi ? "प्रत्यक्ष केंद्र दल संवाद" : "Direct Live Kendra Team Consultation"}
                         </span>
                       </div>
                     )}
@@ -408,10 +408,10 @@ export function PlanSelectorInteractive({
                 ))}
               </tr>
 
-              {/* Row: Acharya Consultation */}
+              {/* Row: Kendra Team Consultation */}
               <tr className="hover:bg-surface-container-low transition-colors">
                 <td className="py-3 px-4 font-medium text-on-surface">
-                  {isHindi ? "प्रत्यक्ष आचार्य विमर्श (Live Call)" : "Live Acharya Discussion"}
+                  {isHindi ? "प्रत्यक्ष केंद्र दल विमर्श (Live Call)" : "Live Kendra Team Discussion"}
                 </td>
                 {plans.map((p) => (
                   <td

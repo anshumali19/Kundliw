@@ -308,7 +308,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
                     : "Submitting Query..."
                   : isHindi
                   ? "प्रश्न कुण्डली समीक्षा अनुरोध दर्ज करें"
-                  : "Submit Horary Question for Acharya Review"}
+                  : "Submit Horary Question for Kendra Team Review"}
               </span>
             </button>
           </form>

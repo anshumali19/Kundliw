@@ -196,7 +196,7 @@ describe("Phase 4: Success Page Order Ownership Security Guard", () => {
     expect(canAccessOrderReceipt(targetOrder, anotherUser)).toBe(false);
   });
 
-  it("allows administrative access for Kendra Acharyas/Admins", () => {
+  it("allows administrative access for Kendra team / Admins", () => {
     expect(canAccessOrderReceipt(targetOrder, adminUser)).toBe(true);
   });
 

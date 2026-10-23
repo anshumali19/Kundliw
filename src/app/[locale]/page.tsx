@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { PanchangWidget } from "@/features/astro/components/PanchangWidget";
+import { LiveClockEphemeris } from "@/components/home/LiveClockEphemeris";
+import { BannerSlot } from "@/components/banners/BannerSlot";
 import {
   Calendar,
   BookOpen,
@@ -45,7 +47,7 @@ export default async function HomePage({
       highlights: [
         "Complete D1 to D60 Shodashvarga mathematical charts",
         "Lifetime Vimshottari & Ashtottari Dasha analysis",
-        "Handcrafted archival bound manual + 1-on-1 Acharya session",
+        "Handcrafted archival bound manual + 1-on-1 Kendra team consultation",
       ],
     },
     {
@@ -62,7 +64,7 @@ export default async function HomePage({
       highlights: [
         "10th House Karmabhava & Dashamsha (D10) analysis",
         "Detailed Sade Sati audit & Shani Shanti measures",
-        "Direct 30-min one-on-one session with Senior Acharya",
+        "Direct 30-min one-on-one session with Kendra consultation team",
       ],
     },
     {
@@ -112,6 +114,9 @@ export default async function HomePage({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column (65% ~ 8 cols) */}
             <div className="lg:col-span-8 flex flex-col justify-start text-left">
+              {/* Live Clock with Date, Day & Tithi */}
+              <LiveClockEphemeris tithi={panchang?.tithi} />
+
               {/* Devanagari Invocation */}
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <span className="px-2.5 py-1 bg-surface-container border border-secondary/30 rounded text-secondary font-serif text-xs font-semibold italic">
@@ -285,10 +290,18 @@ export default async function HomePage({
                   {tTransit("transitNote")}
                 </div>
               </div>
+
+              {/* Right Column Banner Slot */}
+              <BannerSlot position="RIGHT" />
             </div>
           </div>
         </div>
       </section>
+
+      {/* Left Banner Announcement Slot */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+        <BannerSlot position="LEFT" />
+      </div>
 
       {/* 3. CORE SERVICES GRID (2-Column Ruled Editorial Split) */}
       <section className="w-full bg-surface-container-low/70 py-12 border-b border-secondary/20">

@@ -68,16 +68,24 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 The seed script creates realistic demo accounts with pre-populated orders across all 6 canonical statuses and a sample vault document:
 
 ### Administrator Account
-- **URL**: [http://localhost:3000/en/auth/login](http://localhost:3000/en/auth/login)
+- **URL**: [http://localhost:3000/en/auth/signin](http://localhost:3000/en/auth/signin) (toggle "Admin Login" tab)
 - **Email**: `admin@kanad-jyotish.in`
 - **Password**: `ChangeMeInAdminSettings@2026`
+- **Phone**: `+919999900001` (demo fake phone)
 - **Access**: Full Admin CMS (`/admin`), Services & Plans CRUD, Coupon Management, Order Lifecycle Transitions, Customer Vault Uploads, Promotional Banners, Marquee Announcements, Static Pages, Articles, Reviews, and Kendra Settings.
 
 ### Customer Account
-- **Email**: `aditya.sharma@example.com`
-- **Password**: `UserKanad@2026`
-- **Phone**: `+917509124672` (Mobile OTP login in dev environment prints the OTP code to terminal console)
+- **URL**: [http://localhost:3000/en/auth/signin](http://localhost:3000/en/auth/signin) (Mobile OTP tab)
+- **Phone**: `+919999900002` (demo fake phone)
+- **Sign-in Method**: Mobile OTP only. In development, click "Send OTP" and the 6-digit code prints to the terminal console (or use demo code `123456`).
+- **Security Rule**: In strict compliance with Kendra security guidelines, customer accounts sign in exclusively via Mobile OTP. Email and password authentication is strictly reserved for administrative personnel.
 - **Pre-seeded Data**: 6 demo consultation orders representing each lifecycle stage, downloadable GST invoices, and an authenticated Kundli PDF dossier in `/vault`.
+
+### Optional Demo Portal Passkey Gate
+If `DEMO_ACCESS_PASSWORD` is defined in `.env`:
+- Unauthenticated visitors are redirected to `/[locale]/demo-gate`.
+- Entering the configured passkey grants a secure 7-day session cookie (`demo_access`).
+- Leave `DEMO_ACCESS_PASSWORD=""` (default) to disable the gate.
 
 ---
 

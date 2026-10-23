@@ -5,7 +5,19 @@
 
 ---
 
-## 1. Production Launch Checklist & File Map
+## 1. Top Priority: Next.js Security Upgrade & Dependency Audit
+
+Before launching to public traffic, client engineering must execute the dependency upgrade and Linux platform verification:
+
+| Task | Action Required | Verification Steps |
+| :--- | :--- | :--- |
+| **1. Next.js Security Upgrade** | Upgrade Next.js from `14.2.15` to the latest patched stable 14.x or 15.x release to clear upstream advisories. | Run `npm install next@latest react@latest react-dom@latest`<br>Execute `npm audit` to verify advisory resolution. |
+| **2. Linux CI/CD Build Check** | Ensure clean compilation on target Linux host (Ubuntu 22.04 / Alpine) without OS-specific path separators or casing errors. | Run `npm run build` on a Linux runner or Docker container.<br>Confirm Next.js Google font loaders download and optimize offline. |
+| **3. Runtime vs Dev Dependency Split** | Confirm runtime dependencies (`dependencies`) are clean of critical vulnerabilities. Development dependencies (`devDependencies`) used solely during build/linting can be kept on locked versions. | Run `npm audit --production` to ensure zero runtime high/critical CVEs. |
+
+---
+
+## 2. Production Launch Checklist & File Map
 
 To transition from the demo MVP to a live production deployment, complete the following items at the specified file paths:
 
@@ -16,13 +28,12 @@ To transition from the demo MVP to a live production deployment, complete the fo
 | **Astro Ephemeris** | Activate Swiss Ephemeris or AstroSage API credentials for real-time mathematical planetary degrees. | [astrosage.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/astrosage.ts)<br>[factory.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/factory.ts) | ⚠️ Plug in API Keys |
 | **Private Document Storage** | Provision AWS S3 bucket and IAM credentials with private read ACLs for customer Kundli dossiers. | [index.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/storage/index.ts) | ⚠️ Configure S3 Bucket |
 | **Admin Settings & Banking** | Update Kendra beneficiary bank account, IFSC, UPI VPA, QR code image, and Kendra GSTIN. | [page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/admin/settings/page.tsx)<br>Admin UI: `/admin/settings` | ⚠️ Update Sample Placeholders |
-| **Next.js & Security Upgrades** | Run `npm audit fix` and upgrade Next.js to latest patched stable release for enterprise hardening. | [package.json](file:///C:/Users/anshu/Desktop/ClientWork/package.json) | ⚠️ Maintenance |
 | **Database Migrations** | Run production PostgreSQL schema migration and automated snapshot backups. | [schema.prisma](file:///C:/Users/anshu/Desktop/ClientWork/prisma/schema.prisma) | ⚠️ Run on Production DB |
 | **Content Audit** | Replace sample reviews, sample articles, and placeholder notices with verified Kendra content. | Admin UI: `/admin/testimonials`<br>`/admin/blogs` | ⚠️ Client Content Review |
 
 ---
 
-## 2. External Adapters Architecture
+## 3. External Adapters Architecture
 
 The application implements strict interface abstractions in `src/lib/`. The application logic never interacts directly with low-level vendor SDKs:
 
@@ -49,7 +60,7 @@ The application implements strict interface abstractions in `src/lib/`. The appl
 
 ### C. Vedic Astrology & Ephemeris (`AstroProvider`)
 - **Interface**: [types.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/types.ts)
-- **Demo Provider**: `DemoAstroProvider` returns certified Vedic sample data (Vimshottari Dasha, 9-planet coordinates, Ashtakoot 36-Guna matching, and daily Panchang) stamped with `isDemo: true`.
+- **Demo Provider**: `DemoAstroProvider` returns Vedic sample data (Vimshottari Dasha, 9-planet coordinates, Ashtakoot 36-Guna matching, and daily Panchang) stamped with `isDemo: true` and labeled "Sample output, not a real calculation".
 - **Production Provider**: `AstroSageProvider` in [astrosage.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/astrosage.ts). Configure:
   ```env
   ASTROSAGE_USER_ID="your_astrosage_user_id"
@@ -71,7 +82,7 @@ The application implements strict interface abstractions in `src/lib/`. The appl
 
 ---
 
-## 3. Production Safety Guard (`DEMO_MODE`)
+## 4. Production Safety Guard (`DEMO_MODE`)
 
 All placeholder adapters implement the `assertPlaceholderAllowed()` guard defined in [demo.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/config/demo.ts):
 ```ts
@@ -85,18 +96,18 @@ if (process.env.NODE_ENV === "production" && process.env.DEMO_MODE !== "true") {
 
 ---
 
-## 4. Mobile & Android WebView Compatibility Checklist
+## 5. Mobile & Android WebView Compatibility Checklist
 
 The frontend has been built strictly adhering to Android WebView and mobile Safari requirements:
 1. **No Popup Windows**: Avoided all `window.open()` popups that get silently blocked by WebView webChromeClients. All checkouts and authentications happen via in-app full-page views.
 2. **Session Persistence**: NextAuth uses standard HTTP-only JWT cookies with secure attributes, avoiding local storage drops during WebView activity re-creations.
 3. **Form Resiliency**: Booking forms save in-progress state to `sessionStorage` on step transitions, preventing data loss when users switch apps to copy UPI references.
-4. **Touch Target Dimensions**: All buttons, form selects, and interactive links meet or exceed the mandatory 44px minimum touch target height.
+4. **Touch Target Dimensions**: All buttons, form selects, banner carousel controls, and interactive links meet or exceed the mandatory 44px minimum touch target height.
 5. **Authenticated File Streams**: PDF downloads (Invoices and Kundli Vault dossiers) are served via server routes (`/api/invoice/[id]`, `/api/vault/[id]`) with standard `Content-Disposition: attachment` headers, triggering native download managers reliably.
 
 ---
 
-## 5. Security & Rate Limiting Specifications
+## 6. Security, Rate Limiting & Demo Access Password
 
 1. **Role Verification**: Admin routes and APIs call `requireAdmin()` and `guardApiAdmin()`, which re-query the PostgreSQL database on every request to confirm the current user role (`Role.ADMIN`). Tampered or revoked JWT tokens are rejected immediately.
 2. **Database Rate Limiting**: Managed via the `RateLimit` table:
@@ -107,3 +118,15 @@ The frontend has been built strictly adhering to Android WebView and mobile Safa
 3. **Idempotent Sequential Sequences**:
    - Order numbers (`MKJK-2026-XXXX`) and Invoice numbers (`INV-2026-XXXX`) use atomic PostgreSQL transaction increments on the `Counter` model.
 4. **Order Expiry**: Unpaid orders expire after 30 minutes, releasing conditionally claimed slots and coupon limits.
+5. **Demo Password Gate (`DEMO_ACCESS_PASSWORD`)**: When set, middleware intercepts public requests and redirects unauthorized sessions to `/[locale]/demo-gate`.
+
+---
+
+## 7. Deferred from the SRS (Post-MVP Roadmap)
+
+The following items from the original SRS were intentionally deferred for the client engineering team during the post-MVP production deployment:
+
+1. **Facebook OAuth Login**: Customer authentication in this MVP is mobile-first via SMS OTP (Credentials provider), which matches the primary Indian Vedic user demographic. Facebook OAuth integration can be activated in NextAuth providers when enterprise Meta App credentials are ready.
+2. **Automated Horary AI Chatbot**: Deferred in favor of the Horary Prashna Kundli intake form (`/kundli/prashna`) and Kendra team consultation booking flow. An interactive LLM/RAG chatbot can be layered on top of the Kendra knowledge base post-launch.
+3. **Automated Transactional Email/SMS Workflows**: Asynchronous worker queues (e.g. BullMQ / AWS SQS) for dispatch notifications and review solicitation sequences should be provisioned alongside the MSG91/SES gateway.
+4. **Social Chat Floating Overlays**: WhatsApp and Telegram floating chat overlays were deferred to maintain clean Android WebView UX and avoid obscuring bottom mobile navigation bars or 44px touch targets. Kendra contact numbers and direct sister portal links are provided in the header and footer instead.

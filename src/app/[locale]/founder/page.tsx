@@ -29,7 +29,7 @@ export default async function FounderPage({ params: { locale } }: FounderPagePro
   const title = isHindi ? page?.titleHi || "संस्थापक एवं दैवज्ञ परंपरा" : page?.titleEn || "Founder Lineage & Scholarly Tradition";
   const content = isHindi
     ? page?.contentHi ||
-      "केंद्र के संस्थापक वरिष्ठ दैवज्ञों ने काशी हिंदू विश्वविद्यालय एवं संपूर्णानंद संस्कृत विश्वविद्यालय से वेदांग ज्योतिष में आचार्य पद प्राप्त कर पिछले चार दशकों में हजारों जातकों का मार्गदर्शन किया है।"
+      "केंद्र के संस्थापक वरिष्ठ दैवज्ञों ने काशी हिंदू विश्वविद्यालय एवं संपूर्णानंद संस्कृत विश्वविद्यालय से वेदांग ज्योतिष में उच्च उपाधि प्राप्त कर पिछले चार दशकों में हजारों जातकों का मार्गदर्शन किया है।"
     : page?.contentEn ||
       "Founded by senior Daivajnas trained in the classical Vedanga Jyotish tradition of Kashi, our Kendra preserves authentic Siddhanta calculations and ethical predictive consultations.";
 

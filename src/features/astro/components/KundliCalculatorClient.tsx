@@ -242,9 +242,14 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                 {name} • {result.ascendant}
               </h2>
             </div>
-            <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
-              Demo Calculation
-            </span>
+            <div className="flex flex-col sm:items-end gap-1">
+              <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
+                Demo
+              </span>
+              <span className="text-[11px] font-medium text-amber-900">
+                Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं
+              </span>
+            </div>
           </div>
 
           {/* Quick Metrics */}
@@ -318,7 +323,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                 className="min-h-[44px] px-6 py-2.5 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm text-center"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>{isHindi ? "विस्तृत दैवज्ञ कुण्डली विश्लेषण परामर्श लें" : "Order Detailed Acharya Analysis"}</span>
+                <span>{isHindi ? "विस्तृत दैवज्ञ कुण्डली विश्लेषण परामर्श लें" : "Order Detailed Kendra Team Analysis"}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 

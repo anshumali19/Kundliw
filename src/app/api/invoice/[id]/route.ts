@@ -176,7 +176,7 @@ export async function GET(
     <div class="footer-note">
       <strong>Terms & Declaration:</strong><br>
       1. Pure mathematical ephemeris and astrological guidance derived according to classical Surya Siddhantic & Parashari principles.<br>
-      2. Certified electronically by Maharshi Kanad Jyotish Kendra Peeth, Dashashwamedh Ghat, Varanasi.
+      2. Issued electronically by Maharshi Kanad Jyotish Kendra, Dashashwamedh Ghat, Varanasi.
     </div>
   </div>
 </body>

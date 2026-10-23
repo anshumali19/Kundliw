@@ -94,7 +94,7 @@ export default async function BookingSuccessPage({
 
           <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
             {isHindi
-              ? "आपकी दक्षिणा सफलतापूर्वक प्राप्त हो गई है। काशी पीठ के आचार्यगण द्वारा आपकी कुण्डली की शुद्ध शास्त्रीय गणना प्रारंभ की जा रही है।"
+              ? "आपकी दक्षिणा सफलतापूर्वक प्राप्त हो गई है। केंद्र परामर्श दल द्वारा आपकी कुण्डली की शुद्ध शास्त्रीय गणना प्रारंभ की जा रही है।"
               : "Your auspicious payment has been confirmed. Vedic astrological computations and chart analysis are now officially underway."}
           </p>
         </div>

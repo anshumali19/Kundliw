@@ -166,6 +166,13 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
+        // Strict customer access guard: customers must sign in via Mobile OTP only
+        if (user.role !== Role.ADMIN) {
+          throw new Error(
+            "Customer access is via Mobile OTP only. Email and password login is reserved for Kendra administration."
+          );
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
           throw new Error("Invalid email or password");

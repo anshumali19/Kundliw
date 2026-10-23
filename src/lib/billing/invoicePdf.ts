@@ -192,7 +192,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       );
       doc.fillColor("#574237").font("Helvetica").fontSize(7.5);
       doc.text(
-        "Maharshi Kanad Jyotish Kendra • Certified Digital Ephemeris Records",
+        "Maharshi Kanad Jyotish Kendra • Digital Ephemeris Records",
         40,
         notesY + 110,
         { align: "center", width: 515 }

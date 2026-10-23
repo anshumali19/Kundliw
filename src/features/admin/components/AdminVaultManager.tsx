@@ -213,7 +213,7 @@ export function AdminVaultManager({
               <input
                 type="text"
                 required
-                placeholder="e.g. Certified Lifetime Janampatri Dossier"
+                placeholder="e.g. Lifetime Janampatri Dossier"
                 value={titleEn}
                 onChange={(e) => setTitleEn(e.target.value)}
                 className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"

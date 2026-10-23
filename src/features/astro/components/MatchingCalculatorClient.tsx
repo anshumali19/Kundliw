@@ -316,15 +316,20 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
                 {boyName} & {girlName}
               </h2>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <span className="text-xs text-on-surface-variant block">{isHindi ? "कुल प्राप्त गुण" : "Total Score"}</span>
-                <span className="font-serif text-2xl font-bold text-secondary">
-                  {result.totalScore} <span className="text-sm font-normal text-outline">/ {result.maxScore}</span>
+            <div className="flex flex-col sm:items-end gap-1">
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <span className="text-xs text-on-surface-variant block">{isHindi ? "कुल प्राप्त गुण" : "Total Score"}</span>
+                  <span className="font-serif text-2xl font-bold text-secondary">
+                    {result.totalScore} <span className="text-sm font-normal text-outline">/ {result.maxScore}</span>
+                  </span>
+                </div>
+                <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider">
+                  Demo
                 </span>
               </div>
-              <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider">
-                Demo
+              <span className="text-[11px] font-medium text-amber-900">
+                Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं
               </span>
             </div>
           </div>
@@ -416,7 +421,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
                 className="min-h-[44px] px-6 py-2.5 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm text-center"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>{isHindi ? "विस्तृत मेलापक दैवज्ञ परामर्श लें" : "Order Detailed Acharya Analysis"}</span>
+                <span>{isHindi ? "विस्तृत मेलापक परामर्श लें" : "Order Detailed Kendra Team Analysis"}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 

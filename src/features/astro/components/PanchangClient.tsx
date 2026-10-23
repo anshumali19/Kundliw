@@ -126,9 +126,14 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
                 </h2>
               </div>
               {panchang.isDemo && (
-                <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
-                  Demo Ephemeris
-                </span>
+                <div className="flex flex-col sm:items-end gap-1">
+                  <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
+                    Demo
+                  </span>
+                  <span className="text-[11px] font-medium text-amber-900">
+                    Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं
+                  </span>
+                </div>
               )}
             </div>
 
@@ -270,8 +275,8 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
               </h3>
               <p className="text-xs text-on-surface-variant">
                 {isHindi
-                  ? "वरिष्ठ दैवज्ञ आपकी व्यक्तिगत कुण्डली के अनुसार त्रिबल शुद्धि विचार करेंगे।"
-                  : "Senior Acharyas evaluate Tribala Shuddhi according to your natal chart coordinates."}
+                  ? "केंद्र परामर्श दल आपकी व्यक्तिगत कुण्डली के अनुसार त्रिबल शुद्धि विचार करेंगे।"
+                  : "Kendra consultation team evaluates Tribala Shuddhi according to your natal chart coordinates."}
               </p>
             </div>
 

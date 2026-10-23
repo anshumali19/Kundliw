@@ -722,14 +722,14 @@ export function BookingWizard({
                   </div>
                   <p className="text-xs text-on-surface-variant">
                     {isHindi
-                      ? "वरिष्ठ आचार्य के साथ ३० मिनट प्रत्यक्ष वार्ता हेतु उपलब्ध समय चुनें।"
-                      : "Choose a reserved timeframe for your live Acharya consultation."}
+                      ? "केंद्र परामर्श दल के साथ ३० मिनट प्रत्यक्ष वार्ता हेतु उपलब्ध समय चुनें।"
+                      : "Choose a reserved timeframe for your live Kendra team consultation."}
                   </p>
 
                   {initialSlots.length === 0 ? (
                     <div className="p-4 bg-surface-container-low rounded border border-outline-variant text-xs text-secondary">
                       {isHindi
-                        ? "आगामी स्लॉट आदेश उपरांत आचार्य द्वारा निर्धारित किए जाएंगे।"
+                        ? "आगामी स्लॉट आदेश उपरांत केंद्र दल द्वारा निर्धारित किए जाएंगे।"
                         : "Slots will be allocated directly after consultation booking."}
                     </div>
                   ) : (

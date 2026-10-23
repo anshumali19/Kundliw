@@ -56,8 +56,13 @@ export function PanchangWidget({ panchang, locale }: PanchangWidgetProps) {
           </span>
 
           {panchang.isDemo && (
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
-              Demo
+            <span className="flex items-center gap-1.5">
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+                Demo
+              </span>
+              <span className="text-[10px] font-medium text-amber-900 hidden lg:inline">
+                Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं
+              </span>
             </span>
           )}
         </div>

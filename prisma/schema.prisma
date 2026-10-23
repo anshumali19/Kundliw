@@ -337,6 +337,10 @@ model AdminSettings {
   qrCodeUrl         String?
   gstin             String?
   defaultGstRateBps Int?     @default(1800)
+  socialFacebook    String?
+  socialTwitter     String?
+  socialInstagram   String?
+  socialYoutube     String?
   updatedAt         DateTime @updatedAt
 }
 

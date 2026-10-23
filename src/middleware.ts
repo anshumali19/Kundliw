@@ -19,6 +19,20 @@ export async function middleware(request: NextRequest) {
 
   const locale = pathname.startsWith("/en") ? "en" : "hi";
 
+  // 0. Optional DEMO_ACCESS_PASSWORD Gate
+  const demoAccessPassword = process.env.DEMO_ACCESS_PASSWORD;
+  if (demoAccessPassword && demoAccessPassword.trim() !== "") {
+    const isDemoGate = pathname.includes("/demo-gate");
+    if (!isDemoGate) {
+      const demoCookie = request.cookies.get("demo_access")?.value;
+      if (demoCookie !== demoAccessPassword) {
+        const demoGateUrl = new URL(`/${locale}/demo-gate`, request.url);
+        demoGateUrl.searchParams.set("callbackUrl", request.url);
+        return NextResponse.redirect(demoGateUrl);
+      }
+    }
+  }
+
   // 1. Role Guard: Admin route protection
   const isAdminRoute =
     pathname.includes("/admin") && !pathname.includes("/admin/login");
