@@ -36,3 +36,6 @@ next-env.d.ts
 # private vault storage in dev
 /storage/vault/*
 !/storage/vault/.gitkeep
+
+.vercel
+.env*

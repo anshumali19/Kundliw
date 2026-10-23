@@ -48,7 +48,8 @@ async function main() {
     }
   }
 
-  const adminPasswordHash = await bcrypt.hash(initialAdminPassword, 10);
+  const bcryptLib = (bcrypt as any).default || bcrypt;
+  const adminPasswordHash = await bcryptLib.hash(initialAdminPassword, 10);
   const adminUser = await prisma.user.upsert({
     where: { email: "admin@kanad-jyotish.in" },
     update: { role: Role.ADMIN },
@@ -62,7 +63,7 @@ async function main() {
   });
 
   // Demo standard customer user (uses fake demo phone, not SRS phone)
-  const userPasswordHash = await bcrypt.hash("UserKanad@2026", 10);
+  const userPasswordHash = await bcryptLib.hash("UserKanad@2026", 10);
   const demoCustomer = await prisma.user.upsert({
     where: { email: "aditya.sharma@example.com" },
     update: {},
