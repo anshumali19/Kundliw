@@ -1,0 +1,33 @@
+import { Metadata } from "next";
+import { getDailyPanchang } from "@/lib/astro/panchangService";
+import { PanchangClient } from "@/features/astro/components/PanchangClient";
+
+interface PanchangPageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params: { locale } }: PanchangPageProps): Promise<Metadata> {
+  const isHindi = locale === "hi";
+  return {
+    title: isHindi
+      ? "दैनिक पंचांग एवं शुभ मुहूर्त • महर्षि कणाद ज्योतिष केंद्र"
+      : "Daily Vedic Panchang & Shubh Muhurat • Maharshi Kanad Jyotish Kendra",
+    description: isHindi
+      ? "शुद्ध सूर्य सिद्धान्त एवं दृग्गणित पर आधारित वाराणसी दैनिक पंचांग, राहु काल एवं अभिजित मुहूर्त।"
+      : "Authentic mathematical daily Vedic almanac computed for Varanasi coordinates (Dashashwamedh Ghat).",
+  };
+}
+
+export default async function PanchangPage({ params: { locale } }: PanchangPageProps) {
+  const initialPanchang = await getDailyPanchang();
+
+  return (
+    <div className="w-full min-h-screen bg-surface-container-lowest py-8">
+      <PanchangClient initialPanchang={initialPanchang} locale={locale} />
+    </div>
+  );
+}

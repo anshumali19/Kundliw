@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
+import { getDailyPanchang } from "@/lib/astro/panchangService";
+import { PanchangWidget } from "@/features/astro/components/PanchangWidget";
 import {
   Calendar,
   BookOpen,
@@ -13,7 +15,13 @@ import {
   Sparkles,
 } from "lucide-react";
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  const locale = params?.locale || "hi";
+  const panchang = await getDailyPanchang();
   const tCommon = await getTranslations("common");
   const tHero = await getTranslations("hero");
   const tTransit = await getTranslations("transitWidget");
@@ -95,27 +103,8 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col w-full text-on-surface">
-      {/* 1. EPHEMERIS STRIP (Neutral placeholder until Phase 11 live adapter) */}
-      <section className="w-full bg-surface-container-high border-b border-secondary/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-left">
-            <div className="flex items-center gap-2 text-xs">
-              <Calendar className="w-4 h-4 text-primary shrink-0" />
-              <span className="text-secondary font-bold font-serif">
-                {tCommon("siteNameHi")}
-              </span>
-              <span className="text-outline-variant">•</span>
-              <span className="text-on-surface-variant">
-                {tCommon("tagline")}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-on-surface-variant">
-              <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-              <span>{tCommon("varanasiLineage")}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 1. EPHEMERIS STRIP / PANCHANG WIDGET */}
+      <PanchangWidget panchang={panchang} locale={locale} />
 
       {/* 2. ASYMMETRIC HERO SECTION (65 / 35 Split) */}
       <section className="w-full bg-surface border-b border-outline-variant/40">
