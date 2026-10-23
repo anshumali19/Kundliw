@@ -278,8 +278,8 @@ export function BookingWizard({
         // Ignore
       }
 
-      // Navigate to success receipt page
-      router.push(`/${locale}/booking/success/${data.orderId}`);
+      // Navigate to checkout payment page
+      router.push(`/${locale}/booking/checkout/${data.orderId}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Order creation failed.";
       setSubmissionError(msg);

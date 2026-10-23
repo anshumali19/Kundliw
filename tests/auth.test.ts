@@ -156,13 +156,16 @@ describe("SMS Provider Factory & Production Loud Failure", () => {
     const envObj = process.env as Record<string, string | undefined>;
     const originalEnv = envObj.NODE_ENV;
     const originalKey = envObj.MSG91_AUTH_KEY;
+    const originalDemo = envObj.DEMO_MODE;
     envObj.NODE_ENV = "production";
     delete envObj.MSG91_AUTH_KEY;
+    delete envObj.DEMO_MODE;
 
     expect(() => getSmsProvider()).toThrow("CRITICAL CONFIGURATION ERROR: No SMS provider configured");
 
     envObj.NODE_ENV = originalEnv;
     if (originalKey) envObj.MSG91_AUTH_KEY = originalKey;
+    if (originalDemo) envObj.DEMO_MODE = originalDemo;
   });
 });
 

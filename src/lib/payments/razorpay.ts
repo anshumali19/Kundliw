@@ -23,10 +23,18 @@ export function verifyRazorpayPaymentSignature(
     .update(`${orderId}|${paymentId}`)
     .digest("hex");
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature, "utf-8"),
-    Buffer.from(expectedSignature, "utf-8")
-  );
+  try {
+    const sigBuffer = Buffer.from(signature, "utf-8");
+    const expectedBuffer = Buffer.from(expectedSignature, "utf-8");
+
+    if (sigBuffer.length !== expectedBuffer.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(sigBuffer, expectedBuffer);
+  } catch {
+    return false;
+  }
 }
 
 /**

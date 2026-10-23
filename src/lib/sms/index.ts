@@ -1,3 +1,5 @@
+import { assertPlaceholderAllowed, isDemoMode } from "@/lib/config/demo";
+
 export interface SendSmsInput {
   phone: string;
   message: string;
@@ -93,9 +95,12 @@ export function getSmsProvider(): SmsProvider {
     if (process.env.MSG91_AUTH_KEY) {
       return new Msg91SmsProvider();
     }
-    throw new Error(
-      "CRITICAL CONFIGURATION ERROR: No SMS provider configured for production environment. Set MSG91_AUTH_KEY or configure provider."
-    );
+    if (!isDemoMode()) {
+      throw new Error(
+        "CRITICAL CONFIGURATION ERROR: No SMS provider configured for production environment. Set MSG91_AUTH_KEY or configure provider."
+      );
+    }
+    return new DevConsoleSmsProvider();
   }
 
   return new DevConsoleSmsProvider();
