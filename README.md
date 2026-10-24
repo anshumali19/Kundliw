@@ -1,14 +1,32 @@
 # Maharshi Kanad Jyotish Kendra (महर्षि कणाद ज्योतिष केंद्र)
-### Vedic Ephemeris & Astronomical Jyotish Siddhanta Web Platform (Demo MVP)
+### Vedic Ephemeris & Astronomical Jyotish Siddhanta Web Platform
 
 A high-precision, bilingual (Hindi & English) Vedic astrology and consultation web portal built to canonical specifications from Dashashwamedh Ghat, Varanasi.
+
+🌐 **Live Production URL**: [https://kanad-jyotish-kendra.vercel.app](https://kanad-jyotish-kendra.vercel.app)
+
+---
+
+## 📚 Documentation Directory
+
+Complete system and operational documentation is organized in the [`docs/`](file:///C:/Users/anshu/Desktop/ClientWork/docs) directory:
+
+| Document | Description | Path |
+| :--- | :--- | :--- |
+| **System Architecture** | High-level architecture, design system, Lenis scroll engine, state machine, and provider patterns | [docs/ARCHITECTURE.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/ARCHITECTURE.md) |
+| **REST API Reference** | Complete endpoint documentation, request/response payloads, and authentication guards | [docs/API_DOCUMENTATION.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/API_DOCUMENTATION.md) |
+| **Database Schema** | Complete Prisma PostgreSQL models, relations, field dictionaries, and Mermaid ER diagram | [docs/DATABASE_SCHEMA.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/DATABASE_SCHEMA.md) |
+| **Deployment Guide** | Vercel production deployment, PostgreSQL setup, environment variables, and custom domains | [docs/DEPLOYMENT_GUIDE.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/DEPLOYMENT_GUIDE.md) |
+| **Administrator Manual** | Operating manual for Kendra staff managing services, orders, vault, coupons, and content | [docs/ADMIN_MANUAL.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/ADMIN_MANUAL.md) |
+| **Engineering Handoff** | Production integration instructions for SMS, Razorpay, Swiss Ephemeris, and AWS S3 | [HANDOFF.md](file:///C:/Users/anshu/Desktop/ClientWork/HANDOFF.md) |
 
 ---
 
 ## 🌟 Tech Stack
 
 - **Framework**: Next.js 14 (App Router) + TypeScript
-- **Styling**: Tailwind CSS with custom Vedic Broadsheet design system (editorial serifs, saffron/maroon accents, 44px min touch targets, asymmetric layouts)
+- **Smooth Scrolling**: Lenis (`lenis/react`) configured at root layout (`lerp: 0.1`, `duration: 1.2`)
+- **Styling**: Tailwind CSS with custom Vedic Broadsheet design system (editorial serifs, saffron/maroon accents, 44px min touch targets, left-aligned full-width layouts)
 - **Internationalization**: `next-intl` (all copy in `messages/hi.json` and `messages/en.json`, zero hardcoded UI strings)
 - **Database & ORM**: PostgreSQL + Prisma ORM
 - **Authentication**: NextAuth.js / Auth.js (Credentials OTP with rate-limiting, Admin Email/Password with lockout, Google OAuth ready)
@@ -65,7 +83,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🔑 Demo Login Credentials
 
-The seed script creates realistic demo accounts with pre-populated orders across all 6 canonical statuses and a sample vault document:
+The seed script creates realistic demo accounts with pre-populated orders across all 6 canonical statuses and sample vault documents:
 
 ### Administrator Account
 - **URL**: [http://localhost:3000/en/auth/signin](http://localhost:3000/en/auth/signin) (toggle "Admin Login" tab)
@@ -94,9 +112,9 @@ If `DEMO_ACCESS_PASSWORD` is defined in `.env`:
 ### 1. Public & Free Astrological Calculators
 - **Homepage (`/`)**: Ephemeris bar with daily Panchang widget, hero callouts, Vedic lineage overview, service catalog, and customer reviews.
 - **Daily Almanac (`/panchang`)**: Full 5-limb Vedic ephemeris (Tithi, Vaar, Nakshatra, Yoga, Karana), Abhijit Muhurat, Rahu Kaal, Sunrise/Sunset, and Samvat details with date selector.
-- **Janampatri Calculator (`/kundli`)**: Free Vedic chart computation, 9-planet coordinates, ascendant, Vimshottari Mahadasha, and direct booking upsell.
+- **Janampatri Calculator (`/kundli`)**: Free Vedic chart computation, 9-planet coordinates, ascendant, Vimshottari Mahadasha, and direct booking upsell. Matches canonical broadsheet dashboard interface.
 - **Horoscope Matching (`/kundli/matching`)**: 36-Guna Ashtakoot Milapak calculator with Manglik and Nadi Dosha review.
-- **Horary Prashna (`/kundli/prashna`)**: Simplified horary question intake logging a `PRASHNA_KUNDLI` order for Pandit examination.
+- **Horary Prashna (`/kundli/prashna`)**: Horary question intake dashboard logging a `PRASHNA_KUNDLI` order for Pandit examination.
 
 ### 2. Consultation Booking & Payments (Phases 3 to 6)
 - **Services Catalog (`/services`)**: Filterable service listings with plans in Paise.
@@ -161,9 +179,3 @@ Check TypeScript types and ESLint:
 npm run typecheck
 npm run lint
 ```
-
----
-
-## 📄 License & Client Handoff
-
-For production integration details (Razorpay API keys, MSG91 DLT templates, Swiss Ephemeris credentials, and AWS S3 storage), refer to [HANDOFF.md](file:///C:/Users/anshu/Desktop/ClientWork/HANDOFF.md).
