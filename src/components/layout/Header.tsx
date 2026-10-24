@@ -263,27 +263,10 @@ export function Header() {
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 ml-auto">
-            {/* Direct Login and Register on Desktop */}
-            <Link
-              href="/auth/signin"
-              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 text-xs uppercase tracking-wider font-semibold text-secondary hover:bg-surface-container rounded transition-colors min-h-[38px] whitespace-nowrap"
-            >
-              <LogIn className="w-3.5 h-3.5 text-secondary shrink-0" />
-              <span>{tNav("signIn")}</span>
-            </Link>
-
-            <Link
-              href="/auth/register"
-              className="hidden xl:inline-flex items-center gap-1 px-2.5 py-1.5 text-xs uppercase tracking-wider font-semibold text-primary hover:bg-surface-container rounded transition-colors min-h-[38px] whitespace-nowrap"
-            >
-              <UserPlus className="w-3.5 h-3.5 text-primary shrink-0" />
-              <span>{tNav("register")}</span>
-            </Link>
-
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
             <Link
               href="/services"
-              className="hidden sm:inline-flex items-center justify-center px-3.5 py-2 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
+              className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
             >
               <Calendar className="w-4 h-4 mr-1.5 shrink-0" />
               <span>{tCommon("bookConsultation")}</span>
