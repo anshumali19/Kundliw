@@ -21,17 +21,17 @@ export async function Footer() {
   const addressLine1 = settings?.addressEn || t("addressLine1");
 
   return (
-    <footer className="w-full bg-surface-container-low border-t border-secondary/20 pt-12 pb-16 lg:pb-8">
-      <div className="w-full px-4 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-outline-variant/50 text-left">
+    <footer className="w-full bg-surface-container-low border-t border-secondary/20 pt-8 pb-6 text-left">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 xl:gap-8 pb-8 border-b border-outline-variant/50 text-left">
           {/* Col 1: Identity & Sanctum Address with Logo */}
-          <div className="lg:col-span-2 space-y-3">
+          <div className="space-y-3">
             <div className="flex items-center gap-2.5">
               <span className="w-9 h-9 rounded border border-secondary flex items-center justify-center font-serif text-xl text-secondary bg-surface font-bold shrink-0">
                 ॐ
               </span>
               <div className="flex flex-col">
-                <span className="font-serif text-lg font-bold text-secondary leading-tight">
+                <span className="font-serif text-base font-bold text-secondary leading-tight">
                   {t("title")}
                 </span>
                 <span className="text-[10px] uppercase tracking-widest text-primary font-bold">
@@ -39,7 +39,7 @@ export async function Footer() {
                 </span>
               </div>
             </div>
-            <p className="text-xs text-on-surface-variant leading-relaxed max-w-sm">
+            <p className="text-xs text-on-surface-variant leading-relaxed">
               {t("bio")}
             </p>
             <div className="text-xs text-on-surface-variant space-y-1 pt-1">
@@ -108,7 +108,7 @@ export async function Footer() {
             <div className="font-serif text-xs font-bold text-secondary mb-3 uppercase tracking-wider">
               {t("servicesTitle")}
             </div>
-            <ul className="space-y-2 text-xs text-on-surface-variant">
+            <ul className="space-y-1.5 text-xs text-on-surface-variant">
               <li>
                 <Link href="/services" className="hover:text-primary transition-colors block py-0.5">
                   {tNav("services")}
@@ -152,7 +152,7 @@ export async function Footer() {
             <div className="font-serif text-xs font-bold text-secondary mb-3 uppercase tracking-wider">
               {tNav("about")} &amp; केंद्र
             </div>
-            <ul className="space-y-2 text-xs text-on-surface-variant">
+            <ul className="space-y-1.5 text-xs text-on-surface-variant">
               <li>
                 <Link href="/about" className="hover:text-primary transition-colors block py-0.5">
                   {tNav("about")}
@@ -191,39 +191,10 @@ export async function Footer() {
             </ul>
           </div>
 
-          {/* Col 4: Contact, Cross-Services & Legal */}
+          {/* Col 4: Sister Portals & Legal Pages */}
           <div className="space-y-4">
             <div>
               <div className="font-serif text-xs font-bold text-secondary mb-3 uppercase tracking-wider">
-                {t("contactTitle")}
-              </div>
-              <ul className="space-y-1.5 text-xs text-on-surface-variant">
-                <li>
-                  <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="hover:text-primary font-semibold text-on-surface block">
-                    {phone1}
-                  </a>
-                </li>
-                {phone2 && (
-                  <li>
-                    <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="hover:text-primary text-on-surface-variant block">
-                      {phone2}
-                    </a>
-                  </li>
-                )}
-                <li>
-                  <a href={`mailto:${email}`} className="hover:text-primary block">
-                    {email}
-                  </a>
-                </li>
-                <li>
-                  <span>{t("hours")}</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* SRS Required Cross-Services */}
-            <div className="pt-2 border-t border-outline-variant/40">
-              <div className="font-serif text-[11px] font-bold text-secondary mb-2 uppercase tracking-wider">
                 सहयोगी सेवाएँ • Sister Portals
               </div>
               <ul className="space-y-1.5 text-xs">
@@ -252,9 +223,8 @@ export async function Footer() {
               </ul>
             </div>
 
-            {/* Legal Pages */}
             <div className="pt-2 border-t border-outline-variant/40">
-              <div className="font-serif text-[11px] font-bold text-secondary mb-2 uppercase tracking-wider">
+              <div className="font-serif text-xs font-bold text-secondary mb-2 uppercase tracking-wider">
                 {t("legalTitle")}
               </div>
               <ul className="space-y-1 text-xs text-on-surface-variant">
@@ -276,12 +246,41 @@ export async function Footer() {
               </ul>
             </div>
           </div>
+
+          {/* Col 5: Helpline & Support Contact */}
+          <div>
+            <div className="font-serif text-xs font-bold text-secondary mb-3 uppercase tracking-wider">
+              {t("contactTitle")}
+            </div>
+            <ul className="space-y-1.5 text-xs text-on-surface-variant">
+              <li>
+                <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="hover:text-primary font-semibold text-on-surface block">
+                  {phone1}
+                </a>
+              </li>
+              {phone2 && (
+                <li>
+                  <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="hover:text-primary text-on-surface-variant block">
+                    {phone2}
+                  </a>
+                </li>
+              )}
+              <li>
+                <a href={`mailto:${email}`} className="hover:text-primary block">
+                  {email}
+                </a>
+              </li>
+              <li className="pt-1 text-outline">
+                <span>{t("hours")}</span>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Bottom Bar: Broadsheet Copyright & Lineage Seal */}
-        <div className="pt-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-on-surface-variant">
+        <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-on-surface-variant">
           <div className="text-left">
-            {t("copyright")} {tCommon("allRightsReserved")}
+            {t("copyright")}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-secondary font-semibold">दृग्गणित सिद्धान्त</span>
