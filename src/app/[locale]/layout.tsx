@@ -8,6 +8,7 @@ import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { prisma } from "@/lib/prisma";
 import "@/app/globals.css";
 
 const notoSerif = Noto_Serif({
@@ -39,6 +40,20 @@ export default async function LocaleLayout({
 }) {
   const messages = await getMessages();
 
+  const topBanners = await prisma.banner
+    .findMany({
+      where: { isActive: true, position: "TOP" },
+      orderBy: { orderIndex: "asc" },
+    })
+    .catch(() => []);
+
+  const bottomBanners = await prisma.banner
+    .findMany({
+      where: { isActive: true, position: "BOTTOM" },
+      orderBy: { orderIndex: "asc" },
+    })
+    .catch(() => []);
+
   return (
     <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable}`}>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen">
@@ -46,12 +61,12 @@ export default async function LocaleLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Header />
           <div className="pt-[116px]">
-            <BannerSlot position="TOP" />
+            <BannerSlot position="TOP" initialBanners={topBanners} />
           </div>
           <main className="flex-1 w-full pb-16 xl:pb-0">
             {children}
           </main>
-          <BannerSlot position="BOTTOM" />
+          <BannerSlot position="BOTTOM" initialBanners={bottomBanners} />
           <MarqueeStrip />
           <Footer />
           <MobileNav />

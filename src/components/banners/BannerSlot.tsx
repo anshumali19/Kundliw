@@ -228,20 +228,20 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
   return (
     <aside
       aria-label={`${position} Promotional Banner`}
-      className={`bg-surface-container-lowest border border-secondary/40 rounded p-4 flex flex-col justify-between text-left relative overflow-hidden ${className}`}
+      className={`h-full w-full bg-surface-container-lowest border-2 border-secondary/40 rounded p-5 flex flex-col justify-between text-left relative overflow-hidden shadow-sm hover:border-secondary transition-colors ${className}`}
     >
       <div className="space-y-2 mb-4">
         <div className="flex items-center justify-between text-[10px] text-outline uppercase font-bold">
-          <span className="px-1.5 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed rounded">
-            विशेष सूचना
+          <span className="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed rounded font-semibold">
+            विशेष सूचना • Notice
           </span>
           {isCarousel && (
-            <span>
+            <span className="font-mono text-outline">
               {currentIndex + 1} / {total}
             </span>
           )}
         </div>
-        <h4 className="font-serif text-base font-bold text-secondary leading-snug">
+        <h4 className="font-serif text-lg font-bold text-secondary leading-snug">
           {current.titleHi}
         </h4>
         <div className="text-xs font-semibold text-primary">
@@ -254,14 +254,14 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
         )}
       </div>
 
-      <div className="pt-2 border-t border-outline-variant/40 flex items-center justify-between gap-2">
+      <div className="pt-3 border-t border-outline-variant/40 flex items-center justify-between gap-3">
         {current.linkUrl ? (
           <Link
             href={current.linkUrl}
-            className="text-xs font-bold text-primary hover:underline uppercase tracking-wider inline-flex items-center gap-1 min-h-[44px]"
+            className="text-xs font-bold text-primary hover:underline uppercase tracking-wider inline-flex items-center gap-1.5 min-h-[44px]"
           >
-            <span>विवरण देखें</span>
-            <ExternalLink className="w-3 h-3" />
+            <span>विवरण देखें • Explore</span>
+            <ExternalLink className="w-3.5 h-3.5" />
           </Link>
         ) : (
           <div />
@@ -273,7 +273,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
               type="button"
               onClick={prevSlide}
               aria-label="Previous"
-              className="w-11 h-11 flex items-center justify-center rounded text-secondary hover:bg-surface-container text-xs"
+              className="w-11 h-11 flex items-center justify-center rounded border border-outline-variant/50 text-secondary hover:bg-surface-container text-xs"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -281,7 +281,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
               type="button"
               onClick={nextSlide}
               aria-label="Next"
-              className="w-11 h-11 flex items-center justify-center rounded text-secondary hover:bg-surface-container text-xs"
+              className="w-11 h-11 flex items-center justify-center rounded border border-outline-variant/50 text-secondary hover:bg-surface-container text-xs"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

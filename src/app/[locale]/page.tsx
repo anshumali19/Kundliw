@@ -4,6 +4,7 @@ import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { PanchangWidget } from "@/features/astro/components/PanchangWidget";
 import { LiveClockEphemeris } from "@/components/home/LiveClockEphemeris";
 import { BannerSlot } from "@/components/banners/BannerSlot";
+import { prisma } from "@/lib/prisma";
 import {
   Calendar,
   BookOpen,
@@ -24,6 +25,18 @@ export default async function HomePage({
 }) {
   const locale = params?.locale || "hi";
   const panchang = await getDailyPanchang();
+  const leftBanners = await prisma.banner
+    .findMany({
+      where: { isActive: true, position: "LEFT" },
+      orderBy: { orderIndex: "asc" },
+    })
+    .catch(() => []);
+  const rightBanners = await prisma.banner
+    .findMany({
+      where: { isActive: true, position: "RIGHT" },
+      orderBy: { orderIndex: "asc" },
+    })
+    .catch(() => []);
   const tCommon = await getTranslations("common");
   const tHero = await getTranslations("hero");
   const tTransit = await getTranslations("transitWidget");
@@ -290,18 +303,38 @@ export default async function HomePage({
                   {tTransit("transitNote")}
                 </div>
               </div>
-
-              {/* Right Column Banner Slot */}
-              <BannerSlot position="RIGHT" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Left Banner Announcement Slot */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
-        <BannerSlot position="LEFT" />
-      </div>
+      {/* 2.5 PROMOTIONAL BANNERS GRID (Balanced 2-Column Section) */}
+      {(leftBanners.length > 0 || rightBanners.length > 0) && (
+        <section className="w-full bg-surface-container-low/40 border-b border-outline-variant/30 py-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+              {leftBanners.length > 0 ? (
+                <BannerSlot
+                  position="LEFT"
+                  initialBanners={leftBanners}
+                  className="h-full"
+                />
+              ) : (
+                <div />
+              )}
+              {rightBanners.length > 0 ? (
+                <BannerSlot
+                  position="RIGHT"
+                  initialBanners={rightBanners}
+                  className="h-full"
+                />
+              ) : (
+                <div />
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 3. CORE SERVICES GRID (2-Column Ruled Editorial Split) */}
       <section className="w-full bg-surface-container-low/70 py-12 border-b border-secondary/20">

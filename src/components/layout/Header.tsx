@@ -31,6 +31,17 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [currentHash, setCurrentHash] = useState("");
+
+  // Sync hash for hash-based navigation (e.g. /services#plans)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentHash(window.location.hash);
+      const handleHashChange = () => setCurrentHash(window.location.hash);
+      window.addEventListener("hashchange", handleHashChange);
+      return () => window.removeEventListener("hashchange", handleHashChange);
+    }
+  }, [pathname]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -63,6 +74,32 @@ export function Header() {
     { href: "/panchang", label: tNav("panchang"), icon: BookOpen },
     { href: "/track", label: tNav("tracker"), icon: Search },
   ];
+
+  // Precise route matching so siblings don't share active state
+  const checkIsActive = (href: string) => {
+    if (href === "/") {
+      return pathname === "/" || pathname === "";
+    }
+    if (href.includes("#")) {
+      const [base, hash] = href.split("#");
+      return pathname === base && currentHash === `#${hash}`;
+    }
+    if (href === "/services") {
+      return (pathname === "/services" || pathname.startsWith("/services/")) && currentHash !== "#plans";
+    }
+    if (href === "/kundli") {
+      return pathname === "/kundli";
+    }
+    if (href === "/kundli/matching") {
+      return pathname === "/kundli/matching";
+    }
+    if (href === "/kundli/prashna") {
+      return pathname === "/kundli/prashna";
+    }
+    return pathname === href;
+  };
+
+  const isAnyKendraActive = kendraLinks.some((k) => pathname === k.href || pathname.startsWith(`${k.href}/`));
 
   // Complete SRS 13-item navigation list for mobile drawer
   const srsMobileMenu = [
@@ -135,18 +172,22 @@ export function Header() {
           {/* Desktop Nav Links */}
           <nav className="hidden xl:flex items-center gap-1 h-20">
             {primaryLinks.map((link) => {
-              const isActive =
-                link.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(link.href.split("#")[0]);
+              const isActive = checkIsActive(link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`h-full flex items-center px-2.5 text-xs uppercase tracking-wider font-semibold transition-colors border-b-2 ${
+                  onClick={() => {
+                    if (link.href.includes("#")) {
+                      setCurrentHash(`#${link.href.split("#")[1]}`);
+                    } else {
+                      setCurrentHash("");
+                    }
+                  }}
+                  className={`h-full flex items-center px-2.5 text-xs uppercase tracking-wider font-semibold transition-all duration-200 border-b-2 ${
                     isActive
                       ? "text-secondary border-secondary font-bold"
-                      : "text-on-surface-variant hover:text-on-surface border-transparent"
+                      : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
                   }`}
                 >
                   {link.label}
@@ -159,7 +200,11 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                className="h-full flex items-center gap-1 px-2.5 text-xs uppercase tracking-wider font-semibold text-on-surface-variant hover:text-on-surface border-b-2 border-transparent transition-colors min-h-[44px]"
+                className={`h-full flex items-center gap-1 px-2.5 text-xs uppercase tracking-wider font-semibold transition-all duration-200 border-b-2 min-h-[44px] ${
+                  isAnyKendraActive
+                    ? "text-secondary border-secondary font-bold"
+                    : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
+                }`}
                 aria-expanded={moreDropdownOpen}
               >
                 <span>{tNav("about")} &amp; केंद्र</span>
@@ -244,17 +289,24 @@ export function Header() {
             <div className="text-[10px] uppercase font-bold tracking-wider text-on-surface-variant px-3 py-1">
               वेबसाइट मेनू • Website Navigation
             </div>
-            {srsMobileMenu.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2.5 px-3 rounded text-xs uppercase tracking-wider font-semibold text-on-surface hover:bg-surface-container min-h-[44px] flex items-center justify-between"
-              >
-                <span>{link.label}</span>
-                <span className="text-primary text-xs font-serif">→</span>
-              </Link>
-            ))}
+            {srsMobileMenu.map((link) => {
+              const isActive = checkIsActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`py-2.5 px-3 rounded text-xs uppercase tracking-wider font-semibold min-h-[44px] flex items-center justify-between transition-colors ${
+                    isActive
+                      ? "bg-surface-container text-secondary font-bold border-l-4 border-secondary"
+                      : "text-on-surface hover:bg-surface-container"
+                  }`}
+                >
+                  <span>{link.label}</span>
+                  <span className="text-primary text-xs font-serif">→</span>
+                </Link>
+              );
+            })}
             <div className="pt-3 border-t border-outline-variant/30 flex flex-col gap-2">
               <Link
                 href="/services"
