@@ -32,7 +32,7 @@ export default async function BlogsPage({ params: { locale } }: BlogsPageProps) 
   });
 
   return (
-    <div className="w-full min-h-[70vh] py-12 px-4 sm:px-6 max-w-5xl mx-auto text-left space-y-8">
+    <div className="w-full min-h-[70vh] py-12 px-4 sm:px-8 lg:px-12 text-left space-y-8">
       <div>
         <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
           <BookOpen className="w-4 h-4" />

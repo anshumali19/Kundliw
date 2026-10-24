@@ -80,7 +80,7 @@ export default async function ServiceDetailPage({
     <div className="w-full flex flex-col text-on-surface text-left">
       {/* 1. Breadcrumbs Strip */}
       <section className="w-full bg-surface-container-low border-b border-secondary/20 py-3.5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 text-left">
+        <div className="w-full px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-3 text-left">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-on-surface-variant font-medium">
             <Link href="/" className="hover:text-primary transition-colors">
               {isHindi ? "मुख्य पृष्ठ" : "Home"}
@@ -96,7 +96,7 @@ export default async function ServiceDetailPage({
       </section>
 
       {/* 2. Asymmetric Showcase (70% Left Editorial / 30% Right Data Pane) */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-12 text-left">
+      <section className="w-full px-4 sm:px-8 lg:px-12 pt-10 pb-12 text-left">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Pane (70% ~ 8 cols) */}
           <div className="lg:col-span-8 flex flex-col space-y-6 text-left">
@@ -213,7 +213,7 @@ export default async function ServiceDetailPage({
 
       {/* 3. Interactive Plan Selector & Sticky Bar */}
       <section className="w-full bg-surface-container-low/60 border-t border-secondary/20 py-12 text-left">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="w-full px-4 sm:px-8 lg:px-12">
           <PlanSelectorInteractive
             plans={plansDto}
             serviceSlug={service.slug}

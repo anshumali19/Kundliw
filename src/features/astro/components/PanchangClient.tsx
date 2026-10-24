@@ -52,7 +52,7 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-10 text-left space-y-8">
+    <div className="w-full px-4 sm:px-8 lg:px-12 py-6 sm:py-10 text-left space-y-8">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">

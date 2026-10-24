@@ -94,7 +94,7 @@ export function TrackOrderClient({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 text-left space-y-8">
+    <div className="w-full px-4 sm:px-8 lg:px-12 py-6 sm:py-10 text-left space-y-8">
       {/* Page Header */}
       <div>
         <span className="text-xs font-bold uppercase tracking-widest text-primary">

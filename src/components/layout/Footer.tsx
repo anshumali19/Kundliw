@@ -22,7 +22,7 @@ export async function Footer() {
 
   return (
     <footer className="w-full bg-surface-container-low border-t border-secondary/20 pt-12 pb-16 lg:pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-4 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-outline-variant/50 text-left">
           {/* Col 1: Identity & Sanctum Address with Logo */}
           <div className="lg:col-span-2 space-y-3">

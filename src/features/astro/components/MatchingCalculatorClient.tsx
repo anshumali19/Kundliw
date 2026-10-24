@@ -190,7 +190,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
   ];
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 text-left space-y-8">
+    <div className="w-full px-4 sm:px-8 lg:px-12 py-6 sm:py-10 text-left space-y-8">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">

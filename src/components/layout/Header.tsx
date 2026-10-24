@@ -122,7 +122,7 @@ export function Header() {
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
       {/* 1. Top Sub-Bar: Vedic Invocation, Live Ephemeris Summary & Contact */}
       <div className="bg-surface-container-high border-b border-outline-variant/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between gap-2 text-xs text-on-surface-variant font-medium">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-9 flex items-center justify-between gap-2 text-xs text-on-surface-variant font-medium">
           <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap min-w-0 flex-1">
             <span className="font-serif text-secondary font-semibold italic tracking-wide truncate">
               {tHeader("invocation")}
@@ -153,9 +153,9 @@ export function Header() {
 
       {/* 2. Main Navigation Bar */}
       <div className="bg-surface">
-        <div className="h-20 max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="h-20 w-full px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6">
           {/* Logo & Kendra Identity */}
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 sm:flex-initial">
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0 shrink-0">
             <div className="w-10 h-10 sm:w-11 sm:h-11 rounded border border-secondary flex items-center justify-center bg-surface-container-low text-secondary shrink-0">
               <span className="font-serif text-xl sm:text-2xl font-bold">ॐ</span>
             </div>
@@ -170,7 +170,7 @@ export function Header() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden xl:flex items-center gap-1 h-20">
+          <nav className="hidden xl:flex items-center gap-1 h-20 ml-4 mr-auto">
             {primaryLinks.map((link) => {
               const isActive = checkIsActive(link.href);
               return (
@@ -195,8 +195,13 @@ export function Header() {
               );
             })}
 
-            {/* Desktop Dropdown for About & Kendra Lineage */}
-            <div className="relative h-full flex items-center" ref={dropdownRef}>
+            {/* Desktop Dropdown for About & Kendra Lineage (opens on hover and click) */}
+            <div
+              className="relative h-full flex items-center"
+              ref={dropdownRef}
+              onMouseEnter={() => setMoreDropdownOpen(true)}
+              onMouseLeave={() => setMoreDropdownOpen(false)}
+            >
               <button
                 type="button"
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
@@ -216,7 +221,11 @@ export function Header() {
               </button>
 
               {moreDropdownOpen && (
-                <div className="absolute top-full right-0 w-64 bg-surface border border-outline-variant/60 shadow-xl rounded-b py-2 z-50 text-left">
+                <div
+                  className="absolute top-full left-0 w-64 bg-surface border border-outline-variant/60 shadow-xl rounded-b py-2 z-50 text-left"
+                  onMouseEnter={() => setMoreDropdownOpen(true)}
+                  onMouseLeave={() => setMoreDropdownOpen(false)}
+                >
                   {kendraLinks.map((sub) => {
                     const SubIcon = sub.icon;
                     return (

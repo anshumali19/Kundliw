@@ -40,7 +40,7 @@ export default async function ServicesListingPage({
     <div className="w-full flex flex-col text-on-surface text-left">
       {/* 1. Header Breadcrumb & Category Bar */}
       <section className="w-full bg-surface-container-low border-b border-secondary/20 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="w-full px-4 sm:px-8 lg:px-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-on-surface-variant font-medium">
             <Link href="/" className="hover:text-primary transition-colors">
               {isHindi ? "मुख्य पृष्ठ" : "Home"}
@@ -60,7 +60,7 @@ export default async function ServicesListingPage({
 
       {/* 2. Hero Headline Area */}
       <section className="w-full bg-surface border-b border-outline-variant/30 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="w-full px-4 sm:px-8 lg:px-12">
           <div className="max-w-3xl">
             <span className="text-xs uppercase tracking-widest text-primary font-bold">
               {tServices("eyebrow")}
@@ -77,7 +77,7 @@ export default async function ServicesListingPage({
 
       {/* 3. Services Grid */}
       <section className="w-full py-12 bg-surface-container-low/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="w-full px-4 sm:px-8 lg:px-12">
           {services.length === 0 ? (
             <div className="p-12 text-center bg-surface rounded border border-outline-variant/60 flex flex-col items-center justify-center">
               <AlertCircle className="w-10 h-10 text-outline mb-2" />

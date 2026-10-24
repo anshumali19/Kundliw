@@ -123,7 +123,7 @@ export default async function HomePage({
 
       {/* 2. ASYMMETRIC HERO SECTION (65 / 35 Split) */}
       <section className="w-full bg-surface border-b border-outline-variant/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
+        <div className="w-full px-4 sm:px-8 lg:px-12 py-10 lg:py-14">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column (65% ~ 8 cols) */}
             <div className="lg:col-span-8 flex flex-col justify-start text-left">
@@ -311,7 +311,7 @@ export default async function HomePage({
       {/* 2.5 PROMOTIONAL BANNERS GRID (Balanced 2-Column Section) */}
       {(leftBanners.length > 0 || rightBanners.length > 0) && (
         <section className="w-full bg-surface-container-low/40 border-b border-outline-variant/30 py-6">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="w-full px-4 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
               {leftBanners.length > 0 ? (
                 <BannerSlot
@@ -338,7 +338,7 @@ export default async function HomePage({
 
       {/* 3. CORE SERVICES GRID (2-Column Ruled Editorial Split) */}
       <section className="w-full bg-surface-container-low/70 py-12 border-b border-secondary/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-left">
+        <div className="w-full px-4 sm:px-8 lg:px-12 text-left">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-8 border-b-2 border-secondary/30">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-widest">
@@ -426,7 +426,7 @@ export default async function HomePage({
 
       {/* 4. 5-STAGE VEDIC PIPELINE STRIP */}
       <section className="w-full bg-surface-container py-12 border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-left">
+        <div className="w-full px-4 sm:px-8 lg:px-12 text-left">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-8">
             <div>
               <span className="text-xs text-primary font-bold uppercase tracking-wider">
@@ -582,7 +582,7 @@ export default async function HomePage({
 
       {/* 5. CUSTOMER TESTIMONIALS (3-Column Asymmetric Row) */}
       <section className="w-full bg-surface py-12 border-b border-secondary/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-left">
+        <div className="w-full px-4 sm:px-8 lg:px-12 text-left">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
               <span className="text-xs font-bold text-primary uppercase tracking-wider">

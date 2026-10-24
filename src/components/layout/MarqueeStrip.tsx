@@ -48,7 +48,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
       role="region"
       aria-label="Auspicious Announcements"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
+      <div className="w-full px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-3">
         {/* Badge */}
         <div className="flex items-center gap-1.5 shrink-0 bg-primary-container px-2.5 py-1 rounded text-on-primary text-[11px] font-bold uppercase tracking-wider">
           <Megaphone className="w-3.5 h-3.5" />
