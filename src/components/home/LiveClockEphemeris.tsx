@@ -64,7 +64,7 @@ export function LiveClockEphemeris({ tithi }: LiveClockEphemerisProps) {
   return (
     <div
       aria-label="Live Vedic Ephemeris Clock"
-      className="inline-flex flex-wrap items-center gap-3 px-3.5 py-2 bg-surface-container-high rounded border border-secondary/30 text-xs text-on-surface-variant font-medium mb-4 self-start"
+      className="inline-flex flex-wrap items-center gap-2 sm:gap-3 px-3 sm:px-3.5 py-2 bg-surface-container-high rounded border border-secondary/30 text-xs text-on-surface-variant font-medium mb-4 self-start max-w-full overflow-hidden"
     >
       {/* Live IST Clock */}
       <div className="flex items-center gap-1.5 text-secondary font-bold font-mono">

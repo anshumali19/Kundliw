@@ -99,12 +99,12 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
         aria-label="Promotional Announcement"
         className={`w-full bg-gradient-to-r from-surface-container-high via-surface-container-low to-surface-container-high border-b border-secondary/30 py-2.5 px-4 sm:px-6 relative ${className}`}
       >
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-3 overflow-hidden text-left">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-3 text-xs w-full min-w-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 overflow-hidden text-left w-full sm:w-auto min-w-0 flex-1">
             <span className="px-2 py-0.5 bg-secondary text-on-secondary rounded text-[10px] font-bold uppercase tracking-wider shrink-0">
               विशेष
             </span>
-            <div className="truncate">
+            <div className="truncate min-w-0 flex-1">
               <span className="font-serif font-bold text-secondary mr-2">
                 {current.titleHi} • {current.titleEn}
               </span>
@@ -116,7 +116,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-outline-variant/30">
             {current.linkUrl && (
               <Link
                 href={current.linkUrl}
@@ -128,7 +128,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
             )}
 
             {isCarousel && (
-              <div className="flex items-center gap-1 pl-2 border-l border-outline-variant/40">
+              <div className="flex items-center gap-1 pl-2 sm:border-l sm:border-outline-variant/40">
                 <button
                   type="button"
                   onClick={prevSlide}

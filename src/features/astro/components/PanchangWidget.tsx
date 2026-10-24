@@ -34,11 +34,11 @@ export function PanchangWidget({ panchang, locale }: PanchangWidgetProps) {
   }
 
   return (
-    <div className="w-full bg-surface-container-high border-b border-secondary/30 py-2 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-left">
+    <div className="w-full bg-surface-container-high border-b border-secondary/30 py-2 px-4 sm:px-6 overflow-hidden">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-left w-full min-w-0">
         {/* Left: Tithi & Nakshatra */}
-        <div className="flex flex-wrap items-center gap-2.5 text-xs">
-          <div className="flex items-center gap-1.5 font-bold text-secondary font-serif">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-xs min-w-0">
+          <div className="flex items-center gap-1.5 font-bold text-secondary font-serif shrink-0">
             <Sun className="w-3.5 h-3.5 text-primary shrink-0" />
             <span>{panchang.vaar}</span>
           </div>
@@ -68,7 +68,7 @@ export function PanchangWidget({ panchang, locale }: PanchangWidgetProps) {
         </div>
 
         {/* Right: Abhijit & Link */}
-        <div className="flex items-center gap-4 text-xs shrink-0">
+        <div className="flex items-center gap-4 text-xs shrink-0 flex-wrap">
           <div className="hidden sm:flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
             <Clock className="w-3 h-3 text-emerald-600" />
             <span className="font-semibold text-[11px]">
@@ -78,7 +78,7 @@ export function PanchangWidget({ panchang, locale }: PanchangWidgetProps) {
 
           <Link
             href="/panchang"
-            className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-bold text-[11px] uppercase tracking-wider"
+            className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-bold text-[11px] uppercase tracking-wider min-h-[44px]"
           >
             <span>{isHindi ? "सम्पूर्ण पंचांग" : "Full Almanac"}</span>
             <ArrowRight className="w-3 h-3" />

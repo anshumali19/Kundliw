@@ -56,7 +56,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
         </div>
 
         {/* Ticker scroller */}
-        <div className="relative overflow-hidden w-full flex items-center">
+        <div className="relative overflow-hidden w-full flex items-center min-w-0 flex-1">
           <div className="whitespace-nowrap animate-marquee flex items-center gap-8 text-xs tracking-wide">
             {displayList.map((item, index) => {
               const text = locale === "hi" ? item.textHi : item.textEn;

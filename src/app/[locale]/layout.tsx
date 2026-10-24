@@ -55,15 +55,15 @@ export default async function LocaleLayout({
     .catch(() => []);
 
   return (
-    <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable}`}>
-      <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen">
+    <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable} w-full max-w-full overflow-x-hidden`}>
+      <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-hidden relative">
         <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Header />
-          <div className="pt-[116px]">
+          <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
             <BannerSlot position="TOP" initialBanners={topBanners} />
           </div>
-          <main className="flex-1 w-full pb-16 xl:pb-0">
+          <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 xl:pb-0">
             {children}
           </main>
           <BannerSlot position="BOTTOM" initialBanners={bottomBanners} />

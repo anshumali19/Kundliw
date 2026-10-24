@@ -61,10 +61,19 @@
   html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
     background-color: var(--surface);
     color: var(--on-surface);
     font-family: var(--font-noto-sans), sans-serif;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent horizontal overflow across all root containers */
+  body {
+    overflow-x: clip;
   }
 
   /* Android WebView safe area support */

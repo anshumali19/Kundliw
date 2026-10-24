@@ -142,10 +142,10 @@ export default async function HomePage({
               </div>
 
               {/* Seraphic Dual-Language Headline */}
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary tracking-tight mb-2 leading-[1.15]">
+              <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-secondary tracking-tight mb-2 leading-[1.15] break-words">
                 {tHero("title")}
               </h1>
-              <p className="font-serif text-lg sm:text-xl text-primary font-semibold mb-4">
+              <p className="font-serif text-base sm:text-xl text-primary font-semibold mb-4 break-words">
                 {tHero("subtitle")}
               </p>
 
