@@ -8,6 +8,7 @@ import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { prisma } from "@/lib/prisma";
 import "@/app/globals.css";
 
@@ -59,17 +60,19 @@ export default async function LocaleLayout({
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-hidden relative">
         <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Header />
-          <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
-            <BannerSlot position="TOP" initialBanners={topBanners} />
-          </div>
-          <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 xl:pb-0">
-            {children}
-          </main>
-          <BannerSlot position="BOTTOM" initialBanners={bottomBanners} />
-          <MarqueeStrip />
-          <Footer />
-          <MobileNav />
+          <SmoothScrollProvider>
+            <Header />
+            <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
+              <BannerSlot position="TOP" initialBanners={topBanners} />
+            </div>
+            <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 xl:pb-0">
+              {children}
+            </main>
+            <BannerSlot position="BOTTOM" initialBanners={bottomBanners} />
+            <MarqueeStrip />
+            <Footer />
+            <MobileNav />
+          </SmoothScrollProvider>
         </NextIntlClientProvider>
       </body>
     </html>
