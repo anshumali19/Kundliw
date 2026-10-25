@@ -50,6 +50,15 @@ export function calculateGst({
 }
 
 /**
+ * Formats a GST rate expressed in basis points as a percentage string.
+ * Examples: 1800 -> "18", 500 -> "5", 1250 -> "12.5".
+ */
+export function formatGstRateBasisPoints(basisPoints: number): string {
+  if (!Number.isFinite(basisPoints) || basisPoints < 0) return "0";
+  return String(basisPoints / 100);
+}
+
+/**
  * Format paise into Indian Rupee string with symbol (e.g. 210000 -> "₹2,100")
  */
 export function formatPaiseToInr(paise: number, showPaise = false): string {

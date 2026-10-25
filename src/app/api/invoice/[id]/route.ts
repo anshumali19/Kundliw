@@ -3,7 +3,8 @@ import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { generateInvoicePdf } from "@/lib/billing/invoicePdf";
-import { formatPaiseToInr } from "@/lib/billing/gst";
+import { formatPaiseToInr, formatGstRateBasisPoints } from "@/lib/billing/gst";
+import { escapeHtml } from "@/lib/billing/html";
 import { isDemoMode } from "@/lib/config/demo";
 
 export const dynamic = "force-dynamic";
@@ -66,21 +67,46 @@ export async function GET(
       baseAmountPaise: order.baseAmountPaise,
       discountAmountPaise: order.discountAmountPaise,
       taxableAmountPaise: order.taxableAmountPaise,
+      gstRateBasisPoints: order.gstRateBasisPoints,
       gstAmountPaise: order.gstAmountPaise,
       netAmountPaise: order.netAmountPaise,
       paymentMode: order.paymentMode,
+      paymentStatus: order.paymentStatus,
       offerCode: order.offerCode,
     };
 
     const { searchParams } = new URL(request.url);
     const format = searchParams.get("format");
+    const safeFileBase = invoiceNumber.replace(/[^A-Za-z0-9._-]/g, "_");
 
     if (format === "html") {
+      // Every value below can contain customer/admin supplied text, so it is
+      // HTML-escaped before interpolation. Static markup is left untouched.
+      const safe = {
+        siteName: escapeHtml(invoiceData.siteName),
+        siteAddress: escapeHtml(invoiceData.siteAddress),
+        sitePhone: escapeHtml(invoiceData.sitePhone),
+        siteEmail: escapeHtml(invoiceData.siteEmail),
+        gstin: invoiceData.gstin ? escapeHtml(invoiceData.gstin) : null,
+        invoiceNumber: escapeHtml(invoiceData.invoiceNumber),
+        date: escapeHtml(invoiceData.date.toLocaleDateString("en-IN")),
+        orderNumber: escapeHtml(invoiceData.orderNumber),
+        paymentMode: escapeHtml(invoiceData.paymentMode),
+        paymentStatus: escapeHtml(String(invoiceData.paymentStatus).replace(/_/g, " ")),
+        customerName: escapeHtml(invoiceData.customerName),
+        customerPhone: escapeHtml(invoiceData.customerPhone),
+        customerEmail: invoiceData.customerEmail ? escapeHtml(invoiceData.customerEmail) : null,
+        serviceTitle: escapeHtml(invoiceData.serviceTitle),
+        planTitle: escapeHtml(invoiceData.planTitle),
+        offerCode: invoiceData.offerCode ? escapeHtml(invoiceData.offerCode) : null,
+        gstRate: escapeHtml(formatGstRateBasisPoints(invoiceData.gstRateBasisPoints)),
+      };
+
       const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Invoice ${invoiceNumber} - ${invoiceData.siteName}</title>
+  <title>Invoice ${safe.invoiceNumber} - ${safe.siteName}</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 40px; color: #241915; background: #fff; }
     .invoice-card { max-width: 800px; margin: 0 auto; border: 1px solid #dec1b1; padding: 40px; position: relative; }
@@ -105,31 +131,28 @@ export async function GET(
   </style>
 </head>
 <body>
-  <div class="no-print" style="max-width: 800px; margin: 0 auto 16px auto; text-align: right;">
-    <button onclick="window.print()" style="padding: 8px 16px; background: #984700; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Print Invoice</button>
-  </div>
   <div class="invoice-card">
     ${isDemoMode() ? '<div class="demo-watermark">DEMO INVOICE (नमूना)</div>' : ""}
     <div class="header">
-      <h1 class="title">${invoiceData.siteName}</h1>
+      <h1 class="title">${safe.siteName}</h1>
       <div class="subtitle">Vedic Astrological Heritage & Mathematical Computation Centre</div>
-      <div style="font-size: 11px; color: #574237;">${invoiceData.siteAddress} | Phone: ${invoiceData.sitePhone} | Email: ${invoiceData.siteEmail}</div>
-      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${invoiceData.gstin ? `GSTIN: ${invoiceData.gstin}` : "GST: Not Applicable (Unregistered Kendra)"}</div>
+      <div style="font-size: 11px; color: #574237;">${safe.siteAddress} | Phone: ${safe.sitePhone} | Email: ${safe.siteEmail}</div>
+      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${safe.gstin ? `GSTIN: ${safe.gstin}` : "GST: Not Applicable (Unregistered Kendra)"}</div>
     </div>
 
     <div class="meta-grid">
       <div class="meta-col">
         <strong>INVOICE DETAILS:</strong><br>
-        Invoice Number: <strong>${invoiceNumber}</strong><br>
-        Date: ${invoiceData.date.toLocaleDateString("en-IN")}<br>
-        Order Ref: ${invoiceData.orderNumber}<br>
-        Payment Mode: ${invoiceData.paymentMode} (PAID)
+        Invoice Number: <strong>${safe.invoiceNumber}</strong><br>
+        Date: ${safe.date}<br>
+        Order Ref: ${safe.orderNumber}<br>
+        Payment Mode: ${safe.paymentMode} (${safe.paymentStatus})
       </div>
       <div class="meta-col">
         <strong>BILLED TO (CUSTOMER):</strong><br>
-        Name: <strong>${invoiceData.customerName}</strong><br>
-        Phone: ${invoiceData.customerPhone}<br>
-        ${invoiceData.customerEmail ? `Email: ${invoiceData.customerEmail}<br>` : ""}
+        Name: <strong>${safe.customerName}</strong><br>
+        Phone: ${safe.customerPhone}<br>
+        ${safe.customerEmail ? `Email: ${safe.customerEmail}<br>` : ""}
         Jurisdiction: Varanasi, Uttar Pradesh
       </div>
     </div>
@@ -148,12 +171,12 @@ export async function GET(
         <tr>
           <td>1</td>
           <td>
-            <strong>${invoiceData.serviceTitle}</strong><br>
-            <span style="font-size: 11px; color: #574237;">Tier: ${invoiceData.planTitle}${invoiceData.offerCode ? ` (Offer: ${invoiceData.offerCode})` : ""}</span>
+            <strong>${safe.serviceTitle}</strong><br>
+            <span style="font-size: 11px; color: #574237;">Tier: ${safe.planTitle}${safe.offerCode ? ` (Offer: ${safe.offerCode})` : ""}</span>
           </td>
-          <td class="text-right">${formatPaiseToInr(invoiceData.baseAmountPaise)}</td>
-          <td class="text-right">${invoiceData.discountAmountPaise > 0 ? `-${formatPaiseToInr(invoiceData.discountAmountPaise)}` : "₹0"}</td>
-          <td class="text-right"><strong>${formatPaiseToInr(invoiceData.taxableAmountPaise)}</strong></td>
+          <td class="text-right">${escapeHtml(formatPaiseToInr(invoiceData.baseAmountPaise))}</td>
+          <td class="text-right">${invoiceData.discountAmountPaise > 0 ? `-${escapeHtml(formatPaiseToInr(invoiceData.discountAmountPaise))}` : "₹0"}</td>
+          <td class="text-right"><strong>${escapeHtml(formatPaiseToInr(invoiceData.taxableAmountPaise))}</strong></td>
         </tr>
       </tbody>
     </table>
@@ -161,15 +184,15 @@ export async function GET(
     <div class="total-box">
       <div style="display: flex; justify-content: space-between;">
         <span>Taxable Value:</span>
-        <span>${formatPaiseToInr(invoiceData.taxableAmountPaise)}</span>
+        <span>${escapeHtml(formatPaiseToInr(invoiceData.taxableAmountPaise))}</span>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <span>GST (18%):</span>
-        <span>${formatPaiseToInr(invoiceData.gstAmountPaise)}</span>
+        <span>GST (${safe.gstRate}%):</span>
+        <span>${escapeHtml(formatPaiseToInr(invoiceData.gstAmountPaise))}</span>
       </div>
       <div class="grand-total" style="display: flex; justify-content: space-between;">
         <span>Total Auspicious Dakshina:</span>
-        <span>${formatPaiseToInr(invoiceData.netAmountPaise)}</span>
+        <span>${escapeHtml(formatPaiseToInr(invoiceData.netAmountPaise))}</span>
       </div>
     </div>
 
@@ -186,6 +209,12 @@ export async function GET(
         status: 200,
         headers: {
           "Content-Type": "text/html; charset=utf-8",
+          "Content-Disposition": `inline; filename="Invoice-${safeFileBase}.html"`,
+          "Content-Security-Policy":
+            "default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; script-src 'none'; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "DENY",
+          "Referrer-Policy": "no-referrer",
         },
       });
     }
@@ -197,8 +226,9 @@ export async function GET(
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="Invoice-${invoiceNumber}.pdf"`,
+        "Content-Disposition": `inline; filename="Invoice-${safeFileBase}.pdf"`,
         "Content-Length": pdfBuffer.length.toString(),
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error) {

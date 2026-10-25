@@ -1,5 +1,5 @@
 import PDFDocument from "pdfkit";
-import { formatPaiseToInr } from "./gst";
+import { formatPaiseToInr, formatGstRateBasisPoints } from "./gst";
 import { isDemoMode } from "@/lib/config/demo";
 
 export interface InvoicePdfData {
@@ -19,9 +19,11 @@ export interface InvoicePdfData {
   baseAmountPaise: number;
   discountAmountPaise: number;
   taxableAmountPaise: number;
+  gstRateBasisPoints?: number;
   gstAmountPaise: number;
   netAmountPaise: number;
   paymentMode: string;
+  paymentStatus?: string | null;
   offerCode?: string | null;
 }
 
@@ -92,7 +94,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.text(`Invoice No: ${data.invoiceNumber}`, 40, 130);
       doc.text(`Date of Issue: ${data.date.toLocaleDateString("en-IN")}`, 40, 142);
       doc.text(`Booking Reference: ${data.orderNumber}`, 40, 154);
-      doc.text(`Payment Mode: ${data.paymentMode} (Status: CONFIRMED / PAID)`, 40, 166);
+      doc.text(`Payment Mode: ${data.paymentMode} (Status: ${String(data.paymentStatus || "PENDING").replace(/_/g, " ")})`, 40, 166);
 
       // Customer Details (Right column)
       doc.font("Helvetica-Bold").text("BILLED TO (CUSTOMER):", 330, 115);
@@ -148,7 +150,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.text("Taxable Value (कर योग्य दक्षिणा):", 340, calcY);
       doc.text(formatPaiseToInr(data.taxableAmountPaise), 485, calcY, { width: 65, align: "right" });
 
-      doc.text("Goods & Services Tax (GST @ 18%):", 340, calcY + 14);
+      doc.text(`Goods & Services Tax (GST @ ${formatGstRateBasisPoints(data.gstRateBasisPoints ?? 1800)}%):`, 340, calcY + 14);
       doc.text(formatPaiseToInr(data.gstAmountPaise), 485, calcY + 14, { width: 65, align: "right" });
 
       doc.strokeColor("#6B1D1D").lineWidth(1).moveTo(340, calcY + 30).lineTo(555, calcY + 30).stroke();
