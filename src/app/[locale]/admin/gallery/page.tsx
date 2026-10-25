@@ -306,8 +306,8 @@ export default function AdminGalleryPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-2">
+        <div className="contents">
+          <div className="flex items-center gap-2 pt-2">
             <label className="font-semibold">Display Order:</label>
             <input
               type="number"
