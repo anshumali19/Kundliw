@@ -221,8 +221,8 @@ export async function expireUnpaidOrder(
       return false;
     }
 
-    if (order.expiresAt && now <= order.expiresAt) {
-      return false; // Order has not expired yet
+    if (!order.expiresAt || now <= order.expiresAt) {
+      return false; // Order has no reservation window or has not expired yet
     }
 
     // Atomic transition: only one concurrent expiry can claim the release.
@@ -230,7 +230,7 @@ export async function expireUnpaidOrder(
       where: {
         id: orderId,
         paymentStatus: PaymentStatus.PENDING,
-        OR: [{ expiresAt: null }, { expiresAt: { lte: now } }],
+        expiresAt: { lte: now },
       },
       data: {
         paymentStatus: PaymentStatus.FAILED,
@@ -286,7 +286,7 @@ export async function expireOverdueOrders(
   const overdue = await prisma.order.findMany({
     where: {
       paymentStatus: PaymentStatus.PENDING,
-      OR: [{ expiresAt: null }, { expiresAt: { lte: now } }],
+      expiresAt: { lte: now },
     },
     select: { id: true },
     orderBy: { expiresAt: "asc" },

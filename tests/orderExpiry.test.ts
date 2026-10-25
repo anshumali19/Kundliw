@@ -54,7 +54,9 @@ const state = vi.hoisted(() => ({
 vi.mock("@/lib/prisma", () => {
   const appliesExpiryFilter = (row: MockOrder) => {
     if (row.paymentStatus !== "PENDING") return false;
-    if (row.expiresAt === null) return true;
+    // Orders without a reservation window (e.g. zero-value astro requests)
+    // are not abandoned-payment holds and must never expire.
+    if (row.expiresAt === null) return false;
     return row.expiresAt.getTime() <= Date.now();
   };
 
@@ -340,6 +342,17 @@ describe("H7 - scheduled expiry endpoint", () => {
 
   it("does not release an order that has not expired yet", async () => {
     state.orders[0].expiresAt = new Date(Date.now() + 10 * 60_000);
+
+    const result = await expireOverdueOrders();
+
+    expect(result).toEqual({ scanned: 0, expired: 0 });
+    expect(state.orders[0].paymentStatus).toBe("PENDING");
+    expect(state.slots.get("slot-1")?.bookedCount).toBe(1);
+    expect(state.offers.get("offer-1")?.usedCount).toBe(1);
+  });
+
+  it("never expires a pending order without a reservation window", async () => {
+    state.orders[0].expiresAt = null;
 
     const result = await expireOverdueOrders();
 
