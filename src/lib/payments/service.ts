@@ -1,11 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import { Order, PaymentMode, PaymentStatus, Role } from "@prisma/client";
+import { isServerGeneratedPaymentProofUrl } from "./proof";
+
+export const MAX_MANUAL_PAYMENT_ATTEMPTS = 3;
+
+export class PaymentError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number = 409
+  ) {
+    super(message);
+    this.name = "PaymentError";
+  }
+}
 
 export interface MarkPaidInput {
   paymentMode: PaymentMode;
   providerPaymentId?: string;
   signature?: string;
   note?: string;
+  /** Amount actually captured by the provider, in paise. Must match the order. */
+  paidAmountPaise: number;
 }
 
 export interface ManualPaymentInput {
@@ -33,7 +48,37 @@ export async function markOrderPaid(
       throw new Error(`Order not found: ${orderId}`);
     }
 
-    // Idempotent: if already paid, return
+    // Never trust a caller-supplied success flag: the captured amount must
+    // equal the server-computed order total.
+    if (
+      !Number.isInteger(details.paidAmountPaise) ||
+      details.paidAmountPaise < 0 ||
+      details.paidAmountPaise !== order.netAmountPaise
+    ) {
+      throw new PaymentError(
+        "Captured amount does not match the order total.",
+        409
+      );
+    }
+
+    if (
+      order.paymentStatus === PaymentStatus.FAILED ||
+      order.paymentStatus === PaymentStatus.REFUNDED
+    ) {
+      throw new PaymentError(
+        "This order is no longer payable. Its reservation was released or refunded.",
+        409
+      );
+    }
+
+    if (order.expiresAt && new Date() > order.expiresAt) {
+      throw new PaymentError(
+        "This order reservation has expired. Please create a new booking.",
+        409
+      );
+    }
+
+    // Idempotent: if already paid with the verified amount, return
     if (order.paymentStatus === PaymentStatus.PAID) {
       return order;
     }
@@ -93,7 +138,43 @@ export async function submitManualPayment(
     }
 
     if (order.paymentStatus === PaymentStatus.PAID) {
-      throw new Error("Order is already paid.");
+      throw new PaymentError("Order is already paid.");
+    }
+
+    if (
+      order.paymentStatus === PaymentStatus.FAILED ||
+      order.paymentStatus === PaymentStatus.REFUNDED
+    ) {
+      throw new PaymentError("This order is no longer awaiting payment.");
+    }
+
+    if (order.expiresAt && new Date() > order.expiresAt) {
+      throw new PaymentError(
+        "This order reservation has expired. Please create a new booking."
+      );
+    }
+
+    if (
+      details.manualPaymentProofUrl &&
+      !isServerGeneratedPaymentProofUrl(details.manualPaymentProofUrl)
+    ) {
+      throw new PaymentError("Invalid payment proof reference.", 400);
+    }
+
+    // Bound retries after repeated rejections so the review queue cannot be
+    // flooded with the same order.
+    const previousAttempts = await tx.orderStatusEvent.count({
+      where: {
+        orderId,
+        note: { startsWith: "Manual payment submitted" },
+      },
+    });
+
+    if (previousAttempts >= MAX_MANUAL_PAYMENT_ATTEMPTS) {
+      throw new PaymentError(
+        "Maximum manual payment submissions reached for this order.",
+        429
+      );
     }
 
     const updatedOrder = await tx.order.update({
@@ -142,6 +223,17 @@ export async function approveManualPayment(
 
     if (!order) {
       throw new Error(`Order not found: ${orderId}`);
+    }
+
+    if (order.paymentStatus === PaymentStatus.PAID) {
+      return order;
+    }
+
+    if (order.paymentStatus !== PaymentStatus.AWAITING_VERIFICATION) {
+      throw new PaymentError(
+        "Only orders awaiting manual payment verification can be approved.",
+        409
+      );
     }
 
     let invoiceNumber = order.invoiceNumber;

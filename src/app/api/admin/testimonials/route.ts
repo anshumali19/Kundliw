@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -22,22 +23,26 @@ const testimonialSchema = z.object({
 
 export async function GET() {
   try {
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
     const testimonials = await prisma.testimonial.findMany({
       orderBy: { orderIndex: "asc" },
     });
     return NextResponse.json({ success: true, testimonials });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch testimonials";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch testimonials:", error);
+    return NextResponse.json({ error: "Failed to fetch testimonials" }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = testimonialSchema.safeParse(body);
@@ -54,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, testimonial }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to create testimonial";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to create testimonial:", error);
+    return NextResponse.json({ error: "Failed to create testimonial" }, { status: 500 });
   }
 }

@@ -5,6 +5,7 @@ import {
   saveTranslationOverride,
   deleteTranslationOverride,
 } from "@/lib/i18n/translationService";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { z } from "zod";
 
 const saveOverrideSchema = z.object({
@@ -22,7 +23,7 @@ const deleteOverrideSchema = z.object({
 
 export async function GET(req: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   const { searchParams } = new URL(req.url);
   const locale = searchParams.get("locale") || "hi";
@@ -72,7 +73,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(req);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await req.json();
@@ -98,7 +102,10 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(req);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await req.json();

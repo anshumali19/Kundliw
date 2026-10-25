@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAstroProvider } from "@/lib/astro/factory";
+import { checkDbRateLimit, getClientIp } from "@/lib/rateLimit";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
+
+const RATE_LIMIT_MESSAGE = "Too many requests. Please try again later.";
 
 const kundliSchema = z.object({
   name: z.string().min(2),
@@ -14,6 +17,23 @@ const kundliSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limit = await checkDbRateLimit({
+      scope: "ASTRO_KUNDLI_IP",
+      identifier: getClientIp(request.headers),
+      windowSeconds: 60,
+      maxAllowed: 20,
+    });
+
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: RATE_LIMIT_MESSAGE },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limit.retryAfterSeconds ?? 60) },
+        }
+      );
+    }
+
     const body = await request.json();
     const parsed = kundliSchema.safeParse(body);
     if (!parsed.success) {
@@ -28,7 +48,7 @@ export async function POST(request: NextRequest) {
       data: result,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Calculation failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Calculation failed:", error);
+    return NextResponse.json({ error: "Calculation failed" }, { status: 500 });
   }
 }

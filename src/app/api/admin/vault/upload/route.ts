@@ -2,14 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { getStorageProvider, validateFileMagicBytes, MAX_FILE_SIZE_BYTES } from "@/lib/storage";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
+import { OrderStatus } from "@prisma/client";
+import {
+  isValidStatusTransition,
+  type CanonicalOrderStatus,
+} from "@/lib/orders/status";
 
 export const dynamic = "force-dynamic";
+
+class VaultUploadError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number
+  ) {
+    super(message);
+    this.name = "VaultUploadError";
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
     const guard = await guardApiAdmin();
-    if (guard.errorResponse) return guard.errorResponse;
+    if (!guard.ok) return guard.errorResponse;
     const admin = guard.user;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const formData = await request.formData();
     const userId = String(formData.get("userId") || "");
@@ -51,12 +70,97 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Selected user does not exist." }, { status: 404 });
     }
 
+    // An attached order must belong to the selected customer, and the document
+    // upload is a completion action that must follow the order lifecycle.
+    if (orderId) {
+      const targetOrder = await prisma.order.findUnique({
+        where: { id: orderId },
+        select: { id: true, userId: true, status: true },
+      });
+
+      if (!targetOrder) {
+        return NextResponse.json({ error: "Selected order does not exist." }, { status: 404 });
+      }
+
+      if (targetOrder.userId !== userId) {
+        return NextResponse.json(
+          { error: "Selected order does not belong to this customer." },
+          { status: 403 }
+        );
+      }
+
+      if (
+        !isValidStatusTransition(
+          targetOrder.status as CanonicalOrderStatus,
+          "KUNDLI_COMPLETE",
+          true
+        )
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "This order cannot be marked complete from its current status. Move it to KUNDLI_IN_PROGRESS first.",
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     // Save to private vault storage
     const storage = getStorageProvider();
     const stored = await storage.saveFile(buffer, file.name, "application/pdf", "vault");
 
     const vaultFile = await prisma.$transaction(async (tx) => {
-      const record = await tx.vaultFile.create({
+      if (orderId) {
+        // Re-check inside the transaction so ownership and lifecycle cannot
+        // change between authorization and the status write.
+        const order = await tx.order.findUnique({
+          where: { id: orderId },
+          select: { id: true, userId: true, status: true },
+        });
+
+        if (!order) {
+          throw new VaultUploadError("Selected order does not exist.", 404);
+        }
+
+        if (order.userId !== userId) {
+          throw new VaultUploadError(
+            "Selected order does not belong to this customer.",
+            403
+          );
+        }
+
+        if (
+          !isValidStatusTransition(
+            order.status as CanonicalOrderStatus,
+            "KUNDLI_COMPLETE",
+            true
+          )
+        ) {
+          throw new VaultUploadError(
+            "This order cannot be marked complete from its current status.",
+            409
+          );
+        }
+
+        if (order.status !== OrderStatus.KUNDLI_COMPLETE) {
+          await tx.order.update({
+            where: { id: orderId },
+            data: { status: OrderStatus.KUNDLI_COMPLETE },
+          });
+        }
+
+        await tx.orderStatusEvent.create({
+          data: {
+            orderId,
+            status: OrderStatus.KUNDLI_COMPLETE,
+            note: `Kundli PDF dossier "${titleEn}" uploaded to customer vault.`,
+            changedById: admin.id,
+          },
+        });
+      }
+
+      return tx.vaultFile.create({
         data: {
           userId,
           orderId: orderId || null,
@@ -68,19 +172,6 @@ export async function POST(request: NextRequest) {
           mimeType: "application/pdf",
         },
       });
-
-      if (orderId) {
-        await tx.orderStatusEvent.create({
-          data: {
-            orderId,
-            status: "KUNDLI_COMPLETE",
-            note: `Kundli PDF dossier "${titleEn}" uploaded to customer vault.`,
-            changedById: admin.id,
-          },
-        });
-      }
-
-      return record;
     });
 
     return NextResponse.json({
@@ -88,7 +179,11 @@ export async function POST(request: NextRequest) {
       vaultFile,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to upload vault file";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    if (error instanceof VaultUploadError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
+    console.error("Vault upload failed:", error);
+    return NextResponse.json({ error: "Failed to upload vault file" }, { status: 500 });
   }
 }

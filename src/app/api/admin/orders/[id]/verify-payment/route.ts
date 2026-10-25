@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
-import { approveManualPayment, rejectManualPayment } from "@/lib/payments/service";
+import { approveManualPayment, rejectManualPayment, PaymentError } from "@/lib/payments/service";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -17,8 +18,11 @@ export async function POST(
 ) {
   try {
     const guard = await guardApiAdmin();
-    if (guard.errorResponse) return guard.errorResponse;
+    if (!guard.ok) return guard.errorResponse;
     const admin = guard.user;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const orderId = params.id;
 
@@ -50,7 +54,11 @@ export async function POST(
       });
     }
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Verification failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    if (error instanceof PaymentError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
+    console.error("Verification failed:", error);
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }

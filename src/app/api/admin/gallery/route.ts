@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -16,22 +17,26 @@ const gallerySchema = z.object({
 
 export async function GET() {
   try {
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
     const items = await prisma.mediaGalleryItem.findMany({
       orderBy: { orderIndex: "asc" },
     });
     return NextResponse.json({ success: true, items });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch gallery items";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch gallery items:", error);
+    return NextResponse.json({ error: "Failed to fetch gallery items" }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = gallerySchema.safeParse(body);
@@ -48,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, item }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to create gallery item";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to create gallery item:", error);
+    return NextResponse.json({ error: "Failed to create gallery item" }, { status: 500 });
   }
 }

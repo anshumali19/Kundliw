@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { BannerPosition, BannerType } from "@prisma/client";
 import { z } from "zod";
@@ -21,22 +22,26 @@ const bannerSchema = z.object({
 
 export async function GET() {
   try {
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
     const banners = await prisma.banner.findMany({
       orderBy: [{ position: "asc" }, { orderIndex: "asc" }],
     });
     return NextResponse.json({ success: true, banners });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch banners";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch banners:", error);
+    return NextResponse.json({ error: "Failed to fetch banners" }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = bannerSchema.safeParse(body);
@@ -53,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, banner }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to create banner";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to create banner:", error);
+    return NextResponse.json({ error: "Failed to create banner" }, { status: 500 });
   }
 }

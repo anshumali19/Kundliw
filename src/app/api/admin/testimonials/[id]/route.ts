@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -25,10 +26,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = testimonialUpdateSchema.safeParse(body);
@@ -46,8 +48,8 @@ export async function PUT(
 
     return NextResponse.json({ success: true, testimonial });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update testimonial";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update testimonial:", error);
+    return NextResponse.json({ error: "Failed to update testimonial" }, { status: 500 });
   }
 }
 
@@ -56,10 +58,11 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     await prisma.testimonial.delete({
       where: { id: params.id },
@@ -67,7 +70,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: "Testimonial deleted" });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to delete testimonial";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to delete testimonial:", error);
+    return NextResponse.json({ error: "Failed to delete testimonial" }, { status: 500 });
   }
 }

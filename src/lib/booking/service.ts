@@ -1,8 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { CreateBookingOrderInput } from "@/features/booking/validation";
 import { calculateGst } from "@/lib/billing/gst";
+import { getGstSettings } from "@/lib/billing/gstSettings";
 import { claimOfferInTransaction } from "@/lib/offers/apply";
 import { OrderStatus, PaymentStatus, PaymentMode, RequestType, Prisma } from "@prisma/client";
+
+export class BookingError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "BookingError";
+  }
+}
 
 /**
  * Generates sequential order numbers (e.g. MKJK-2026-0001) using Counter model.
@@ -63,7 +71,7 @@ export async function createBookingOrder(
     });
 
     if (!service) {
-      throw new Error("Requested Vedic service is unavailable or inactive.");
+      throw new BookingError("Requested Vedic service is unavailable or inactive.");
     }
 
     // 2. Fetch active plan directly from DB — never trust client price
@@ -77,14 +85,14 @@ export async function createBookingOrder(
     });
 
     if (!plan || !plan.isActive) {
-      throw new Error("Requested consultation tier is unavailable or inactive.");
+      throw new BookingError("Requested consultation tier is unavailable or inactive.");
     }
 
     // 3. If plan includes live call, validate and reserve appointment slot
     let reservedSlotId: string | null = null;
     if (plan.hasCall) {
       if (!input.slotId) {
-        throw new Error("An appointment slot is required for consultation calls.");
+        throw new BookingError("An appointment slot is required for consultation calls.");
       }
 
       const slot = await tx.slot.findUnique({
@@ -92,7 +100,7 @@ export async function createBookingOrder(
       });
 
       if (!slot) {
-        throw new Error("Selected appointment slot does not exist.");
+        throw new BookingError("Selected appointment slot does not exist.");
       }
 
       // Atomic conditional reservation: increment only if bookedCount < capacity
@@ -106,7 +114,7 @@ export async function createBookingOrder(
       });
 
       if (reservationResult.count === 0) {
-        throw new Error("Selected appointment slot is fully booked. Please choose another time.");
+        throw new BookingError("Selected appointment slot is fully booked. Please choose another time.");
       }
 
       reservedSlotId = slot.id;
@@ -137,19 +145,15 @@ export async function createBookingOrder(
       }
     }
 
-    // 5. Fetch Kendra GSTIN and default tax rate from AdminSettings (0 if GSTIN unset)
-    const adminSettings = await tx.adminSettings.findUnique({
-      where: { id: "default" },
-    });
-    const hasGstin = Boolean(adminSettings?.gstin && adminSettings.gstin.trim());
-    const gstRateBps = hasGstin ? (adminSettings?.defaultGstRateBps ?? 1800) : 0;
-    const gstinSnapshot = hasGstin ? adminSettings?.gstin : null;
+    // 5. Fetch Kendra GSTIN and default tax rate from the shared settings helper
+    const gst = await getGstSettings(tx);
+    const gstinSnapshot = gst.gstin;
 
     // 6. Compute GST calculation strictly from database prices
     const billing = calculateGst({
       baseAmountPaise: plan.pricePaise,
       discountAmountPaise: discountPaise,
-      gstRateBasisPoints: gstRateBps,
+      gstRateBasisPoints: gst.rateBasisPoints,
     });
 
     // 7. Generate sequential order number
@@ -211,7 +215,10 @@ export async function createBookingOrder(
 /**
  * Checks if an order has exceeded its expiry window and releases its reserved slot and offer claim.
  */
-export async function expireUnpaidOrder(orderId: string): Promise<boolean> {
+export async function expireUnpaidOrder(
+  orderId: string,
+  now: Date = new Date()
+): Promise<boolean> {
   return await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
@@ -221,29 +228,38 @@ export async function expireUnpaidOrder(orderId: string): Promise<boolean> {
       return false;
     }
 
-    if (order.expiresAt && new Date() <= order.expiresAt) {
-      return false; // Order has not expired yet
+    if (!order.expiresAt || now <= order.expiresAt) {
+      return false; // Order has no reservation window or has not expired yet
     }
 
-    await tx.order.update({
-      where: { id: orderId },
+    // Atomic transition: only one concurrent expiry can claim the release.
+    const claimed = await tx.order.updateMany({
+      where: {
+        id: orderId,
+        paymentStatus: PaymentStatus.PENDING,
+        expiresAt: { lte: now },
+      },
       data: {
         paymentStatus: PaymentStatus.FAILED,
       },
     });
 
-    // Release slot bookedCount
+    if (claimed.count === 0) {
+      return false;
+    }
+
+    // Release slot bookedCount without ever going negative.
     if (order.slotId) {
-      await tx.slot.update({
-        where: { id: order.slotId },
+      await tx.slot.updateMany({
+        where: { id: order.slotId, bookedCount: { gt: 0 } },
         data: { bookedCount: { decrement: 1 } },
       });
     }
 
-    // Release coupon usedCount
+    // Release coupon usedCount without ever going negative.
     if (order.offerId) {
-      await tx.offer.update({
-        where: { id: order.offerId },
+      await tx.offer.updateMany({
+        where: { id: order.offerId, usedCount: { gt: 0 } },
         data: { usedCount: { decrement: 1 } },
       });
     }
@@ -258,4 +274,42 @@ export async function expireUnpaidOrder(orderId: string): Promise<boolean> {
 
     return true;
   });
+}
+
+export interface ExpireOverdueResult {
+  scanned: number;
+  expired: number;
+}
+
+/**
+ * Releases reservations for unpaid orders whose 30-minute window has elapsed.
+ * Safe to call from read paths and from the scheduled cron endpoint; each order
+ * is expired atomically, so concurrent callers cannot double-release.
+ */
+export async function expireOverdueOrders(
+  now: Date = new Date(),
+  take = 200
+): Promise<ExpireOverdueResult> {
+  const overdue = await prisma.order.findMany({
+    where: {
+      paymentStatus: PaymentStatus.PENDING,
+      expiresAt: { lte: now },
+    },
+    select: { id: true },
+    orderBy: { expiresAt: "asc" },
+    take,
+  });
+
+  let expired = 0;
+  for (const order of overdue) {
+    try {
+      if (await expireUnpaidOrder(order.id, now)) {
+        expired += 1;
+      }
+    } catch (error) {
+      console.error(`Failed to expire overdue order ${order.id}:`, error);
+    }
+  }
+
+  return { scanned: overdue.length, expired };
 }

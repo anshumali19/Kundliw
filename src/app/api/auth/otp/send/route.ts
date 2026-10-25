@@ -92,8 +92,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!sendResult.success) {
+      console.error("OTP SMS dispatch failed:", sendResult.error);
       return NextResponse.json(
-        { error: sendResult.error || "Failed to dispatch SMS" },
+        { error: "Failed to dispatch OTP. Please try again." },
         { status: 500 }
       );
     }
@@ -105,12 +106,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error in OTP send route:", error);
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to dispatch OTP. Please try again.",
-      },
+      { error: "Failed to dispatch OTP. Please try again." },
       { status: 500 }
     );
   }

@@ -7,7 +7,7 @@ import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
 export async function POST(request: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   const csrf = validateCsrfOrigin(request);
   if (!csrf.isValid) return csrf.errorResponse;

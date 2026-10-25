@@ -22,6 +22,32 @@ export interface StorageProvider {
 
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB strict limit
 
+export const ALLOWED_STORAGE_SUBFOLDERS = ["uploads", "media", "payment-proofs", "vault"] as const;
+
+function assertAllowedSubfolder(subfolder: string): void {
+  if (!(ALLOWED_STORAGE_SUBFOLDERS as readonly string[]).includes(subfolder)) {
+    throw new Error(
+      `Invalid storage subfolder "${subfolder}". Allowed: ${ALLOWED_STORAGE_SUBFOLDERS.join(", ")}.`
+    );
+  }
+}
+
+/**
+ * Resolves a path relative to the storage base and asserts the result stays
+ * inside it. Rejects absolute paths, `..` segments and Windows/Unix variants.
+ */
+function resolveWithinBase(baseDir: string, relativePath: string): string {
+  const base = path.resolve(baseDir);
+  const target = path.resolve(base, relativePath);
+  const relative = path.relative(base, target);
+
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    throw new Error("Invalid storage path: traversal outside the storage directory is forbidden.");
+  }
+
+  return target;
+}
+
 /**
  * Validates file magic bytes against accepted types (PDF, PNG, JPEG, WEBP).
  */
@@ -96,7 +122,8 @@ export class LocalDiskStorageProvider implements StorageProvider {
 
     const safeName = path.basename(originalFilename).replace(/[^a-zA-Z0-9._-]/g, "_");
     const uniqueName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${safeName}`;
-    const targetDir = path.join(this.baseDir, subfolder);
+    assertAllowedSubfolder(subfolder);
+    const targetDir = resolveWithinBase(this.baseDir, subfolder);
 
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
@@ -115,8 +142,7 @@ export class LocalDiskStorageProvider implements StorageProvider {
   }
 
   async getFile(storageKey: string): Promise<{ buffer: Buffer; mimeType: string }> {
-    const safeKey = path.normalize(storageKey).replace(/^(\.\.[\/\\])+/, "");
-    const fullPath = path.join(this.baseDir, safeKey);
+    const fullPath = resolveWithinBase(this.baseDir, storageKey);
 
     if (!fs.existsSync(fullPath)) {
       throw new Error(`File not found: ${storageKey}`);

@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { expireOverdueOrders } from "@/lib/booking/service";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
+    // Opportunistically release abandoned reservations before reporting
+    // availability, so an unpaid hold cannot keep a slot sold out.
+    try {
+      await expireOverdueOrders();
+    } catch (error) {
+      console.error("Failed to expire overdue orders before slot listing:", error);
+    }
+
     const { searchParams } = new URL(request.url);
     const dateParam = searchParams.get("date"); // YYYY-MM-DD
 

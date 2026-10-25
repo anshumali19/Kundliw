@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { BannerPosition, BannerType } from "@prisma/client";
 import { z } from "zod";
@@ -24,10 +25,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = bannerUpdateSchema.safeParse(body);
@@ -45,8 +47,8 @@ export async function PUT(
 
     return NextResponse.json({ success: true, banner });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update banner";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update banner:", error);
+    return NextResponse.json({ error: "Failed to update banner" }, { status: 500 });
   }
 }
 
@@ -55,10 +57,11 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     await prisma.banner.delete({
       where: { id: params.id },
@@ -66,7 +69,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: "Banner deleted" });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to delete banner";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to delete banner:", error);
+    return NextResponse.json({ error: "Failed to delete banner" }, { status: 500 });
   }
 }

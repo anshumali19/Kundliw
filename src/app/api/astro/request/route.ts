@@ -3,18 +3,40 @@ import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { getNextOrderNumber } from "@/lib/booking/service";
 import { OrderStatus, PaymentStatus, PaymentMode, RequestType, Prisma } from "@prisma/client";
-import { z } from "zod";
+import { astroRequestSchema } from "@/features/astro/validation";
+import { checkDbRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
-const astroRequestSchema = z.object({
-  requestType: z.enum(["KUNDLI_REQUEST", "KUNDLI_MATCHING", "PRASHNA_KUNDLI"]),
-  jatakaDetails: z.record(z.unknown()),
-});
+const RATE_LIMIT_MESSAGE =
+  "Too many requests. Please try again after some time.";
 
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
+    const clientIp = getClientIp(request.headers);
+
+    // Anonymous zero-value order creation is limited per IP; signed-in
+    // customers get a separate, slightly higher allowance.
+    const limit = await checkDbRateLimit({
+      scope: user ? "ASTRO_REQUEST_USER" : "ASTRO_REQUEST_ANON",
+      identifier: user?.id || clientIp,
+      windowSeconds: 3600,
+      maxAllowed: user ? 20 : 5,
+    });
+
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: RATE_LIMIT_MESSAGE },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(limit.retryAfterSeconds ?? 3600),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const parsed = astroRequestSchema.safeParse(body);
     if (!parsed.success) {
@@ -62,7 +84,7 @@ export async function POST(request: NextRequest) {
       orderNumber: result.orderNumber,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to record request";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to record request:", error);
+    return NextResponse.json({ error: "Failed to record request" }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -19,22 +20,26 @@ const blogSchema = z.object({
 
 export async function GET() {
   try {
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
     const posts = await prisma.blogPost.findMany({
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json({ success: true, posts });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch blogs";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch blogs:", error);
+    return NextResponse.json({ error: "Failed to fetch blogs" }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = blogSchema.safeParse(body);
@@ -54,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, post }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to create blog post";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to create blog post:", error);
+    return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 });
   }
 }

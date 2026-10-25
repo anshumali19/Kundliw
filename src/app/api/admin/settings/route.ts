@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -29,22 +30,26 @@ const settingsSchema = z.object({
 
 export async function GET() {
   try {
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
     const settings = await prisma.adminSettings.findUnique({
       where: { id: "default" },
     });
     return NextResponse.json({ success: true, settings: settings || {} });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch settings";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch settings:", error);
+    return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = settingsSchema.safeParse(body);
@@ -66,7 +71,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true, settings });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update settings";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update settings:", error);
+    return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });
   }
 }

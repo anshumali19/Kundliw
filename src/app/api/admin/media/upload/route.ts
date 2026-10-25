@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { getStorageProvider, validateFileMagicBytes, MAX_FILE_SIZE_BYTES } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
       fileSize: result.fileSize,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Media upload failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Media upload failed:", error);
+    return NextResponse.json({ error: "Media upload failed" }, { status: 500 });
   }
 }

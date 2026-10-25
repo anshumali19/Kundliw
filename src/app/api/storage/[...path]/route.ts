@@ -28,7 +28,7 @@ export async function GET(
             where: {
               userId: user.id,
               manualPaymentProof: {
-                contains: storageKey,
+                in: [storageKey, `/api/storage/${storageKey}`],
               },
             },
           });

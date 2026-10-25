@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -15,22 +16,26 @@ const pageSchema = z.object({
 
 export async function GET() {
   try {
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
     const pages = await prisma.staticPage.findMany({
       orderBy: { slug: "asc" },
     });
     return NextResponse.json({ success: true, pages });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch pages";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch pages:", error);
+    return NextResponse.json({ error: "Failed to fetch pages" }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const admin = await guardApiAdmin();
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized: Administrator access required" }, { status: 401 });
-    }
+    const guard = await guardApiAdmin();
+    if (!guard.ok) return guard.errorResponse;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const body = await request.json();
     const parsed = pageSchema.safeParse(body);
@@ -49,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, page });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to save page";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to save page:", error);
+    return NextResponse.json({ error: "Failed to save page" }, { status: 500 });
   }
 }

@@ -45,7 +45,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Error retrieving vault document";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Error retrieving vault document:", error);
+    return NextResponse.json({ error: "Error retrieving vault document" }, { status: 500 });
   }
 }

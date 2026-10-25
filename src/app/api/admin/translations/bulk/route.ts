@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { bulkSaveTranslationOverrides } from "@/lib/i18n/translationService";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { z } from "zod";
 
 const bulkSchema = z.object({
@@ -16,7 +17,10 @@ const bulkSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(req);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await req.json();

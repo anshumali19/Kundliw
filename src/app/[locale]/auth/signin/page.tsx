@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
+import { sanitizeCallbackUrl } from "@/lib/auth/safeRedirect";
 import { Phone, Lock, Mail, AlertCircle, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 export default function SignInPage() {
@@ -13,7 +14,10 @@ export default function SignInPage() {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || `/${locale}`;
+  const callbackUrl = sanitizeCallbackUrl(
+    searchParams.get("callbackUrl"),
+    `/${locale}`
+  );
 
   // Mode: "OTP" | "ADMIN"
   const [authMode, setAuthMode] = useState<"OTP" | "ADMIN">("OTP");

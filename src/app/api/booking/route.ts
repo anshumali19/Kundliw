@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { guardApiUser } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { createBookingOrderSchema } from "@/features/booking/validation";
-import { createBookingOrder } from "@/lib/booking/service";
+import { createBookingOrder, BookingError } from "@/lib/booking/service";
 
 export async function POST(request: NextRequest) {
   // 1. Enforce user authentication
   const guard = await guardApiUser();
-  if (guard.errorResponse) {
+  if (!guard.ok) {
     return guard.errorResponse;
   }
   const user = guard.user;
@@ -46,8 +46,14 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: unknown) {
     console.error("Booking order creation error:", error);
-    const message =
-      error instanceof Error ? error.message : "Failed to create order.";
-    return NextResponse.json({ error: message }, { status: 400 });
+
+    if (error instanceof BookingError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json(
+      { error: "Failed to create order." },
+      { status: 500 }
+    );
   }
 }

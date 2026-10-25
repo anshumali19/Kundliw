@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
-import { markOrderPaid } from "@/lib/payments/service";
-import { PaymentMode, Role } from "@prisma/client";
+import { markOrderPaid, PaymentError } from "@/lib/payments/service";
+import { isDemoMode } from "@/lib/config/demo";
+import { PaymentMode, PaymentStatus, Role } from "@prisma/client";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,12 @@ const demoPaymentSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Simulation backdoor: never available in production builds and only when
+    // DEMO_MODE is explicitly enabled. Respond 404 so the route is invisible.
+    if (!isDemoMode() || process.env.NODE_ENV === "production") {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
@@ -45,6 +52,7 @@ export async function POST(request: NextRequest) {
       const updatedOrder = await markOrderPaid(orderId, {
         paymentMode: PaymentMode.RAZORPAY,
         providerPaymentId: `demo_pay_${Date.now()}`,
+        paidAmountPaise: order.netAmountPaise,
         note: "Simulated online gateway checkout completed (Demo Mode)",
       });
 
@@ -54,10 +62,26 @@ export async function POST(request: NextRequest) {
         paymentStatus: updatedOrder.paymentStatus,
       });
     } else {
-      await prisma.order.update({
-        where: { id: orderId },
-        data: { paymentStatus: "FAILED" },
+      if (order.paymentStatus === PaymentStatus.PAID) {
+        return NextResponse.json(
+          { error: "A paid order cannot be marked as failed." },
+          { status: 409 }
+        );
+      }
+
+      // Conditional update: never downgrade an order that became PAID between
+      // the ownership check above and this write.
+      const result = await prisma.order.updateMany({
+        where: { id: orderId, paymentStatus: { not: PaymentStatus.PAID } },
+        data: { paymentStatus: PaymentStatus.FAILED },
       });
+
+      if (result.count === 0) {
+        return NextResponse.json(
+          { error: "A paid order cannot be marked as failed." },
+          { status: 409 }
+        );
+      }
 
       await prisma.orderStatusEvent.create({
         data: {
@@ -73,7 +97,11 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Internal error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    if (error instanceof PaymentError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
+    console.error("Internal error:", error);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

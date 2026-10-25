@@ -8,7 +8,7 @@ import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
 export async function GET(request: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   const csrf = validateCsrfOrigin(request);
   if (!csrf.isValid) return csrf.errorResponse;
