@@ -22,10 +22,11 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, banners });
   } catch (error) {
+    console.error("Failed to load banners:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to load banners",
+        error: "Failed to load banners",
       },
       { status: 500 }
     );

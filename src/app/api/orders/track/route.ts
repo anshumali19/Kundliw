@@ -127,6 +127,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    console.error("Order tracking lookup failed:", error);
     return NextResponse.json({ error: GENERIC_ERROR }, { status: 500 });
   }
 }

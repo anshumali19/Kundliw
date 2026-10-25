@@ -38,8 +38,8 @@ export async function GET() {
     });
     return NextResponse.json({ success: true, settings: settings || {} });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch settings";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch settings:", error);
+    return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 });
   }
 }
 
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true, settings });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update settings";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update settings:", error);
+    return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });
   }
 }

@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: error.status });
     }
 
-    const msg = error instanceof Error ? error.message : "Failed to submit manual payment";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to submit manual payment:", error);
+    return NextResponse.json({ error: "Failed to submit manual payment" }, { status: 500 });
   }
 }

@@ -48,8 +48,8 @@ export async function PUT(
 
     return NextResponse.json({ success: true, testimonial });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update testimonial";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update testimonial:", error);
+    return NextResponse.json({ error: "Failed to update testimonial" }, { status: 500 });
   }
 }
 
@@ -70,7 +70,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: "Testimonial deleted" });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to delete testimonial";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to delete testimonial:", error);
+    return NextResponse.json({ error: "Failed to delete testimonial" }, { status: 500 });
   }
 }

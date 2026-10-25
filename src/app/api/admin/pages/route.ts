@@ -24,8 +24,8 @@ export async function GET() {
     });
     return NextResponse.json({ success: true, pages });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch pages";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch pages:", error);
+    return NextResponse.json({ error: "Failed to fetch pages" }, { status: 500 });
   }
 }
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, page });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to save page";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to save page:", error);
+    return NextResponse.json({ error: "Failed to save page" }, { status: 500 });
   }
 }

@@ -28,8 +28,8 @@ export async function GET() {
     });
     return NextResponse.json({ success: true, posts });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch blogs";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch blogs:", error);
+    return NextResponse.json({ error: "Failed to fetch blogs" }, { status: 500 });
   }
 }
 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, post }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to create blog post";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to create blog post:", error);
+    return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 });
   }
 }

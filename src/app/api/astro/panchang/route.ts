@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, panchang });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Panchang request failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Panchang request failed:", error);
+    return NextResponse.json({ error: "Panchang request failed" }, { status: 500 });
   }
 }

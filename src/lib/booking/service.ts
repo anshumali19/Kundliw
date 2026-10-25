@@ -5,6 +5,13 @@ import { getGstSettings } from "@/lib/billing/gstSettings";
 import { claimOfferInTransaction } from "@/lib/offers/apply";
 import { OrderStatus, PaymentStatus, PaymentMode, RequestType, Prisma } from "@prisma/client";
 
+export class BookingError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "BookingError";
+  }
+}
+
 /**
  * Generates sequential order numbers (e.g. MKJK-2026-0001) using Counter model.
  * Atomic inside Prisma transaction.
@@ -64,7 +71,7 @@ export async function createBookingOrder(
     });
 
     if (!service) {
-      throw new Error("Requested Vedic service is unavailable or inactive.");
+      throw new BookingError("Requested Vedic service is unavailable or inactive.");
     }
 
     // 2. Fetch active plan directly from DB — never trust client price
@@ -78,14 +85,14 @@ export async function createBookingOrder(
     });
 
     if (!plan || !plan.isActive) {
-      throw new Error("Requested consultation tier is unavailable or inactive.");
+      throw new BookingError("Requested consultation tier is unavailable or inactive.");
     }
 
     // 3. If plan includes live call, validate and reserve appointment slot
     let reservedSlotId: string | null = null;
     if (plan.hasCall) {
       if (!input.slotId) {
-        throw new Error("An appointment slot is required for consultation calls.");
+        throw new BookingError("An appointment slot is required for consultation calls.");
       }
 
       const slot = await tx.slot.findUnique({
@@ -93,7 +100,7 @@ export async function createBookingOrder(
       });
 
       if (!slot) {
-        throw new Error("Selected appointment slot does not exist.");
+        throw new BookingError("Selected appointment slot does not exist.");
       }
 
       // Atomic conditional reservation: increment only if bookedCount < capacity
@@ -107,7 +114,7 @@ export async function createBookingOrder(
       });
 
       if (reservationResult.count === 0) {
-        throw new Error("Selected appointment slot is fully booked. Please choose another time.");
+        throw new BookingError("Selected appointment slot is fully booked. Please choose another time.");
       }
 
       reservedSlotId = slot.id;

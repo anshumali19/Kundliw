@@ -58,7 +58,7 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: error.status });
     }
 
-    const msg = error instanceof Error ? error.message : "Verification failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Verification failed:", error);
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }

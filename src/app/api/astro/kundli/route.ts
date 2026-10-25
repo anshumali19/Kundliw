@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       data: result,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Calculation failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Calculation failed:", error);
+    return NextResponse.json({ error: "Calculation failed" }, { status: 500 });
   }
 }

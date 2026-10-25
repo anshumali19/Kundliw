@@ -31,8 +31,8 @@ export async function GET() {
     });
     return NextResponse.json({ success: true, testimonials });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch testimonials";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch testimonials:", error);
+    return NextResponse.json({ error: "Failed to fetch testimonials" }, { status: 500 });
   }
 }
 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, testimonial }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to create testimonial";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to create testimonial:", error);
+    return NextResponse.json({ error: "Failed to create testimonial" }, { status: 500 });
   }
 }

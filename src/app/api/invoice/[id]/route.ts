@@ -232,7 +232,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Invoice generation failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Invoice generation failed:", error);
+    return NextResponse.json({ error: "Invoice generation failed" }, { status: 500 });
   }
 }

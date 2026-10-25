@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       orderNumber: result.orderNumber,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to record request";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to record request:", error);
+    return NextResponse.json({ error: "Failed to record request" }, { status: 500 });
   }
 }

@@ -25,8 +25,8 @@ export async function GET() {
     });
     return NextResponse.json({ success: true, items });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to fetch gallery items";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to fetch gallery items:", error);
+    return NextResponse.json({ error: "Failed to fetch gallery items" }, { status: 500 });
   }
 }
 
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, item }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to create gallery item";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to create gallery item:", error);
+    return NextResponse.json({ error: "Failed to create gallery item" }, { status: 500 });
   }
 }

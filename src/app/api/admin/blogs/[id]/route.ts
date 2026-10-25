@@ -47,8 +47,8 @@ export async function PUT(
 
     return NextResponse.json({ success: true, post });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update blog post";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update blog post:", error);
+    return NextResponse.json({ error: "Failed to update blog post" }, { status: 500 });
   }
 }
 
@@ -69,7 +69,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: "Blog post deleted" });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to delete blog post";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to delete blog post:", error);
+    return NextResponse.json({ error: "Failed to delete blog post" }, { status: 500 });
   }
 }

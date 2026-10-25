@@ -88,7 +88,7 @@ export async function POST(
       order: updated,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update status";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update status:", error);
+    return NextResponse.json({ error: "Failed to update status" }, { status: 500 });
   }
 }

@@ -42,8 +42,8 @@ export async function PUT(
 
     return NextResponse.json({ success: true, item });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to update gallery item";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to update gallery item:", error);
+    return NextResponse.json({ error: "Failed to update gallery item" }, { status: 500 });
   }
 }
 
@@ -64,7 +64,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: "Gallery item deleted" });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Failed to delete gallery item";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Failed to delete gallery item:", error);
+    return NextResponse.json({ error: "Failed to delete gallery item" }, { status: 500 });
   }
 }
