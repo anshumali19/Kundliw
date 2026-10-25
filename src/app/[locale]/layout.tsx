@@ -198,7 +198,7 @@ export default async function LocaleLayout(
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>
             {topMarquee.length > 0 && <MarqueeStrip items={topMarquee} position="TOP" />}
-            <main className="flex-1 w-full max-w-full overflow-x-hidden pb-6 xl:pb-0">
+            <main className="flex-1 w-full max-w-full overflow-x-clip pb-6 xl:pb-0">
               <PageNavButtons />
               {children}
             </main>

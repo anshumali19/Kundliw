@@ -348,8 +348,8 @@ export function AdminOffersManager({
 
       {/* Modal: Offer Form */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-xl w-full p-6 text-left my-8">
+        <div className="fixed inset-0 z-[70] bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-xl w-full p-6 text-left max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/40">
               <h2 className="font-serif text-lg font-bold text-secondary">
                 {editingOffer
@@ -536,7 +536,7 @@ export function AdminOffersManager({
                 </label>
               </div>
 
-              <div className="pt-3 border-t border-outline-variant/40 flex justify-end gap-3">
+              <div className="sticky bottom-0 z-10 bg-surface -mx-6 -mb-6 px-6 py-3 border-t border-outline-variant/40 flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}

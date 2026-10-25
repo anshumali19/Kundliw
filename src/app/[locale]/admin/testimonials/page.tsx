@@ -330,6 +330,7 @@ export default function AdminTestimonialsPage() {
             </label>
           </div>
 
+          <div className="sticky bottom-[calc(6.75rem+env(safe-area-inset-bottom,0px))] xl:bottom-12 z-30 bg-surface/95 backdrop-blur border-t border-outline-variant/40 -mx-2 px-2 py-3">
           <button
             type="submit"
             disabled={submitting}
@@ -338,6 +339,7 @@ export default function AdminTestimonialsPage() {
             <Plus className="w-4 h-4" />
             <span>{submitting ? "Saving..." : "Add Testimonial"}</span>
           </button>
+          </div>
         </form>
       </div>
 

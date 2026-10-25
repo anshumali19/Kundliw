@@ -425,8 +425,8 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
 
       {/* Create / Edit Modal */}
       {isCreating && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-surface rounded-2xl border border-outline-variant p-6 shadow-2xl my-8">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl bg-surface rounded-2xl border border-outline-variant p-6 shadow-2xl max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/30">
               <h2 className="text-lg font-serif font-bold text-on-surface">
                 {editingItem
@@ -630,7 +630,7 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
               </div>
 
               {/* Buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-outline-variant/30">
+              <div className="sticky bottom-0 z-10 bg-surface -mx-6 -mb-6 px-6 py-3 flex justify-end gap-3 border-t border-outline-variant/30">
                 <button
                   type="button"
                   onClick={closeModal}

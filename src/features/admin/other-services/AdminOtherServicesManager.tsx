@@ -347,11 +347,11 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       {/* Edit/Create Modal */}
       {modalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-xs"
           onClick={() => setModalOpen(false)}
         >
           <div
-            className="w-full max-w-2xl bg-surface border border-outline-variant/60 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col text-left"
+            className="w-full max-w-2xl bg-surface border border-outline-variant/60 rounded-2xl shadow-2xl overflow-hidden max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] flex flex-col text-left"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-surface-container-low px-6 py-4 border-b border-outline-variant/30 flex items-center justify-between shrink-0">
@@ -528,7 +528,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                 </label>
               </div>
 
-              <div className="pt-4 border-t border-outline-variant/30 flex items-center justify-end gap-3">
+              <div className="sticky bottom-0 z-10 bg-surface -mx-6 -mb-6 px-6 py-3 border-t border-outline-variant/30 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}

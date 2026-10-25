@@ -464,6 +464,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
 
         {/* Save Bar */}
         <div className="flex items-center justify-end pt-2">
+          <div className="sticky bottom-[calc(6.75rem+env(safe-area-inset-bottom,0px))] xl:bottom-12 z-30 bg-surface/95 backdrop-blur border-t border-outline-variant/40 -mx-2 px-2 py-3">
           <button
             type="submit"
             disabled={submitting || uploading}
@@ -472,6 +473,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
             <Save className="w-4 h-4" />
             <span>{submitting ? "Saving..." : "Save Founder Profile Live"}</span>
           </button>
+          </div>
         </div>
       </form>
     </div>
