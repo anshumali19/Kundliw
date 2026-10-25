@@ -41,7 +41,7 @@ header { border-bottom: 3px solid var(--signal); }
     padding: 0;
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
     position: relative;
     background-color: var(--surface);
     color: var(--on-surface);

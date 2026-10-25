@@ -187,8 +187,8 @@ export default async function LocaleLayout(
   };
 
   return (
-    <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable} w-full max-w-full overflow-x-hidden`}>
-      <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-hidden relative">
+    <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable} w-full max-w-full overflow-x-clip`}>
+      <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-clip relative">
         <JsonLd data={structuredData} />
         <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
