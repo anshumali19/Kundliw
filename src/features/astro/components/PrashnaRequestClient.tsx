@@ -157,7 +157,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
             <span className="text-xs font-bold uppercase tracking-widest text-primary">
               {isHindi ? "दैवज्ञ प्रश्न शास्त्र" : "VEDIC PRASHNA SHASTRA"}
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand/20 text-primary border border-brand">
               Demo
             </span>
           </div>
@@ -219,7 +219,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
                     key={area.titleEn}
                     className="p-2.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3"
                   >
-                    <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0 mt-0.5">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
@@ -391,7 +391,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full min-h-[48px] px-6 py-3 bg-[#e8751a] hover:bg-[#d06410] text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer shadow-sm"
+              className="w-full min-h-[48px] px-6 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs sm:text-sm uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer shadow-sm"
             >
               <Send className="w-4 h-4" />
               <span>
@@ -406,8 +406,8 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
             </button>
 
             {/* Confidentiality Notice Banner */}
-            <div className="p-3.5 rounded-lg bg-sky-50/80 border border-sky-200 text-sky-900 text-xs flex items-center gap-2.5">
-              <Lock className="w-4 h-4 text-sky-600 shrink-0" />
+            <div className="p-3.5 rounded-lg bg-brand/20 border border-brand text-primary text-xs flex items-center gap-2.5">
+              <Lock className="w-4 h-4 text-primary shrink-0" />
               <p>
                 {isHindi
                   ? "आपकी जानकारी पूर्णतः गोपनीय है एवं इसका उपयोग केवल ज्योतिषीय विश्लेषण प्रदान करने हेतु किया जाएगा।"
@@ -418,7 +418,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
 
           {/* Error Message */}
           {error && (
-            <div className="p-4 rounded-lg bg-error-container/20 border border-error text-error text-xs flex items-start gap-2">
+            <div className="p-4 rounded-lg bg-error-container/20 border border-error text-on-error-container text-xs flex items-start gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -475,7 +475,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <Target className="w-4 h-4" />
             </div>
             <div>
@@ -492,7 +492,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
 
           {/* Card 2 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <Users className="w-4 h-4" />
             </div>
             <div>
@@ -509,7 +509,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
 
           {/* Card 3 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <div>
@@ -526,7 +526,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
 
           {/* Card 4 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>

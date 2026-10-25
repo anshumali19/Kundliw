@@ -148,14 +148,14 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
         <div
           className={`p-4 rounded-lg flex items-center gap-2 text-sm ${
             status.type === "success"
-              ? "bg-secondary-container/30 text-on-secondary-container border border-secondary"
-              : "bg-error-container/30 text-error border border-error"
+              ? "bg-brand/30 text-on-brand border border-secondary"
+              : "bg-error-container/30 text-on-error-container border border-error"
           }`}
         >
           {status.type === "success" ? (
             <CheckCircle2 className="w-4 h-4 shrink-0 text-secondary" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-error" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-on-error-container" />
           )}
           <span>{status.text}</span>
         </div>
@@ -186,7 +186,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
               onClick={() => setFilter(mode)}
               className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
                 filter === mode
-                  ? "bg-primary text-on-primary"
+                  ? "bg-brand text-on-brand"
                   : "bg-surface-container text-on-surface-variant hover:text-on-surface"
               }`}
             >
@@ -211,7 +211,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
               onClick={() => setSourceFilter(src.id)}
               className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
                 sourceFilter === src.id
-                  ? "bg-secondary text-on-secondary"
+                  ? "bg-brand text-on-brand"
                   : "bg-surface-container text-on-surface-variant hover:text-on-surface"
               }`}
             >
@@ -251,11 +251,11 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                       {item.name}
                     </span>
                     {item.source === "CHATBOT_LEAD" ? (
-                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30 flex items-center gap-1">
+                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-brand/200/15 text-primary border border-brand flex items-center gap-1">
                         {isHindi ? "चैटबॉट लीड" : "Chatbot Lead"}
                       </span>
                     ) : item.source === "CHATBOT_TICKET" ? (
-                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30 flex items-center gap-1">
+                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-brand/200/15 text-primary border border-brand flex items-center gap-1">
                         {isHindi ? "चैटबॉट टिकट" : "Chatbot Ticket"}
                       </span>
                     ) : (
@@ -266,8 +266,8 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                     <span
                       className={`text-[11px] px-2 py-0.5 rounded font-medium ${
                         item.isResolved
-                          ? "bg-secondary-container/40 text-on-secondary-container"
-                          : "bg-amber-500/10 text-amber-700"
+                          ? "bg-brand/40 text-on-brand"
+                          : "bg-brand/200/10 text-primary"
                       }`}
                     >
                       {item.isResolved ? "Resolved" : "Pending"}
@@ -304,7 +304,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                     className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                       item.isResolved
                         ? "bg-surface-container text-on-surface-variant hover:text-on-surface"
-                        : "bg-secondary text-on-secondary hover:bg-secondary/90"
+                        : "bg-brand text-on-brand hover:bg-brand-hover"
                     }`}
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
@@ -321,7 +321,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
 
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-1.5 rounded hover:bg-error-container/30 text-on-surface-variant hover:text-error"
+                    className="p-1.5 rounded hover:bg-error-container/30 text-on-surface-variant hover:text-on-error-container"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />

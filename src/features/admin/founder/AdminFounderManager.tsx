@@ -200,7 +200,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
           className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
             status.type === "success"
               ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
-              : "bg-red-500/10 text-red-700 border border-red-500/20"
+              : "bg-error-container0/10 text-on-error-container border border-error"
           }`}
         >
           {status.type === "success" ? (
@@ -389,7 +389,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
                 <button
                   type="button"
                   onClick={() => handleRemoveLink(idx)}
-                  className="p-1 rounded text-red-600 hover:bg-red-500/10 transition-colors"
+                  className="p-1 rounded text-on-error-container hover:bg-error-container0/10 transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -423,7 +423,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
               <button
                 type="button"
                 onClick={handleAddLink}
-                className="px-3 py-2 rounded-xl bg-secondary text-on-secondary font-semibold hover:bg-secondary/90 transition-colors shrink-0"
+                className="px-3 py-2 rounded-xl bg-brand text-on-brand font-semibold hover:bg-brand-hover transition-colors shrink-0"
               >
                 Add Link
               </button>
@@ -467,7 +467,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
           <button
             type="submit"
             disabled={submitting || uploading}
-            className="px-6 py-3 rounded-xl bg-primary text-on-primary font-semibold text-xs sm:text-sm hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center gap-2 shadow-sm"
+            className="px-6 py-3 rounded-xl bg-brand text-on-brand font-semibold text-xs sm:text-sm hover:bg-brand-hover disabled:opacity-50 transition-all flex items-center gap-2 shadow-sm"
           >
             <Save className="w-4 h-4" />
             <span>{submitting ? "Saving..." : "Save Founder Profile Live"}</span>

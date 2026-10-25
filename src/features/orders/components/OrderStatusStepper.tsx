@@ -123,7 +123,7 @@ export function OrderStatusStepper({
                     {isCompleted ? (
                       <CheckCircle2 className="w-4 h-4 text-secondary" />
                     ) : isCurrent ? (
-                      <span className="w-2.5 h-2.5 rounded-full bg-primary-container animate-ping" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-brand animate-ping" />
                     ) : (
                       <Circle className="w-3.5 h-3.5 text-outline" />
                     )}

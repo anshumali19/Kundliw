@@ -131,7 +131,7 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
             href={googleMapsDirectionsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 rounded-lg bg-secondary text-on-secondary text-xs font-bold hover:bg-secondary/90 flex items-center gap-1.5 transition-colors shadow-sm"
+            className="px-4 py-2 rounded-lg bg-brand text-on-brand text-xs font-bold hover:bg-brand-hover flex items-center gap-1.5 transition-colors shadow-sm"
           >
             <span>{isHindi ? "दिशा-निर्देश प्राप्त करें (Google Maps)" : "Get Directions on Google Maps"}</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -241,7 +241,7 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
               {status.type === "success" ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <AlertCircle className="w-4 h-4 text-error shrink-0" />
+                <AlertCircle className="w-4 h-4 text-on-error-container shrink-0" />
               )}
               <span>{status.text}</span>
             </div>
@@ -327,7 +327,7 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 py-3 rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 flex items-center justify-center gap-2 transition-all shadow-sm min-h-[44px] disabled:opacity-50"
+              className="w-full sm:w-auto px-6 py-3 rounded-lg bg-brand text-on-brand text-xs font-bold hover:bg-brand-hover flex items-center justify-center gap-2 transition-all shadow-sm min-h-[44px] disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{loading ? (isHindi ? "भेजा जा रहा है..." : "Submitting...") : (isHindi ? "संदेश भेजें" : "Send Enquiry")}</span>

@@ -43,7 +43,7 @@ export default async function VaultPage(props: VaultPageProps) {
       {/* Header Banner */}
       <div className="bg-surface-container rounded-lg p-6 sm:p-8 border-2 border-secondary/30 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-full bg-brand text-on-brand flex items-center justify-center shrink-0">
             <FolderLock className="w-7 h-7" />
           </div>
           <div>
@@ -110,7 +110,7 @@ export default async function VaultPage(props: VaultPageProps) {
             <div className="pt-2">
               <Link
                 href="/services"
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 bg-primary-container text-on-primary rounded text-xs uppercase font-bold tracking-wider"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 bg-brand text-on-brand rounded text-xs uppercase font-bold tracking-wider"
               >
                 <span>{isHindi ? "परामर्श सेवाएँ देखें" : "View Services"}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -156,7 +156,7 @@ export default async function VaultPage(props: VaultPageProps) {
                     href={`/api/vault/${doc.id}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="min-h-[44px] px-5 py-2.5 bg-secondary hover:bg-secondary/90 text-on-secondary text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-2 text-center"
+                    className="min-h-[44px] px-5 py-2.5 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-2 text-center"
                   >
                     <Download className="w-4 h-4" />
                     <span>{isHindi ? "कुण्डली PDF डाउनलोड" : "Download PDF Report"}</span>

@@ -231,7 +231,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
           </button>
           <button
             onClick={() => handleOpenModal()}
-            className="px-4 py-2 rounded-xl bg-primary text-on-primary hover:bg-primary/90 transition-colors font-semibold text-xs flex items-center gap-1.5 shadow-sm"
+            className="px-4 py-2 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors font-semibold text-xs flex items-center gap-1.5 shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>{isHindi ? "नई सेवा जोड़ें" : "Add Other Service"}</span>
@@ -245,7 +245,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
           className={`p-4 rounded-xl flex items-center gap-2 text-xs ${
             status.type === "success"
               ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
-              : "bg-red-500/10 text-red-700 border border-red-500/20"
+              : "bg-error-container0/10 text-on-error-container border border-error"
           }`}
         >
           {status.type === "success" ? (
@@ -314,7 +314,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                   </div>
                 )}
                 {item.youtubeUrl && (
-                  <div className="flex items-center gap-1 text-[11px] text-red-600 truncate">
+                  <div className="flex items-center gap-1 text-[11px] text-on-error-container truncate">
                     <Video className="w-3 h-3 shrink-0" />
                     <span className="truncate">{item.youtubeUrl}</span>
                   </div>
@@ -333,7 +333,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                 <button
                   type="button"
                   onClick={() => handleDelete(item.id)}
-                  className="p-1.5 rounded-lg hover:bg-red-500/10 text-outline hover:text-red-600 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-error-container0/10 text-outline hover:text-on-error-container transition-colors"
                   title="Delete"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -539,7 +539,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-semibold text-xs disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-brand text-on-brand hover:bg-brand-hover font-semibold text-xs disabled:opacity-50"
                 >
                   {submitting ? "Saving..." : isHindi ? "सहेजें" : "Save Item"}
                 </button>

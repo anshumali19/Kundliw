@@ -218,7 +218,7 @@ export function PlanSelectorInteractive({
               >
                 {/* Popular Badge */}
                 {plan.isPopular && (
-                  <div className="absolute -top-3 left-6 bg-primary text-on-primary text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
+                  <div className="absolute -top-3 left-6 bg-brand text-on-brand text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-tertiary-fixed" />
                     <span>{isHindi ? "सर्वाधिक अनुशंसित" : "Most Preferred"}</span>
                   </div>
@@ -236,7 +236,7 @@ export function PlanSelectorInteractive({
                         : "Digital Report"}
                     </span>
                     {isSelected && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-container text-on-primary flex items-center gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand text-on-brand flex items-center gap-1">
                         <Check className="w-3 h-3" />
                         {isHindi ? "चयनित" : "Selected"}
                       </span>
@@ -316,8 +316,8 @@ export function PlanSelectorInteractive({
                     }}
                     className={`w-full min-h-[44px] py-2.5 px-4 rounded font-medium text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 ${
                       isSelected
-                        ? "bg-primary text-on-primary font-bold shadow-sm"
-                        : "border border-secondary text-secondary hover:bg-secondary hover:text-on-secondary"
+                        ? "bg-brand text-on-brand font-bold shadow-sm"
+                        : "border border-secondary text-secondary hover:bg-brand-hover hover:text-on-brand"
                     }`}
                   >
                     <span>
@@ -352,7 +352,7 @@ export function PlanSelectorInteractive({
         <div className="overflow-x-auto rounded border border-outline-variant/60 shadow-sm bg-surface">
           <table className="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
-              <tr className="bg-secondary text-on-secondary border-b-2 border-secondary font-serif">
+              <tr className="bg-brand text-on-brand border-b-2 border-secondary font-serif">
                 <th className="py-3 px-4 font-bold tracking-wide w-1/3 text-left">
                   {isHindi ? "शास्त्रीय घटक / विशेषता" : "Canonical Matrix Feature"}
                 </th>
@@ -361,7 +361,7 @@ export function PlanSelectorInteractive({
                     key={p.id}
                     className={`py-3 px-4 text-center font-bold tracking-wide ${
                       p.id === selectedPlanId
-                        ? "bg-primary-container text-on-primary"
+                        ? "bg-brand text-on-brand"
                         : ""
                     }`}
                   >
@@ -383,7 +383,7 @@ export function PlanSelectorInteractive({
                   <td
                     key={p.id}
                     className={`py-3 px-4 text-center ${
-                      p.id === selectedPlanId ? "bg-primary/5 font-semibold text-secondary" : "text-on-surface-variant"
+                      p.id === selectedPlanId ? "bg-brand/5 font-semibold text-secondary" : "text-on-surface-variant"
                     }`}
                   >
                     {p.deliveryDays} {isHindi ? "कार्यदिवस" : "Working Days"}
@@ -400,7 +400,7 @@ export function PlanSelectorInteractive({
                   <td
                     key={p.id}
                     className={`py-3 px-4 text-center ${
-                      p.id === selectedPlanId ? "bg-primary/5 font-semibold text-secondary" : "text-on-surface-variant"
+                      p.id === selectedPlanId ? "bg-brand/5 font-semibold text-secondary" : "text-on-surface-variant"
                     }`}
                   >
                     {p.pages ? `${p.pages} ${isHindi ? "पृष्ठ" : "Pages"}` : "—"}
@@ -417,7 +417,7 @@ export function PlanSelectorInteractive({
                   <td
                     key={p.id}
                     className={`py-3 px-4 text-center ${
-                      p.id === selectedPlanId ? "bg-primary/5 font-semibold text-secondary" : "text-on-surface-variant"
+                      p.id === selectedPlanId ? "bg-brand/5 font-semibold text-secondary" : "text-on-surface-variant"
                     }`}
                   >
                     {p.hasCall ? (
@@ -441,7 +441,7 @@ export function PlanSelectorInteractive({
                   <td
                     key={p.id}
                     className={`py-3 px-4 text-center ${
-                      p.id === selectedPlanId ? "bg-primary/5 font-semibold text-secondary" : "text-on-surface-variant"
+                      p.id === selectedPlanId ? "bg-brand/5 font-semibold text-secondary" : "text-on-surface-variant"
                     }`}
                   >
                     <span className="inline-flex items-center gap-1 text-tertiary font-bold">
@@ -486,7 +486,7 @@ export function PlanSelectorInteractive({
               <button
                 type="button"
                 onClick={handleRemoveCoupon}
-                className="min-h-[44px] px-3 py-2 bg-surface hover:bg-surface-container-high border border-outline-variant text-error text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-1"
+                className="min-h-[44px] px-3 py-2 bg-surface hover:bg-surface-container-high border border-outline-variant text-on-error-container text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-1"
               >
                 <X className="w-3.5 h-3.5" />
                 <span>{isHindi ? "हटाएँ" : "Remove"}</span>
@@ -496,7 +496,7 @@ export function PlanSelectorInteractive({
                 type="button"
                 onClick={() => handleApplyCoupon()}
                 disabled={couponLoading || !couponInput.trim()}
-                className="min-h-[44px] px-4 py-2 bg-secondary hover:bg-primary text-on-secondary font-medium text-xs uppercase tracking-wider rounded transition-colors disabled:opacity-50"
+                className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-medium text-xs uppercase tracking-wider rounded transition-colors disabled:opacity-50"
               >
                 {couponLoading ? (isHindi ? "जाँच..." : "Checking...") : isHindi ? "लागू करें" : "Apply"}
               </button>
@@ -505,7 +505,7 @@ export function PlanSelectorInteractive({
 
           {/* Coupon Feedback Alerts */}
           {couponError && (
-            <div className="flex items-center gap-1.5 text-xs text-error font-medium pt-1">
+            <div className="flex items-center gap-1.5 text-xs text-on-error-container font-medium pt-1">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{couponError}</span>
             </div>
@@ -529,7 +529,7 @@ export function PlanSelectorInteractive({
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           {/* Selected Plan Details */}
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded bg-primary-container text-on-primary flex items-center justify-center shrink-0 border border-primary">
+            <div className="w-11 h-11 rounded bg-brand text-on-brand flex items-center justify-center shrink-0 border border-primary">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -563,7 +563,7 @@ export function PlanSelectorInteractive({
           <div className="w-full md:w-auto">
             <Link
               href={bookingHref}
-              className="w-full md:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded shadow-sm transition-colors border border-primary text-center"
+              className="w-full md:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded shadow-sm transition-colors border border-primary text-center"
             >
               <span>{isHindi ? "जन्म विवरण दर्ज करें" : "Proceed to Birth Details"}</span>
               <ArrowRight className="w-4 h-4" />

@@ -150,7 +150,7 @@ export function AdminVaultManager({
         </div>
 
         {error && (
-          <div className="p-4 rounded bg-error-container/20 border border-error text-error text-xs flex items-start gap-2">
+          <div className="p-4 rounded bg-error-container/20 border border-error text-on-error-container text-xs flex items-start gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -252,7 +252,7 @@ export function AdminVaultManager({
           <button
             type="submit"
             disabled={submitting}
-            className="min-h-[44px] px-6 py-2.5 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+            className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
           >
             <Upload className="w-4 h-4" />
             <span>{submitting ? (isHindi ? "अपलोड हो रहा है..." : "Uploading...") : (isHindi ? "वॉल्ट में सुरक्षित करें" : "Upload to Vault")}</span>

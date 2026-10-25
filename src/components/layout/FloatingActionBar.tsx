@@ -33,7 +33,7 @@ interface FloatingActionBarProps {
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
 
 const FAB_CIRCLE =
-  "flex items-center justify-center w-14 h-14 rounded-full border-2 border-white text-white transition-transform active:scale-95 hover:scale-105";
+  "flex items-center justify-center w-14 h-14 rounded-full border-2 border-maroon transition-transform active:scale-95 hover:scale-105";
 
 /** Renders **bold** segments from chat text without exposing the asterisks. */
 function renderBold(text: string): React.ReactNode[] {
@@ -48,7 +48,7 @@ function renderBold(text: string): React.ReactNode[] {
 
 function FabLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-white text-xs font-bold leading-none whitespace-nowrap">
+    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-brand text-xs font-bold leading-none whitespace-nowrap">
       {children}
     </span>
   );
@@ -353,7 +353,7 @@ export function FloatingActionBar({
               className="relative pb-2 flex flex-col items-center"
               aria-label={isHindi ? "कॉल करें" : "Call us"}
             >
-              <span className={`${FAB_CIRCLE} bg-secondary`}>
+              <span className={`${FAB_CIRCLE} bg-brand text-maroon`}>
                 <Phone className="w-6 h-6" />
               </span>
               <FabLabel>{isHindi ? "कॉल" : "Call"}</FabLabel>
@@ -367,7 +367,7 @@ export function FloatingActionBar({
               className="relative pb-2 flex flex-col items-center"
               aria-label={isHindi ? "व्हाट्सएप पर संदेश भेजें" : "Message us on WhatsApp"}
             >
-              <span className={`${FAB_CIRCLE} bg-[#178a45]`}>
+              <span className={`${FAB_CIRCLE} bg-[#178a45] text-white`}>
                 <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.97.57 3.805 1.554 5.352L2.016 22l4.773-1.523c1.5 0.922 3.266 1.453 5.242 1.453 5.536 0 10.031-4.495 10.031-10.031S17.567 2 12.031 2zm0 18.234c-1.742 0-3.359-0.5-4.734-1.375l-0.344-0.219-3.328 1.062 1.094-3.234-0.234-0.375c-0.969-1.422-1.516-3.125-1.516-4.938 0-4.523 3.68-8.203 8.203-8.203 4.523 0 8.203 3.68 8.203 8.203 0 4.523-3.68 8.203-8.203 8.203zm4.531-6.141c-0.25-0.125-1.469-0.727-1.703-0.812-0.234-0.086-0.406-0.125-0.578 0.125s-0.664 0.812-0.812 0.984c-0.156 0.172-0.305 0.187-0.555 0.062s-1.055-0.391-2.016-1.242c-0.742-0.664-1.242-1.484-1.391-1.734s-0.016-0.383 0.109-0.508c0.109-0.109 0.25-0.281 0.375-0.422s0.172-0.234 0.25-0.391c0.078-0.156 0.039-0.297-0.02-0.422s-0.578-1.391-0.797-1.906c-0.211-0.5-0.43-0.43-0.594-0.438-0.156-0.008-0.336-0.008-0.516-0.008s-0.469 0.062-0.719 0.336c-0.25 0.266-0.953 0.93-0.953 2.273s0.977 2.641 1.109 2.82c0.141 0.18 1.922 2.938 4.656 4.117 0.656 0.281 1.164 0.453 1.562 0.578 0.656 0.211 1.258 0.18 1.734 0.109 0.531-0.078 1.469-0.602 1.68-1.188s0.211-1.086 0.148-1.188c-0.062-0.109-0.234-0.172-0.484-0.297z" />
                 </svg>
@@ -385,7 +385,7 @@ export function FloatingActionBar({
             aria-expanded={isOpen && mode === "ai"}
             aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
           >
-            <span className={`${FAB_CIRCLE} bg-tertiary`}>
+            <span className={`${FAB_CIRCLE} bg-signal text-white`}>
               <Sparkles className="w-6 h-6" />
             </span>
             <FabLabel>AI</FabLabel>
@@ -397,7 +397,7 @@ export function FloatingActionBar({
             aria-expanded={isOpen && mode === "chat"}
             aria-label={isHindi ? "चैट खोलें" : "Open chat"}
           >
-            <span className={`${FAB_CIRCLE} bg-primary`}>
+            <span className={`${FAB_CIRCLE} bg-brand-hover text-maroon`}>
               {isOpen && mode === "chat" ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
             </span>
             <FabLabel>{isHindi ? "चैट" : "Chat"}</FabLabel>
@@ -416,7 +416,7 @@ export function FloatingActionBar({
           {/* Drawer Header */}
           <div className="bg-surface-container-high px-4 py-3.5 border-b border-outline-variant flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-primary">
                 <Sparkles className="w-4 h-4 text-primary" />
               </div>
               <div className="text-left">
@@ -433,7 +433,7 @@ export function FloatingActionBar({
                       : "Kendra Help Chat"}
                 </h3>
                 <span className="text-[10px] text-secondary flex items-center gap-1 font-sans">
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
                   <span>{mode === "ai" ? (isHindi ? "तुरंत उत्तर • निःशुल्क" : "Instant answers • Free") : (isHindi ? "ऑनलाइन • निःशुल्क" : "Online • Free")}</span>
                 </span>
               </div>
@@ -463,7 +463,7 @@ export function FloatingActionBar({
                     className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed ${
                       isBot
                         ? "bg-surface-container-low text-on-surface border border-outline-variant/30 rounded-tl-sm shadow-sm"
-                        : "bg-primary text-on-primary rounded-tr-sm shadow"
+                        : "bg-brand text-on-brand rounded-tr-sm shadow"
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{renderBold(m.text)}</p>
@@ -487,7 +487,7 @@ export function FloatingActionBar({
                         <Link
                           href="/contact"
                           onClick={() => setIsOpen(false)}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-secondary text-on-secondary text-[11px] font-medium shadow-sm hover:opacity-95"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-brand text-on-brand text-[11px] font-medium shadow-sm hover:opacity-95"
                         >
                           <Mail className="w-3 h-3" />
                           <span>{isHindi ? "संदेश भेजें" : "Submit Enquiry"}</span>
@@ -552,7 +552,7 @@ export function FloatingActionBar({
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="p-2 rounded-xl bg-primary text-on-primary hover:bg-primary/90 disabled:opacity-40 transition-colors"
+              className="p-2 rounded-xl bg-brand text-on-brand hover:bg-brand-hover disabled:opacity-40 transition-colors"
               aria-label="Send message"
             >
               <Send className="w-4 h-4" />

@@ -2,65 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Surface palette - Warm Pressed Parchment */
-  --surface: #fff8f6;
-  --surface-dim: #ebd5ce;
-  --surface-bright: #fff8f6;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low: #fff1ec;
-  --surface-container: #ffe9e2;
-  --surface-container-high: #fae3dc;
-  --surface-container-highest: #f4ded7;
-  --on-surface: #241915;
-  --on-surface-variant: #574237;
-  --inverse-surface: #3b2d29;
-  --inverse-on-surface: #ffede7;
-  --outline: #6f5a4c;
-  --outline-variant: #dec1b1;
-  --surface-tint: #984700;
-
-  /* Saffron Primary tokens */
-  --primary: #984700;
-  --on-primary: #ffffff;
-  --primary-container: #e8751a;
-  --on-primary-container: #4d2100;
-  --primary-fixed: #ffdbc8;
-  --primary-fixed-dim: #ffb68a;
-  --on-primary-fixed: #321300;
-  --on-primary-fixed-variant: #743500;
-
-  /* Deep Kumkum Maroon Secondary tokens */
-  --secondary: #6b1d1d;
-  --on-secondary: #ffffff;
-  --secondary-container: #fe8e88;
-  --on-secondary-container: #762524;
-  --secondary-fixed: #ffdad7;
-  --secondary-fixed-dim: #ffb3ae;
-  --on-secondary-fixed: #410005;
-  --on-secondary-fixed-variant: #7d2b29;
-
-  /* Turmeric Yellow Tertiary tokens */
-  --tertiary: #785900;
-  --on-tertiary: #ffffff;
-  --tertiary-container: #bd8e00;
-  --on-tertiary-container: #3c2b00;
-  --tertiary-fixed: #ffdf9d;
-  --tertiary-fixed-dim: #f9bd14;
-  --on-tertiary-fixed: #251a00;
-  --on-tertiary-fixed-variant: #5b4300;
-
-  /* Error */
-  --error: #ba1a1a;
-  --on-error: #ffffff;
-  --error-container: #ffdad6;
-  --on-error-container: #93000a;
-}
-
-/* High-contrast fix: white on saffron measures 3:1, so saffron buttons use dark text
-   (about 6:1) and revert to white once the hover state turns the fill deep saffron. */
-.bg-primary-container.text-on-primary { color: #2b1200; }
-.bg-primary-container.text-on-primary.hover\:bg-primary:hover { color: #ffffff; }
 
 /* Readability scale. Declared after the utilities layer so these win at equal specificity. */
 @media (min-width: 768px) {
@@ -90,6 +31,9 @@
   .text-\[11px\] { font-size: 0.875rem; line-height: 1.35rem; }
   input, select, textarea { font-size: 1.0625rem; }
 }
+
+/* Red accent line under the fixed header */
+header { border-bottom: 3px solid var(--signal); }
 
 @layer base {
   html, body {

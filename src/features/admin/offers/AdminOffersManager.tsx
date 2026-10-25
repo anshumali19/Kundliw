@@ -203,7 +203,7 @@ export function AdminOffersManager({
         <button
           type="button"
           onClick={() => handleOpenModal()}
-          className="min-h-[44px] px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
+          className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>{isHindi ? "नया कूपन बनाएँ" : "Create Offer Code"}</span>
@@ -219,7 +219,7 @@ export function AdminOffersManager({
       )}
 
       {errorMsg && (
-        <div className="p-3 bg-surface rounded border border-error text-xs text-error font-medium flex items-center gap-2">
+        <div className="p-3 bg-surface rounded border border-error text-xs text-on-error-container font-medium flex items-center gap-2">
           <AlertCircle className="w-4 h-4" />
           <span>{errorMsg}</span>
         </div>
@@ -332,7 +332,7 @@ export function AdminOffersManager({
                         <button
                           type="button"
                           onClick={() => handleOpenModal(offer)}
-                          className="min-h-[36px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-secondary hover:text-on-secondary transition-colors"
+                          className="min-h-[36px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand transition-colors"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -547,7 +547,7 @@ export function AdminOffersManager({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="min-h-[44px] px-6 py-2 bg-primary hover:bg-primary-container text-on-primary rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                  className="min-h-[44px] px-6 py-2 bg-brand hover:bg-brand-hover text-on-brand rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
                 >
                   {loading ? (isHindi ? "सहेज रहे हैं..." : "Saving...") : isHindi ? "सहेजें" : "Save Offer"}
                 </button>

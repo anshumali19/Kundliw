@@ -60,7 +60,7 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
             {isHindi ? "दैनिक दृग्गणित पंचांग" : "Canonical Vedic Ephemeris"}
           </span>
           {panchang?.isDemo && (
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand/20 text-primary border border-brand">
               Demo
             </span>
           )}
@@ -107,7 +107,7 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
       )}
 
       {error && (
-        <div className="p-4 rounded bg-error-container/20 border border-error text-error text-xs">
+        <div className="p-4 rounded bg-error-container/20 border border-error text-on-error-container text-xs">
           {error}
         </div>
       )}
@@ -127,10 +127,10 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
               </div>
               {panchang.isDemo && (
                 <div className="flex flex-col sm:items-end gap-1">
-                  <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
+                  <span className="px-2.5 py-1 bg-brand/20 text-primary border border-brand rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
                     Demo
                   </span>
-                  <span className="text-[11px] font-medium text-amber-900">
+                  <span className="text-[11px] font-medium text-primary">
                     Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं
                   </span>
                 </div>
@@ -224,37 +224,37 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
             </div>
 
             {/* Inauspicious Periods */}
-            <div className="bg-surface rounded-lg p-6 border border-amber-300 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 pb-2 border-b border-amber-200">
-                <AlertTriangle className="w-5 h-5 text-amber-600" />
-                <h3 className="font-serif text-base font-bold text-amber-950">
+            <div className="bg-surface rounded-lg p-6 border border-brand shadow-sm space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-brand">
+                <AlertTriangle className="w-5 h-5 text-primary" />
+                <h3 className="font-serif text-base font-bold text-primary">
                   {isHindi ? "अशुभ काल (वर्जित समय)" : "Inauspicious Windows (Varjya)"}
                 </h3>
               </div>
 
               <div className="space-y-3 text-xs">
-                <div className="p-3 rounded bg-amber-50/60 border border-amber-200 flex items-center justify-between">
+                <div className="p-3 rounded bg-brand/20 border border-brand flex items-center justify-between">
                   <div>
-                    <span className="font-bold text-amber-900 block">
+                    <span className="font-bold text-primary block">
                       {isHindi ? "राहु काल" : "Rahu Kaal"}
                     </span>
-                    <span className="text-[11px] text-amber-800">
+                    <span className="text-[11px] text-primary">
                       {isHindi ? "नवीन कार्य शुभारंभ वर्जित" : "Avoid starting major ventures"}
                     </span>
                   </div>
-                  <span className="font-mono font-bold text-sm text-amber-950">
+                  <span className="font-mono font-bold text-sm text-primary">
                     {panchang.rahuKaal}
                   </span>
                 </div>
 
-                <div className="p-3 rounded bg-amber-50/60 border border-amber-200 flex items-center justify-between">
+                <div className="p-3 rounded bg-brand/20 border border-brand flex items-center justify-between">
                   <div>
-                    <span className="font-bold text-amber-900 block">
+                    <span className="font-bold text-primary block">
                       {isHindi ? "सूर्यास्त काल" : "Sunset (Suryasta)"}
                     </span>
-                    <span className="text-[11px] text-amber-800">Sandhya Sandhi</span>
+                    <span className="text-[11px] text-primary">Sandhya Sandhi</span>
                   </div>
-                  <span className="font-mono font-bold text-sm text-amber-950">
+                  <span className="font-mono font-bold text-sm text-primary">
                     {panchang.sunset}
                   </span>
                 </div>
@@ -282,7 +282,7 @@ export function PanchangClient({ initialPanchang, locale }: PanchangClientProps)
 
             <Link
               href="/booking?service=complete-janampatri"
-              className="min-h-[44px] px-6 py-2.5 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm shrink-0"
+              className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm shrink-0"
             >
               <Sparkles className="w-4 h-4" />
               <span>{isHindi ? "मुहूर्त परामर्श बुक करें" : "Book Muhurat Session"}</span>

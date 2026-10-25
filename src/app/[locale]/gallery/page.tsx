@@ -108,7 +108,7 @@ export default async function GalleryPage(props: GalleryPageProps) {
                           rel="noopener noreferrer"
                           className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <span className="p-3 rounded-full bg-primary text-on-primary shadow-lg">
+                          <span className="p-3 rounded-full bg-brand text-on-brand shadow-lg">
                             <Play className="w-5 h-5 fill-current" />
                           </span>
                         </a>
@@ -122,7 +122,7 @@ export default async function GalleryPage(props: GalleryPageProps) {
                         {title}
                       </h2>
                       {item.mediaType === "YOUTUBE" && (
-                        <span className="px-2 py-0.5 rounded-full bg-red-600/10 text-red-600 font-mono text-[10px] font-bold shrink-0">
+                        <span className="px-2 py-0.5 rounded-full bg-red-600/10 text-on-error-container font-mono text-[10px] font-bold shrink-0">
                           Video
                         </span>
                       )}

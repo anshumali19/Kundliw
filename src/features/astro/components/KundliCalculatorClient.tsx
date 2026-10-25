@@ -147,7 +147,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
           <span className="text-xs font-bold uppercase tracking-widest text-primary">
             {isHindi ? "विशुद्ध गणितीय कुण्डली" : "VEDIC EPHEMERIS COMPUTATION"}
           </span>
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand/20 text-primary border border-brand">
             Demo
           </span>
         </div>
@@ -273,7 +273,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full min-h-[48px] px-6 py-3 bg-[#e8751a] hover:bg-[#d06410] text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer shadow-sm"
+                  className="w-full min-h-[48px] px-6 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs sm:text-sm uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer shadow-sm"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>
@@ -289,8 +289,8 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
               </div>
 
               <div className="sm:col-span-7">
-                <div className="p-3 rounded-lg bg-sky-50/80 border border-sky-200 text-sky-900 text-xs flex items-center gap-2.5">
-                  <Info className="w-4 h-4 text-sky-600 shrink-0" />
+                <div className="p-3 rounded-lg bg-brand/20 border border-brand text-primary text-xs flex items-center gap-2.5">
+                  <Info className="w-4 h-4 text-primary shrink-0" />
                   <p className="leading-tight text-[11px]">
                     {isHindi
                       ? "कृपया सुनिश्चित करें कि जन्म समय एवं स्थान सटीक हैं। सूक्ष्म समय भेद से लग्न व ग्रह स्थिति में परिवर्तन हो सकता है।"
@@ -303,7 +303,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
 
           {/* Error Message */}
           {error && (
-            <div className="p-4 rounded-lg bg-error-container/20 border border-error text-error text-xs flex items-start gap-2">
+            <div className="p-4 rounded-lg bg-error-container/20 border border-error text-on-error-container text-xs flex items-start gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -361,7 +361,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                   key={item.titleEn}
                   className="p-2.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3"
                 >
-                  <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0 mt-0.5">
                     <Icon className="w-4 h-4" />
                   </div>
                     <div className="min-w-0">
@@ -391,7 +391,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Feature 1 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <Target className="w-4 h-4" />
             </div>
             <div>
@@ -408,7 +408,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
 
           {/* Feature 2 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <Users className="w-4 h-4" />
             </div>
             <div>
@@ -425,7 +425,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
 
           {/* Feature 3 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4" />
             </div>
             <div>
@@ -442,7 +442,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
 
           {/* Feature 4 */}
           <div className="p-3.5 rounded-lg bg-surface-container-low/40 border border-outline-variant/30 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
@@ -472,10 +472,10 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
               </h2>
             </div>
             <div className="flex flex-col sm:items-end gap-1">
-              <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
+              <span className="px-2.5 py-1 bg-brand/20 text-primary border border-brand rounded text-xs font-bold uppercase tracking-wider self-start sm:self-auto">
                 Demo
               </span>
-              <span className="text-[11px] font-medium text-amber-900">
+              <span className="text-[11px] font-medium text-primary">
                 Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं
               </span>
             </div>
@@ -548,7 +548,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                       <td className="p-2.5 text-center font-bold text-secondary">{planet.house}</td>
                       <td className="p-2.5 text-center">
                         {planet.isRetrograde ? (
-                          <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded text-[10px] font-bold">
+                          <span className="px-1.5 py-0.5 bg-brand/20 text-primary rounded text-[10px] font-bold">
                             वक्र (R)
                           </span>
                         ) : (
@@ -573,7 +573,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                 href={`/booking?service=complete-janampatri&name=${encodeURIComponent(
                   name
                 )}&dob=${dob}&tob=${tob}&pob=${encodeURIComponent(pob)}`}
-                className="min-h-[44px] px-6 py-2.5 bg-[#e8751a] hover:bg-[#d06410] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 text-center shadow-sm"
+                className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 text-center shadow-sm"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>{isHindi ? "सम्पूर्ण जन्मपत्रिका मँगवाएं" : "Order Full Janampatri"}</span>
@@ -584,7 +584,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                 type="button"
                 disabled={submittingOrder || Boolean(orderCreated)}
                 onClick={handleSaveAsOrder}
-                className="min-h-[44px] px-4 py-2.5 border border-secondary text-secondary hover:bg-secondary/10 font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+                className="min-h-[44px] px-4 py-2.5 border border-secondary text-secondary hover:bg-brand-hover font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
               >
                 <FileText className="w-4 h-4" />
                 <span>

@@ -103,7 +103,7 @@ export function SubPageNav({
           {nextHref && (
             <Link
               href={nextHref as any}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors text-xs font-semibold shadow-xs"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-brand text-on-brand hover:bg-brand-hover transition-colors text-xs font-semibold shadow-xs"
               aria-label={nextLabel || defaultNextLabel}
             >
               <span>{nextLabel || defaultNextLabel}</span>

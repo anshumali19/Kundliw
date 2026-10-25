@@ -130,7 +130,7 @@ export default async function OtherServicesPage(
                         href={item.actionUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-primary/90 transition-colors font-semibold text-xs shadow-sm"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors font-semibold text-xs shadow-sm"
                       >
                         <span>{actionText || (isHindi ? "पोर्टल पर जाएं" : "Visit Portal")}</span>
                         <ExternalLink className="w-4 h-4" />

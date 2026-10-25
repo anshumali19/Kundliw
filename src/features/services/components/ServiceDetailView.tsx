@@ -154,7 +154,7 @@ export function ServiceDetailView({
               <button
                 type="button"
                 onClick={() => setEnquiryModalOpen(true)}
-                className="self-start px-4 py-2 rounded-xl border border-secondary text-secondary hover:bg-secondary hover:text-on-secondary transition-colors text-xs font-semibold flex items-center gap-1.5 shrink-0 shadow-xs"
+                className="self-start px-4 py-2 rounded-xl border border-secondary text-secondary hover:bg-brand-hover hover:text-on-brand transition-colors text-xs font-semibold flex items-center gap-1.5 shrink-0 shadow-xs"
               >
                 <HelpCircle className="w-4 h-4" />
                 <span>{isHindi ? "सेवा पूछताछ करें" : "Quick Enquiry"}</span>
@@ -361,7 +361,7 @@ export function ServiceDetailView({
             <button
               type="button"
               onClick={() => setEnquiryModalOpen(true)}
-              className="w-full py-3 rounded-xl border border-secondary text-secondary hover:bg-secondary hover:text-on-secondary transition-colors text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs"
+              className="w-full py-3 rounded-xl border border-secondary text-secondary hover:bg-brand-hover hover:text-on-brand transition-colors text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs"
             >
               <HelpCircle className="w-3.5 h-3.5" />
               <span>{isHindi ? "विशेष परामर्श पूछताछ" : "Ask About This Service"}</span>

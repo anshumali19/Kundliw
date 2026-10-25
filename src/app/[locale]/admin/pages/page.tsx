@@ -127,7 +127,7 @@ export default function AdminPagesPage() {
       </div>
 
       {error && (
-        <div className="p-3 rounded bg-error-container/20 border border-error text-error text-xs flex items-center gap-2">
+        <div className="p-3 rounded bg-error-container/20 border border-error text-on-error-container text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -152,7 +152,7 @@ export default function AdminPagesPage() {
               onClick={() => handleSelectSlug(preset.slug)}
               className={`min-h-[40px] px-3.5 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                 isSelected
-                  ? "bg-secondary text-on-secondary"
+                  ? "bg-brand text-on-brand"
                   : "bg-surface-container hover:bg-surface-container-high text-on-surface"
               }`}
             >
@@ -175,7 +175,7 @@ export default function AdminPagesPage() {
           <button
             type="submit"
             disabled={saving}
-            className="min-h-[44px] px-6 py-2.5 bg-secondary hover:bg-secondary/90 text-on-secondary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+            className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? "Saving..." : "Save Page"}</span>

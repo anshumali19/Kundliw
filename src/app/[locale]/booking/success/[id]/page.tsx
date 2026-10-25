@@ -74,7 +74,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
         <div className="bg-surface-container rounded-lg p-6 sm:p-8 border-2 border-secondary/30 shadow-sm space-y-4 text-left">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-full bg-brand text-on-brand flex items-center justify-center shrink-0">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div>
@@ -104,33 +104,33 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
           </p>
         </div>
       ) : isAwaiting ? (
-        <div className="bg-amber-50 rounded-lg p-6 sm:p-8 border-2 border-amber-300 shadow-sm space-y-4 text-left">
+        <div className="bg-brand/20 rounded-lg p-6 sm:p-8 border-2 border-brand shadow-sm space-y-4 text-left">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0">
                 <Clock className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[11px] uppercase tracking-widest text-amber-800 font-bold">
+                <span className="text-[11px] uppercase tracking-widest text-primary font-bold">
                   {isHindi ? "सत्यापन प्रक्रियाधीन" : "Awaiting Verification"}
                 </span>
-                <h1 className="font-serif text-2xl sm:text-3xl font-bold text-amber-900">
+                <h1 className="font-serif text-2xl sm:text-3xl font-bold text-primary">
                   {order.orderNumber}
                 </h1>
               </div>
             </div>
 
             <div className="text-left sm:text-right">
-              <span className="text-xs text-amber-800 block">
+              <span className="text-xs text-primary block">
                 {isHindi ? "भुगतान स्थिति:" : "Payment Status:"}
               </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-200 text-amber-900 border border-amber-400 mt-1">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand/20 text-primary border border-brand mt-1">
                 {isHindi ? "सत्यापन शेष" : "Awaiting Verification"}
               </span>
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm text-amber-900 leading-relaxed">
+          <p className="text-xs sm:text-sm text-primary leading-relaxed">
             {isHindi
               ? `आपका मैनुअल भुगतान संदर्भ (${order.manualPaymentRef || "Ref"}) प्राप्त हो गया है। केंद्र लेखा विभाग द्वारा पुष्टि होते ही आदेश स्वतः स्वीकृत हो जाएगा।`
               : `Your manual payment reference (${order.manualPaymentRef || "Submitted"}) is pending confirmation by our Kendra administration. Calculations will begin as soon as verified.`}
@@ -140,7 +140,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
         <div className="bg-surface-container rounded-lg p-6 sm:p-8 border-2 border-primary/40 shadow-sm space-y-4 text-left">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-full bg-brand text-on-brand flex items-center justify-center shrink-0">
                 <AlertCircle className="w-6 h-6" />
               </div>
               <div>
@@ -156,7 +156,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
             <div>
               <Link
                 href={`/booking/checkout/${order.id}`}
-                className="min-h-[44px] px-5 py-2.5 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded flex items-center gap-2"
+                className="min-h-[44px] px-5 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded flex items-center gap-2"
               >
                 <span>{isHindi ? "दक्षिणा भुगतान करें" : "Complete Payment"}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -314,7 +314,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
                 href={`/api/invoice/${order.id}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full min-h-[44px] px-4 py-2 bg-secondary hover:bg-secondary/90 text-on-secondary text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 text-center"
+                className="w-full min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 text-center"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>{isHindi ? "बीजक (GST Invoice) डाउनलोड" : "Download GST Invoice (PDF)"}</span>

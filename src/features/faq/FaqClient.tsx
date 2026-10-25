@@ -90,7 +90,7 @@ export function FaqClient({ initialItems, locale }: FaqClientProps) {
                 onClick={() => setSelectedCategory(cat.key)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                   isSelected
-                    ? "bg-primary text-on-primary shadow-sm"
+                    ? "bg-brand text-on-brand shadow-sm"
                     : "bg-surface-container text-on-surface hover:bg-surface-container-high border border-outline-variant/30"
                 }`}
               >
@@ -182,7 +182,7 @@ export function FaqClient({ initialItems, locale }: FaqClientProps) {
 
         <Link
           href="/contact"
-          className="px-4 py-2.5 rounded-xl bg-primary text-on-primary font-semibold text-xs hover:bg-primary/90 transition-colors flex items-center gap-1.5 shrink-0"
+          className="px-4 py-2.5 rounded-xl bg-brand text-on-brand font-semibold text-xs hover:bg-brand-hover transition-colors flex items-center gap-1.5 shrink-0"
         >
           <Mail className="w-4 h-4" />
           <span>{isHindi ? "पूछताछ भेजें" : "Submit Enquiry"}</span>

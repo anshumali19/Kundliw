@@ -58,7 +58,7 @@ export default async function AccountPage(props: AccountPageProps) {
       {/* User Profile Header Card */}
       <div className="bg-surface-container rounded-lg p-6 sm:p-8 border-2 border-secondary/30 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-serif text-xl font-bold shrink-0">
+          <div className="w-14 h-14 rounded-full bg-brand text-on-brand flex items-center justify-center font-serif text-xl font-bold shrink-0">
             {user.name ? user.name.charAt(0).toUpperCase() : "Y"}
           </div>
           <div>
@@ -89,7 +89,7 @@ export default async function AccountPage(props: AccountPageProps) {
 
           <Link
             href="/services"
-            className="min-h-[44px] px-4 py-2.5 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-1.5 shadow-sm"
+            className="min-h-[44px] px-4 py-2.5 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-1.5 shadow-sm"
           >
             <span>{isHindi ? "नवीन परामर्श बुक करें" : "Book Consultation"}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -122,7 +122,7 @@ export default async function AccountPage(props: AccountPageProps) {
             <div className="pt-2">
               <Link
                 href="/services"
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 bg-secondary text-on-secondary rounded text-xs uppercase font-bold"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 bg-brand text-on-brand rounded text-xs uppercase font-bold"
               >
                 <span>{isHindi ? "वैदिक सेवाएँ देखें" : "Explore Services"}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -173,7 +173,7 @@ export default async function AccountPage(props: AccountPageProps) {
                           isPaid
                             ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
                             : isAwaiting
-                            ? "bg-amber-100 text-amber-900 border border-amber-300"
+                            ? "bg-brand/20 text-primary border border-brand"
                             : "bg-surface-container-high text-on-surface-variant"
                         }`}
                       >
@@ -245,7 +245,7 @@ export default async function AccountPage(props: AccountPageProps) {
                       {isPending && (
                         <Link
                           href={`/booking/checkout/${order.id}`}
-                          className="min-h-[44px] px-4 py-2 bg-primary-container hover:bg-primary text-on-primary font-bold rounded flex items-center gap-1.5 shadow-sm"
+                          className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold rounded flex items-center gap-1.5 shadow-sm"
                         >
                           <CreditCard className="w-3.5 h-3.5" />
                           <span>{isHindi ? "दक्षिणा भुगतान करें" : "Pay Dakshina"}</span>

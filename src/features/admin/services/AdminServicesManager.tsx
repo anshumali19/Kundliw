@@ -532,7 +532,7 @@ export function AdminServicesManager({
         <button
           type="button"
           onClick={() => handleOpenServiceModal()}
-          className="min-h-[44px] px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
+          className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>{isHindi ? "नई सेवा जोड़ें" : "Add Service"}</span>
@@ -548,7 +548,7 @@ export function AdminServicesManager({
       )}
 
       {errorMsg && (
-        <div className="p-3 bg-surface rounded border border-error text-xs text-error font-medium flex items-center gap-2">
+        <div className="p-3 bg-surface rounded border border-error text-xs text-on-error-container font-medium flex items-center gap-2">
           <AlertCircle className="w-4 h-4" />
           <span>{errorMsg}</span>
         </div>
@@ -626,7 +626,7 @@ export function AdminServicesManager({
                     <button
                       type="button"
                       onClick={() => handleOpenServiceModal(service)}
-                      className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-secondary hover:text-on-secondary transition-colors flex items-center gap-1"
+                      className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand transition-colors flex items-center gap-1"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                       <span>{isHindi ? "संपादित करें" : "Edit"}</span>
@@ -635,7 +635,7 @@ export function AdminServicesManager({
                     <button
                       type="button"
                       onClick={() => handleOpenPlanModal(service.id)}
-                      className="min-h-[38px] px-3 py-1 text-xs bg-primary hover:bg-primary-container text-on-primary font-semibold rounded transition-colors flex items-center gap-1"
+                      className="min-h-[38px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded transition-colors flex items-center gap-1"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>{isHindi ? "संस्करण जोड़ें" : "Add Plan"}</span>
@@ -673,7 +673,7 @@ export function AdminServicesManager({
                                   {isHindi ? plan.titleHi : plan.titleEn}
                                 </span>
                                 {plan.isPopular && (
-                                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-container text-on-primary">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand text-on-brand">
                                     {isHindi ? "लोकप्रिय" : "Popular"}
                                   </span>
                                 )}
@@ -722,7 +722,7 @@ export function AdminServicesManager({
                               <button
                                 type="button"
                                 onClick={() => handleOpenPlanModal(service.id, plan)}
-                                className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary font-medium rounded hover:bg-secondary hover:text-on-secondary transition-colors"
+                                className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary font-medium rounded hover:bg-brand-hover hover:text-on-brand transition-colors"
                               >
                                 {isHindi ? "संपादित करें" : "Edit Plan"}
                               </button>
@@ -1076,7 +1076,7 @@ export function AdminServicesManager({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="min-h-[44px] px-6 py-2 bg-primary hover:bg-primary-container text-on-primary rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                  className="min-h-[44px] px-6 py-2 bg-brand hover:bg-brand-hover text-on-brand rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
                 >
                   {loading ? (isHindi ? "सहेज रहे हैं..." : "Saving...") : isHindi ? "सहेजें" : "Save Service"}
                 </button>
@@ -1426,7 +1426,7 @@ export function AdminServicesManager({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="min-h-[44px] px-6 py-2 bg-primary hover:bg-primary-container text-on-primary rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                  className="min-h-[44px] px-6 py-2 bg-brand hover:bg-brand-hover text-on-brand rounded text-xs font-bold uppercase tracking-wider disabled:opacity-50"
                 >
                   {loading ? (isHindi ? "सहेज रहे हैं..." : "Saving...") : isHindi ? "सहेजें" : "Save Plan"}
                 </button>

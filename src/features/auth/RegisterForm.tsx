@@ -110,7 +110,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
         {/* Right Form Container */}
         <div className="lg:col-span-6 bg-surface p-6 sm:p-8 rounded border border-secondary/30">
           {errorMsg && (
-            <div className="mb-4 p-3 bg-error-container/40 border border-error/30 rounded text-error text-xs flex items-center gap-2">
+            <div className="mb-4 p-3 bg-error-container/40 border border-error/30 rounded text-on-error-container text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -193,7 +193,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary flex items-center justify-center gap-2 min-h-[44px] mt-2"
+              className="w-full py-3 px-4 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary flex items-center justify-center gap-2 min-h-[44px] mt-2"
             >
               <span>
                 {loading

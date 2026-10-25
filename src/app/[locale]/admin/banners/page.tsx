@@ -186,7 +186,7 @@ export default function AdminBannersPage() {
       </div>
 
       {error && (
-        <div className="p-3 rounded bg-error-container/20 border border-error text-error text-xs flex items-center gap-2">
+        <div className="p-3 rounded bg-error-container/20 border border-error text-on-error-container text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -346,7 +346,7 @@ export default function AdminBannersPage() {
           <button
             type="submit"
             disabled={submitting || !imageUrl}
-            className="min-h-[44px] px-6 py-2.5 bg-secondary hover:bg-secondary/90 text-on-secondary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
             <span>{submitting ? "Saving..." : "Create Banner"}</span>
@@ -393,7 +393,7 @@ export default function AdminBannersPage() {
 
                   <button
                     onClick={() => handleDeleteBanner(banner.id)}
-                    className="p-1.5 rounded hover:bg-error-container/20 text-error transition-colors"
+                    className="p-1.5 rounded hover:bg-error-container/20 text-on-error-container transition-colors"
                     title="Delete banner"
                   >
                     <Trash2 className="w-4 h-4" />

@@ -157,21 +157,21 @@ export function CheckoutClient({
           <span className="text-primary font-bold">{order.orderNumber}</span>
         </div>
         <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
-          <div className="bg-primary-container h-full w-full"></div>
+          <div className="bg-brand h-full w-full"></div>
         </div>
       </div>
 
       {order.rejectionReason && (
-        <div className="mb-6 p-4 rounded-lg bg-amber-50 border-2 border-amber-400 text-amber-950 flex items-start gap-3 text-left">
-          <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 rounded-lg bg-brand/20 border-2 border-brand text-primary flex items-start gap-3 text-left">
+          <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-amber-900">
+            <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-primary">
               {isHindi ? "पूर्व मैनुअल भुगतान अस्वीकृत किया गया" : "Previous Manual Payment Verification Failed"}
             </h4>
-            <p className="text-xs text-amber-900 mt-0.5">
+            <p className="text-xs text-primary mt-0.5">
               <strong>{isHindi ? "कारण:" : "Reason:"}</strong> {order.rejectionReason}
             </p>
-            <p className="text-[11px] text-amber-800 mt-1">
+            <p className="text-[11px] text-primary mt-1">
               {isHindi
                 ? "कृपया सही संदर्भ (UTR) दर्ज कर पुनः विवरण भेजें अथवा ऑनलाइन गेटवे का उपयोग करें।"
                 : "Please resubmit with a valid UTR transaction reference, or complete your contribution via the online gateway."}
@@ -181,7 +181,7 @@ export function CheckoutClient({
       )}
 
       {errorMessage && (
-        <div className="mb-6 p-4 rounded-lg bg-error-container/20 border border-error text-error flex items-start gap-3">
+        <div className="mb-6 p-4 rounded-lg bg-error-container/20 border border-error text-on-error-container flex items-start gap-3">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <p className="text-sm">{errorMessage}</p>
         </div>
@@ -299,7 +299,7 @@ export function CheckoutClient({
                         ? "त्वरित ऑनलाइन गेटवे (UPI / Card / Netbanking)"
                         : "Instant Online Gateway (UPI / Card / Netbanking)"}
                     </span>
-                    <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[10px] font-bold uppercase tracking-wider">
+                    <span className="px-2 py-0.5 bg-brand/20 text-primary border border-brand rounded text-[10px] font-bold uppercase tracking-wider">
                       Demo
                     </span>
                   </div>
@@ -319,7 +319,7 @@ export function CheckoutClient({
                   type="button"
                   disabled={loading}
                   onClick={() => handleSimulatePayment("SIMULATE_SUCCESS")}
-                  className="w-full min-h-[44px] px-5 py-3 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                  className="w-full min-h-[44px] px-5 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>
@@ -333,7 +333,7 @@ export function CheckoutClient({
                   type="button"
                   disabled={loading}
                   onClick={() => handleSimulatePayment("SIMULATE_FAILURE")}
-                  className="w-full min-h-[44px] px-5 py-2.5 bg-surface hover:bg-surface-container border border-error text-error font-semibold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full min-h-[44px] px-5 py-2.5 bg-surface hover:bg-surface-container border border-error text-on-error-container font-semibold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <AlertCircle className="w-4 h-4" />
                   <span>
@@ -369,7 +369,7 @@ export function CheckoutClient({
                         ? "प्रत्यक्ष केंद्र यूपीआई (Direct Kendra UPI VPA)"
                         : "Direct Kendra UPI VPA"}
                     </span>
-                    <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[10px] font-bold uppercase tracking-wider">
+                    <span className="px-2 py-0.5 bg-brand/20 text-primary border border-brand rounded text-[10px] font-bold uppercase tracking-wider">
                       Demo
                     </span>
                   </div>
@@ -448,7 +448,7 @@ export function CheckoutClient({
                     type="button"
                     disabled={loading}
                     onClick={() => handleManualSubmit("MANUAL_UPI")}
-                    className="w-full min-h-[44px] px-5 py-3 bg-secondary hover:bg-secondary/90 text-on-secondary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full min-h-[44px] px-5 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     <Upload className="w-4 h-4" />
                     <span>
@@ -485,7 +485,7 @@ export function CheckoutClient({
                         ? "बैंक अंतरण (NEFT / RTGS / IMPS)"
                         : "Bank Wire Transfer (NEFT / RTGS / IMPS)"}
                     </span>
-                    <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[10px] font-bold uppercase tracking-wider">
+                    <span className="px-2 py-0.5 bg-brand/20 text-primary border border-brand rounded text-[10px] font-bold uppercase tracking-wider">
                       Demo
                     </span>
                   </div>
@@ -571,7 +571,7 @@ export function CheckoutClient({
                     type="button"
                     disabled={loading}
                     onClick={() => handleManualSubmit("MANUAL_BANK")}
-                    className="w-full min-h-[44px] px-5 py-3 bg-secondary hover:bg-secondary/90 text-on-secondary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full min-h-[44px] px-5 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     <Upload className="w-4 h-4" />
                     <span>

@@ -103,7 +103,7 @@ export function AdminUsersManager({ locale }: { locale: string }) {
         <div
           role="status"
           className={`p-3 rounded border text-sm ${
-            message.type === "ok" ? "border-primary/40 text-primary" : "border-error/40 text-error"
+            message.type === "ok" ? "border-primary/40 text-primary" : "border-error/40 text-on-error-container"
           }`}
         >
           {message.text}

@@ -101,7 +101,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
       >
         <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-3 text-xs min-w-0">
           <div className="flex items-center gap-2.5 sm:gap-3 overflow-hidden text-left w-full sm:w-auto min-w-0 flex-1">
-            <span className="px-2 py-0.5 bg-secondary text-on-secondary rounded text-[10px] font-bold uppercase tracking-wider shrink-0">
+            <span className="px-2 py-0.5 bg-brand text-on-brand rounded text-[10px] font-bold uppercase tracking-wider shrink-0">
               विशेष
             </span>
             <div className="truncate min-w-0 flex-1">
@@ -120,7 +120,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
             {current.linkUrl && (
               <Link
                 href={current.linkUrl}
-                className="inline-flex items-center gap-1 px-3 py-1 bg-primary text-on-primary font-bold rounded text-[11px] uppercase tracking-wider hover:opacity-90 transition-opacity min-h-[44px]"
+                className="inline-flex items-center gap-1 px-3 py-1 bg-brand text-on-brand font-bold rounded text-[11px] uppercase tracking-wider hover:opacity-90 transition-opacity min-h-[44px]"
               >
                 <span>विवरण देखें</span>
                 <span className="font-serif text-sm">→</span>
@@ -171,7 +171,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
         <div className="p-5 sm:p-6 bg-surface-container-low border-2 border-secondary/30 rounded flex flex-col md:flex-row items-center justify-between gap-4 text-left">
           <div className="space-y-1 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-bold uppercase rounded">
+              <span className="px-2 py-0.5 bg-brand/20 text-primary text-[10px] font-bold uppercase rounded">
                 Kendra Update
               </span>
               <span className="text-xs text-outline">
@@ -192,7 +192,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
             {current.linkUrl && (
               <Link
                 href={current.linkUrl}
-                className="px-5 py-2.5 bg-primary-container text-on-primary text-xs uppercase tracking-wider font-bold rounded hover:bg-primary transition-colors min-h-[44px] flex items-center justify-center"
+                className="px-5 py-2.5 bg-brand text-on-brand text-xs uppercase tracking-wider font-bold rounded hover:bg-brand-hover transition-colors min-h-[44px] flex items-center justify-center"
               >
                 विस्तृत जानकारी
               </Link>

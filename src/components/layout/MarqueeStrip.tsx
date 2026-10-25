@@ -36,8 +36,12 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
   const displayList = items && items.length > 0 ? items : defaultItems;
   const style = items && items.length > 0 ? items[0] : undefined;
 
-  const background = safeColor(style?.bgColor, "var(--secondary)");
-  const color = safeColor(style?.textColor, "var(--on-secondary)");
+  // Maroon is reserved for the footer Quick Links, so legacy maroon marquee settings use the brand style.
+  const LEGACY_MAROON = new Set(["var(--secondary)", "var(--primary)", "var(--maroon)", "#800000", "#6b1d1d"]);
+  const configuredBg = style?.bgColor?.trim().toLowerCase();
+  const useBrand = !configuredBg || LEGACY_MAROON.has(configuredBg);
+  const background = useBrand ? "var(--brand)" : safeColor(style?.bgColor, "var(--brand)");
+  const color = useBrand ? "var(--on-brand)" : safeColor(style?.textColor, "var(--on-brand)");
   const fontSize = Math.min(Math.max(style?.fontSize ?? 14, 12), 28);
   const speed = Math.min(Math.max(style?.speedSec ?? 30, 8), 120);
 
@@ -45,8 +49,8 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
   // TOP: a normal strip at the start of the page.
   const placement =
     position === "BOTTOM"
-      ? "fixed inset-x-0 z-40 bottom-[calc(4rem+2px+env(safe-area-inset-bottom,0px))] xl:bottom-0 border-t border-primary/40"
-      : "relative w-full border-b border-primary/40";
+      ? "fixed inset-x-0 z-40 bottom-[calc(4rem+2px+env(safe-area-inset-bottom,0px))] xl:bottom-0 border-t-2 border-maroon"
+      : "relative w-full border-b-2 border-maroon";
 
   return (
     <div
@@ -56,7 +60,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
       aria-label="Announcements"
     >
       <div className="w-full px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 shrink-0 bg-primary-container px-2.5 py-1 rounded text-[#2b1200] text-xs font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-1.5 shrink-0 bg-brand-hover border border-maroon px-2.5 py-1 rounded text-maroon text-xs font-bold uppercase tracking-wider">
           <Megaphone className="w-3.5 h-3.5" />
           <span>{tMarquee("badge")}</span>
         </div>
@@ -76,7 +80,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
                     aria-hidden={copy === 1 ? "true" : undefined}
                   >
                     <span>{text}</span>
-                    <span className="text-tertiary-fixed font-bold">•</span>
+                    <span className="text-maroon font-bold">•</span>
                   </span>
                 );
               })
@@ -86,7 +90,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
 
         <Link
           href="/services"
-          className="shrink-0 hidden md:inline-flex items-center gap-1 text-xs uppercase tracking-wider text-tertiary-fixed hover:underline font-bold"
+          className="shrink-0 hidden md:inline-flex items-center gap-1 text-xs uppercase tracking-wider text-maroon hover:underline font-bold"
         >
           <span>{tMarquee("cta")}</span>
           <ArrowRight className="w-3.5 h-3.5" />

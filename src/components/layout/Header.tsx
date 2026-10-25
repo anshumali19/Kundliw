@@ -215,7 +215,7 @@ export function Header({ phone }: HeaderProps = {}) {
                   }}
                   className={`h-full flex items-center px-1.5 xl:px-1.5 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
                     isActive
-                      ? "text-secondary border-secondary font-bold"
+                      ? "text-secondary border-signal font-bold"
                       : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
                   }`}
                 >
@@ -236,7 +236,7 @@ export function Header({ phone }: HeaderProps = {}) {
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
                 className={`h-full flex items-center gap-1 px-1.5 xl:px-1.5 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 min-h-[44px] whitespace-nowrap ${
                   isAnyKendraActive
-                    ? "text-secondary border-secondary font-bold"
+                    ? "text-secondary border-signal font-bold"
                     : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
                 }`}
                 aria-expanded={moreDropdownOpen}
@@ -280,7 +280,7 @@ export function Header({ phone }: HeaderProps = {}) {
               href="/services"
               aria-label={tCommon("bookConsultation")}
               title={tCommon("bookConsultation")}
-              className="hidden sm:inline-flex items-center justify-center px-3 xl:px-3 py-2 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
+              className="hidden sm:inline-flex items-center justify-center px-3 xl:px-3 py-2 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
             >
               <Calendar className="w-4 h-4 2xl:mr-1.5 shrink-0" />
               <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
@@ -289,7 +289,7 @@ export function Header({ phone }: HeaderProps = {}) {
             <Link
               href="/account"
               aria-label={tHeader("profileAria")}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 transition-opacity min-h-[36px] min-w-[36px] shrink-0 shadow-sm"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand flex items-center justify-center text-on-brand hover:opacity-90 transition-opacity min-h-[36px] min-w-[36px] shrink-0 shadow-sm"
             >
               <User className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
@@ -334,7 +334,7 @@ export function Header({ phone }: HeaderProps = {}) {
               <Link
                 href="/services"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center px-4 py-3 bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded border border-primary min-h-[44px]"
+                className="w-full flex items-center justify-center px-4 py-3 bg-brand text-on-brand font-bold text-xs uppercase tracking-wider rounded border border-primary min-h-[44px]"
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 {tCommon("bookConsultation")}

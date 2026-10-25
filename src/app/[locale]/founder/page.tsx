@@ -58,7 +58,7 @@ export default async function FounderPage(props: FounderPageProps) {
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded bg-primary-container hover:bg-primary text-on-primary text-sm uppercase tracking-wider font-bold border border-primary min-h-[44px] transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded bg-brand hover:bg-brand-hover text-on-brand text-sm uppercase tracking-wider font-bold border border-primary min-h-[44px] transition-colors"
           >
             {isHindi ? "संपर्क करें" : "Contact us"}
           </Link>
@@ -108,7 +108,7 @@ export default async function FounderPage(props: FounderPageProps) {
             <div className="p-5 bg-surface-container-low border-t border-outline-variant/30">
               <Link
                 href="/services"
-                className="w-full py-3 px-4 rounded bg-primary-container hover:bg-primary text-on-primary font-bold text-sm uppercase tracking-wider border border-primary transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                className="w-full py-3 px-4 rounded bg-brand hover:bg-brand-hover text-on-brand font-bold text-sm uppercase tracking-wider border border-primary transition-colors flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <Calendar className="w-4 h-4" />
                 <span>{isHindi ? "परामर्श बुक करें" : "Book a consultation"}</span>

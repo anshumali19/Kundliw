@@ -65,7 +65,7 @@ export default function DemoGatePage() {
         </p>
 
         {errorMsg && (
-          <div className="mb-4 p-3 bg-error-container/20 border border-error text-error rounded flex items-center gap-2 text-xs">
+          <div className="mb-4 p-3 bg-error-container/20 border border-error text-on-error-container rounded flex items-center gap-2 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -96,7 +96,7 @@ export default function DemoGatePage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded hover:opacity-95 transition-opacity disabled:opacity-50 min-h-[44px]"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-brand text-on-brand font-bold text-xs uppercase tracking-wider rounded hover:opacity-95 transition-opacity disabled:opacity-50 min-h-[44px]"
           >
             {loading ? (
               <span>Verifying...</span>

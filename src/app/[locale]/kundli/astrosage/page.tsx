@@ -91,10 +91,10 @@ export default async function AstroSagePage(
           </p>
 
           {/* Fallback Notice & Direct Action Buttons */}
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-on-surface flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-4">
+          <div className="p-4 rounded-xl bg-brand/200/10 border border-brand text-xs text-on-surface flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-4">
             <div className="space-y-1">
-              <div className="font-semibold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-amber-600" />
+              <div className="font-semibold text-primary flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-primary" />
                 <span>{isHindi ? "सुरक्षित संदर्भ एवं लिंक-आउट सूचना" : "Safe Link-Out & Iframe Notice"}</span>
               </div>
               <p className="text-on-surface-variant text-[11px] leading-relaxed">
@@ -109,7 +109,7 @@ export default async function AstroSagePage(
                 href={embedUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-primary text-on-primary hover:bg-primary/90 transition-colors font-semibold text-xs flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors font-semibold text-xs flex items-center gap-1.5 shadow-sm"
               >
                 <span>{isHindi ? "एस्ट्रोसेज पोर्टल पर खोलें" : "Open in AstroSage Portal"}</span>
                 <ExternalLink className="w-3.5 h-3.5" />

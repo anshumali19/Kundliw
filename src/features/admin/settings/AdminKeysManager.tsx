@@ -217,14 +217,14 @@ export function AdminKeysManager({ locale }: { locale: string }) {
         <div
           className={`p-4 rounded-lg flex items-center gap-2 text-sm ${
             status.type === "success"
-              ? "bg-secondary-container/30 text-on-secondary-container border border-secondary"
-              : "bg-error-container/30 text-error border border-error"
+              ? "bg-brand/30 text-on-brand border border-secondary"
+              : "bg-error-container/30 text-on-error-container border border-error"
           }`}
         >
           {status.type === "success" ? (
             <CheckCircle2 className="w-4 h-4 shrink-0 text-secondary" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-error" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-on-error-container" />
           )}
           <span>{status.text}</span>
         </div>
@@ -287,7 +287,7 @@ export function AdminKeysManager({ locale }: { locale: string }) {
                         {/* Status Badge */}
                         <div className="flex items-center gap-1.5 self-start sm:self-auto">
                           {cred.source === "DATABASE" && (
-                            <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-medium">
+                            <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-brand/40 text-on-brand font-medium">
                               <ShieldCheck className="w-3 h-3 text-secondary" />
                               <span>{isHindi ? "डेटाबेस में सक्रिय" : "Active (DB)"}</span>
                             </span>
@@ -300,7 +300,7 @@ export function AdminKeysManager({ locale }: { locale: string }) {
                           )}
                           {cred.source === "NOT_CONFIGURED" && (
                             <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant/80 font-medium">
-                              <ShieldAlert className="w-3 h-3 text-amber-500" />
+                              <ShieldAlert className="w-3 h-3 text-primary" />
                               <span>{isHindi ? "रिक्त (Not Set)" : "Not Set"}</span>
                             </span>
                           )}
@@ -383,7 +383,7 @@ export function AdminKeysManager({ locale }: { locale: string }) {
           <button
             type="submit"
             disabled={saving || loading}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded bg-primary text-on-primary font-medium text-xs uppercase tracking-wider hover:bg-primary/90 transition-all shadow disabled:opacity-50"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded bg-brand text-on-brand font-medium text-xs uppercase tracking-wider hover:bg-brand-hover transition-all shadow disabled:opacity-50"
           >
             {saving ? (
               <RefreshCw className="w-4 h-4 animate-spin" />

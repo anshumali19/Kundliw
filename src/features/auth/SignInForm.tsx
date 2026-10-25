@@ -266,7 +266,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
 
           {/* Feedback Notices */}
           {errorMsg && (
-            <div className="mb-4 p-3 bg-error-container/40 border border-error/30 rounded text-error text-xs flex items-center gap-2">
+            <div className="mb-4 p-3 bg-error-container/40 border border-error/30 rounded text-on-error-container text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -306,7 +306,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 px-4 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary flex items-center justify-center gap-2 min-h-[44px]"
+                    className="w-full py-3 px-4 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>{loading ? tCommon("loading") : tAuth("sendOtp")}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -354,7 +354,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                   <button
                     type="submit"
                     disabled={loading || otp.length !== 6}
-                    className="w-full py-3 px-4 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-50"
+                    className="w-full py-3 px-4 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wider font-bold rounded transition-colors border border-primary flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-50"
                   >
                     <span>{loading ? tCommon("loading") : tAuth("verifyOtp")}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -394,7 +394,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                         d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z"
                       />
                       <path
-                        fill="#FBBC05"
+                        fill="#F4C430"
                         d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
                       />
                       <path
@@ -448,7 +448,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-secondary hover:bg-secondary/90 text-on-secondary text-xs uppercase tracking-wider font-bold rounded transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                className="w-full py-3 px-4 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wider font-bold rounded transition-colors flex items-center justify-center gap-2 min-h-[44px]"
               >
                 <span>{loading ? tCommon("loading") : tAuth(PORTAL_TITLE_KEY[portal])}</span>
                 <ArrowRight className="w-4 h-4" />

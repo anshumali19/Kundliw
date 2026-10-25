@@ -101,7 +101,7 @@ export default async function AboutPage(props: AboutPageProps) {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
         <Link
           href="/services"
-          className="px-5 py-3 rounded bg-primary-container hover:bg-primary text-on-primary font-bold text-sm uppercase tracking-wider border border-primary transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+          className="px-5 py-3 rounded bg-brand hover:bg-brand-hover text-on-brand font-bold text-sm uppercase tracking-wider border border-primary transition-colors flex items-center justify-center gap-2 min-h-[44px]"
         >
           <span>{isHindi ? "सेवाएँ देखें" : "View services"}</span>
           <ArrowRight className="w-4 h-4" />

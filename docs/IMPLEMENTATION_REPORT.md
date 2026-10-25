@@ -117,25 +117,27 @@ Done:
 Remaining:
 - Email sending, order-status notifications, backups, Facebook login, "Ask API" (point 42).
 
-## 5. Colour and theme check
+## 5. Colour and theme
 
-The PDF asks for saffron, yellow, maroon and high contrast.
+The client specified four colours, used in high contrast across the whole site:
 
-| Colour | Value | Use |
+| Colour | Hex | Where it is used |
 | :--- | :--- | :--- |
-| Saffron | `#e8751a` | Main buttons |
-| Deep saffron | `#984700` | Links, hover |
-| Maroon | `#6b1d1d` | Headings, header |
-| Turmeric yellow | `#f9bd14` and `#bd8e00` | Highlights, badges |
-| Text | `#241915` on `#fff8f6` | Body text |
+| Saffron | `#F4C430` | Buttons, highlights, marquee strip, table headers |
+| Yellow | `#FFFF00` | Button hover state, soft page and card backgrounds (lighter tints) |
+| Maroon | `#800000` | Headings, text, borders, icons. As a filled background only in the footer Quick Links |
+| Red | `#FF0000` | Accent: the line under the header, card top edges, active menu underline, the AI button |
 
-Measured contrast (WCAG): body text 16.3:1, headings 11.0:1, white on maroon 11.6:1,
-links 6.2:1, badges 13.3:1. Two failures were found and fixed:
-- White text on the saffron button was 3.0:1. The text is now dark (about 5.9:1) and turns
-  white when the button darkens on hover.
-- The grey used for placeholders was 4.28:1. It is now 6.2:1.
+Body text is a maroon-tinted black (`#1A0000`) on white or pale yellow.
 
-The theme matches the PDF.
+Measured contrast: maroon on white 10.9:1, maroon on yellow 10.2:1, maroon on saffron 6.7:1,
+black text on saffron 12.8:1, white or yellow text on the maroon footer 10:1 or better.
+Red is only 4.0:1 against white, so it is never used for small text. A scan of about 2,000
+text elements on 12 pages at desktop and phone width found no remaining contrast failures
+and no maroon backgrounds outside the footer.
+
+Success states (for example "Paid") keep a green tick or badge because it is a universal signal.
+This is the one deliberate exception to the four colours.
 
 ## 6. Database, security and quality
 

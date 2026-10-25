@@ -194,7 +194,7 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
 
         <button
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded-xl bg-primary text-on-primary font-semibold text-xs hover:bg-primary/90 transition-colors flex items-center gap-2 self-start sm:self-auto shadow-sm"
+          className="px-4 py-2.5 rounded-xl bg-brand text-on-brand font-semibold text-xs hover:bg-brand-hover transition-colors flex items-center gap-2 self-start sm:self-auto shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>{isHindi ? "नया प्रश्न जोड़ें" : "Add FAQ Question"}</span>
@@ -206,7 +206,7 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
           className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
             status.type === "success"
               ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
-              : "bg-red-500/10 text-red-700 border border-red-500/20"
+              : "bg-error-container0/10 text-on-error-container border border-error"
           }`}
         >
           {status.type === "success" ? (
@@ -227,7 +227,7 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
               onClick={() => setFilterCategory(cat)}
               className={`px-3 py-1.5 rounded-full font-semibold transition-colors ${
                 filterCategory === cat
-                  ? "bg-primary text-on-primary"
+                  ? "bg-brand text-on-brand"
                   : "bg-surface-container text-on-surface hover:bg-surface-container-high border border-outline-variant/30"
               }`}
             >
@@ -303,7 +303,7 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-1.5 rounded-lg border border-red-500/30 hover:bg-red-500/10 text-red-600 transition-colors"
+                    className="p-1.5 rounded-lg border border-error hover:bg-error-container0/10 text-on-error-container transition-colors"
                     title="Delete FAQ"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -428,7 +428,7 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                  className="px-5 py-2 rounded-xl bg-brand text-on-brand font-semibold hover:bg-brand-hover disabled:opacity-50 transition-colors"
                 >
                   {submitting ? "Saving..." : editingId ? "Update FAQ" : "Save FAQ"}
                 </button>

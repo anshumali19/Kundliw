@@ -252,7 +252,7 @@ export function AdminOrdersManager({
               onClick={() => setFilter(tab.id as typeof filter)}
               className={`min-h-[44px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider transition-colors ${
                 filter === tab.id
-                  ? "bg-secondary text-on-secondary"
+                  ? "bg-brand text-on-brand"
                   : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant"
               }`}
             >
@@ -263,7 +263,7 @@ export function AdminOrdersManager({
       </div>
 
       {actionError && (
-        <div className="p-4 rounded bg-error-container/20 border border-error text-error text-xs flex items-start gap-2">
+        <div className="p-4 rounded bg-error-container/20 border border-error text-on-error-container text-xs flex items-start gap-2">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{actionError}</span>
         </div>
@@ -310,7 +310,7 @@ export function AdminOrdersManager({
                           order.paymentStatus === "PAID"
                             ? "bg-emerald-100 text-emerald-800"
                             : order.paymentStatus === "AWAITING_VERIFICATION"
-                            ? "bg-amber-100 text-amber-900 border border-amber-300"
+                            ? "bg-brand/20 text-primary border border-brand"
                             : "bg-surface-container-high text-on-surface-variant"
                         }`}
                       >
@@ -350,7 +350,7 @@ export function AdminOrdersManager({
                     </span>
 
                     {order.paymentStatus === "AWAITING_VERIFICATION" && (
-                      <span className="text-amber-800 font-bold flex items-center gap-1 text-[11px]">
+                      <span className="text-primary font-bold flex items-center gap-1 text-[11px]">
                         <Clock className="w-3.5 h-3.5" />
                         <span>Ref: {order.manualPaymentRef}</span>
                       </span>
@@ -389,23 +389,23 @@ export function AdminOrdersManager({
 
               {/* Payment Verification Section if Awaiting */}
               {selectedOrder.paymentStatus === "AWAITING_VERIFICATION" && (
-                <div className="p-4 rounded-lg bg-amber-50 border-2 border-amber-300 space-y-3">
-                  <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
-                    <Clock className="w-4 h-4 text-amber-700" />
+                <div className="p-4 rounded-lg bg-brand/20 border-2 border-brand space-y-3">
+                  <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+                    <Clock className="w-4 h-4 text-primary" />
                     <span>{isHindi ? "मैनुअल भुगतान सत्यापन" : "Verify Manual Payment"}</span>
                   </div>
 
-                  <div className="text-xs text-amber-950 space-y-1">
+                  <div className="text-xs text-primary space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-amber-800">{isHindi ? "मोड:" : "Mode:"}</span>
+                      <span className="text-primary">{isHindi ? "मोड:" : "Mode:"}</span>
                       <span className="font-semibold">{selectedOrder.paymentMode}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-amber-800">{isHindi ? "संदर्भ संख्या:" : "Reference:"}</span>
+                      <span className="text-primary">{isHindi ? "संदर्भ संख्या:" : "Reference:"}</span>
                       <span className="font-mono font-bold">{selectedOrder.manualPaymentRef}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-amber-800">{isHindi ? "शुद्ध दक्षिणा:" : "Amount:"}</span>
+                      <span className="text-primary">{isHindi ? "शुद्ध दक्षिणा:" : "Amount:"}</span>
                       <span className="font-bold">{formatPaiseToInr(selectedOrder.netAmountPaise)}</span>
                     </div>
                   </div>
@@ -437,7 +437,7 @@ export function AdminOrdersManager({
                       type="button"
                       disabled={submitting}
                       onClick={() => handleVerifyPayment(selectedOrder.id, "REJECT")}
-                      className="min-h-[44px] px-3 py-2 bg-surface hover:bg-surface-container border border-error text-error text-xs font-bold uppercase rounded flex items-center justify-center gap-1 disabled:opacity-50"
+                      className="min-h-[44px] px-3 py-2 bg-surface hover:bg-surface-container border border-error text-on-error-container text-xs font-bold uppercase rounded flex items-center justify-center gap-1 disabled:opacity-50"
                     >
                       <AlertCircle className="w-3.5 h-3.5" />
                       <span>{isHindi ? "अस्वीकृत (Reject)" : "Reject"}</span>
@@ -524,7 +524,7 @@ export function AdminOrdersManager({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full min-h-[44px] px-4 py-2.5 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
+                  className="w-full min-h-[44px] px-4 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>{isHindi ? "स्थिति अद्यतन सुरक्षित करें" : "Commit Status Transition"}</span>

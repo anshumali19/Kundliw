@@ -21,7 +21,7 @@ export function MobileNav() {
       role="navigation"
       aria-label="Mobile Navigation"
     >
-      <div className="w-full h-[2px] bg-primary-container"></div>
+      <div className="w-full h-[2px] bg-brand"></div>
       <div className="grid grid-cols-4 items-center h-16 px-2">
         {tabs.map((tab) => {
           const isActive =

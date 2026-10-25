@@ -197,7 +197,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
           <span className="text-xs font-bold uppercase tracking-widest text-primary">
             {isHindi ? "अष्टकूट गुण मिलान" : "VEDIC ASHTAKOOT GUN MILAN"}
           </span>
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand/20 text-primary border border-brand">
             Demo
           </span>
         </div>
@@ -215,7 +215,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <HeartHandshake className="w-5 h-5" />
           </div>
           <div>
@@ -232,7 +232,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
 
         {/* Card 2 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <Star className="w-5 h-5" />
           </div>
           <div>
@@ -249,7 +249,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
 
         {/* Card 3 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <Activity className="w-5 h-5" />
           </div>
           <div>
@@ -266,7 +266,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
 
         {/* Card 4 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <FileText className="w-5 h-5" />
           </div>
           <div>
@@ -376,8 +376,8 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
             </div>
 
             {/* Boy Alert Notice (Rose tinted) */}
-            <div className="p-3.5 rounded-lg bg-rose-50/80 border border-rose-200 text-rose-900 text-xs flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-lg bg-error-container border border-error text-on-error-container text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-on-error-container shrink-0 mt-0.5" />
               <p className="leading-relaxed">
                 {isHindi
                   ? "सटीक कुंडली मिलान के लिए जन्म समय और स्थान अत्यंत महत्वपूर्ण हैं। यदि सही समय ज्ञात न हो, तो निकटतम उपलब्ध समय दर्ज करें।"
@@ -463,8 +463,8 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
             </div>
 
             {/* Girl Confidentiality Notice (Sky tinted) */}
-            <div className="p-3.5 rounded-lg bg-sky-50/80 border border-sky-200 text-sky-900 text-xs flex items-start gap-2.5">
-              <Lock className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-lg bg-brand/20 border border-brand text-primary text-xs flex items-start gap-2.5">
+              <Lock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <p className="leading-relaxed">
                 {isHindi
                   ? "सभी विवरण पूर्णतः गोपनीय रखे जाते हैं और केवल अनुकूलता गणना के लिए प्रयुक्त होते हैं। हम आपकी व्यक्तिगत जानकारी संग्रहीत नहीं करते।"
@@ -476,7 +476,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
             <button
               type="submit"
               disabled={loading}
-              className="w-full min-h-[48px] px-6 py-3 bg-[#e8751a] hover:bg-[#d06410] text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+              className="w-full min-h-[48px] px-6 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs sm:text-sm uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
             >
               <HeartHandshake className="w-5 h-5" />
               <span>
@@ -537,12 +537,12 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
             </div>
 
             {/* Ideal Compatibility Card */}
-            <div className="p-4 rounded-lg bg-amber-50/90 border border-amber-300 text-amber-950 space-y-1.5">
-              <div className="flex items-center gap-1.5 font-bold text-xs text-amber-900">
-                <CheckCircle2 className="w-4 h-4 text-amber-700" />
+            <div className="p-4 rounded-lg bg-brand/20 border border-brand text-primary space-y-1.5">
+              <div className="flex items-center gap-1.5 font-bold text-xs text-primary">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
                 <span>{isHindi ? "आदर्श अनुकूलता (१८+ गुण)" : "Ideal Compatibility (18+)"}</span>
               </div>
-              <p className="text-[11px] text-amber-900 leading-relaxed">
+              <p className="text-[11px] text-primary leading-relaxed">
                 {isHindi
                   ? "विवाह हेतु ३६ में से न्यूनतम १८ अंक अनुशंसित हैं। २४ से अधिक अंक एक सुखी एवं आनंदमय दांपत्य जीवन के लिए अत्यंत शुभ माने जाते हैं।"
                   : "A minimum score of 18 points out of 36 is recommended for marriage. Scores above 24 are considered very auspicious for a blissful union."}
@@ -556,7 +556,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <BarChart2 className="w-5 h-5" />
           </div>
           <div>
@@ -573,7 +573,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
 
         {/* Card 2 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <FileCheck className="w-5 h-5" />
           </div>
           <div>
@@ -590,7 +590,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
 
         {/* Card 3 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <Lightbulb className="w-5 h-5" />
           </div>
           <div>
@@ -607,7 +607,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
 
         {/* Card 4 */}
         <div className="bg-surface rounded-xl p-4 border border-outline-variant/40 flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-error-container border border-error text-on-error-container flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
@@ -625,7 +625,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
 
       {/* Error state */}
       {error && (
-        <div className="p-4 rounded-lg bg-error-container/20 border border-error text-error text-xs flex items-start gap-2">
+        <div className="p-4 rounded-lg bg-error-container/20 border border-error text-on-error-container text-xs flex items-start gap-2">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -680,11 +680,11 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
                     {result.totalScore} <span className="text-sm font-normal text-outline">/ {result.maxScore}</span>
                   </span>
                 </div>
-                <span className="px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 rounded text-xs font-bold uppercase tracking-wider">
+                <span className="px-2.5 py-1 bg-brand/20 text-primary border border-brand rounded text-xs font-bold uppercase tracking-wider">
                   Demo
                 </span>
               </div>
-              <span className="text-[11px] font-medium text-amber-900">
+              <span className="text-[11px] font-medium text-primary">
                 Sample output, not a real calculation • नमूना परिणाम, वास्तविक गणना नहीं
               </span>
             </div>
@@ -714,7 +714,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
               <span className="text-[10px] uppercase text-outline font-semibold block">
                 {isHindi ? "नाड़ी दोष" : "Nadi Dosha"}
               </span>
-              <span className={`font-bold text-sm ${result.nadiDosha ? "text-error" : "text-emerald-700"}`}>
+              <span className={`font-bold text-sm ${result.nadiDosha ? "text-on-error-container" : "text-emerald-700"}`}>
                 {result.nadiDosha
                   ? isHindi
                     ? "दोष उपस्थित"
@@ -780,7 +780,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
                 )}&partnerName=${encodeURIComponent(
                   girlName
                 )}&partnerDob=${girlDob}&partnerTob=${girlTob}&partnerPob=${encodeURIComponent(girlPob)}`}
-                className="min-h-[44px] px-6 py-2.5 bg-[#e8751a] hover:bg-[#d06410] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 text-center"
+                className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 text-center"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>{isHindi ? "विस्तृत मेलापक परामर्श लें" : "Order Detailed Kendra Team Analysis"}</span>
@@ -791,7 +791,7 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
                 type="button"
                 disabled={submittingOrder || Boolean(orderCreated)}
                 onClick={handleSaveAsOrder}
-                className="min-h-[44px] px-4 py-2.5 border border-secondary text-secondary hover:bg-secondary/10 font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+                className="min-h-[44px] px-4 py-2.5 border border-secondary text-secondary hover:bg-brand-hover font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
               >
                 <FileText className="w-4 h-4" />
                 <span>

@@ -136,7 +136,7 @@ export function ServicesListingClient({
               onClick={() => handleToggleView("grid")}
               className={`p-2 rounded-lg flex items-center gap-1.5 text-xs font-semibold transition-all ${
                 viewMode === "grid"
-                  ? "bg-primary text-on-primary shadow-xs"
+                  ? "bg-brand text-on-brand shadow-xs"
                   : "text-on-surface-variant hover:text-on-surface"
               }`}
               title={isHindi ? "ग्रिड दृश्य (Grid View)" : "Grid View"}
@@ -151,7 +151,7 @@ export function ServicesListingClient({
               onClick={() => handleToggleView("list")}
               className={`p-2 rounded-lg flex items-center gap-1.5 text-xs font-semibold transition-all ${
                 viewMode === "list"
-                  ? "bg-primary text-on-primary shadow-xs"
+                  ? "bg-brand text-on-brand shadow-xs"
                   : "text-on-surface-variant hover:text-on-surface"
               }`}
               title={isHindi ? "सूची दृश्य (List View)" : "List View"}
@@ -264,14 +264,14 @@ export function ServicesListingClient({
                     <button
                       type="button"
                       onClick={() => handleOpenEnquiry(title)}
-                      className="flex-1 py-2 px-3 rounded-xl border border-outline-variant bg-surface text-secondary hover:bg-secondary hover:text-on-secondary transition-colors text-xs font-semibold flex items-center justify-center gap-1"
+                      className="flex-1 py-2 px-3 rounded-xl border border-outline-variant bg-surface text-secondary hover:bg-brand-hover hover:text-on-brand transition-colors text-xs font-semibold flex items-center justify-center gap-1"
                     >
                       <HelpCircle className="w-3.5 h-3.5" />
                       <span>{isHindi ? "पूछताछ करें" : "Enquire"}</span>
                     </button>
                     <Link
                       href={`/services/${service.slug}`}
-                      className="flex-1 py-2 px-3 rounded-xl bg-primary text-on-primary hover:bg-primary/90 transition-colors text-xs font-semibold flex items-center justify-center gap-1 shadow-xs"
+                      className="flex-1 py-2 px-3 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors text-xs font-semibold flex items-center justify-center gap-1 shadow-xs"
                     >
                       <span>{isHindi ? "विवरण देखें" : "View Plans"}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -320,7 +320,7 @@ export function ServicesListingClient({
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
                         {tagline && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand/10 text-primary">
                             {tagline}
                           </span>
                         )}
@@ -367,7 +367,7 @@ export function ServicesListingClient({
                       <button
                         type="button"
                         onClick={() => handleOpenEnquiry(title)}
-                        className="py-2.5 px-4 rounded-xl border border-outline-variant text-secondary hover:bg-secondary hover:text-on-secondary transition-colors text-xs font-semibold flex items-center gap-1 shadow-xs"
+                        className="py-2.5 px-4 rounded-xl border border-outline-variant text-secondary hover:bg-brand-hover hover:text-on-brand transition-colors text-xs font-semibold flex items-center gap-1 shadow-xs"
                       >
                         <HelpCircle className="w-3.5 h-3.5" />
                         <span>{isHindi ? "पूछताछ" : "Enquire"}</span>
@@ -375,7 +375,7 @@ export function ServicesListingClient({
 
                       <Link
                         href={`/services/${service.slug}`}
-                        className="py-2.5 px-5 rounded-xl bg-primary text-on-primary hover:bg-primary/90 transition-colors text-xs font-semibold flex items-center gap-1 shadow-xs"
+                        className="py-2.5 px-5 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors text-xs font-semibold flex items-center gap-1 shadow-xs"
                       >
                         <span>{isHindi ? "संस्करण चुनें" : "View Plans"}</span>
                         <ArrowRight className="w-3.5 h-3.5" />

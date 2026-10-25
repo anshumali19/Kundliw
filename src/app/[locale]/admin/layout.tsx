@@ -45,10 +45,10 @@ export default async function AdminLayout(props: AdminLayoutProps) {
   return (
     <div className="w-full min-h-[calc(100vh-120px)] bg-surface text-on-surface text-left">
       {/* Admin Command Bar */}
-      <div className="w-full bg-secondary text-on-secondary border-b border-secondary/50 py-3 px-4 sm:px-6">
+      <div className="w-full bg-brand text-on-brand border-b border-secondary/50 py-3 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
           <div className="flex items-center gap-3">
-            <span className="p-1 rounded bg-secondary-fixed text-on-secondary-container font-bold text-xs uppercase tracking-widest flex items-center gap-1.5">
+            <span className="p-1 rounded bg-secondary-fixed text-on-brand font-bold text-xs uppercase tracking-widest flex items-center gap-1.5">
               <ShieldAlert className="w-3.5 h-3.5" />
               <span>CMS Admin</span>
             </span>

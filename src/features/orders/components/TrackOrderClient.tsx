@@ -172,7 +172,7 @@ export function TrackOrderClient({
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto min-h-[44px] px-8 py-3 bg-primary-container hover:bg-primary text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+              className="w-full sm:w-auto min-h-[44px] px-8 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
             >
               <Search className="w-4 h-4" />
               <span>{loading ? (isHindi ? "खोज जारी..." : "Tracking...") : (isHindi ? "स्थिति ट्रैक करें" : "Track Order Status")}</span>
@@ -188,7 +188,7 @@ export function TrackOrderClient({
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-error-container/20 border border-error text-error text-xs flex items-start gap-2.5">
+        <div className="p-4 rounded-lg bg-error-container/20 border border-error text-on-error-container text-xs flex items-start gap-2.5">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>

@@ -111,7 +111,7 @@ export default async function HomePage(
               <div className="flex flex-wrap items-center gap-3">
                 <Link
                   href="/services"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary-container hover:bg-primary text-on-primary text-sm uppercase tracking-wider rounded font-bold transition-colors border border-primary min-h-[44px]"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-brand hover:bg-brand-hover text-on-brand text-sm uppercase tracking-wider rounded font-bold transition-colors border border-primary min-h-[44px]"
                 >
                   <Calendar className="w-4 h-4" />
                   {t("ctaBook")}
@@ -125,7 +125,7 @@ export default async function HomePage(
               </div>
             </div>
 
-            <div className="lg:col-span-5 bg-surface-container-low p-5 rounded border border-secondary/30 text-left">
+            <div className="lg:col-span-5 bg-surface-container-low p-5 rounded border border-secondary/30 border-t-4 border-t-signal text-left">
               <h2 className="font-serif text-lg font-bold text-secondary pb-2 mb-2 border-b border-outline-variant/50">
                 {t("toolsTitle")}
               </h2>
@@ -206,7 +206,7 @@ export default async function HomePage(
                   <Link
                     key={service.id}
                     href={`/services/${service.slug}`}
-                    className="bg-surface p-5 rounded border border-secondary/40 hover:border-secondary flex flex-col gap-2 transition-colors"
+                    className="bg-surface p-5 rounded border border-secondary/40 border-t-4 border-t-signal hover:border-secondary flex flex-col gap-2 transition-colors"
                   >
                     <h3 className="font-serif text-lg font-bold text-secondary">{title}</h3>
                     <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-3">
@@ -245,7 +245,7 @@ export default async function HomePage(
                 key={step.title}
                 className="bg-surface p-4 sm:p-5 rounded border border-secondary/30 flex gap-3 sm:block"
               >
-                <span className="w-8 h-8 shrink-0 rounded-full bg-secondary text-on-secondary text-sm font-bold flex items-center justify-center sm:mb-3">
+                <span className="w-8 h-8 shrink-0 rounded-full bg-brand text-on-brand text-sm font-bold flex items-center justify-center sm:mb-3">
                   {index + 1}
                 </span>
                 <div>

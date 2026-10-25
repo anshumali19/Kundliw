@@ -173,7 +173,7 @@ export default function AdminGalleryPage() {
       </div>
 
       {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 text-xs flex items-center gap-2">
+        <div className="p-3 bg-error-container0/10 border border-error rounded-xl text-on-error-container text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -320,7 +320,7 @@ export default function AdminGalleryPage() {
           <button
             type="submit"
             disabled={submitting || uploading}
-            className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center gap-2"
+            className="px-5 py-2.5 rounded-xl bg-brand text-on-brand font-semibold hover:bg-brand-hover disabled:opacity-50 transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>{submitting ? "Saving..." : "Save Gallery Item"}</span>
@@ -390,7 +390,7 @@ export default function AdminGalleryPage() {
                   <span className="text-[10px] font-mono text-outline">Order: {item.orderIndex}</span>
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-1.5 rounded-lg text-red-600 hover:bg-red-500/10 transition-colors"
+                    className="p-1.5 rounded-lg text-on-error-container hover:bg-error-container0/10 transition-colors"
                     title="Delete item"
                   >
                     <Trash2 className="w-4 h-4" />

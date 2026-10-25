@@ -249,7 +249,7 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
 
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded bg-primary text-on-primary font-medium text-xs uppercase tracking-wider hover:bg-primary/90 transition-all shadow"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded bg-brand text-on-brand font-medium text-xs uppercase tracking-wider hover:bg-brand-hover transition-all shadow"
         >
           <Plus className="w-4 h-4" />
           <span>{isHindi ? "नया प्रश्न जोड़ें" : "Add Q&A Entry"}</span>
@@ -261,14 +261,14 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
         <div
           className={`p-4 rounded-lg flex items-center gap-2 text-sm ${
             status.type === "success"
-              ? "bg-secondary-container/30 text-on-secondary-container border border-secondary"
-              : "bg-error-container/30 text-error border border-error"
+              ? "bg-brand/30 text-on-brand border border-secondary"
+              : "bg-error-container/30 text-on-error-container border border-error"
           }`}
         >
           {status.type === "success" ? (
             <CheckCircle2 className="w-4 h-4 shrink-0 text-secondary" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-error" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-on-error-container" />
           )}
           <span>{status.text}</span>
         </div>
@@ -336,7 +336,7 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-outline-variant/20">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary font-bold">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-brand/10 text-primary font-bold">
                       {item.category}
                     </span>
                     <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">
@@ -345,7 +345,7 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
                     <span
                       className={`text-[11px] px-2 py-0.5 rounded font-medium ${
                         item.isActive
-                          ? "bg-secondary-container/50 text-secondary"
+                          ? "bg-brand/50 text-secondary"
                           : "bg-surface-container-high text-on-surface-variant"
                       }`}
                     >
@@ -377,7 +377,7 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-1.5 rounded hover:bg-error-container/30 text-on-surface-variant hover:text-error transition-colors"
+                    className="p-1.5 rounded hover:bg-error-container/30 text-on-surface-variant hover:text-on-error-container transition-colors"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -640,7 +640,7 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded bg-primary text-on-primary font-medium hover:bg-primary/90"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded bg-brand text-on-brand font-medium hover:bg-brand-hover"
                 >
                   <Save className="w-4 h-4" />
                   <span>{isHindi ? "सहेजें" : "Save Entry"}</span>

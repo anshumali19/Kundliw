@@ -317,7 +317,7 @@ export function BookingWizard({
       <div className="w-full bg-surface-container rounded-lg p-4 border border-outline-variant/40">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
           <div className="flex items-center gap-3">
-            <span className="text-xs uppercase font-bold tracking-widest text-primary bg-primary-container/20 px-2.5 py-1 rounded">
+            <span className="text-xs uppercase font-bold tracking-widest text-primary bg-brand/20 px-2.5 py-1 rounded">
               {isHindi ? `चरण ${currentStep} / ३` : `Step ${currentStep} of 3`}
             </span>
             <span className="font-serif font-bold text-sm sm:text-base text-secondary">
@@ -343,7 +343,7 @@ export function BookingWizard({
       </div>
 
       {submissionError && (
-        <div className="p-4 bg-surface rounded border border-error text-xs text-error font-medium flex items-center gap-2">
+        <div className="p-4 bg-surface rounded border border-error text-xs text-on-error-container font-medium flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{submissionError}</span>
         </div>
@@ -420,7 +420,7 @@ export function BookingWizard({
                             <div className="font-serif font-bold text-sm text-secondary flex items-center gap-2">
                               <span>{isHindi ? p.titleHi : p.titleEn}</span>
                               {isSelected && (
-                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary text-on-primary">
+                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand text-on-brand">
                                   {isHindi ? "चयनित" : "Selected"}
                                 </span>
                               )}
@@ -457,7 +457,7 @@ export function BookingWizard({
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className="min-h-[44px] px-6 py-2.5 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2"
+                  className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2"
                 >
                   <span>{isHindi ? "अगला: जन्म विवरण दर्ज करें" : "Next: Jataka Birth Details"}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -797,7 +797,7 @@ export function BookingWizard({
                     setSubmissionError(null);
                     setCurrentStep(3);
                   }}
-                  className="min-h-[44px] px-6 py-2.5 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2"
+                  className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2"
                 >
                   <span>{isHindi ? "समीक्षा एवं पुष्टि करें" : "Review & Summary"}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -883,7 +883,7 @@ export function BookingWizard({
                   type="button"
                   onClick={handleCreateOrder}
                   disabled={submitting}
-                  className="min-h-[44px] px-8 py-3 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+                  className="min-h-[44px] px-8 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
                 >
                   <Lock className="w-4 h-4" />
                   <span>
@@ -947,7 +947,7 @@ export function BookingWizard({
                     setAppliedOffer(null);
                     setOfferCodeInput("");
                   }}
-                  className="min-h-[44px] px-3 bg-surface border border-outline-variant text-error rounded hover:bg-surface-container"
+                  className="min-h-[44px] px-3 bg-surface border border-outline-variant text-on-error-container rounded hover:bg-surface-container"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -956,7 +956,7 @@ export function BookingWizard({
                   type="button"
                   onClick={() => handleValidateOffer()}
                   disabled={offerLoading || !offerCodeInput.trim()}
-                  className="min-h-[44px] px-4 bg-secondary text-on-secondary rounded text-xs uppercase font-bold hover:bg-primary transition-colors disabled:opacity-50"
+                  className="min-h-[44px] px-4 bg-brand text-on-brand rounded text-xs uppercase font-bold hover:bg-brand-hover transition-colors disabled:opacity-50"
                 >
                   {offerLoading ? "..." : isHindi ? "लागू" : "Apply"}
                 </button>
@@ -964,7 +964,7 @@ export function BookingWizard({
             </div>
 
             {offerError && (
-              <div className="text-[11px] text-error font-medium flex items-center gap-1">
+              <div className="text-[11px] text-on-error-container font-medium flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>{offerError}</span>
               </div>

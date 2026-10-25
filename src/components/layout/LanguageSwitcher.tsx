@@ -25,7 +25,7 @@ export function LanguageSwitcher() {
         onClick={() => switchLanguage("hi")}
         className={`px-2.5 py-1 text-xs font-semibold tracking-wider transition-colors min-h-[36px] sm:min-h-[28px] ${
           locale === "hi"
-            ? "bg-secondary text-on-secondary font-bold"
+            ? "bg-brand text-on-brand font-bold"
             : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant"
         }`}
         aria-pressed={locale === "hi"}
@@ -37,7 +37,7 @@ export function LanguageSwitcher() {
         onClick={() => switchLanguage("en")}
         className={`px-2.5 py-1 text-xs font-semibold tracking-wider transition-colors min-h-[36px] sm:min-h-[28px] ${
           locale === "en"
-            ? "bg-secondary text-on-secondary font-bold"
+            ? "bg-brand text-on-brand font-bold"
             : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant"
         }`}
         aria-pressed={locale === "en"}

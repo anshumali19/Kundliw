@@ -139,7 +139,7 @@ export function ServiceEnquiryModal({
               className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
                 status.type === "success"
                   ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20"
-                  : "bg-red-500/10 text-red-700 border border-red-500/20"
+                  : "bg-error-container0/10 text-on-error-container border border-error"
               }`}
             >
               {status.type === "success" ? (
@@ -253,7 +253,7 @@ export function ServiceEnquiryModal({
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-5 py-2 rounded-xl bg-primary text-on-primary hover:bg-primary/90 transition-colors font-semibold text-xs flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                className="px-5 py-2 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors font-semibold text-xs flex items-center gap-1.5 shadow-sm disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{submitting ? (isHindi ? "भेज रहे हैं..." : "Sending...") : isHindi ? "पूछताछ भेजें" : "Submit Enquiry"}</span>
