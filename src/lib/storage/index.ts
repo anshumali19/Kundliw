@@ -102,7 +102,8 @@ export class LocalDiskStorageProvider implements StorageProvider {
 
   constructor(baseDir?: string) {
     assertPlaceholderAllowed("LocalDiskStorageProvider");
-    this.baseDir = baseDir || path.join(process.cwd(), "storage");
+    this.baseDir =
+      baseDir || process.env.STORAGE_PATH || path.join(process.cwd(), "storage");
   }
 
   async saveFile(
