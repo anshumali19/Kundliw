@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { matchChatbotQuery } from "@/lib/chatbot/matcher";
+import { askLlm, isLlmConfigured } from "@/lib/chatbot/llm";
 import { getClientIp, checkDbRateLimit } from "@/lib/rateLimit";
 
 const MAX_QUERY_LENGTH = 500;
@@ -37,6 +38,20 @@ export async function GET(req: NextRequest) {
 
   try {
     const result = await matchChatbotQuery(q, locale);
+    // Free AI (Gemini) when a key is configured; otherwise keep the rule-based answer
+    if (q && isLlmConfigured()) {
+      const aiAnswer = await askLlm(q, locale);
+      if (aiAnswer) {
+        return NextResponse.json({
+          success: true,
+          ...result,
+          matched: true,
+          answer: aiAnswer,
+          showTicketFallback: false,
+          ai: true,
+        });
+      }
+    }
     return NextResponse.json({ success: true, ...result });
   } catch (error) {
     console.error("[API Chatbot Ask] Error:", error);
