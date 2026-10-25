@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Video, ExternalLink, Play } from "lucide-react";
 
 interface GalleryPageProps {
   params: {
@@ -14,11 +14,11 @@ export async function generateMetadata({ params: { locale } }: GalleryPageProps)
   const isHindi = locale === "hi";
   return {
     title: isHindi
-      ? "चित्र दीर्घा • महर्षि कणाद ज्योतिष केंद्र"
-      : "Sanctum Gallery • Maharshi Kanad Jyotish Kendra",
+      ? "चित्र एवं वीडियो दीर्घा • महर्षि कणाद ज्योतिष केंद्र"
+      : "Sanctum Gallery & Discourses • Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "काशी दशाश्वमेध घाट ज्योतिष पीठ, पांडुलिपि संग्रह एवं वैदिक अनुष्ठान।"
-      : "Visual archive of our sacred Varanasi sanctum, manuscripts, and astronomical observations.",
+      ? "काशी दशाश्वमेध घाट ज्योतिष पीठ, पांडुलिपि संग्रह, वीडियो व्याख्यान एवं वैदिक अनुष्ठान।"
+      : "Visual archive and video discourses of our Dashashwamedh Ghat sanctum and ancient ephemerides.",
   };
 }
 
@@ -29,53 +29,112 @@ export default async function GalleryPage({ params: { locale } }: GalleryPagePro
   });
 
   return (
-    <div className="w-full min-h-[70vh] py-12 px-4 sm:px-8 lg:px-12 text-left space-y-8">
-      <div>
+    <div className="w-full min-h-[70vh] py-10 px-4 sm:px-6 lg:px-12 text-left space-y-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="border-b border-outline-variant/30 pb-6 space-y-2">
         <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
-          <ImageIcon className="w-4 h-4" />
-          <span>{isHindi ? "चित्र दीर्घा" : "Visual Archive"}</span>
+          <ImageIcon className="w-4 h-4 text-primary" />
+          <span>{isHindi ? "चित्र एवं वीडियो दीर्घा" : "Visual Archive & Video Discourses"}</span>
         </div>
-        <h1 className="font-serif text-3xl font-bold text-secondary mt-1">
-          {isHindi ? "पीठ एवं पांडुलिपि दीर्घा" : "Sanctum & Astrological Archives"}
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary">
+          {isHindi ? "पीठ, पांडुलिपि एवं व्याख्यान दीर्घा" : "Sanctum, Manuscripts & Discourse Gallery"}
         </h1>
-        <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+        <p className="text-xs sm:text-sm text-on-surface-variant max-w-3xl">
           {isHindi
-            ? "दशाश्वमेध घाट वाराणसी स्थित केंद्र, हस्तलिखित पंचांग एवं वैदिक साधना।"
-            : "Photographs of our Dashashwamedh Ghat center, handwritten ephemerides, and ritual ceremonies."}
+            ? "दशाश्वमेध घाट, वाराणसी स्थित केंद्र की वेदी, चार दशकों से सुरक्षित हस्तलिखित पोथियां एवं पंचांग व्याख्यान।"
+            : "Photographs of our Dashashwamedh Ghat center, handwritten astrological charts, and recorded video lectures."}
         </p>
       </div>
 
+      {/* Grid of Media Items */}
       {items.length === 0 ? (
-        <div className="p-8 rounded-lg bg-surface border border-dashed border-outline-variant text-center text-xs text-outline">
-          {isHindi ? "दीर्घा में वर्तमान में कोई चित्र उपलब्ध नहीं है।" : "No gallery images uploaded yet."}
+        <div className="p-12 rounded-2xl bg-surface border border-dashed border-outline-variant text-center text-xs text-outline space-y-2">
+          <ImageIcon className="w-8 h-8 mx-auto opacity-50" />
+          <div>{isHindi ? "दीर्घा में वर्तमान में कोई चित्र अथवा वीडियो उपलब्ध नहीं है।" : "No gallery media published yet."}</div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => {
             const title = isHindi ? item.titleHi : item.titleEn;
             const caption = isHindi ? item.captionHi : item.captionEn;
+            const isYouTube = item.mediaType === "YOUTUBE" && item.videoUrl;
 
             return (
               <div
                 key={item.id}
-                className="bg-surface rounded-lg border border-outline-variant/40 overflow-hidden space-y-3 pb-3"
+                className="bg-surface rounded-2xl border border-outline-variant/40 overflow-hidden shadow-sm flex flex-col justify-between transition-all hover:shadow-md"
               >
-                <div className="h-56 w-full bg-surface-container overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.imageUrl}
-                    alt={title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="px-4 space-y-1">
-                  <h3 className="font-serif font-bold text-sm text-secondary">{title}</h3>
-                  {caption && (
-                    <p className="text-xs text-on-surface-variant leading-relaxed">
-                      {caption}
-                    </p>
+                <div>
+                  {isYouTube ? (
+                    <div className="aspect-video w-full bg-black relative">
+                      <iframe
+                        src={
+                          item.videoUrl!.includes("embed")
+                            ? item.videoUrl!
+                            : item.videoUrl!.replace("watch?v=", "embed/").split("&")[0]
+                        }
+                        title={title}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-60 w-full bg-surface-container overflow-hidden relative group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.imageUrl}
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {item.videoUrl && (
+                        <a
+                          href={item.videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <span className="p-3 rounded-full bg-primary text-on-primary shadow-lg">
+                            <Play className="w-5 h-5 fill-current" />
+                          </span>
+                        </a>
+                      )}
+                    </div>
                   )}
+
+                  <div className="p-5 space-y-2 text-left">
+                    <div className="flex items-center justify-between gap-2">
+                      <h2 className="font-serif font-bold text-sm sm:text-base text-secondary">
+                        {title}
+                      </h2>
+                      {item.mediaType === "YOUTUBE" && (
+                        <span className="px-2 py-0.5 rounded-full bg-red-600/10 text-red-600 font-mono text-[10px] font-bold shrink-0">
+                          Video
+                        </span>
+                      )}
+                    </div>
+
+                    {caption && (
+                      <p className="text-xs text-on-surface-variant leading-relaxed">
+                        {caption}
+                      </p>
+                    )}
+                  </div>
                 </div>
+
+                {item.externalLink && (
+                  <div className="px-5 pb-4 pt-1 border-t border-outline-variant/20">
+                    <a
+                      href={item.externalLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-semibold"
+                    >
+                      <span>{isHindi ? "संबद्ध विवरण देखें" : "View Details"}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                )}
               </div>
             );
           })}

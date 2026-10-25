@@ -23,7 +23,11 @@ import {
   LogIn,
 } from "lucide-react";
 
-export function Header() {
+interface HeaderProps {
+  phone?: string;
+}
+
+export function Header({ phone }: HeaderProps = {}) {
   const tNav = useTranslations("nav");
   const tHeader = useTranslations("header");
   const tCommon = useTranslations("common");
@@ -139,14 +143,18 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            <a
-              href="tel:+919827991224"
-              className="hidden sm:inline-flex items-center gap-1.5 hover:text-primary transition-colors text-xs"
-            >
-              <Phone className="w-3 h-3 text-primary" />
-              <span className="font-semibold">+91-9827991224</span>
-            </a>
-            <span className="hidden sm:inline-block w-px h-3 bg-outline-variant shrink-0"></span>
+            {phone && (
+              <>
+                <a
+                  href={`tel:${phone.replace(/[^\d+]/g, "")}`}
+                  className="hidden sm:inline-flex items-center gap-1.5 hover:text-primary transition-colors text-xs"
+                >
+                  <Phone className="w-3 h-3 text-primary" />
+                  <span className="font-semibold">{phone}</span>
+                </a>
+                <span className="hidden sm:inline-block w-px h-3 bg-outline-variant shrink-0"></span>
+              </>
+            )}
             <Link
               href="/auth/signin"
               className="hidden md:inline-flex items-center gap-1 hover:text-primary transition-colors text-xs font-semibold text-secondary"

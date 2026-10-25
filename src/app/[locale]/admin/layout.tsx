@@ -14,6 +14,8 @@ import {
   MessageSquare,
   Inbox,
   KeyRound,
+  Award,
+  HelpCircle,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -110,6 +112,22 @@ export default async function AdminLayout({
             className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
             <span>{isHindi ? "मार्की (Marquee)" : "Marquee"}</span>
+          </Link>
+
+          <Link
+            href="/admin/founder"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <Award className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "संस्थापक (Founder)" : "Founder"}</span>
+          </Link>
+
+          <Link
+            href="/admin/faq"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-secondary" />
+            <span>{isHindi ? "प्रश्नोत्तरी (FAQ)" : "FAQ"}</span>
           </Link>
 
           <Link

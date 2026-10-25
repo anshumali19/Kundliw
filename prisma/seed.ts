@@ -728,6 +728,7 @@ startxref
         captionEn: "Morning ephemeris calculation ritual facing the Ganges.",
         captionHi: "माँ गंगा के पावन तट पर प्रातःकालीन पंचांग पठन एवं ग्रह वेदी।",
         imageUrl: "/images/gallery-1.jpg",
+        mediaType: "IMAGE",
         orderIndex: 1,
       },
       {
@@ -736,6 +737,7 @@ startxref
         captionEn: "Archival astronomical charts preserved over four decades.",
         captionHi: "चार दशकों से संरक्षित शुद्ध गणितीय चक्र एवं कुण्डली ग्रंथ।",
         imageUrl: "/images/gallery-2.jpg",
+        mediaType: "IMAGE",
         orderIndex: 2,
       },
       {
@@ -744,12 +746,188 @@ startxref
         captionEn: "Senior Kendra team determining festival tithis and eclipse timings.",
         captionHi: "वरिष्ठ दैवज्ञों द्वारा ग्रहण एवं पर्व काल का सूक्ष्म निर्धारण।",
         imageUrl: "/images/gallery-3.jpg",
+        mediaType: "IMAGE",
         orderIndex: 3,
+      },
+      {
+        titleEn: "Kashi Ganga Aarti & Jyotish Discourse",
+        titleHi: "काशी गंगा आरती एवं ज्योतिष विमर्श",
+        captionEn: "Live documentary on ephemeris calculation and planetary worship.",
+        captionHi: "पंचांग गणना एवं ग्रह शांति पर विशेष व्याख्यान वीडियो।",
+        imageUrl: "/images/gallery-1.jpg",
+        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        mediaType: "YOUTUBE",
+        externalLink: "https://kanadjyotishkendra.vercel.app/services",
+        orderIndex: 4,
       },
     ],
   });
 
-  // 15. Pre-cache Panchang for Today in Varanasi
+  // 15. Founder Profile
+  await prisma.founderProfile.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      nameEn: "Pt. Radheshyam Shastri (Shastri Ji)",
+      nameHi: "पं. राधेश्याम शास्त्री (शास्त्री जी)",
+      designationEn: "Founder, Senior Daivajna & Ephemeris Scholar",
+      designationHi: "संस्थापक, वरिष्ठ दैवज्ञ एवं पंचांगकार",
+      roleEn: "Vedanga Jyotish Lineage of Varanasi • 40+ Years of Guidance",
+      roleHi: "काशी वेदांग ज्योतिष परंपरा • 40 से अधिक वर्षों का वैदिक अनुभव",
+      photoUrl: "/images/founder-shastri.jpg",
+      bioEn:
+        "Hailing from a revered family of Siddhanta Jyotish scholars on Dashashwamedh Ghat, Pt. Radheshyam Shastri holds Shastri and Acharya titles from Sampurnanand Sanskrit University. For over four decades, he has championed ethical, unadulterated planetary guidance based strictly on classical texts (Brihat Parashara Hora Shastra, Jaimini Sutram, and Surya Siddhanta).\n\nUnder his guidance, the Kendra has preserved authentic handwritten horoscopes and trained junior scholars in ephemeris computations, rejecting fear-mongering and commercial astrology.",
+      bioHi:
+        "दशाश्वमेध घाट, वाराणसी की प्रतिष्ठित दैवज्ञ परंपरा से संबद्ध, पं. राधेश्याम शास्त्री जी ने संपूर्णानंद संस्कृत विश्वविद्यालय से वेदांग ज्योतिष में आचार्य उपाधि प्राप्त की है। विगत 4 दशकों से उन्होंने हजारों जातकों को महर्षि पराशर, जैमिनि एवं सूर्य सिद्धांत के सूक्ष्म गणितीय आधार पर सत्य एवं निष्पक्ष मार्गदर्शन प्रदान किया है।\n\nशास्त्री जी के निर्देशन में केंद्र ने शुद्ध हस्तलिखित कुण्डली परंपरा को जीवित रखा है और अंधविश्वास अथवा भय-व्यापार के विरुद्ध शास्त्रसम्मत समाधान की अलख जगाई है।",
+      youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      additionalLinks: [
+        {
+          labelEn: "Sister Portal: Vindhya Vivah Sanskar",
+          labelHi: "सहयोगी पोर्टल: विंध्य विवाह संस्कार",
+          url: "https://vindhyavivahsanskar.com",
+        },
+        {
+          labelEn: "Ephemeris Calculation Methodology",
+          labelHi: "पंचांग एवं सूक्ष्म ग्रह गणित पद्धति",
+          url: "https://kanadjyotishkendra.vercel.app/legal/ephemeris-sources",
+        },
+      ],
+      footerNoteEn:
+        "Note: Consultations follow the traditional Dakshina code. No black magic, fear-mongering, or misleading claims are entertained at the Kendra.",
+      footerNoteHi:
+        "नोट: समस्त परामर्श शास्त्रसम्मत दक्षिणा पद्धति से संपन्न होते हैं। केंद्र पर किसी भी प्रकार के अंधविश्वास, भय अथवा मिथ्या दावों का पूर्ण निषेध है।",
+      isActive: true,
+    },
+  });
+
+  // 16. FAQs
+  await prisma.faqItem.deleteMany({});
+  await prisma.faqItem.createMany({
+    data: [
+      {
+        questionEn: "How are Kundlis prepared at Maharshi Kanad Jyotish Kendra?",
+        questionHi: "महर्षि कणाद ज्योतिष केंद्र में कुण्डली निर्माण की क्या पद्धति है?",
+        answerEn:
+          "All Kundlis are calculated using Drik Ganita (astronomical ephemeris) based on exact latitude, longitude, and timezone of the birth location with Lahiri Ayanamsha (Chitra Paksha). Planetary longitudes, divisional charts (D1 to D60), Vimshottari Dasha, and Ashtakavarga are derived with high mathematical precision.",
+        answerHi:
+          "केंद्र में समस्त कुंडलियों का निर्माण दृश्य गणित (लाहिड़ी अयनांश/चित्रा पक्ष) के आधार पर किया जाता है। जन्म स्थान के सटीक अक्षांश एवं रेखांश पर आधारित षोडशवर्ग, विंशोत्तरी दशा एवं अष्टकवर्ग की सूक्ष्म गणना अनुभवी दैवज्ञों द्वारा की जाती है।",
+        category: "KUNDLI",
+        orderIndex: 1,
+        isActive: true,
+      },
+      {
+        questionEn: "How will I receive my completed Kundli or Consultation report?",
+        questionHi: "मुझे अपनी कुण्डली अथवा परामर्श रिपोर्ट कैसे प्राप्त होगी?",
+        answerEn:
+          "Digital PDF reports are uploaded directly to your encrypted customer Vault in your account. You will also receive an SMS/WhatsApp notification with the secure download link. Physical bound copies are dispatched via speed post with live tracking.",
+        answerHi:
+          "डिजिटल पीडीएफ कुण्डली सीधे आपके व्यक्तिगत वॉल्ट (Vault) में सुरक्षित रूप से उपलब्ध कराई जाती है। इसके अतिरिक्त आपके पंजीकृत मोबाइल नंबर पर सूचना भेजी जाती है। मुद्रित ग्रंथ डाक/कूरियर द्वारा ट्रैकिंग सहित प्रेषित किया जाता है।",
+        category: "KUNDLI",
+        orderIndex: 2,
+        isActive: true,
+      },
+      {
+        questionEn: "What payment methods are supported on the website?",
+        questionHi: "वेबसाइट पर दक्षिणा भुगतान के कौन से माध्यम उपलब्ध हैं?",
+        answerEn:
+          "We accept UPI (Google Pay, PhonePe, Paytm, BHIM), Net Banking, Debit/Credit Cards via Razorpay secure gateway, as well as Direct Bank Transfer (NEFT/RTGS/IMPS) and Kendra QR Code.",
+        answerHi:
+          "आप रेज़रपे गेटवे के माध्यम से UPI (Google Pay, PhonePe, Paytm), नेट बैंकिंग, कार्ड से भुगतान कर सकते हैं। इसके अतिरिक्त सीधे बैंक ट्रांसफर (NEFT/RTGS) तथा केंद्र के QR कोड पर भी दक्षिणा अर्पित कर सकते हैं।",
+        category: "PAYMENT",
+        orderIndex: 3,
+        isActive: true,
+      },
+      {
+        questionEn: "Can I cancel a booking or request a refund?",
+        questionHi: "क्या मैं बुकिंग रद्द कर सकता हूँ या धनवापसी का क्या नियम है?",
+        answerEn:
+          "Cancellations requested before the consultation preparation begins are eligible for refund as per our Refund Policy. Once a personalized horoscope has been computed and astrologer time spent, Dakshina is non-refundable. Please refer to /legal/refund for details.",
+        answerHi:
+          "यदि कुण्डली निर्माण या अनुष्ठान तैयारी प्रारंभ होने से पूर्व सूचना दी जाए तो नियमानुसार धनवापसी संभव है। दैवज्ञ द्वारा समय व्यतीत करने एवं गणना पूर्ण होने के उपरांत दक्षिणा अहस्तांतरणीय है। विस्तृत नियम /legal/refund पर देखें।",
+        category: "PAYMENT",
+        orderIndex: 4,
+        isActive: true,
+      },
+      {
+        questionEn: "Are online pujas performed with Vedic sankalp?",
+        questionHi: "क्या ऑनलाइन अनुष्ठान शास्त्रसम्मत संकल्प के साथ संपन्न होते हैं?",
+        answerEn:
+          "Yes. Every ritual is conducted with live or recorded video Sankalp mentioning your Gotra, Name, and Nakshatra by initiated Vedic Pandits at Varanasi or designated pilgrimage shrines.",
+        answerHi:
+          "हाँ, प्रत्येक पूजा एवं ग्रह शांति अनुष्ठान जातक के नाम, गोत्र एवं नक्षत्र के शास्त्रसम्मत संकल्प के साथ काशी के वैदिक ब्राह्मणों द्वारा संपन्न किया जाता है। इसका वीडियो प्रमाण भी वॉल्ट में प्रदान किया जाता है।",
+        category: "PUJA",
+        orderIndex: 5,
+        isActive: true,
+      },
+      {
+        questionEn: "How do I consult with Shastri Ji directly?",
+        questionHi: "शास्त्री जी से प्रत्यक्ष व्यक्तिगत परामर्श कैसे प्राप्त करें?",
+        answerEn:
+          "You can select the 'Telephonic / Video Consultation' service, pick an available appointment slot, and complete the booking. Our coordinator will schedule your call via Google Meet or Phone.",
+        answerHi:
+          "आप 'व्यक्तिगत वार्ता / वीडियो परामर्श' सेवा का चयन कर उपलब्ध समय चुन सकते हैं। बुकिंग के उपरांत केंद्र प्रबंधक आपको निश्चित समय पर संपर्क कराएगा।",
+        category: "GENERAL",
+        orderIndex: 6,
+        isActive: true,
+      },
+    ],
+  });
+
+  // 17. Ensure Static Pages for Legal routes exist
+  const extraLegalPages = [
+    {
+      slug: "legal/privacy",
+      titleEn: "Privacy Policy & Data Security",
+      titleHi: "गोपनीयता नीति एवं डेटा सुरक्षा",
+      contentEn:
+        "At Maharshi Kanad Jyotish Kendra, we treat your birth details, family lineage, and consultation discussions with sacred confidentiality. Personal birth parameters (date, time, place of birth) are used solely for astronomical ephemeris computations and never sold or shared with any third-party marketing entities.",
+      contentHi:
+        "महर्षि कणाद ज्योतिष केंद्र आपके जन्म विवरण, पारिवारिक गोत्र एवं परामर्श की गोपनीयता को पवित्र मानता है। आपका जन्म समय, दिनांक एवं स्थान केवल पंचांग गणित हेतु उपयोग किया जाता है और किसी भी व्यावसायिक संस्था से साझा नहीं किया जाता।",
+    },
+    {
+      slug: "legal/terms",
+      titleEn: "Terms of Service & Astrological Advisory Disclaimer",
+      titleHi: "सेवा की शर्तें एवं ज्योतिषीय परामर्श नियम",
+      contentEn:
+        "All astrological horoscopes, gemstone recommendations, and muhurta determinations represent advisory guidance derived from ancient Vedic texts (Brihat Parashara Hora Shastra, Jaimini Sutram). Astrology is an indicative spiritual science (Pratyaksha Shastra) of tendencies and karmic probabilities, not absolute fatalism.",
+      contentHi:
+        "केंद्र द्वारा प्रदत्त समस्त फलादेश, रत्न संस्तुति एवं मुहूर्त प्राचीन पाराशरी एवं जैमिनी सूत्रों पर आधारित सांकेतिक परामर्श हैं। ज्योतिष कर्म सिद्धांत एवं ग्रह स्थिति का दिग्दर्शन कराता है, यह अंतिम प्रारब्ध नहीं है।",
+    },
+    {
+      slug: "legal/refund",
+      titleEn: "Cancellation & Refund Policy",
+      titleHi: "रद्दीकरण एवं धनवापसी नीति",
+      contentEn:
+        "Consultation bookings may be cancelled up to 24 hours prior to the scheduled slot for a full refund minus payment processing fees. Personalized handcrafted Kundli charts are custom works; once calculation has commenced, Dakshina is non-refundable.",
+      contentHi:
+        "निर्धारित परामर्श समय से २४ घंटे पूर्व सूचना देकर बुकिंग रद्द करने पर गेटवे शुल्क घटाकर शेष राशि वापस की जाएगी। हस्तलिखित कुण्डली का गणित प्रारंभ होने के पश्चात दक्षिणा अहस्तांतरणीय है।",
+    },
+    {
+      slug: "legal/ephemeris-sources",
+      titleEn: "Astronomical Ephemeris & Drik Ganita Methodology",
+      titleHi: "दृग्गणित सिद्धांत एवं पंचांग स्रोत",
+      contentEn:
+        "Our computations follow the Indian Ephemeris standards approved by the Positional Astronomy Centre (IMD) with Chitra Paksha (Lahiri) Ayanamsha. Planetary degrees and rising times are synchronized with NASA JPL planetary ephemeris tables and Varanasi local apparent solar time.",
+      contentHi:
+        "हमारी पंचांग गणना भारत मौसम विज्ञान विभाग (IMD) एवं पॉजिशनल एस्ट्रोनॉमी सेंटर द्वारा मान्य दृश्य गणित (लाहिड़ी अयनांश) पर आधारित है। ग्रहों के स्पष्ट भोग एवं सूर्योदय का मान काशी के स्थानीय सूर्य समय से संबद्ध है।",
+    },
+  ];
+
+  for (const sp of extraLegalPages) {
+    await prisma.staticPage.upsert({
+      where: { slug: sp.slug },
+      update: {
+        titleEn: sp.titleEn,
+        titleHi: sp.titleHi,
+        contentEn: sp.contentEn,
+        contentHi: sp.contentHi,
+      },
+      create: sp,
+    });
+  }
+
+  // 18. Pre-cache Panchang for Today in Varanasi
   const todayStr = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   await prisma.panchangCache.upsert({
     where: {

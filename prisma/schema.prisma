@@ -467,14 +467,51 @@ model Testimonial {
 }
 
 model MediaGalleryItem {
-  id         String   @id @default(cuid())
-  titleEn    String
-  titleHi    String
-  captionEn  String?
-  captionHi  String?
-  imageUrl   String
-  orderIndex Int      @default(0)
-  createdAt  DateTime @default(now())
+  id           String   @id @default(cuid())
+  titleEn      String
+  titleHi      String
+  captionEn    String?
+  captionHi    String?
+  imageUrl     String
+  videoUrl     String?
+  mediaType    String   @default("IMAGE") // IMAGE, VIDEO, YOUTUBE
+  externalLink String?
+  orderIndex   Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model FounderProfile {
+  id              String   @id @default("default")
+  nameEn          String   @default("Pt. Radheshyam Shastri")
+  nameHi          String   @default("पं. राधेश्याम शास्त्री")
+  designationEn   String   @default("Founder & Chief Astrologer")
+  designationHi   String   @default("संस्थापक एवं मुख्य ज्योतिषाचार्य")
+  roleEn          String   @default("Vedic Ephemeris & Siddhanta Jyotish Tradition")
+  roleHi          String   @default("काशी वेदांग ज्योतिष एवं दृग्गणित सिद्धान्त परंपरा")
+  photoUrl        String?
+  bioEn           String   @db.Text
+  bioHi           String   @db.Text
+  youtubeUrl      String?
+  additionalLinks Json?    // Array of { labelEn: string, labelHi: string, url: string }
+  footerNoteEn    String?  @db.Text
+  footerNoteHi    String?  @db.Text
+  isActive        Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+model FaqItem {
+  id          String   @id @default(cuid())
+  questionEn  String
+  questionHi  String
+  answerEn    String   @db.Text
+  answerHi    String   @db.Text
+  category    String   @default("GENERAL") // GENERAL, KUNDLI, PUJA, PAYMENT
+  orderIndex  Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, isActive, orderIndex])
 }
 
 model StaticPage {

@@ -75,7 +75,7 @@ export default async function LocaleLayout({
         <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SmoothScrollProvider>
-            <Header />
+            <Header phone={settings?.phone1 ?? undefined} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>

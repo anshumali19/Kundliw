@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Scale, FileText, ArrowLeft } from "lucide-react";
+import { Link } from "@/i18n/routing";
 
 interface LegalPageProps {
   params: {
@@ -12,71 +13,95 @@ interface LegalPageProps {
 
 export const dynamic = "force-dynamic";
 
-const VALID_SLUGS = ["terms", "privacy", "refund"];
-
-export async function generateMetadata({ params: { locale, slug } }: LegalPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params: { locale, slug },
+}: LegalPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
-  const titles: Record<string, { en: string; hi: string }> = {
-    terms: { en: "Terms of Service & Astrological Ethics", hi: "सेवा नियम एवं ज्योतिषीय आचार संहिता" },
-    privacy: { en: "Privacy Policy & Natal Data Protection", hi: "गोपनीयता नीति एवं जन्म विवरण सुरक्षा" },
-    refund: { en: "Dakshina & Consultation Cancellation Policy", hi: "परामर्श निरस्तीकरण एवं धनवापसी नीति" },
-  };
+  const fullSlug = `legal/${slug}`;
+  const page = await prisma.staticPage
+    .findFirst({
+      where: {
+        OR: [{ slug: fullSlug }, { slug }],
+      },
+    })
+    .catch(() => null);
 
-  const current = titles[slug] || { en: "Legal Notice", hi: "वैधानिक सूचना" };
+  const title = isHindi ? page?.titleHi : page?.titleEn;
   return {
-    title: `${isHindi ? current.hi : current.en} • Maharshi Kanad Jyotish Kendra`,
+    title: `${title || slug.toUpperCase()} • महर्षि कणाद ज्योतिष केंद्र`,
+    description: isHindi
+      ? "महर्षि कणाद ज्योतिष केंद्र की आधिकारिक नीतियां एवं शास्त्रसम्मत नियम।"
+      : "Official policies and canonical standards of Maharshi Kanad Jyotish Kendra.",
   };
 }
 
 export default async function LegalPage({ params: { locale, slug } }: LegalPageProps) {
-  if (!VALID_SLUGS.includes(slug)) {
+  const isHindi = locale === "hi";
+  const fullSlug = `legal/${slug}`;
+
+  const page = await prisma.staticPage
+    .findFirst({
+      where: {
+        OR: [{ slug: fullSlug }, { slug }],
+      },
+    })
+    .catch(() => null);
+
+  if (!page) {
     notFound();
   }
 
-  const isHindi = locale === "hi";
-  const page = await prisma.staticPage.findUnique({ where: { slug } });
-
-  const defaultTitles: Record<string, { en: string; hi: string }> = {
-    terms: { en: "Terms of Service & Astrological Ethics", hi: "सेवा नियम एवं ज्योतिषीय आचार संहिता" },
-    privacy: { en: "Privacy Policy & Natal Data Protection", hi: "गोपनीयता नीति एवं जन्म विवरण सुरक्षा" },
-    refund: { en: "Dakshina Cancellation & Refund Policy", hi: "परामर्श निरस्तीकरण एवं दक्षिणा वापसी नीति" },
-  };
-
-  const defaultContents: Record<string, { en: string; hi: string }> = {
-    terms: {
-      en: "All astrological consultations, horary analyses, and computational Janampatris provided by Maharshi Kanad Jyotish Kendra are rendered strictly under ancient Vedanga Jyotish principles. Astrology is an advisory discipline designed for ethical life guidance.",
-      hi: "महर्षि कणाद ज्योतिष केंद्र द्वारा प्रदान किए जाने वाले समस्त परामर्श, प्रश्न विचार एवं गणितीय कुण्डलियां शास्त्रीय वेदांग ज्योतिष के सिद्धांतों पर आधारित हैं। ज्योतिष एक मार्गदर्शनकारी विद्या है।",
-    },
-    privacy: {
-      en: "We respect the confidentiality of every customer's birth coordinates, family Gotra, and specific personal queries. Your birth records are stored securely and never shared with third parties or advertising brokers.",
-      hi: "हम प्रत्येक जातक के जन्म विवरण, गोत्र एवं व्यक्तिगत प्रश्नों की पूर्ण गोपनीयता सुनिश्चित करते हैं। आपका विवरण किसी भी तृतीय पक्ष को विपणन हेतु प्रदान नहीं किया जाता।",
-    },
-    refund: {
-      en: "Consultation slots may be rescheduled or cancelled up to 24 hours prior to the reserved time. Once custom planetary calculations and physical Kundli calligraphy have commenced, Dakshina contributions are processed per policy guidelines.",
-      hi: "परामर्श स्लॉट को निर्धारित समय से २४ घंटे पूर्व पुनः निर्धारित अथवा निरस्त किया जा सकता है। हस्तलिखित कुण्डली निर्माण प्रारंभ होने के पश्चात नियमानुसार कार्यवाही की जाती है।",
-    },
-  };
-
-  const title = isHindi
-    ? page?.titleHi || defaultTitles[slug]?.hi
-    : page?.titleEn || defaultTitles[slug]?.en;
-
-  const content = isHindi
-    ? page?.contentHi || defaultContents[slug]?.hi
-    : page?.contentEn || defaultContents[slug]?.en;
+  const title = isHindi ? page.titleHi : page.titleEn;
+  const content = isHindi ? page.contentHi : page.contentEn;
 
   return (
-    <div className="w-full min-h-[70vh] py-12 px-4 sm:px-6 max-w-4xl mx-auto text-left space-y-8">
+    <div className="w-full max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 text-left space-y-8">
+      {/* Breadcrumb / Back Link */}
       <div>
-        <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
-          <ShieldCheck className="w-4 h-4" />
-          <span>{isHindi ? "वैधानिक एवं नीति विधान" : "Legal & Compliance"}</span>
-        </div>
-        <h1 className="font-serif text-3xl font-bold text-secondary mt-1">{title}</h1>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-primary transition-colors font-medium"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>{isHindi ? "मुख्य पृष्ठ" : "Back to Home"}</span>
+        </Link>
       </div>
 
-      <div className="p-6 sm:p-8 rounded-lg bg-surface border border-outline-variant/40 shadow-sm leading-relaxed whitespace-pre-line text-sm text-on-surface space-y-4">
+      {/* Header */}
+      <div className="border-b border-outline-variant/30 pb-6 space-y-2">
+        <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
+          <Scale className="w-4 h-4 text-primary" />
+          <span>{isHindi ? "विधिक एवं शास्त्रसम्मत नीतियां" : "Legal & Sanctum Canonical Terms"}</span>
+        </div>
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary">
+          {title}
+        </h1>
+        <div className="flex items-center gap-2 text-[11px] text-outline pt-1">
+          <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
+          <span>
+            {isHindi
+              ? "काशी दैवज्ञ परंपरा एवं भारतीय विधि अनुपालन"
+              : "In accordance with Kashi Vedanga Ethics & Applicable Laws"}
+          </span>
+        </div>
+      </div>
+
+      {/* Content Container */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-outline-variant/40 shadow-sm leading-relaxed text-sm sm:text-base text-on-surface whitespace-pre-line space-y-4">
         {content}
+      </div>
+
+      {/* Ephemeris & Ethics Disclaimer Seal */}
+      <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30 text-xs text-on-surface-variant flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <FileText className="w-4 h-4 text-secondary shrink-0" />
+          <span>
+            {isHindi
+              ? "यह दस्तावेज महर्षि कणाद ज्योतिष केंद्र के मुख्य प्रशासक द्वारा अधिकृत है।"
+              : "This document is authorized by Maharshi Kanad Jyotish Kendra administration."}
+          </span>
+        </div>
+        <span className="font-mono text-[10px] text-outline">v2026.1</span>
       </div>
     </div>
   );

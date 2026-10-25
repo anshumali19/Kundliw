@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { HelpCircle, Phone, Mail, Clock } from "lucide-react";
+import { HelpCircle, Phone, Mail, Clock, MessageSquare, Search, FileText } from "lucide-react";
+import { Link } from "@/i18n/routing";
 
 interface HelpPageProps {
   params: {
@@ -14,88 +15,147 @@ export async function generateMetadata({ params: { locale } }: HelpPageProps): P
   const isHindi = locale === "hi";
   return {
     title: isHindi
-      ? "सहायता एवं संपर्क • महर्षि कणाद ज्योतिष केंद्र"
-      : "Help & Support • Maharshi Kanad Jyotish Kendra",
+      ? "सहायता एवं ग्राहक समर्थन • महर्षि कणाद ज्योतिष केंद्र"
+      : "Help & Customer Support • Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "परामर्श बुकिंग, भुगतान सत्यापन एवं अक्सर पूछे जाने वाले प्रश्न।"
-      : "Consultation booking support, payment verification, and frequently asked questions.",
+      ? "बुकिंग, रिपोर्ट डाउनलोड, दक्षिणा रसीद एवं परामर्श संबंधी सहायता केंद्र।"
+      : "Help center for bookings, horoscope report downloads, receipts, and consultation inquiries.",
   };
 }
 
 export default async function HelpPage({ params: { locale } }: HelpPageProps) {
   const isHindi = locale === "hi";
+
   const [page, settings] = await Promise.all([
-    prisma.staticPage.findUnique({ where: { slug: "help" } }),
-    prisma.adminSettings.findUnique({ where: { id: "default" } }),
+    prisma.staticPage.findUnique({ where: { slug: "help" } }).catch(() => null),
+    prisma.adminSettings.findFirst().catch(() => null),
   ]);
 
-  const title = isHindi ? page?.titleHi || "सहायता एवं संपर्क केंद्र" : page?.titleEn || "Help Center & Support";
+  const title = isHindi ? page?.titleHi || "सहायता एवं संपर्क केंद्र" : page?.titleEn || "Help & Customer Support";
   const content = isHindi
     ? page?.contentHi ||
-      "यदि आपको परामर्श स्लॉट चयन, जन्म विवरण दर्ज करने अथवा भुगतान में कोई सहायता चाहिए, तो आप हमारे सहायता कक्ष से संपर्क कर सकते हैं।"
+      "अपनी बुकिंग, वॉल्ट डाउनलोड अथवा कुण्डली विश्लेषण से संबंधित किसी भी सहायता हेतु हमारी हेल्पलाइन सोमवार से शनिवार प्रातः १०:०० से सायं ०७:०० बजे तक उपलब्ध है। आप हमारे वैदिक सहायक बॉट अथवा पूछताछ फॉर्म के माध्यम से भी संपर्क कर सकते हैं।"
     : page?.contentEn ||
-      "If you need guidance with consultation booking, birth detail verification, or payment reconciliation, our helpline is available daily.";
+      "Need assistance with your booking, report download, or horoscope analysis? Our helpline team is available from 10:00 AM to 07:00 PM (IST) on Monday through Saturday. You can also chat with our Vedic Assistant bot or submit an enquiry.";
 
-  const phone1 = settings?.phone1 || "+91-9827991224";
-  const phone2 = settings?.phone2 || "+91-7509124672";
+  const phone1 = settings?.phone1;
+  const phone2 = settings?.phone2;
+  const email = settings?.email;
 
   return (
-    <div className="w-full min-h-[70vh] py-12 px-4 sm:px-8 lg:px-12 text-left space-y-8">
-      <div>
+    <div className="w-full max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8 text-left space-y-10">
+      {/* Header */}
+      <div className="border-b border-outline-variant/30 pb-6 space-y-2">
         <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
-          <HelpCircle className="w-4 h-4" />
-          <span>{isHindi ? "सहायता एवं मार्गदर्शन" : "Help & Guidance"}</span>
+          <HelpCircle className="w-4 h-4 text-primary" />
+          <span>{isHindi ? "सहायता एवं समर्थन" : "Help & Guidance Portal"}</span>
         </div>
-        <h1 className="font-serif text-3xl font-bold text-secondary mt-1">{title}</h1>
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary">
+          {title}
+        </h1>
+        <p className="text-xs sm:text-sm text-on-surface-variant">
+          {isHindi
+            ? "बुकिंग, रिपोर्ट डाउनलोड, दक्षिणा सत्यापन एवं परामर्श सहायता"
+            : "Assistance with consultations, PDF vault downloads, payments, and order tracking"}
+        </p>
       </div>
 
-      {/* Contact Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-4 rounded-lg bg-surface border border-outline-variant/40 space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
-            {isHindi ? "सीधी दूरभाष हेल्पलाइन" : "Direct Telephone Helpline"}
-          </span>
-          <div className="space-y-1">
-            <a
-              href={`tel:${phone1.replace(/[^0-9+]/g, "")}`}
-              className="flex items-center gap-2 text-sm font-bold text-secondary hover:underline"
-            >
-              <Phone className="w-4 h-4 text-primary" />
-              <span>{phone1}</span>
-            </a>
-            <a
-              href={`tel:${phone2.replace(/[^0-9+]/g, "")}`}
-              className="flex items-center gap-2 text-sm font-bold text-secondary hover:underline"
-            >
-              <Phone className="w-4 h-4 text-primary" />
-              <span>{phone2}</span>
-            </a>
-          </div>
-          <p className="text-[11px] text-on-surface-variant">
-            {isHindi ? "प्रातः ०९:०० से सायं ०७:०० बजे तक" : "Daily 09:00 AM – 07:00 PM IST"}
-          </p>
-        </div>
-
-        <div className="p-4 rounded-lg bg-surface border border-outline-variant/40 space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
-            {isHindi ? "आधिकारिक ईमेल" : "Official Inquiries Email"}
-          </span>
-          <a
-            href="mailto:contact@kanadastro.org"
-            className="flex items-center gap-2 text-sm font-bold text-secondary hover:underline"
-          >
-            <Mail className="w-4 h-4 text-primary" />
-            <span>contact@kanadastro.org</span>
-          </a>
-          <p className="text-[11px] text-on-surface-variant">
-            {isHindi ? "२४ घंटे के भीतर लिखित प्रत्युत्तर" : "Written response within 24 hours"}
-          </p>
-        </div>
-      </div>
-
-      <div className="p-6 sm:p-8 rounded-lg bg-surface border border-outline-variant/40 shadow-sm leading-relaxed whitespace-pre-line text-sm text-on-surface space-y-4">
+      {/* Intro Message */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-outline-variant/40 shadow-sm leading-relaxed text-sm sm:text-base text-on-surface whitespace-pre-line space-y-4">
         {content}
       </div>
+
+      {/* Quick Action Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <Link
+          href="/faq"
+          className="p-5 rounded-2xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 transition-all space-y-2 group"
+        >
+          <Search className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+          <div className="font-serif font-bold text-sm text-secondary">
+            {isHindi ? "प्रायः पूछे जाने वाले प्रश्न (FAQ)" : "Read FAQs"}
+          </div>
+          <p className="text-xs text-on-surface-variant leading-relaxed">
+            {isHindi
+              ? "कुण्डली, दक्षिणा, मुहूर्त एवं अनुष्ठान से जुड़े सामान्य प्रश्नों के उत्तर।"
+              : "Instant answers regarding horoscopes, Dakshina, muhurtas, and rituals."}
+          </p>
+        </Link>
+
+        <Link
+          href="/track"
+          className="p-5 rounded-2xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 transition-all space-y-2 group"
+        >
+          <FileText className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+          <div className="font-serif font-bold text-sm text-secondary">
+            {isHindi ? "बुकिंग स्थिति जांचें" : "Track Your Booking"}
+          </div>
+          <p className="text-xs text-on-surface-variant leading-relaxed">
+            {isHindi
+              ? "अपने 6-चरणीय कुण्डली निर्माण एवं प्रेषण की लाइव स्थिति देखें।"
+              : "Check the real-time 6-stage lifecycle of your Kundli preparation and dispatch."}
+          </p>
+        </Link>
+
+        <Link
+          href="/contact"
+          className="p-5 rounded-2xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 transition-all space-y-2 group"
+        >
+          <Mail className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+          <div className="font-serif font-bold text-sm text-secondary">
+            {isHindi ? "संदेश / पूछताछ भेजें" : "Submit Enquiry"}
+          </div>
+          <p className="text-xs text-on-surface-variant leading-relaxed">
+            {isHindi
+              ? "केंद्र दल को सीधे संदेश भेजें, २४ घंटे के भीतर संपर्क किया जाएगा।"
+              : "Send a direct query to our coordinators for priority response within 24 hours."}
+          </p>
+        </Link>
+      </div>
+
+      {/* Direct Contact Details from AdminSettings */}
+      {(phone1 || email) && (
+        <div className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-4">
+          <div className="font-serif font-bold text-sm text-secondary uppercase tracking-wider">
+            {isHindi ? "प्रत्यक्ष संपर्क सूत्र" : "Direct Helpline & Sanctum Coordinates"}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs text-on-surface">
+            {phone1 && (
+              <div className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-primary shrink-0" />
+                <div>
+                  <div className="text-[10px] uppercase text-outline">{isHindi ? "हेल्पलाइन १" : "Helpline 1"}</div>
+                  <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="font-semibold text-secondary hover:underline">
+                    {phone1}
+                  </a>
+                </div>
+              </div>
+            )}
+            {phone2 && (
+              <div className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-primary shrink-0" />
+                <div>
+                  <div className="text-[10px] uppercase text-outline">{isHindi ? "हेल्पलाइन २" : "Helpline 2"}</div>
+                  <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="font-semibold text-secondary hover:underline">
+                    {phone2}
+                  </a>
+                </div>
+              </div>
+            )}
+            {email && (
+              <div className="flex items-center gap-2.5">
+                <Mail className="w-4 h-4 text-primary shrink-0" />
+                <div>
+                  <div className="text-[10px] uppercase text-outline">{isHindi ? "ईमेल संपर्क" : "Email Support"}</div>
+                  <a href={`mailto:${email}`} className="font-semibold text-secondary hover:underline">
+                    {email}
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -35,9 +35,6 @@ interface ContactClientProps {
   locale: string;
 }
 
-const DEFAULT_MAP_EMBED =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3606.877840131435!2d83.00762957599026!3d25.30831627763878!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2e21759d57a9%3A0xea8f7c94fafe0e52!2sDashashwamedh%20Ghat!5e0!3m2!1sen!2sin!4v1729864000000!5m2!1sen!2sin";
-
 export function ContactClient({ settings, locale }: ContactClientProps) {
   const isHindi = locale === "hi";
   const [name, setName] = useState("");
@@ -48,13 +45,13 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const phone1 = settings.phone1 || "+91-9827991224";
-  const phone2 = settings.phone2 || "+91-7509124672";
-  const emailAddr = settings.email || "contact@kanadastro.org";
+  const phone1 = settings.phone1 || "";
+  const phone2 = settings.phone2 || "";
+  const emailAddr = settings.email || "";
   const address = isHindi
-    ? settings.addressHi || "दशाश्वमेध घाट, वाराणसी, उत्तर प्रदेश - २२१००१"
-    : settings.addressEn || "Dashashwamedh Ghat, Varanasi, Uttar Pradesh - 221001";
-  const mapUrl = settings.googleMapEmbedUrl || DEFAULT_MAP_EMBED;
+    ? settings.addressHi || settings.addressEn || ""
+    : settings.addressEn || settings.addressHi || "";
+  const mapUrl = settings.googleMapEmbedUrl || "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

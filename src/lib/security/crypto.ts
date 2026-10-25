@@ -5,13 +5,33 @@ const IV_LENGTH = 12; // Standard 96-bit IV for GCM
 const AUTH_TAG_LENGTH = 16;
 
 /**
+ * Checks whether the master credentials encryption key is configured.
+ */
+export function hasMasterEncryptionKey(): boolean {
+  return !!(process.env.CREDENTIALS_ENCRYPTION_KEY || process.env.ENCRYPTION_SECRET);
+}
+
+/**
  * Derives a 32-byte key deterministically from application secrets.
+ * In production, fails closed if CREDENTIALS_ENCRYPTION_KEY is not configured.
  */
 function getDerivedKey(): Buffer {
   const secret =
-    process.env.ENCRYPTION_SECRET ||
-    process.env.NEXTAUTH_SECRET ||
-    "kanad-jyotish-vedic-default-encryption-key-salt-32chars";
+    process.env.CREDENTIALS_ENCRYPTION_KEY ||
+    process.env.ENCRYPTION_SECRET;
+
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "CRITICAL SECURITY CONFIGURATION ERROR: CREDENTIALS_ENCRYPTION_KEY is not set in production. " +
+        "You must generate a 32-byte key (e.g. `openssl rand -base64 32`) and set CREDENTIALS_ENCRYPTION_KEY " +
+        "in your hosting environment (Vercel) to encrypt credentials at rest."
+      );
+    }
+    const devFallback = process.env.NEXTAUTH_SECRET || "kanad-dev-only-secret-key-32chars";
+    return crypto.createHash("sha256").update(devFallback).digest();
+  }
+
   return crypto.createHash("sha256").update(secret).digest();
 }
 

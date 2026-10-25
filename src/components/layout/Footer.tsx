@@ -15,10 +15,10 @@ export async function Footer() {
     })
     .catch(() => null);
 
-  const phone1 = settings?.phone1 || "+91-9827991224";
-  const phone2 = settings?.phone2 || "+91-7509124672";
-  const email = settings?.email || "contact@kanadastro.org";
-  const addressLine1 = settings?.addressEn || t("addressLine1");
+  const phone1 = settings?.phone1;
+  const phone2 = settings?.phone2;
+  const email = settings?.email;
+  const addressLine1 = settings?.addressEn || settings?.addressHi || t("addressLine1");
 
   return (
     <footer className="w-full bg-surface-container-low border-t border-secondary/20 pt-8 pb-6 text-left">
@@ -253,11 +253,13 @@ export async function Footer() {
               {t("contactTitle")}
             </div>
             <ul className="space-y-1.5 text-xs text-on-surface-variant">
-              <li>
-                <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="hover:text-primary font-semibold text-on-surface block">
-                  {phone1}
-                </a>
-              </li>
+              {phone1 && (
+                <li>
+                  <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="hover:text-primary font-semibold text-on-surface block">
+                    {phone1}
+                  </a>
+                </li>
+              )}
               {phone2 && (
                 <li>
                   <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="hover:text-primary text-on-surface-variant block">
@@ -265,11 +267,13 @@ export async function Footer() {
                   </a>
                 </li>
               )}
-              <li>
-                <a href={`mailto:${email}`} className="hover:text-primary block">
-                  {email}
-                </a>
-              </li>
+              {email && (
+                <li>
+                  <a href={`mailto:${email}`} className="hover:text-primary block">
+                    {email}
+                  </a>
+                </li>
+              )}
               <li className="pt-1 text-outline">
                 <span>{t("hours")}</span>
               </li>

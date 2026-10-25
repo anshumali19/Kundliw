@@ -89,7 +89,7 @@ test.describe("Phase 16 - Contact Page, Vedic Chatbot & Encrypted Keys Vault", (
     await page.fill('input[type="email"]', "admin@kanad-jyotish.in");
     await page.fill('input[type="password"]', "ChangeMeInAdminSettings@2026");
     await page.locator('button[type="submit"]').click();
-    await page.waitForURL(/\/admin/);
+    await page.waitForURL((url) => url.pathname.includes("/admin/settings/keys"), { timeout: 15000 });
 
     // 1. Verify Keys Vault is loaded
     await expect(

@@ -12,6 +12,9 @@ const galleryUpdateSchema = z.object({
   captionEn: z.string().optional().nullable(),
   captionHi: z.string().optional().nullable(),
   imageUrl: z.string().min(1).optional(),
+  videoUrl: z.string().optional().nullable(),
+  mediaType: z.enum(["IMAGE", "VIDEO", "YOUTUBE"]).optional(),
+  externalLink: z.string().optional().nullable(),
   orderIndex: z.number().int().optional(),
 });
 
@@ -62,7 +65,7 @@ export async function DELETE(
       where: { id: params.id },
     });
 
-    return NextResponse.json({ success: true, message: "Gallery item deleted" });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Failed to delete gallery item:", error);
     return NextResponse.json({ error: "Failed to delete gallery item" }, { status: 500 });

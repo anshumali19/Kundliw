@@ -30,9 +30,11 @@ interface FloatingActionBarProps {
   whatsappNumber?: string;
 }
 
+type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
+
 export function FloatingActionBar({
-  phone = "+919827991224",
-  whatsappNumber = "+919827991224",
+  phone,
+  whatsappNumber,
 }: FloatingActionBarProps) {
   const locale = useLocale();
   const isHindi = locale === "hi";
@@ -41,14 +43,19 @@ export function FloatingActionBar({
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [leadStep, setLeadStep] = useState<LeadStep>("COMPLETE");
+  const [leadName, setLeadName] = useState("");
+  const [leadPhone, setLeadPhone] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const cleanWhatsapp = whatsappNumber.replace(/[^\d]/g, "");
-  const defaultWhatsappUrl = `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
-    isHindi
-      ? "सादर प्रणाम, मुझे महर्षि कणाद ज्योतिष केंद्र की सेवाओं के बारे में जानकारी चाहिए।"
-      : "Namaste, I would like to inquire about Maharshi Kanad Jyotish Kendra services."
-  )}`;
+  const cleanWhatsapp = (whatsappNumber || "").replace(/[^\d]/g, "");
+  const defaultWhatsappUrl = cleanWhatsapp
+    ? `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
+        isHindi
+          ? "सादर प्रणाम, मुझे महर्षि कणाद ज्योतिष केंद्र की सेवाओं के बारे में जानकारी चाहिए।"
+          : "Namaste, I would like to inquire about Maharshi Kanad Jyotish Kendra services."
+      )}`
+    : "";
 
   // Scroll to bottom when messages update
   const scrollToBottom = () => {
@@ -61,8 +68,45 @@ export function FloatingActionBar({
     }
   }, [messages, isOpen]);
 
+  // Check whether visitor lead was already collected in this browser session
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = sessionStorage.getItem("kanad_chatbot_lead");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed?.name && parsed?.phone) {
+            setLeadStep("COMPLETE");
+            setLeadName(parsed.name);
+            setLeadPhone(parsed.phone);
+            return;
+          }
+        }
+      } catch {
+        // sessionStorage unavailable, default to ask name
+      }
+      setLeadStep("ASK_NAME");
+    }
+  }, []);
+
   const fetchWelcomeMessage = useCallback(async () => {
     setLoading(true);
+
+    // If visitor lead is not yet collected, start with polite name request
+    if (leadStep === "ASK_NAME") {
+      setMessages([
+        {
+          id: "welcome-lead-name",
+          sender: "bot",
+          text: isHindi
+            ? "सादर प्रणाम! महर्षि कणाद ज्योतिष केंद्र के वैदिक सहायक में आपका स्वागत है।\n\nउचित परामर्श एवं सेवा सहायता हेतु, कृपया पहले अपना **शुभ नाम** बताएं:"
+            : "Namaste! Welcome to the Vedic Assistant at Maharshi Kanad Jyotish Kendra.\n\nTo assist you accurately, please share your **full name**:",
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch(`/api/chatbot/ask?q=&locale=${locale}`);
       const data = await res.json();
@@ -91,7 +135,7 @@ export function FloatingActionBar({
     } finally {
       setLoading(false);
     }
-  }, [locale, isHindi]);
+  }, [locale, isHindi, leadStep]);
 
   // Load initial welcome message on first open
   useEffect(() => {
@@ -113,6 +157,104 @@ export function FloatingActionBar({
     setInput("");
     setLoading(true);
 
+    // Lead capture state machine
+    if (leadStep === "ASK_NAME") {
+      if (textToSend.length < 2) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `bot-val-${Date.now()}`,
+            sender: "bot",
+            text: isHindi
+              ? "कृपया अपना पूरा नाम लिखें (कम से कम 2 अक्षर):"
+              : "Please enter your full name (at least 2 characters):",
+          },
+        ]);
+        setLoading(false);
+        return;
+      }
+
+      setLeadName(textToSend);
+      setLeadStep("ASK_PHONE");
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-ask-phone-${Date.now()}`,
+          sender: "bot",
+          text: isHindi
+            ? `धन्यवाद ${textToSend} जी। कृपया अपना 10 अंकों का **मोबाइल नंबर** दर्ज करें ताकि केंद्र के ज्योतिषी अथवा सहायक आपसे संपर्क कर सकें:`
+            : `Thank you, ${textToSend}. Please enter your 10-digit **mobile phone number** so our astrologers or team can follow up:`,
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+
+    if (leadStep === "ASK_PHONE") {
+      const digitsOnly = textToSend.replace(/[^\d]/g, "");
+      if (digitsOnly.length < 10) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `bot-val-phone-${Date.now()}`,
+            sender: "bot",
+            text: isHindi
+              ? "कृपया एक मान्य 10 अंकों का मोबाइल नंबर दर्ज करें (उदा. 9876543210):"
+              : "Please enter a valid 10-digit mobile number (e.g. 9876543210):",
+          },
+        ]);
+        setLoading(false);
+        return;
+      }
+
+      setLeadPhone(textToSend);
+      setLeadStep("ASK_NEED");
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-ask-need-${Date.now()}`,
+          sender: "bot",
+          text: isHindi
+            ? "धन्यवाद! अब कृपया बताएं कि आपको किस विषय या सेवा में परामर्श चाहिए (उदा. जन्मपत्रिका, विवाह मिलान, पूजा दक्षिणा, मुहूर्त, रत्न, ग्रह शांति):"
+            : "Thank you! Please describe what service or question you would like guidance on (e.g. Kundli, marriage matching, puja rituals, muhurta, gemstones):",
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+
+    if (leadStep === "ASK_NEED") {
+      // Save visitor lead to backend as ContactEnquiry with source "CHATBOT_LEAD"
+      try {
+        await fetch("/api/contact/enquiry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: leadName || "Website Visitor",
+            phone: leadPhone || "0000000000",
+            message: textToSend,
+            source: "CHATBOT_LEAD",
+          }),
+        });
+
+        if (typeof window !== "undefined") {
+          try {
+            sessionStorage.setItem(
+              "kanad_chatbot_lead",
+              JSON.stringify({ name: leadName, phone: leadPhone })
+            );
+          } catch {
+            // ignore
+          }
+        }
+      } catch (err) {
+        console.error("Failed to save chatbot lead:", err);
+      }
+
+      setLeadStep("COMPLETE");
+    }
+
+    // Process astrological Q&A query
     try {
       const res = await fetch(
         `/api/chatbot/ask?q=${encodeURIComponent(textToSend)}&locale=${locale}`
@@ -168,24 +310,26 @@ export function FloatingActionBar({
         aria-label="Quick contact and assistance"
       >
         {/* WhatsApp Direct Button */}
-        <a
-          href={defaultWhatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-[#25D366] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all text-xs font-semibold"
-          aria-label="Chat with Astrologer on WhatsApp"
-        >
-          <svg
-            className="w-4 h-4 fill-current shrink-0"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
+        {defaultWhatsappUrl && (
+          <a
+            href={defaultWhatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-[#25D366] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all text-xs font-semibold"
+            aria-label="Chat with Astrologer on WhatsApp"
           >
-            <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.97.57 3.805 1.554 5.352L2.016 22l4.773-1.523c1.5 0.922 3.266 1.453 5.242 1.453 5.536 0 10.031-4.495 10.031-10.031S17.567 2 12.031 2zm0 18.234c-1.742 0-3.359-0.5-4.734-1.375l-0.344-0.219-3.328 1.062 1.094-3.234-0.234-0.375c-0.969-1.422-1.516-3.125-1.516-4.938 0-4.523 3.68-8.203 8.203-8.203 4.523 0 8.203 3.68 8.203 8.203 0 4.523-3.68 8.203-8.203 8.203zm4.531-6.141c-0.25-0.125-1.469-0.727-1.703-0.812-0.234-0.086-0.406-0.125-0.578 0.125s-0.664 0.812-0.812 0.984c-0.156 0.172-0.305 0.187-0.555 0.062s-1.055-0.391-2.016-1.242c-0.742-0.664-1.242-1.484-1.391-1.734s-0.016-0.383 0.109-0.508c0.109-0.109 0.25-0.281 0.375-0.422s0.172-0.234 0.25-0.391c0.078-0.156 0.039-0.297-0.02-0.422s-0.578-1.391-0.797-1.906c-0.211-0.5-0.43-0.43-0.594-0.438-0.156-0.008-0.336-0.008-0.516-0.008s-0.469 0.062-0.719 0.336c-0.25 0.266-0.953 0.93-0.953 2.273s0.977 2.641 1.109 2.82c0.141 0.18 1.922 2.938 4.656 4.117 0.656 0.281 1.164 0.453 1.562 0.578 0.656 0.211 1.258 0.18 1.734 0.109 0.531-0.078 1.469-0.602 1.68-1.188s0.211-1.086 0.148-1.188c-0.062-0.109-0.234-0.172-0.484-0.297z" />
-          </svg>
-          <span className="hidden sm:inline font-sans">
-            {isHindi ? "व्हाट्सएप परामर्श" : "WhatsApp"}
-          </span>
-        </a>
+            <svg
+              className="w-4 h-4 fill-current shrink-0"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.97.57 3.805 1.554 5.352L2.016 22l4.773-1.523c1.5 0.922 3.266 1.453 5.242 1.453 5.536 0 10.031-4.495 10.031-10.031S17.567 2 12.031 2zm0 18.234c-1.742 0-3.359-0.5-4.734-1.375l-0.344-0.219-3.328 1.062 1.094-3.234-0.234-0.375c-0.969-1.422-1.516-3.125-1.516-4.938 0-4.523 3.68-8.203 8.203-8.203 4.523 0 8.203 3.68 8.203 8.203 0 4.523-3.68 8.203-8.203 8.203zm4.531-6.141c-0.25-0.125-1.469-0.727-1.703-0.812-0.234-0.086-0.406-0.125-0.578 0.125s-0.664 0.812-0.812 0.984c-0.156 0.172-0.305 0.187-0.555 0.062s-1.055-0.391-2.016-1.242c-0.742-0.664-1.242-1.484-1.391-1.734s-0.016-0.383 0.109-0.508c0.109-0.109 0.25-0.281 0.375-0.422s0.172-0.234 0.25-0.391c0.078-0.156 0.039-0.297-0.02-0.422s-0.578-1.391-0.797-1.906c-0.211-0.5-0.43-0.43-0.594-0.438-0.156-0.008-0.336-0.008-0.516-0.008s-0.469 0.062-0.719 0.336c-0.25 0.266-0.953 0.93-0.953 2.273s0.977 2.641 1.109 2.82c0.141 0.18 1.922 2.938 4.656 4.117 0.656 0.281 1.164 0.453 1.562 0.578 0.656 0.211 1.258 0.18 1.734 0.109 0.531-0.078 1.469-0.602 1.68-1.188s0.211-1.086 0.148-1.188c-0.062-0.109-0.234-0.172-0.484-0.297z" />
+            </svg>
+            <span className="hidden sm:inline font-sans">
+              {isHindi ? "व्हाट्सएप परामर्श" : "WhatsApp"}
+            </span>
+          </a>
+        )}
 
         {/* Vedic Chatbot Toggle Button */}
         <button

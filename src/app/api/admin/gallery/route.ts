@@ -12,6 +12,9 @@ const gallerySchema = z.object({
   captionEn: z.string().optional().nullable(),
   captionHi: z.string().optional().nullable(),
   imageUrl: z.string().min(1),
+  videoUrl: z.string().optional().nullable(),
+  mediaType: z.enum(["IMAGE", "VIDEO", "YOUTUBE"]).default("IMAGE"),
+  externalLink: z.string().optional().nullable(),
   orderIndex: z.number().int().default(0),
 });
 

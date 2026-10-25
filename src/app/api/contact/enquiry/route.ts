@@ -4,12 +4,12 @@ import { getClientIp, checkDbRateLimit } from "@/lib/rateLimit";
 import { z } from "zod";
 
 const enquirySchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  phone: z.string().min(10, "Valid 10-digit phone number is required"),
-  email: z.string().email().optional().or(z.literal("")),
-  subject: z.string().optional(),
-  message: z.string().min(5, "Message must be at least 5 characters"),
-  source: z.enum(["CONTACT_PAGE", "CHATBOT_TICKET", "SERVICE_MODAL"]).default("CONTACT_PAGE"),
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must not exceed 100 characters"),
+  phone: z.string().trim().min(10, "Valid 10-digit phone number is required").max(20, "Phone number must not exceed 20 characters"),
+  email: z.string().trim().email("Invalid email address").max(120, "Email must not exceed 120 characters").optional().or(z.literal("")),
+  subject: z.string().trim().max(200, "Subject must not exceed 200 characters").optional(),
+  message: z.string().trim().min(5, "Message must be at least 5 characters").max(3000, "Message must not exceed 3000 characters"),
+  source: z.enum(["CONTACT_PAGE", "CHATBOT_TICKET", "CHATBOT_LEAD", "SERVICE_MODAL"]).default("CONTACT_PAGE"),
 });
 
 export async function POST(req: NextRequest) {
