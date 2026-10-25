@@ -92,8 +92,8 @@ export default async function LegalPage(props: LegalPageProps) {
           <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
           <span>
             {isHindi
-              ? "काशी दैवज्ञ परंपरा एवं भारतीय विधि अनुपालन"
-              : "In accordance with Kashi Vedanga Ethics & Applicable Laws"}
+              ? "लागू कानूनों के अनुसार"
+              : "In accordance with applicable laws"}
           </span>
         </div>
       </div>

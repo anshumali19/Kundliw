@@ -43,7 +43,7 @@ export function FaqClient({ initialItems, locale }: FaqClientProps) {
     { key: "KUNDLI", labelEn: "Kundli & Janampatri", labelHi: "कुण्डली एवं जन्मपत्रिका", icon: BookOpen },
     { key: "PUJA", labelEn: "Puja & Anushthan", labelHi: "पूजा एवं अनुष्ठान", icon: Flame },
     { key: "PAYMENT", labelEn: "Dakshina & Orders", labelHi: "दक्षिणा एवं बुकिंग", icon: DollarSign },
-    { key: "GENERAL", labelEn: "General & Sanctum", labelHi: "सामान्य एवं केंद्र", icon: HelpCircle },
+    { key: "GENERAL", labelEn: "General", labelHi: "सामान्य एवं केंद्र", icon: HelpCircle },
   ];
 
   const toggleAccordion = (id: string) => {
@@ -124,8 +124,8 @@ export function FaqClient({ initialItems, locale }: FaqClientProps) {
             </p>
             <p className="text-xs text-on-surface-variant">
               {isHindi
-                ? "कृपया अन्य श्रेणी चुनें अथवा हमारे वैदिक सहायक बॉट से पूछें।"
-                : "Try selecting another category or chat with our Vedic Assistant."}
+                ? "कृपया कोई अन्य श्रेणी चुनें या सहायता चैट का उपयोग करें।"
+                : "Try selecting another category or use Help Chat."}
             </p>
           </div>
         ) : (
@@ -175,8 +175,8 @@ export function FaqClient({ initialItems, locale }: FaqClientProps) {
           </div>
           <p className="text-xs text-on-surface-variant">
             {isHindi
-              ? "हमारे वैदिक सहायक से तुरंत पूछें अथवा संपर्क फॉर्म भरकर मार्गदर्शन प्राप्त करें।"
-              : "Ask our automated Vedic Assistant or submit an enquiry to the Kendra team."}
+              ? "सहायता चैट से पूछें या केंद्र को पूछताछ भेजें।"
+              : "Ask Help Chat or submit an enquiry to the Kendra team."}
           </p>
         </div>
 

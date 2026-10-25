@@ -168,7 +168,7 @@ export default function AdminGalleryPage() {
           Media Gallery Management (चित्र एवं वीडियो दीर्घा)
         </h1>
         <p className="text-xs text-on-surface-variant">
-          Upload sanctum photos, add YouTube discourse links, video URLs, and external links (#11).
+          Upload photos, add YouTube and video links, and external links.
         </p>
       </div>
 

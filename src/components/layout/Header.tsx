@@ -71,6 +71,8 @@ export function Header({ phone }: HeaderProps = {}) {
   const kendraLinks = [
     { href: "/about", label: tNav("about"), icon: Compass },
     { href: "/founder", label: tNav("founder"), icon: Sparkles },
+    { href: "/other-services", label: tNav("otherServices"), icon: Sparkles },
+    { href: "/kundli/astrosage", label: tNav("astrosageTool"), icon: BookOpen },
     { href: "/gallery", label: tNav("gallery"), icon: ImageIcon },
     { href: "/blogs", label: tNav("blogs"), icon: FileText },
     { href: "/testimonials", label: tNav("testimonials"), icon: MessageSquare },
@@ -114,6 +116,8 @@ export function Header({ phone }: HeaderProps = {}) {
     { href: "/kundli/prashna", label: tNav("prashna") },
     { href: "/about", label: tNav("about") },
     { href: "/founder", label: tNav("founder") },
+    { href: "/other-services", label: tNav("otherServices") },
+    { href: "/kundli/astrosage", label: tNav("astrosageTool") },
     { href: "/gallery", label: tNav("gallery") },
     { href: "/blogs", label: tNav("blogs") },
     { href: "/testimonials", label: tNav("testimonials") },
@@ -189,7 +193,7 @@ export function Header({ phone }: HeaderProps = {}) {
                 {tCommon("siteNameHi")}
               </span>
               <span className="text-[8px] sm:text-[9px] xl:text-[9.5px] 2xl:text-[10.5px] font-semibold text-primary tracking-normal sm:tracking-wider uppercase mt-0.5 whitespace-nowrap truncate">
-                {tCommon("siteName")}
+                MAHARSHI KANAD JYOTISH KENDRA
               </span>
             </div>
           </Link>
@@ -209,7 +213,7 @@ export function Header({ phone }: HeaderProps = {}) {
                       setCurrentHash("");
                     }
                   }}
-                  className={`h-full flex items-center px-1.5 xl:px-2 2xl:px-2.5 text-xs uppercase tracking-wide font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
+                  className={`h-full flex items-center px-1.5 xl:px-1.5 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
                     isActive
                       ? "text-secondary border-secondary font-bold"
                       : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
@@ -230,7 +234,7 @@ export function Header({ phone }: HeaderProps = {}) {
               <button
                 type="button"
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                className={`h-full flex items-center gap-1 px-1.5 xl:px-2 2xl:px-2.5 text-xs uppercase tracking-wide font-semibold transition-all duration-200 border-b-2 min-h-[44px] whitespace-nowrap ${
+                className={`h-full flex items-center gap-1 px-1.5 xl:px-1.5 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 min-h-[44px] whitespace-nowrap ${
                   isAnyKendraActive
                     ? "text-secondary border-secondary font-bold"
                     : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
@@ -274,10 +278,12 @@ export function Header({ phone }: HeaderProps = {}) {
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 ml-auto">
             <Link
               href="/services"
-              className="hidden sm:inline-flex items-center justify-center px-3 xl:px-3.5 py-2 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
+              aria-label={tCommon("bookConsultation")}
+              title={tCommon("bookConsultation")}
+              className="hidden sm:inline-flex items-center justify-center px-3 xl:px-3 py-2 bg-primary-container hover:bg-primary text-on-primary text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
             >
-              <Calendar className="w-4 h-4 mr-1.5 shrink-0" />
-              <span>{tCommon("bookConsultation")}</span>
+              <Calendar className="w-4 h-4 2xl:mr-1.5 shrink-0" />
+              <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
             </Link>
 
             <Link

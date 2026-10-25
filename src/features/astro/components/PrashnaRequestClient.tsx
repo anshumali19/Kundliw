@@ -53,7 +53,7 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
   const [questionText, setQuestionText] = useState("");
   const [dateOfQuery, setDateOfQuery] = useState(defaultDate);
   const [timeOfQuery, setTimeOfQuery] = useState(defaultTime);
-  const [placeOfQuery, setPlaceOfQuery] = useState("Varanasi, UP");
+  const [placeOfQuery, setPlaceOfQuery] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -99,8 +99,8 @@ export function FloatingActionBar({
           id: "welcome-lead-name",
           sender: "bot",
           text: isHindi
-            ? "सादर प्रणाम! महर्षि कणाद ज्योतिष केंद्र के वैदिक सहायक में आपका स्वागत है।\n\nउचित परामर्श एवं सेवा सहायता हेतु, कृपया पहले अपना **शुभ नाम** बताएं:"
-            : "Namaste! Welcome to the Vedic Assistant at Maharshi Kanad Jyotish Kendra.\n\nTo assist you accurately, please share your **full name**:",
+            ? "सादर प्रणाम! महर्षि कणाद ज्योतिष केंद्र के सहायता चैट में आपका स्वागत है।\n\nउचित परामर्श एवं सेवा सहायता हेतु, कृपया पहले अपना **शुभ नाम** बताएं:"
+            : "Namaste! Welcome to Help Chat at Maharshi Kanad Jyotish Kendra.\n\nTo assist you accurately, please share your **full name**:",
         },
       ]);
       setLoading(false);

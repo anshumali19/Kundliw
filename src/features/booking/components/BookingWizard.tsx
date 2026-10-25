@@ -133,7 +133,7 @@ export function BookingWizard({
     dob: initialJataka?.dob || "1995-01-01",
     tob: initialJataka?.tob || "10:30",
     isTimeUnknown: false,
-    pob: initialJataka?.pob || "Varanasi",
+    pob: initialJataka?.pob || "",
     phone: userPhone || "",
     email: userEmail || "",
     language: (locale === "en" ? "en" : "hi") as "hi" | "en",
@@ -569,7 +569,7 @@ export function BookingWizard({
                       required
                       value={formData.pob}
                       onChange={(e) => setFormData({ ...formData, pob: e.target.value })}
-                      placeholder="e.g. Varanasi, Uttar Pradesh"
+                      placeholder="City, State"
                       className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
                     />
                   </div>

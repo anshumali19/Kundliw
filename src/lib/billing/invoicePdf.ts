@@ -179,7 +179,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
         notesY + 30
       );
       doc.text(
-        "3. This is an electronically generated receipt verified by Maharshi Kanad Jyotish Kendra Peeth, Varanasi.",
+        "3. This is a computer-generated invoice issued by Maharshi Kanad Jyotish Kendra.",
         48,
         notesY + 40
       );

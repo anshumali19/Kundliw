@@ -37,6 +37,14 @@ export interface AdminPlanItem {
   isPopular: boolean;
   orderIndex: number;
   isActive: boolean;
+  programEn?: string | null;
+  programHi?: string | null;
+  preparationEn?: string | null;
+  preparationHi?: string | null;
+  samagriEn?: string | null;
+  samagriHi?: string | null;
+  itineraryEn?: string | null;
+  itineraryHi?: string | null;
 }
 
 export interface AdminServiceItem {
@@ -53,6 +61,13 @@ export interface AdminServiceItem {
   notesEn?: string | null;
   notesHi?: string | null;
   icon?: string | null;
+  imageUrl?: string | null;
+  itineraryEn?: string | null;
+  itineraryHi?: string | null;
+  samagriEn?: string | null;
+  samagriHi?: string | null;
+  youtubeUrl?: string | null;
+  additionalLinks?: Array<{ title: string; url: string; description?: string }> | null;
   orderIndex: number;
   isActive: boolean;
   plans: AdminPlanItem[];
@@ -92,6 +107,13 @@ export function AdminServicesManager({
     notesEn: "",
     notesHi: "",
     icon: "auto_stories",
+    imageUrl: "",
+    itineraryEn: "",
+    itineraryHi: "",
+    samagriEn: "",
+    samagriHi: "",
+    youtubeUrl: "",
+    additionalLinksText: "",
     orderIndex: 0,
     isActive: true,
   });
@@ -117,7 +139,35 @@ export function AdminServicesManager({
     isPopular: false,
     orderIndex: 0,
     isActive: true,
+    programEn: "",
+    programHi: "",
+    preparationEn: "",
+    preparationHi: "",
+    samagriEn: "",
+    samagriHi: "",
+    itineraryEn: "",
+    itineraryHi: "",
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (file: File) => {
+    setUploadingImage(true);
+    setErrorMsg(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("subfolder", "media");
+      const res = await fetch("/api/admin/media/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Image upload failed");
+      setServiceForm((prev) => ({ ...prev, imageUrl: data.url }));
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -142,6 +192,15 @@ export function AdminServicesManager({
         notesEn: service.notesEn || "",
         notesHi: service.notesHi || "",
         icon: service.icon || "auto_stories",
+        imageUrl: service.imageUrl || "",
+        itineraryEn: service.itineraryEn || "",
+        itineraryHi: service.itineraryHi || "",
+        samagriEn: service.samagriEn || "",
+        samagriHi: service.samagriHi || "",
+        youtubeUrl: service.youtubeUrl || "",
+        additionalLinksText: (service.additionalLinks || [])
+          .map((l) => [l.title, l.url, l.description].filter(Boolean).join(" | "))
+          .join("\n"),
         orderIndex: service.orderIndex,
         isActive: service.isActive,
       });
@@ -160,6 +219,13 @@ export function AdminServicesManager({
         notesEn: "",
         notesHi: "",
         icon: "auto_stories",
+        imageUrl: "",
+        itineraryEn: "",
+        itineraryHi: "",
+        samagriEn: "",
+        samagriHi: "",
+        youtubeUrl: "",
+        additionalLinksText: "",
         orderIndex: services.length + 1,
         isActive: true,
       });
@@ -175,6 +241,20 @@ export function AdminServicesManager({
     setSuccessMsg(null);
 
     try {
+      const parsedLinks = serviceForm.additionalLinksText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const parts = line.split("|").map((p) => p.trim());
+          return {
+            title: parts[0] || "",
+            url: parts[1] || "",
+            description: parts[2] || undefined,
+          };
+        })
+        .filter((l) => l.title && l.url);
+
       const payload = {
         slug: serviceForm.slug,
         titleEn: serviceForm.titleEn,
@@ -194,6 +274,13 @@ export function AdminServicesManager({
         notesEn: serviceForm.notesEn ? serviceForm.notesEn.trim() : null,
         notesHi: serviceForm.notesHi ? serviceForm.notesHi.trim() : null,
         icon: serviceForm.icon || "auto_stories",
+        imageUrl: serviceForm.imageUrl ? serviceForm.imageUrl.trim() : null,
+        itineraryEn: serviceForm.itineraryEn ? serviceForm.itineraryEn.trim() : null,
+        itineraryHi: serviceForm.itineraryHi ? serviceForm.itineraryHi.trim() : null,
+        samagriEn: serviceForm.samagriEn ? serviceForm.samagriEn.trim() : null,
+        samagriHi: serviceForm.samagriHi ? serviceForm.samagriHi.trim() : null,
+        youtubeUrl: serviceForm.youtubeUrl ? serviceForm.youtubeUrl.trim() : null,
+        additionalLinks: parsedLinks.length > 0 ? parsedLinks : null,
         orderIndex: Number(serviceForm.orderIndex),
         isActive: Boolean(serviceForm.isActive),
       };
@@ -275,6 +362,14 @@ export function AdminServicesManager({
         isPopular: plan.isPopular,
         orderIndex: plan.orderIndex,
         isActive: plan.isActive,
+        programEn: plan.programEn || "",
+        programHi: plan.programHi || "",
+        preparationEn: plan.preparationEn || "",
+        preparationHi: plan.preparationHi || "",
+        samagriEn: plan.samagriEn || "",
+        samagriHi: plan.samagriHi || "",
+        itineraryEn: plan.itineraryEn || "",
+        itineraryHi: plan.itineraryHi || "",
       });
     } else {
       setEditingPlan(null);
@@ -296,6 +391,14 @@ export function AdminServicesManager({
         isPopular: false,
         orderIndex: (parent?.plans.length || 0) + 1,
         isActive: true,
+        programEn: "",
+        programHi: "",
+        preparationEn: "",
+        preparationHi: "",
+        samagriEn: "",
+        samagriHi: "",
+        itineraryEn: "",
+        itineraryHi: "",
       });
     }
     setPlanModalOpen(true);
@@ -339,6 +442,14 @@ export function AdminServicesManager({
         isPopular: Boolean(planForm.isPopular),
         orderIndex: Number(planForm.orderIndex),
         isActive: Boolean(planForm.isActive),
+        programEn: planForm.programEn ? planForm.programEn.trim() : null,
+        programHi: planForm.programHi ? planForm.programHi.trim() : null,
+        preparationEn: planForm.preparationEn ? planForm.preparationEn.trim() : null,
+        preparationHi: planForm.preparationHi ? planForm.preparationHi.trim() : null,
+        samagriEn: planForm.samagriEn ? planForm.samagriEn.trim() : null,
+        samagriHi: planForm.samagriHi ? planForm.samagriHi.trim() : null,
+        itineraryEn: planForm.itineraryEn ? planForm.itineraryEn.trim() : null,
+        itineraryHi: planForm.itineraryHi ? planForm.itineraryHi.trim() : null,
       };
 
       const url = editingPlan
@@ -818,6 +929,129 @@ export function AdminServicesManager({
                 </div>
               </div>
 
+              {/* Media: Image & YouTube URL (#17, #47) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Featured Image
+                  </label>
+                  <input
+                    type="text"
+                    value={serviceForm.imageUrl}
+                    onChange={(e) => setServiceForm({ ...serviceForm, imageUrl: e.target.value })}
+                    placeholder="Paste an image link, or upload a file below"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                  <div className="mt-2 flex items-center gap-3">
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      disabled={uploadingImage}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(file);
+                        e.target.value = "";
+                      }}
+                      className="text-xs"
+                    />
+                    {uploadingImage && <span className="text-xs text-on-surface-variant">Uploading...</span>}
+                  </div>
+                  {serviceForm.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={serviceForm.imageUrl}
+                      alt="Service preview"
+                      className="mt-2 h-24 w-auto rounded border border-outline-variant/60 object-cover"
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    YouTube Video URL
+                  </label>
+                  <input
+                    type="url"
+                    value={serviceForm.youtubeUrl}
+                    onChange={(e) => setServiceForm({ ...serviceForm, youtubeUrl: e.target.value })}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                </div>
+              </div>
+
+              {/* Itinerary (#12) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Itinerary / Step-by-Step Schedule (English)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={serviceForm.itineraryEn}
+                    onChange={(e) => setServiceForm({ ...serviceForm, itineraryEn: e.target.value })}
+                    placeholder="Day 1: Sankalp & Pooja&#10;Day 2: Havan & Abhishek"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    यात्रा क्रम / दैनिक कार्ययोजना (हिन्दी)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={serviceForm.itineraryHi}
+                    onChange={(e) => setServiceForm({ ...serviceForm, itineraryHi: e.target.value })}
+                    placeholder="दिन १: संकल्प एवं गणेश पूजन&#10;दिन २: रुद्राभिषेक एवं हवन"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Samagri List (#12) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Puja Samagri / Required Materials (English)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={serviceForm.samagriEn}
+                    onChange={(e) => setServiceForm({ ...serviceForm, samagriEn: e.target.value })}
+                    placeholder="Gangajal, Roli, Akshat, Belpatra, Dhoop..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    पूजन सामग्री / आवश्यक द्रव्य (हिन्दी)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={serviceForm.samagriHi}
+                    onChange={(e) => setServiceForm({ ...serviceForm, samagriHi: e.target.value })}
+                    placeholder="गंगाजल, रोली, अक्षत, बिल्वपत्र, धूप, दीप..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Additional Links (#47) */}
+              <div>
+                <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                  Additional External Links (One per line: Title | URL | Description)
+                </label>
+                <textarea
+                  rows={2}
+                  value={serviceForm.additionalLinksText}
+                  onChange={(e) => setServiceForm({ ...serviceForm, additionalLinksText: e.target.value })}
+                  placeholder="Vedic Guidelines | https://example.com/guide | Important instructions"
+                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+                />
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -1032,6 +1266,122 @@ export function AdminServicesManager({
                     value={planForm.featuresHiText}
                     onChange={(e) => setPlanForm({ ...planForm, featuresHiText: e.target.value })}
                     placeholder="१८ पृष्ठ PDF&#10;D1 + D9 चक्र"
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Plan Program Details (#12) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Program / Ritual Details (English)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.programEn}
+                    onChange={(e) => setPlanForm({ ...planForm, programEn: e.target.value })}
+                    placeholder="Detailed order of rituals, mantra japa count..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    अनुष्ठान / कार्यक्रम विवरण (हिन्दी)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.programHi}
+                    onChange={(e) => setPlanForm({ ...planForm, programHi: e.target.value })}
+                    placeholder="अनुष्ठान प्रक्रिया, मंत्र जप संख्या, आहुति विधान..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Plan Preparation Instructions (#12) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Preparation Instructions for Devotee (English)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.preparationEn}
+                    onChange={(e) => setPlanForm({ ...planForm, preparationEn: e.target.value })}
+                    placeholder="Fasting guidelines, dress code, purity rules..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    यजमान हेतु पूर्व तैयारी निर्देश (हिन्दी)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.preparationHi}
+                    onChange={(e) => setPlanForm({ ...planForm, preparationHi: e.target.value })}
+                    placeholder="व्रत नियम, शुद्ध वस्त्र, शुचिता विधान..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Plan-specific Samagri (#12) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Tier Samagri (English)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.samagriEn}
+                    onChange={(e) => setPlanForm({ ...planForm, samagriEn: e.target.value })}
+                    placeholder="Tier-specific samagri kit included..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    संस्करण पूजन सामग्री (हिन्दी)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.samagriHi}
+                    onChange={(e) => setPlanForm({ ...planForm, samagriHi: e.target.value })}
+                    placeholder="इस संस्करण में सम्मिलित विशेष पूजन सामग्री..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Plan-specific Itinerary (#12) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    Tier Schedule / Timeline (English)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.itineraryEn}
+                    onChange={(e) => setPlanForm({ ...planForm, itineraryEn: e.target.value })}
+                    placeholder="Specific delivery timeline or ritual schedule..."
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    संस्करण समय-सारणी (हिन्दी)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={planForm.itineraryHi}
+                    onChange={(e) => setPlanForm({ ...planForm, itineraryHi: e.target.value })}
+                    placeholder="इस संस्करण की विशेष समय-सारणी..."
                     className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>

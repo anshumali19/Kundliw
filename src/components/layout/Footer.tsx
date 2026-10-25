@@ -1,9 +1,10 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
 import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
 
 export async function Footer() {
+  const locale = await getLocale();
   const t = await getTranslations("footer");
   const tCommon = await getTranslations("common");
   const tNav = await getTranslations("nav");
@@ -18,7 +19,10 @@ export async function Footer() {
   const phone1 = settings?.phone1;
   const phone2 = settings?.phone2;
   const email = settings?.email;
-  const addressLine1 = settings?.addressEn || settings?.addressHi || t("addressLine1");
+  const addressLine1 =
+    (locale === "hi"
+      ? settings?.addressHi || settings?.addressEn
+      : settings?.addressEn || settings?.addressHi) || "";
 
   return (
     <footer className="w-full bg-surface-container-low border-t border-secondary/20 pt-8 pb-6 text-left">
@@ -42,6 +46,7 @@ export async function Footer() {
             <p className="text-xs text-on-surface-variant leading-relaxed">
               {t("bio")}
             </p>
+            {addressLine1 && (
             <div className="text-xs text-on-surface-variant space-y-1 pt-1">
               <div className="font-semibold text-secondary uppercase tracking-wider text-[11px]">
                 {t("campusLabel")}
@@ -53,6 +58,7 @@ export async function Footer() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Social Media Links from AdminSettings */}
             <div className="flex items-center gap-3 pt-2">
@@ -137,6 +143,16 @@ export async function Footer() {
               <li>
                 <Link href="/panchang" className="hover:text-primary transition-colors block py-0.5">
                   {tNav("panchang")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/other-services" className="hover:text-primary transition-colors block py-0.5">
+                  {tNav("otherServices")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/kundli/astrosage" className="hover:text-primary transition-colors block py-0.5">
+                  {tNav("astrosageTool")}
                 </Link>
               </li>
               <li>
@@ -274,9 +290,6 @@ export async function Footer() {
                   </a>
                 </li>
               )}
-              <li className="pt-1 text-outline">
-                <span>{t("hours")}</span>
-              </li>
             </ul>
           </div>
         </div>

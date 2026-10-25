@@ -77,7 +77,7 @@ export default async function AstroSagePage(
         <div className="max-w-4xl space-y-3">
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-primary font-bold">
             <Compass className="w-4 h-4" />
-            <span>{isHindi ? "निःशुल्क वैदिक सॉफ्टवेयर एकीकरण (#28)" : "Free Vedic Software Integration (#28)"}</span>
+            <span>{isHindi ? "निःशुल्क वैदिक सॉफ्टवेयर एकीकरण" : "Free Vedic Software Integration"}</span>
           </div>
 
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary">

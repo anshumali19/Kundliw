@@ -210,7 +210,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
           <div className="flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-primary" />
             <h1 className="text-2xl font-serif font-bold text-on-surface">
-              {isHindi ? "अन्य सेवाएँ CMS (#13)" : "Other Services CMS (#13)"}
+              {isHindi ? "अन्य सेवाएँ CMS" : "Other Services CMS"}
             </h1>
           </div>
           <p className="text-sm text-on-surface-variant mt-1">
@@ -494,7 +494,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-semibold block mb-1">YouTube Video URL (#13, #47)</label>
+                  <label className="font-semibold block mb-1">YouTube Video URL</label>
                   <input
                     type="text"
                     value={youtubeUrl}

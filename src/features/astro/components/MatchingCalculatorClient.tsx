@@ -35,16 +35,16 @@ export function MatchingCalculatorClient({ locale }: MatchingCalculatorClientPro
   const isHindi = locale === "hi";
 
   // Boy details
-  const [boyName, setBoyName] = useState("Aarav Sharma");
-  const [boyDob, setBoyDob] = useState("1994-06-12");
-  const [boyTob, setBoyTob] = useState("07:15");
-  const [boyPob, setBoyPob] = useState("Varanasi, UP");
+  const [boyName, setBoyName] = useState("");
+  const [boyDob, setBoyDob] = useState("");
+  const [boyTob, setBoyTob] = useState("");
+  const [boyPob, setBoyPob] = useState("");
 
   // Girl details
-  const [girlName, setGirlName] = useState("Pooja Mishra");
-  const [girlDob, setGirlDob] = useState("1996-09-24");
-  const [girlTob, setGirlTob] = useState("14:40");
-  const [girlPob, setGirlPob] = useState("Patna, Bihar");
+  const [girlName, setGirlName] = useState("");
+  const [girlDob, setGirlDob] = useState("");
+  const [girlTob, setGirlTob] = useState("");
+  const [girlPob, setGirlPob] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

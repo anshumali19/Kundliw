@@ -59,62 +59,7 @@ export default async function OtherServicesPage(
     })
     .catch(() => []);
 
-  // Canonical baseline items if none seeded in DB yet (#13)
-  const defaultItems = [
-    {
-      id: "teerth-yatra",
-      slug: "bharat-darshan-teerth-yatra",
-      titleEn: "Bharat Darshan Teerth Yatra & Pilgrimage",
-      titleHi: "भारत दर्शन तीर्थ यात्रा एवं पावन धाम दर्शन",
-      taglineEn: "Sacred Pilgrimage Guided by Vedic Scholars",
-      taglineHi: "विद्वानों के सानिध्य में शास्त्रसम्मत तीर्थ यात्रा",
-      descriptionEn:
-        "Comprehensive sacred pilgrimage coordination covering Kashi Vishwanath, Prayagraj Triveni Sangam, Ayodhya Ram Mandir, Vindhyachal Dham, and Gaya Shraddha Tarpana. Daily Sankalpa, temple pujas, and comfortable lodging arranged with reverence.",
-      descriptionHi:
-        "काशी विश्वनाथ, प्रयागराज त्रिवेणी संगम, अयोध्या श्रीराम जन्मभूमि, विंध्याचल शक्तिपीठ एवं गया श्राद्ध तर्पण हेतु शास्त्रसम्मत तीर्थ यात्रा का आयोजन। विद्वान ब्राह्मणों द्वारा नित्य संकल्प, दर्शन एवं सुगम व्यवस्था।",
-      imageUrl: "/images/gallery-1.jpg",
-      actionUrl: "https://kanadjyotishkendra.vercel.app/contact",
-      actionTextEn: "Enquire About Yatra Schedule",
-      actionTextHi: "यात्रा विवरण एवं तिथियों की जानकारी लें",
-      youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    },
-    {
-      id: "matrimonial",
-      slug: "vindhya-vivah-sanskar",
-      titleEn: "Vedic Matrimonial Services (Vindhya Vivah Sanskar)",
-      titleHi: "वैदिक वैवाहिक संस्कार (विंध्य विवाह संस्कार)",
-      taglineEn: "Affiliated Matrimonial & Gotra Alliance Portal",
-      taglineHi: "संस्कारयुक्त परिवार एवं शुद्ध गोत्र मिलान",
-      descriptionEn:
-        "Authentic Vedic matrimonial matchmaking backed by 36-Guna Ashtakoot chart synchronization, Gotra verification, and spiritual family counseling through our sister portal Vindhya Vivah Sanskar.",
-      descriptionHi:
-        "शास्त्रसम्मत ३६ गुण मिलान, कुलीन गोत्र परीक्षा एवं पारिवारिक समन्वय पर आधारित विश्वसनीय वैवाहिक मंच। हमारे सहयोगी संस्थान विंध्य विवाह संस्कार के माध्यम से संस्कारी परिवारों का परस्पर मिलन।",
-      imageUrl: "/images/gallery-2.jpg",
-      actionUrl: "https://vindhyavivahsanskar.com",
-      actionTextEn: "Visit Vindhya Vivah Sanskar Portal",
-      actionTextHi: "विंध्य विवाह संस्कार पोर्टल पर जाएं",
-      youtubeUrl: null,
-    },
-    {
-      id: "youtube-discourses",
-      slug: "vedic-astrology-discourses",
-      titleEn: "Vedic Astrology Discourses & Video Lectures",
-      titleHi: "धार्मिक व्याख्यान एवं ज्योतिष वीडियो प्रवचन",
-      taglineEn: "Classical Wisdom from Dashashwamedh Sanctum",
-      taglineHi: "काशी दशाश्वमेध घाट से शास्त्रीय ज्ञान",
-      descriptionEn:
-        "Watch authenticated lectures on planetary transits (Gochar), Sade Sati remedies, solar and lunar eclipse muhurtas, and ephemeris calculation methodology on our dedicated spiritual channels.",
-      descriptionHi:
-        "ग्रह गोचर प्रभाव, साढ़ेसाती शांति उपाय, सूर्य-चन्द्र ग्रहण काल एवं पंचांग गणित की सूक्ष्म गणनाओं पर दैवज्ञों के प्रामाणिक वीडियो व्याख्यान देखें।",
-      imageUrl: "/images/gallery-3.jpg",
-      actionUrl: "https://www.youtube.com",
-      actionTextEn: "Explore YouTube Video Channel",
-      actionTextHi: "यूट्यूब चैनल पर व्याख्यान देखें",
-      youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    },
-  ];
-
-  const items = dbItems.length > 0 ? dbItems : defaultItems;
+  const items = dbItems;
 
   return (
     <div className="w-full flex flex-col text-on-surface text-left">
@@ -133,7 +78,7 @@ export default async function OtherServicesPage(
         <div className="max-w-3xl space-y-2">
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-primary font-bold">
             <Sparkles className="w-4 h-4" />
-            <span>{isHindi ? "संबद्ध आध्यात्मिक प्रकल्प (#13)" : "Allied Spiritual Initiatives (#13)"}</span>
+            <span>{isHindi ? "संबद्ध आध्यात्मिक प्रकल्प" : "Allied Spiritual Initiatives"}</span>
           </div>
 
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary">

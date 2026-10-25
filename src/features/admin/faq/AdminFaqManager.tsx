@@ -182,7 +182,7 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
         <div>
           <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
             <HelpCircle className="w-4 h-4" />
-            <span>FAQ System CMS (#25)</span>
+            <span>FAQ System CMS</span>
           </div>
           <h1 className="font-serif text-2xl font-bold text-secondary">
             Frequently Asked Questions (प्रश्नोत्तरी प्रबंधन)

@@ -69,11 +69,12 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
   if (!csrf.isValid) return csrf.errorResponse;
 
   try {
-    await prisma.otherService.delete({
+    await prisma.otherService.update({
       where: { id: params.id },
+      data: { isActive: false },
     });
 
-    return NextResponse.json({ success: true, message: "Other service deleted." });
+    return NextResponse.json({ success: true, message: "Other service deactivated." });
   } catch (error) {
     console.error("[API Admin OtherServices DELETE] Error:", error);
     return NextResponse.json(

@@ -2,9 +2,9 @@ import { z } from "zod";
 import { DiscountType } from "@prisma/client";
 
 export const linkSchema = z.object({
-  labelEn: z.string().trim().min(1),
-  labelHi: z.string().trim().min(1),
+  title: z.string().trim().min(1),
   url: z.string().trim().url(),
+  description: z.string().trim().optional(),
 });
 
 export const serviceInputSchema = z.object({

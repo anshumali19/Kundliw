@@ -33,11 +33,11 @@ interface KundliCalculatorClientProps {
 export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) {
   const isHindi = locale === "hi";
 
-  const [name, setName] = useState("Aditya Sharma");
+  const [name, setName] = useState("");
   const [gender, setGender] = useState("MALE");
-  const [dob, setDob] = useState("1995-05-14");
-  const [tob, setTob] = useState("08:30");
-  const [pob, setPob] = useState("Varanasi, UP");
+  const [dob, setDob] = useState("");
+  const [tob, setTob] = useState("");
+  const [pob, setPob] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

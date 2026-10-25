@@ -16,8 +16,8 @@ export async function generateMetadata(
       ? "संपर्क करें एवं स्थान | महर्षि कणाद ज्योतिष केंद्र"
       : "Contact Us & Location | Maharshi Kanad Jyotish Kendra",
     description: isHi
-      ? "महर्षि कणाद ज्योतिष केंद्र से संपर्क करें, वाराणसी केंद्र का गूगल मैप देखें और अपनी जन्मकुंडली या परामर्श संबंधित पूछताछ भेजें।"
-      : "Contact Maharshi Kanad Jyotish Kendra, view Google Map location in Varanasi, and submit your astrology enquiries.",
+      ? "महर्षि कणाद ज्योतिष केंद्र से संपर्क करें और अपनी पूछताछ भेजें।"
+      : "Contact Maharshi Kanad Jyotish Kendra and send your astrology enquiry.",
   };
 }
 

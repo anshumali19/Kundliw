@@ -6,7 +6,6 @@ import {
   MapPin,
   Phone,
   Mail,
-  Clock,
   Navigation,
   Send,
   CheckCircle2,
@@ -95,9 +94,9 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
     }
   };
 
-  const googleMapsDirectionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    "Dashashwamedh Ghat, Varanasi, Uttar Pradesh, India"
-  )}`;
+  const googleMapsDirectionsUrl = address
+    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`
+    : "";
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left space-y-10">
@@ -105,27 +104,29 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
       <div className="border-b border-outline-variant/40 pb-6">
         <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest mb-2">
           <MapPin className="w-4 h-4" />
-          <span>{isHindi ? "केंद्र संपर्क एवं स्थान" : "Sanctum Location & Direct Contact"}</span>
+          <span>{isHindi ? "संपर्क" : "Contact"}</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-on-surface">
-          {isHindi ? "महर्षि कणाद ज्योतिष केंद्र • वाराणसी" : "Maharshi Kanad Jyotish Kendra • Varanasi"}
+          {isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "Maharshi Kanad Jyotish Kendra"}
         </h1>
         <p className="text-sm text-on-surface-variant mt-2 max-w-3xl leading-relaxed">
           {isHindi
-            ? "पवित्र गंगा तट, दशाश्वमेध घाट, वाराणसी पर स्थित हमारा केंद्र वैदिक ज्योतिष, जन्मपत्री निर्माण एवं व्यक्तिगत परामर्श हेतु उपस्थित है।"
-            : "Situated at the sacred banks of Ganga at Dashashwamedh Ghat, Varanasi. We welcome consultation inquiries, personal visits, and remote astrological requests."}
+            ? "परामर्श, बुकिंग या किसी भी जानकारी के लिए हमसे संपर्क करें।"
+            : "Reach us for consultations, bookings or any question."}
         </p>
       </div>
 
       {/* Embedded Google Map Section */}
+      {mapUrl && (
       <div className="bg-surface-container-low border border-outline-variant/60 rounded-xl overflow-hidden shadow-sm">
         <div className="p-4 bg-surface border-b border-outline-variant/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Navigation className="w-4 h-4 text-primary" />
             <span className="font-serif font-bold text-sm text-on-surface">
-              {isHindi ? "गूगल मानचित्र अवस्थिति" : "Live Google Map Navigation"}
+              {isHindi ? "मानचित्र एवं दिशा-निर्देश" : "Map and directions"}
             </span>
           </div>
+          {googleMapsDirectionsUrl && (
           <a
             href={googleMapsDirectionsUrl}
             target="_blank"
@@ -135,6 +136,7 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
             <span>{isHindi ? "दिशा-निर्देश प्राप्त करें (Google Maps)" : "Get Directions on Google Maps"}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
+          )}
         </div>
 
         {/* Responsive Map Embed Container */}
@@ -151,6 +153,7 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
           />
         </div>
       </div>
+      )}
 
       {/* Asymmetric Two-Column Split: Contact Details vs Quick Enquiry Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -158,25 +161,27 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-surface border border-outline-variant/60 rounded-xl p-6 space-y-5">
             <h2 className="font-serif font-bold text-lg text-secondary border-b border-outline-variant/30 pb-3">
-              {isHindi ? "सीधा संपर्क विवरण" : "Direct Contact Coordinates"}
+              {isHindi ? "संपर्क विवरण" : "Contact details"}
             </h2>
 
             <div className="space-y-4 text-xs">
+              {address && (
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
                   <div className="font-bold text-on-surface mb-0.5">
-                    {isHindi ? "पवित्र धाम का पता" : "Sacred Address"}
+                    {isHindi ? "पता" : "Address"}
                   </div>
                   <p className="text-on-surface-variant leading-relaxed">{address}</p>
                 </div>
               </div>
+              )}
 
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
                   <div className="font-bold text-on-surface mb-0.5">
-                    {isHindi ? "आधिकारिक हेल्पलाइन नंबर" : "Helpline & Appointment Inquiries"}
+                    {isHindi ? "फ़ोन" : "Phone"}
                   </div>
                   <div className="space-y-1 font-mono text-secondary font-semibold">
                     <div>
@@ -197,25 +202,11 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
                 <Mail className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
                   <div className="font-bold text-on-surface mb-0.5">
-                    {isHindi ? "ईमेल पत्राचार" : "Electronic Mail"}
+                    {isHindi ? "ईमेल" : "Email"}
                   </div>
                   <a href={`mailto:${emailAddr}`} className="text-secondary font-mono hover:underline">
                     {emailAddr}
                   </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-bold text-on-surface mb-0.5">
-                    {isHindi ? "परामर्श समय (भारतीय मानक समय)" : "Consultation Hours (IST)"}
-                  </div>
-                  <p className="text-on-surface-variant">
-                    {isHindi
-                      ? "सोमवार से रविवार: प्रातः ०७:०० से सायं ०९:०० बजे तक"
-                      : "Monday through Sunday: 07:00 AM – 09:00 PM IST"}
-                  </p>
                 </div>
               </div>
             </div>

@@ -23,18 +23,8 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
   const defaultItems = [
     {
       id: "1",
-      textEn: "Special Notice: Registration open for Guru-Shani transit Maha-Yajna at Dashashwamedh Ghat",
-      textHi: "विशेष सूचना: गुरु-शनि राशि परिवर्तन पर विशेष महायज्ञ पंजीकरण प्रारंभ, दशाश्वमेध घाट काशी",
-    },
-    {
-      id: "2",
-      textEn: "Surya Siddhanta Vivah & Griha Pravesh Muhurat Tables published for Samvat 2081",
-      textHi: "शुद्ध सूर्य सिद्धान्त सम्मत ज्येष्ठ मास विवाह एवं गृह प्रवेश शुभ मुहूर्त तालिका प्रकाशित",
-    },
-    {
-      id: "3",
-      textEn: "Authentic Kashi Vishwanath Ephemeris daily ephemeris bulletin available",
-      textHi: "दृग्गणित पंचांग आधारित दैनिक कालनिर्णय बुलेटिन उपलब्ध",
+      textEn: "Welcome to Maharshi Kanad Jyotish Kendra. Book Kundli, matching and consultations online.",
+      textHi: "महर्षि कणाद ज्योतिष केंद्र में आपका स्वागत है। कुंडली, मिलान और परामर्श ऑनलाइन बुक करें।",
     },
   ];
 

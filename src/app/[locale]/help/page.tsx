@@ -48,9 +48,9 @@ export default async function HelpPage(props: HelpPageProps) {
   const title = isHindi ? page?.titleHi || "सहायता एवं संपर्क केंद्र" : page?.titleEn || "Help & Customer Support";
   const content = isHindi
     ? page?.contentHi ||
-      "अपनी बुकिंग, वॉल्ट डाउनलोड अथवा कुण्डली विश्लेषण से संबंधित किसी भी सहायता हेतु हमारी हेल्पलाइन सोमवार से शनिवार प्रातः १०:०० से सायं ०७:०० बजे तक उपलब्ध है। आप हमारे वैदिक सहायक बॉट अथवा पूछताछ फॉर्म के माध्यम से भी संपर्क कर सकते हैं।"
+      "बुकिंग, रिपोर्ट डाउनलोड या ऑर्डर की स्थिति में सहायता के लिए हमें कॉल करें, सहायता चैट का उपयोग करें या पूछताछ भेजें।"
     : page?.contentEn ||
-      "Need assistance with your booking, report download, or horoscope analysis? Our helpline team is available from 10:00 AM to 07:00 PM (IST) on Monday through Saturday. You can also chat with our Vedic Assistant bot or submit an enquiry.";
+      "Need help with your booking, report download or order status? Call us, use Help Chat, or send an enquiry.";
 
   const phone1 = settings?.phone1;
   const phone2 = settings?.phone2;
@@ -122,7 +122,7 @@ export default async function HelpPage(props: HelpPageProps) {
           <p className="text-xs text-on-surface-variant leading-relaxed">
             {isHindi
               ? "केंद्र दल को सीधे संदेश भेजें, २४ घंटे के भीतर संपर्क किया जाएगा।"
-              : "Send a direct query to our coordinators for priority response within 24 hours."}
+              : "Send a direct query to our team."}
           </p>
         </Link>
       </div>
@@ -131,7 +131,7 @@ export default async function HelpPage(props: HelpPageProps) {
       {(phone1 || email) && (
         <div className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-4">
           <div className="font-serif font-bold text-sm text-secondary uppercase tracking-wider">
-            {isHindi ? "प्रत्यक्ष संपर्क सूत्र" : "Direct Helpline & Sanctum Coordinates"}
+            {isHindi ? "प्रत्यक्ष संपर्क सूत्र" : "Contact details"}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs text-on-surface">
             {phone1 && (

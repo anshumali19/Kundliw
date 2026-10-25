@@ -185,7 +185,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
       <div className="border-b border-outline-variant/30 pb-4">
         <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
           <Award className="w-4 h-4" />
-          <span>Founder Page CMS Control (#8)</span>
+          <span>Founder Page CMS Control</span>
         </div>
         <h1 className="font-serif text-2xl font-bold text-secondary">
           Founder Profile & Lineage (संस्थापक परिचय प्रबंधन)
@@ -274,7 +274,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
                 type="text"
                 value={roleEn}
                 onChange={(e) => setRoleEn(e.target.value)}
-                placeholder="e.g. Vedanga Jyotish Lineage of Varanasi • 40+ Years"
+                placeholder="e.g. Astrologer and founder"
                 className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
               />
             </div>

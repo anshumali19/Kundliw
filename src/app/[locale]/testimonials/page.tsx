@@ -25,8 +25,8 @@ export async function generateMetadata(props: TestimonialsPageProps): Promise<Me
       ? "ग्राहक अनुभव एवं संस्तुतियाँ • महर्षि कणाद ज्योतिष केंद्र"
       : "Client Experiences & Testimonials • Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "वाराणसी दशाश्वमेध पीठ से लाभान्वित परामर्शार्थियों के प्रामाणिक अनुभव।"
-      : "Authentic consultations and client testimonials from Maharshi Kanad Jyotish Kendra.",
+      ? "महर्षि कणाद ज्योतिष केंद्र के ग्राहकों के अनुभव।"
+      : "Client feedback for Maharshi Kanad Jyotish Kendra.",
   };
 }
 
@@ -39,7 +39,7 @@ export default async function TestimonialsPage(props: TestimonialsPageProps) {
 
   const isHindi = locale === "hi";
   const testimonials = await prisma.testimonial.findMany({
-    where: { isActive: true },
+    where: { isActive: true, isVerified: true },
     orderBy: { orderIndex: "asc" },
   });
 
@@ -55,14 +55,14 @@ export default async function TestimonialsPage(props: TestimonialsPageProps) {
         </h1>
         <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
           {isHindi
-            ? "चार दशकों में देश-विदेश के जिज्ञासुओं और परिवारों द्वारा व्यक्त प्रामाणिक संस्मरण।"
-            : "Authentic feedback from individuals and families guided through rigorous Siddhanta analysis."}
+            ? "हमारी सेवाएँ लेने वाले ग्राहकों के अनुभव।"
+            : "Feedback from clients who have used our services."}
         </p>
       </div>
 
       {testimonials.length === 0 ? (
         <div className="p-8 rounded-lg bg-surface border border-dashed border-outline-variant text-center text-xs text-outline">
-          {isHindi ? "वर्तमान में कोई संस्तुति उपलब्ध नहीं है।" : "No testimonials available yet."}
+          {isHindi ? "वर्तमान में कोई संस्तुति उपलब्ध नहीं है।" : "Client feedback will be shown here soon."}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

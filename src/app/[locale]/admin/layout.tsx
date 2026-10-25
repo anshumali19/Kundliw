@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link } from "@/i18n/routing";
 import { requireAdmin } from "@/lib/auth/guards";
 import {
+  LayoutDashboard,
   ShieldAlert,
   Layers,
   Tag,
@@ -16,6 +17,7 @@ import {
   KeyRound,
   Award,
   HelpCircle,
+  Sparkles,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -76,6 +78,14 @@ export default async function AdminLayout(props: AdminLayoutProps) {
       <div className="w-full bg-surface-container-low border-b border-outline-variant/40 py-2 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto">
           <Link
+            href="/admin"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-secondary hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <LayoutDashboard className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "डैशबोर्ड (Dashboard)" : "Dashboard"}</span>
+          </Link>
+
+          <Link
             href="/admin/services"
             className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-secondary hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
@@ -84,11 +94,27 @@ export default async function AdminLayout(props: AdminLayoutProps) {
           </Link>
 
           <Link
+            href="/admin/other-services"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-tertiary" />
+            <span>{isHindi ? "अन्य सेवाएँ (Other Services)" : "Other Services"}</span>
+          </Link>
+
+          <Link
             href="/admin/offers"
             className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
             <Tag className="w-3.5 h-3.5 text-tertiary" />
             <span>{isHindi ? "कूपन (Offers)" : "Offers"}</span>
+          </Link>
+
+          <Link
+            href="/admin/users"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <Users className="w-3.5 h-3.5 text-secondary" />
+            <span>{isHindi ? "उपयोगकर्ता (Users)" : "Users"}</span>
           </Link>
 
           <Link

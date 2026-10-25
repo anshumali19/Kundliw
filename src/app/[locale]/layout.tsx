@@ -45,7 +45,6 @@ export const metadata: Metadata = {
     "Prashna Kundli",
     "Jyotish consultation",
     "Panchang",
-    "Varanasi astrologer",
     "कुंडली",
     "ज्योतिष परामर्श",
   ],

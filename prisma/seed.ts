@@ -777,17 +777,6 @@ startxref
         mediaType: "IMAGE",
         orderIndex: 3,
       },
-      {
-        titleEn: "Kashi Ganga Aarti & Jyotish Discourse",
-        titleHi: "काशी गंगा आरती एवं ज्योतिष विमर्श",
-        captionEn: "Live documentary on ephemeris calculation and planetary worship.",
-        captionHi: "पंचांग गणना एवं ग्रह शांति पर विशेष व्याख्यान वीडियो।",
-        imageUrl: "/images/gallery-1.jpg",
-        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        mediaType: "YOUTUBE",
-        externalLink: "https://kanadjyotishkendra.vercel.app/services",
-        orderIndex: 4,
-      },
     ],
   });
 

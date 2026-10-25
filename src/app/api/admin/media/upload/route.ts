@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
-import { getStorageProvider, validateFileMagicBytes, MAX_FILE_SIZE_BYTES } from "@/lib/storage";
+import {
+  getStorageProvider,
+  validateFileMagicBytes,
+  MAX_FILE_SIZE_BYTES,
+  ALLOWED_STORAGE_SUBFOLDERS,
+} from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +20,14 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
-    const subfolder = (formData.get("subfolder") as string) || "media";
+    // Admin screens label uploads by feature (banners, gallery, ...). Storage only allows a fixed
+    // set of folders, so anything else is stored under "media" rather than failing the upload.
+    const requestedFolder = (formData.get("subfolder") as string) || "media";
+    const subfolder = (ALLOWED_STORAGE_SUBFOLDERS as readonly string[]).includes(requestedFolder) &&
+      requestedFolder !== "vault" &&
+      requestedFolder !== "payment-proofs"
+      ? requestedFolder
+      : "media";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });

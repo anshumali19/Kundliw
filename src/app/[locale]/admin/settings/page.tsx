@@ -199,7 +199,7 @@ export default function AdminSettingsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                Primary Phone * (SRS: +91-9827991224)
+                Primary Phone *
               </label>
               <input
                 type="text"
@@ -212,7 +212,7 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                Secondary Phone * (SRS: +91-7509124672)
+                Secondary Phone *
               </label>
               <input
                 type="text"

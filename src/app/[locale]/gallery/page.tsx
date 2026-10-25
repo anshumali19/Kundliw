@@ -48,15 +48,15 @@ export default async function GalleryPage(props: GalleryPageProps) {
       <div className="border-b border-outline-variant/30 pb-6 space-y-2">
         <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
           <ImageIcon className="w-4 h-4 text-primary" />
-          <span>{isHindi ? "चित्र एवं वीडियो दीर्घा" : "Visual Archive & Video Discourses"}</span>
+          <span>{isHindi ? "चित्र एवं वीडियो दीर्घा" : "Photos and videos"}</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary">
-          {isHindi ? "पीठ, पांडुलिपि एवं व्याख्यान दीर्घा" : "Sanctum, Manuscripts & Discourse Gallery"}
+          {isHindi ? "गैलरी" : "Gallery"}
         </h1>
         <p className="text-xs sm:text-sm text-on-surface-variant max-w-3xl">
           {isHindi
-            ? "दशाश्वमेध घाट, वाराणसी स्थित केंद्र की वेदी, चार दशकों से सुरक्षित हस्तलिखित पोथियां एवं पंचांग व्याख्यान।"
-            : "Photographs of our Dashashwamedh Ghat center, handwritten astrological charts, and recorded video lectures."}
+            ? "केंद्र से जुड़ी तस्वीरें और वीडियो।"
+            : "Photos and videos from the Kendra."}
         </p>
       </div>
 
