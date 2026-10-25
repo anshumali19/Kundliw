@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CreateBookingOrderInput } from "@/features/booking/validation";
 import { calculateGst } from "@/lib/billing/gst";
+import { getGstSettings } from "@/lib/billing/gstSettings";
 import { claimOfferInTransaction } from "@/lib/offers/apply";
 import { OrderStatus, PaymentStatus, PaymentMode, RequestType, Prisma } from "@prisma/client";
 
@@ -137,19 +138,15 @@ export async function createBookingOrder(
       }
     }
 
-    // 5. Fetch Kendra GSTIN and default tax rate from AdminSettings (0 if GSTIN unset)
-    const adminSettings = await tx.adminSettings.findUnique({
-      where: { id: "default" },
-    });
-    const hasGstin = Boolean(adminSettings?.gstin && adminSettings.gstin.trim());
-    const gstRateBps = hasGstin ? (adminSettings?.defaultGstRateBps ?? 1800) : 0;
-    const gstinSnapshot = hasGstin ? adminSettings?.gstin : null;
+    // 5. Fetch Kendra GSTIN and default tax rate from the shared settings helper
+    const gst = await getGstSettings(tx);
+    const gstinSnapshot = gst.gstin;
 
     // 6. Compute GST calculation strictly from database prices
     const billing = calculateGst({
       baseAmountPaise: plan.pricePaise,
       discountAmountPaise: discountPaise,
-      gstRateBasisPoints: gstRateBps,
+      gstRateBasisPoints: gst.rateBasisPoints,
     });
 
     // 7. Generate sequential order number

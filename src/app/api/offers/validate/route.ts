@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { validateOfferQuerySchema } from "@/features/services/validation";
 import { applyOffer } from "@/lib/offers/apply";
 import { calculateGst, formatPaiseToInr } from "@/lib/billing/gst";
+import { getGstSettings } from "@/lib/billing/gstSettings";
 import { getClientIp, checkDbRateLimit } from "@/lib/rateLimit";
 
 const GENERIC_UNAVAILABLE_MESSAGE = "Invalid or unavailable coupon code.";
@@ -77,11 +78,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Compute verified billing math
+    // Compute verified billing math using the same AdminSettings source as
+    // order creation, so preview and checkout totals always match.
+    const gst = await getGstSettings();
     const billing = calculateGst({
       baseAmountPaise: plan.pricePaise,
       discountAmountPaise: evalResult.discountPaise,
-      gstRateBasisPoints: 1800,
+      gstRateBasisPoints: gst.rateBasisPoints,
     });
 
     return NextResponse.json({
@@ -95,6 +98,8 @@ export async function POST(request: NextRequest) {
       netAmountFormatted: formatPaiseToInr(billing.netAmountPaise),
       gstAmountPaise: billing.gstAmountPaise,
       taxableAmountPaise: billing.taxableAmountPaise,
+      gstRateBasisPoints: gst.rateBasisPoints,
+      gstRateLabel: gst.label,
     });
   } catch (error) {
     console.error("Coupon validation error:", error);
