@@ -49,7 +49,7 @@ export async function askLlm(query: string, locale: "hi" | "en"): Promise<string
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
           contents: [{ role: "user", parts: [{ text: query }] }],
-          generationConfig: { temperature: 0.3, maxOutputTokens: 400 },
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1500 },
         }),
         signal: AbortSignal.timeout(TIMEOUT_MS),
       }
