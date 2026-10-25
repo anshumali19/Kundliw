@@ -1,5 +1,5 @@
 # Maharshi Kanad Jyotish Kendra (महर्षि कणाद ज्योतिष केंद्र)
-# Comprehensive Gap Matrix: 49 Requirements & SRS Audit
+# Comprehensive Gap Matrix: 49 Requirements & SRS Audit (Reconciled)
 
 > **Audit Date**: 2026-10-25  
 > **Production Target**: [https://kanadjyotishkendra.vercel.app/](https://kanadjyotishkendra.vercel.app/)  
@@ -8,14 +8,14 @@
 
 ---
 
-## Executive Summary
+## Executive Summary (Reconciled)
 
 | Category | Total Items | Implemented | Partial | Missing | Implementation Readiness |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **Client Requirement Points (1–48)** | 48 | 19 | 23 | 6 | Phase 15–22 Target |
+| **Client Requirement Points (1–48)** | 48 | 18 | 25 | 5 | Phases 15–22 Target (#42 on hold) |
 | **New 49th Requirement (Associate Panel)** | 1 | 0 | 0 | 1 | Phase 20 Target |
-| **Mandatory Client Conditions** | 5 | 0 | 1 | 4 | Integrated into Phases 15–22 |
-| **Total Tracked Deliverables** | **54** | **19** | **24** | **11** | **35% Complete, 44% Partial, 21% Missing** |
+| **Mandatory Client Conditions (COND 1–5)** | 5 | 0 | 1 | 4 | Integrated into Phases 15, 16, 21, 22 |
+| **Total Tracked Deliverables** | **54** | **18** | **26** | **10** | **33.3% Complete, 48.1% Partial, 18.5% Missing** |
 
 ---
 
@@ -57,7 +57,7 @@
 | **25** | **Kundli work progress Report > order Received > Kundli in progress > Kundli Complete > Dispatched > Delivered > Complete** | 🟢 **IMPLEMENTED** | [src/features/orders/components/OrderStatusStepper.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/orders/components/OrderStatusStepper.tsx)<br>[src/app/[locale]/track/page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/track/page.tsx) | 6-stage milestone tracker stepper with phone verification and admin update controls. |
 | **26** | **Prashna Kundli form format with all details** | 🟢 **IMPLEMENTED** | [src/features/astro/components/PrashnaRequestClient.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/astro/components/PrashnaRequestClient.tsx)<br>[src/app/[locale]/kundli/prashna/page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/kundli/prashna/page.tsx) | Redesigned per client mock with seed number (1–249), query categories, horary planetary placements, and order intake. |
 | **27** | **Google Map Page with Address Location Navigation, Enquiry link, Social Link** | 🔴 **MISSING** | [src/components/layout/Footer.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/components/layout/Footer.tsx) (address text only) | **Gap**: Dedicated `/contact` or `/location` page with interactive Google Map embed iframe, "Open in Google Maps / Navigate" GPS button, quick enquiry contact form, and direct social links. |
-| **28** | **Free Astrosage Kundli software Integration with all feature** | 🟢 **IMPLEMENTED** | [src/lib/astro/astrosage.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/astrosage.ts)<br>[src/lib/astro/demo.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/demo.ts) | Pluggable `AstroProvider` architecture with AstroSage API adapter and demo simulation. |
+| **28** | **Free Astrosage Kundli software Integration with all feature** | 🟡 **PARTIAL** | [src/lib/astro/astrosage.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/astrosage.ts)<br>[src/lib/astro/demo.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/astro/demo.ts) | **Supported**: Modular `AstroProvider` interface, Demo mathematical calculation returning Vimshottari Mahadasha, 9-planet coordinates, Ashtakoot 36-point matching, daily Panchang tithi/nakshatra, request payload validation, and demo safety disclaimers.<br>**Requires Live Key**: Real-time astronomical planetary degrees and Kundli generation directly from AstroSage Cloud API (`ASTROSAGE_USER_ID`, `ASTROSAGE_API_KEY`). |
 | **29** | **Customer Support 24 * 7** | 🟡 **PARTIAL** | [src/app/[locale]/help/page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/help/page.tsx) | Static helpline and emergency contact information displayed on help page. **Gap**: Floating 24/7 quick contact buttons (WhatsApp, Phone dialer) and support ticket submission form. |
 | **30** | **Legal Page & Active Links** | 🟢 **IMPLEMENTED** | [src/app/[locale]/legal/[slug]/page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/legal/[slug]/page.tsx) | Dynamic CMS-driven legal pages for Privacy Policy, Terms of Service, and Refund Policy with active links in footer. |
 | **31** | **FAQ** | 🟡 **PARTIAL** | [src/app/[locale]/help/page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/help/page.tsx#L40-L75) | Hardcoded FAQ accordion on help page. **Gap**: Dedicated `/faq` page and admin CMS manager to dynamically add, edit, reorder, and categorize FAQs in Hindi and English. |
@@ -71,8 +71,8 @@
 | **39** | **Upload option File upload & URL Link upload both option mention all expected feature** | 🟡 **PARTIAL** | [src/lib/storage/index.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/storage/index.ts) | Local/S3 storage provider handles file uploads. **Gap**: Admin forms often enforce file upload only or URL only; need dual inputs (File Upload OR external URL link) across services, gallery, founder, banners. |
 | **40** | **PDF file Upload through Admin Panel For any User & Download option in User** | 🟢 **IMPLEMENTED** | [src/features/admin/components/AdminVaultManager.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/admin/components/AdminVaultManager.tsx)<br>[src/app/[locale]/vault/page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/vault/page.tsx) | Fully implemented with magic-byte validation, user-specific assignment, and secure streaming. |
 | **41** | **Android App Download option from website to any user with URL links & QR Code total modification & control from admin panel** | 🔴 **MISSING** | *None* | **Gap**: Dedicated `/app-download` page displaying direct APK download URL, Google Play Store link, and dynamic QR code controlled from Site Settings, plus Android WebView project files ready to compile into `.apk`. |
-| **42** | **Free API Ask Integration for all program information received by user** | 🟡 **PARTIAL** | [src/app/api/astro/](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/astro/) | Astro calculation APIs exist for internal forms. **Gap**: Public/Free horoscope inquiry API route with astrological overview. |
-| **43** | **Free Assistance Chatbot option** | 🔴 **MISSING** | *None (Deferred in Phase 1)* | **Gap**: Floating AI/Vedic Assistance Chatbot widget with instant answers on astrology, services, pricing, and consultation booking, with admin toggle and knowledge base settings. |
+| **42** | **Free API Ask Integration for all program information received by user** | 🟡 **ON HOLD** | [src/app/api/astro/](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/astro/) | **Ambiguous**: Deferred per instructions until meaning is confirmed with client. |
+| **43** | **Free Assistance Chatbot option** | 🔴 **MISSING** | *None (Deferred in Phase 1)* | **Gap**: Rule-based Vedic Assistance Chatbot widget with instant answers on astrology, services, pricing, and consultation booking, with admin Q&A entries, keywords, and quick replies editable in Hindi and English, with fallback to WhatsApp or ticket. |
 | **44** | **Social Media Integration as like Facebook, Whatsapp, Instagram, Twitter & other Social media platform** | 🟡 **PARTIAL** | [src/components/layout/Footer.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/components/layout/Footer.tsx#L110-L122) | Static social links in footer. **Gap**: Floating quick-contact bar (WhatsApp click-to-chat, Phone dialer), blog/service social share buttons, and admin control over all social handles. |
 | **45** | **Per page & Expected used program Back & Next Icon option** | 🔴 **MISSING** | *None* | **Gap**: Explicit breadcrumb trail with "Back" and "Next" icon buttons across Service details, Booking wizard steps, Kundli calculators, Blog articles, and Legal pages. |
 | **46** | **Notification through Gmail, SMS, OTP** | 🟡 **PARTIAL** | [src/lib/sms/index.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/sms/index.ts) | SMS OTP interface exists. **Gap**: Transactional email notifications (via Nodemailer / SMTP adapter) and event triggers for order placed, payment approved, vault file uploaded, and appointment booked. |
@@ -85,18 +85,16 @@
 ## Part 2: Mandatory Client Conditions Gap Analysis
 
 | Condition ID | Client Condition Specification | Current Status | Codebase Evidence | Identified Implementation Scope |
-| :---: | :--- | :---: | :--- | :--- |
+| :--- | :--- | :---: | :--- | :--- |
 | **COND-1** | **All API Credentials Managed via Admin Site Settings & `.env.example`**<br>(Hosting, domain, Google Play belong to client; code ready so only API keys need entering; no hardcoded secrets) | 🟡 **PARTIAL** | [.env.example](file:///C:/Users/anshu/Desktop/ClientWork/.env.example)<br>[src/app/[locale]/admin/settings/page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/admin/settings/page.tsx) | Base env vars documented. **Gap**: Expand Site Settings admin interface with secure fields for Razorpay keys, Google/Facebook OAuth IDs, MSG91 Auth Key, SMTP credentials, AstroSage keys, and Google Analytics ID with fallback to `.env`. |
 | **COND-2** | **EVERY Line, Word, Label, Menu Item, Button Text, Footer Text, and Error Message Editable from Admin in Hindi & English**<br>(No code change required for any text; database override layer) | 🔴 **MISSING** | [messages/en.json](file:///C:/Users/anshu/Desktop/ClientWork/messages/en.json)<br>[messages/hi.json](file:///C:/Users/anshu/Desktop/ClientWork/messages/hi.json) | Translations are currently static JSON dictionaries. **Gap**: Create `TranslationOverride` database model, dynamic i18n resolver merging database overrides with fallback JSON, and `/admin/translations` search/filter editor. |
 | **COND-3** | **Automated & Manual Backups**<br>(Daily, weekly, monthly backup scheduling, status, manual run, download/restore guidance in Site Settings, honest documentation of serverless/DB limits) | 🔴 **MISSING** | *None* | **Gap**: Database backup engine in `lib/backup/`, admin console at `/admin/backups` or Site Settings, SQL/JSON snapshot export, download, restore guidance, and cron documentation. |
 | **COND-4** | **PDF Guides for Admin, User, and Associate Panels**<br>(Integrated into admin panel, editable from there, dynamic PDF generation via PDFKit, or upload/replace flow) | 🔴 **MISSING** | *None* | **Gap**: `Guide` model in Prisma, dynamic PDFKit generator for Admin, User, and Associate handbooks, downloadable from panels, editable in `/admin/guides`. |
-| **COND-5** | **Android App Setup (WebView APK) & Website Download Page**<br>(Complete Android project setup ready for Play Store, download page with QR code controlled from admin) | 🔴 **MISSING** | *None* | **Gap**: Dedicated `/app-download` page with admin QR code and download links, plus Android WebView Gradle wrapper project in `android/` with icons and manifest. |
+| **COND-5** | **Android App Setup (WebView APK) & Website Download Page**<br>(Complete Android project setup ready for Play Store, download page with QR code controlled from admin) | 🔴 **MISSING** | *None* | **Gap**: Dedicated `/app-download` page with admin QR code and download links, plus Android WebView Gradle wrapper project in `android/` with icons, manifest, and configurable base URL. |
 
 ---
 
 ## Part 3: Implementation Roadmap (Phases 15–22)
-
-To maintain 100% stability and zero disruption to the 97 passing tests, the gaps are structured into distinct, incremental phases:
 
 ```mermaid
 flowchart TD
@@ -108,77 +106,7 @@ flowchart TD
     P20["Phase 20: Associate Subsystem: Registration, Admin Approval, Referral Tracking, Commission & Dashboard (Point 49)"]
     P21["Phase 21: Database Backup Engine, Schedule & PDF Guides Subsystem (COND-3, COND-4)"]
     P22["Phase 22: Android WebView APK Project, Play Store Setup & Website Download Page with QR Code (Points 2, 41, COND-5)"]
-    P23["Phase 23: Comprehensive End-to-End Testing (Playwright), Full QA & Final Handoff Report"]
+    P23["Phase 23: Full System Regression, Playwright Test Run & Final Handoff Report"]
 
     P15 --> P16 --> P17 --> P18 --> P19 --> P20 --> P21 --> P22 --> P23
 ```
-
-### Phase Details
-
-1. **Phase 15: Translation Override Layer & Full Admin String CMS**
-   - Prisma Model: `TranslationOverride` (`id`, `locale`, `namespace`, `key`, `value`, `updatedAt`).
-   - Dynamic i18n Resolver: Injects database overrides over default JSON dictionary messages on server and client.
-   - Admin UI: `/admin/translations` search, filter by namespace/locale, bulk inline editing.
-   - Verification: Unit tests verifying override precedence, fallback to JSON dictionary, and immediate cache invalidation.
-
-2. **Phase 16: Extended Site Settings, Social Integration, Google Analytics & 24/7 Chatbot**
-   - Prisma Schema: Expand `AdminSettings` with `logoUrl`, `faviconUrl`, `googleAnalyticsId`, `socialWhatsapp`, `socialTelegram`, `facebookAppId`, `facebookAppSecret`, `smtpHost`, `smtpPort`, `smtpUser`, `smtpPass`, `smtpFrom`, `chatbotEnabled`, `chatbotWelcomeMessageEn/Hi`.
-   - Google Analytics: Dynamic measurement ID injection and client-side pageview/event tracking.
-   - Floating Quick-Action Bar: WhatsApp click-to-chat, Phone dialer, Emergency contact modal.
-   - Vedic Assistance Chatbot: Floating interactive assistant widget answering astrology FAQs, services, muhurta, and pricing with admin-configurable knowledge base.
-   - Google Map Page: Dedicated `/contact` page with interactive map iframe, GPS navigation CTA, quick enquiry form, and social links.
-
-3. **Phase 17: Service Catalog Enhancements & UI Navigation Controls**
-   - Prisma Schema: Update `Service` and `Plan` with `itinerary`, `samagriList`, `youtubeUrl`, `additionalLinks`.
-   - Service Catalog: Interactive **Grid View** vs **List View** toggle button with local storage persistence.
-   - Service Details: Tabs for Overview, Program Itinerary, Puja Samagri (materials), YouTube video embed, and Quick Service Enquiry form.
-   - Navigation Controls: Standardized "Back" and "Next" icon buttons and breadcrumbs across all sub-pages.
-
-4. **Phase 18: Dynamic Founder, Extra CMS Pages, Gallery Video Embeds & Dedicated FAQ**
-   - Admin CMS: Manage Founder details, photo upload/URL, YouTube video embed, and custom biography links.
-   - Gallery Enhancements: Support for YouTube video links and external URLs alongside image uploads.
-   - Other Services Page: Dedicated `/other-services` tab/page for Bharat Darshan Teerth Yatra and Matrimonial Service with rich cards and video links.
-   - Dedicated FAQ Page: Dynamic `/faq` accordion driven by admin CMS categories.
-
-5. **Phase 19: Appointment Reporting Dashboard & Transactional Email/SMS Notifications**
-   - Admin Analytics Dashboard: `/admin` redesigned with live metrics (Gross Revenue, Total Bookings, User Growth, Service Distribution, Associate Metrics).
-   - Dedicated Appointment Management: Calendar/slot filter view with one-click approval/rejection.
-   - Transactional Email Engine: Nodemailer SMTP adapter sending automated HTML receipts for order placement, payment approval, vault uploads, and appointment bookings.
-
-6. **Phase 20: Associate Subsystem (The 49th Requirement)**
-   - Prisma Schema: Role `ASSOCIATE`, `AssociateProfile`, `ReferralAttribution`, `CommissionRule`, `PayoutRequest`.
-   - Partner Registration & Auth: `/associate/register` and `/associate/signin`.
-   - Admin Approval Console: `/admin/associates` review, approve, reject, set commission percentage/flat rates.
-   - Referral Engine: Unique referral links (`?ref=CODE`) automatically captured in session and attributed to orders.
-   - Associate Dashboard: `/associate/dashboard` tracking referrals, assigned consultations, earnings ledger, and bank details.
-   - Payout System: Payout requests by associates and admin approval/processing console (`/admin/payouts`).
-
-7. **Phase 21: Database Backup Engine, Schedule & PDF Guides Subsystem**
-   - Backup Engine: `/admin/backups` with manual snapshot trigger (SQL/JSON export), scheduled backup documentation, and step-by-step restoration guide.
-   - PDF Guides Subsystem: PDFKit-generated downloadable handbooks for Admin, User, and Associate panels, editable and customizable from `/admin/guides`.
-
-8. **Phase 22: Android WebView APK Project, Play Store Setup & Website Download Page**
-   - Android Studio Project: Complete Gradle wrapper project in `android/` with MainActivity loading `https://kanadjyotishkendra.vercel.app/`, splash screen, offline caching, and camera/file upload permissions.
-   - Website Download Page: `/app-download` page displaying direct APK download URL, Google Play badge, and dynamic QR code generated from admin settings.
-
-9. **Phase 23: Comprehensive Testing (Unit + Integration + Playwright E2E) & Test Report**
-   - Maintain all 97 existing unit tests green.
-   - Write comprehensive unit tests for new modules (Translations, Associates, Backups, Email notifications, Chatbot).
-   - Configure and execute Playwright end-to-end tests for all critical user and admin journeys.
-   - Generate `TEST_REPORT.md` and client manual QA checklist.
-
----
-
-## Part 4: Technical Dependencies & Credentials Audit
-
-| Integration Service | Implementation State | Configuration Location | Client Action Required for Public Launch |
-| :--- | :--- | :--- | :--- |
-| **Razorpay Payments** | Complete Adapter + Webhook | Site Settings or `.env` | Enter live Key ID, Secret, Webhook Secret in Admin Settings |
-| **SMS / OTP (MSG91)** | Complete Adapter | Site Settings or `.env` | Enter MSG91 Auth Key, Sender ID, and DLT Template IDs |
-| **Transactional Email (SMTP)** | Nodemailer Adapter | Site Settings or `.env` | Enter SMTP Host, Port, Username, Password, and From Email |
-| **Google Sign-In** | NextAuth Provider | Site Settings or `.env` | Enter Google Client ID and Secret in Google Cloud Console |
-| **Facebook Login** | NextAuth Provider | Site Settings or `.env` | Enter Facebook App ID and App Secret in Meta for Developers |
-| **AstroSage Ephemeris** | Complete Adapter | Site Settings or `.env` | Enter AstroSage User ID and API Key |
-| **Google Analytics** | Tracking Component | Site Settings or `.env` | Enter GA4 Measurement ID (`G-XXXXXXXXXX`) in Admin Settings |
-| **Google Maps API** | Map Embed Component | Site Settings or `.env` | Enter Google Maps Embed API Key or Place URL |
-| **Private Vault Storage** | S3 / Local Provider | Site Settings or `.env` | Configure AWS S3 Bucket Name and AWS credentials (or use Local) |
