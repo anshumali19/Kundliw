@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.8-flash";
 const TIMEOUT_MS = 12000;
 
 export function isLlmConfigured(): boolean {
