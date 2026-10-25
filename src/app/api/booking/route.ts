@@ -7,7 +7,7 @@ import { createBookingOrder } from "@/lib/booking/service";
 export async function POST(request: NextRequest) {
   // 1. Enforce user authentication
   const guard = await guardApiUser();
-  if (guard.errorResponse) {
+  if (!guard.ok) {
     return guard.errorResponse;
   }
   const user = guard.user;

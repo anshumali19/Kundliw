@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { isValidStatusTransition } from "@/lib/orders/status";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { OrderStatus } from "@prisma/client";
 import { z } from "zod";
 
@@ -20,8 +21,11 @@ export async function POST(
 ) {
   try {
     const guard = await guardApiAdmin();
-    if (guard.errorResponse) return guard.errorResponse;
+    if (!guard.ok) return guard.errorResponse;
     const admin = guard.user;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const orderId = params.id;
 

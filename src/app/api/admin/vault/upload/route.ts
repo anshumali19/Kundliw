@@ -2,14 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { getStorageProvider, validateFileMagicBytes, MAX_FILE_SIZE_BYTES } from "@/lib/storage";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
     const guard = await guardApiAdmin();
-    if (guard.errorResponse) return guard.errorResponse;
+    if (!guard.ok) return guard.errorResponse;
     const admin = guard.user;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const formData = await request.formData();
     const userId = String(formData.get("userId") || "");

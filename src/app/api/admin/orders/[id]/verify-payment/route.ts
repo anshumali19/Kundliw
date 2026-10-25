@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { approveManualPayment, rejectManualPayment } from "@/lib/payments/service";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -17,8 +18,11 @@ export async function POST(
 ) {
   try {
     const guard = await guardApiAdmin();
-    if (guard.errorResponse) return guard.errorResponse;
+    if (!guard.ok) return guard.errorResponse;
     const admin = guard.user;
+
+    const csrf = validateCsrfOrigin(request);
+    if (!csrf.isValid) return csrf.errorResponse;
 
     const orderId = params.id;
 

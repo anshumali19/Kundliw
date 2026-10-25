@@ -78,33 +78,49 @@ export async function requireAdmin(
 }
 
 /**
+ * Discriminated union result for API route guards.
+ *
+ * Callers MUST narrow on `ok` before accessing `user`:
+ *   const guard = await guardApiAdmin();
+ *   if (!guard.ok) return guard.errorResponse;
+ *   const admin = guard.user;
+ *
+ * The `ok` discriminant intentionally makes the success branch incompatible
+ * with an `errorResponse` property, so TypeScript rejects the old
+ * `if (!guard)` truthiness check that silently allowed every request through.
+ */
+export type ApiUserGuardResult =
+  | { ok: true; user: AuthenticatedUser }
+  | { ok: false; errorResponse: NextResponse };
+
+export type ApiAdminGuardResult = ApiUserGuardResult;
+
+/**
  * Route handler guard for APIs requiring an authenticated user.
  */
-export async function guardApiUser(): Promise<
-  { user: AuthenticatedUser; errorResponse?: never } | { user?: never; errorResponse: NextResponse }
-> {
+export async function guardApiUser(): Promise<ApiUserGuardResult> {
   const user = await getCurrentUser();
   if (!user) {
     return {
+      ok: false,
       errorResponse: NextResponse.json(
         { error: "Authentication required to access this resource." },
         { status: 401 }
       ),
     };
   }
-  return { user };
+  return { ok: true, user };
 }
 
 /**
  * Route handler guard for APIs requiring ADMIN role.
  * Re-reads user role directly from database.
  */
-export async function guardApiAdmin(): Promise<
-  { user: AuthenticatedUser; errorResponse?: never } | { user?: never; errorResponse: NextResponse }
-> {
+export async function guardApiAdmin(): Promise<ApiAdminGuardResult> {
   const user = await getCurrentUser();
   if (!user) {
     return {
+      ok: false,
       errorResponse: NextResponse.json(
         { error: "Authentication required to access this resource." },
         { status: 401 }
@@ -113,11 +129,12 @@ export async function guardApiAdmin(): Promise<
   }
   if (user.role !== Role.ADMIN) {
     return {
+      ok: false,
       errorResponse: NextResponse.json(
         { error: "Forbidden. Administrative privileges required." },
         { status: 403 }
       ),
     };
   }
-  return { user };
+  return { ok: true, user };
 }

@@ -11,7 +11,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   const csrf = validateCsrfOrigin(request);
   if (!csrf.isValid) return csrf.errorResponse;
@@ -76,7 +76,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   const csrf = validateCsrfOrigin(request);
   if (!csrf.isValid) return csrf.errorResponse;
