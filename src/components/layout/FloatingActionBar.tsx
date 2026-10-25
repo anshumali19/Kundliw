@@ -72,6 +72,11 @@ export function FloatingActionBar({
   const [leadName, setLeadName] = useState("");
   const [leadPhone, setLeadPhone] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Popular topics come from the admin-managed chatbot Q&A list
+  const [topics, setTopics] = useState<Array<{ label: string; query: string }>>([]);
+  const [barInput, setBarInput] = useState("");
+  const [pendingQuestion, setPendingQuestion] = useState("");
+  const [hintIdx, setHintIdx] = useState(0);
 
   const callHref = (phone || "").replace(/[^\d+]/g, "") ? `tel:${(phone || "").replace(/[^\d+]/g, "")}` : "";
   const cleanWhatsapp = (whatsappNumber || "").replace(/[^\d]/g, "");
@@ -92,6 +97,27 @@ export function FloatingActionBar({
     setMessages([]);
     setIsOpen(true);
   };
+
+  // Load popular topics once so the Ask AI bar can show rotating suggestions
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/chatbot/ask?q=&locale=${locale}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled && d?.success && Array.isArray(d.quickReplies)) setTopics(d.quickReplies);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
+
+  // Auto-rotate the suggested question shown in the Ask AI bar
+  useEffect(() => {
+    if (topics.length < 2) return;
+    const timer = setInterval(() => setHintIdx((i) => (i + 1) % topics.length), 3500);
+    return () => clearInterval(timer);
+  }, [topics.length]);
 
   // Scroll to bottom when messages update
   const scrollToBottom = () => {
@@ -152,11 +178,12 @@ export function FloatingActionBar({
             id: "welcome",
             sender: "bot",
             text: data.answer,
-            quickReplies: data.quickReplies,
+            quickReplies: mode === "ai" ? undefined : data.quickReplies,
             whatsappUrl: data.whatsappUrl,
             showTicketFallback: data.showTicketFallback,
           },
         ]);
+        if (Array.isArray(data.quickReplies)) setTopics(data.quickReplies);
       }
     } catch {
       setMessages([
@@ -337,8 +364,61 @@ export function FloatingActionBar({
     }
   };
 
+  // Question typed in the Ask AI bar: send it as soon as the panel has loaded
+  useEffect(() => {
+    if (pendingQuestion && isOpen && mode === "ai" && messages.length > 0 && !loading) {
+      const q = pendingQuestion;
+      setPendingQuestion("");
+      handleSend(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingQuestion, isOpen, mode, messages.length, loading]);
+
+  const submitBar = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = (barInput.trim() || topics[hintIdx]?.query || "").trim();
+    setBarInput("");
+    if (q) setPendingQuestion(q);
+    if (!(isOpen && mode === "ai")) {
+      setMode("ai");
+      setMessages([]);
+      setIsOpen(true);
+    }
+  };
+
+  const barHint = topics[hintIdx]?.query || (isHindi ? "अपना प्रश्न पूछें..." : "Ask your question...");
+
   return (
     <>
+      {/* Ask AI bar (tablet and desktop): shows a rotating suggested question */}
+      {!isOpen && (
+        <form
+          onSubmit={submitBar}
+          className="pointer-events-auto fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden sm:flex items-center gap-2 w-[min(34rem,calc(100vw-16rem))] bg-surface rounded-full border-2 border-maroon p-1.5 shadow-lg"
+          aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
+        >
+          <span className="w-9 h-9 shrink-0 rounded-full bg-brand text-maroon flex items-center justify-center">
+            <Sparkles className="w-5 h-5" />
+          </span>
+          <input
+            type="text"
+            value={barInput}
+            onChange={(e) => setBarInput(e.target.value)}
+            placeholder={barHint}
+            maxLength={300}
+            className="flex-1 min-w-0 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none"
+            aria-label={isHindi ? "अपना प्रश्न लिखें" : "Type your question"}
+          />
+          <button
+            type="submit"
+            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-signal text-white text-sm font-bold"
+          >
+            <Send className="w-4 h-4" />
+            <span>{isHindi ? "एआई से पूछें" : "Ask AI"}</span>
+          </button>
+        </form>
+      )}
+
       {/* Floating quick actions: Call + WhatsApp on the left, AI + Chat on the right (mobile).
           They sit above the fixed marquee strip and the bottom navigation. */}
       <div
@@ -448,6 +528,29 @@ export function FloatingActionBar({
             </button>
           </div>
 
+          {/* Popular topics (AI mode) */}
+          {mode === "ai" && topics.length > 0 && (
+            <div className="px-3 pt-3 pb-2 border-b border-outline-variant/40 bg-surface-container-low text-left">
+              <p className="text-xs font-bold uppercase tracking-wider text-maroon mb-2 flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-signal" />
+                {isHindi ? "प्रमुख विषय:" : "Popular topics:"}
+              </p>
+              <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
+                {topics.map((tp, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSend(tp.query)}
+                    disabled={loading}
+                    className="px-2.5 py-1.5 rounded-full bg-surface border border-maroon/40 hover:bg-brand text-on-surface text-xs font-medium transition-colors disabled:opacity-50"
+                  >
+                    {tp.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Messages Stream */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs text-left">
             {messages.map((m) => {
@@ -543,8 +646,12 @@ export function FloatingActionBar({
               onChange={(e) => setInput(e.target.value)}
               placeholder={
                 isHindi
-                  ? "प्रश्न पूछें (उदा. कुंडली दक्षिणा, मुहूर्त)..."
-                  : "Ask anything (e.g. fees, kundli, muhurta)..."
+                  ? mode === "ai"
+                    ? "अगला प्रश्न पूछें..."
+                    : "प्रश्न पूछें (उदा. कुंडली दक्षिणा, मुहूर्त)..."
+                  : mode === "ai"
+                    ? "Ask a follow-up question..."
+                    : "Ask anything (e.g. fees, kundli, muhurta)..."
               }
               disabled={loading}
               className="flex-1 px-3 py-2 rounded-xl border border-outline-variant bg-surface text-on-surface text-xs focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/50"
