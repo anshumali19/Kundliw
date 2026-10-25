@@ -24,11 +24,11 @@ export async function generateMetadata({ params: { locale } }: FounderPageProps)
   const isHindi = locale === "hi";
   return {
     title: isHindi
-      ? "संस्थापक एवं दैवज्ञ परंपरा • पं. राधेश्याम शास्त्री • महर्षि कणाद ज्योतिष केंद्र"
-      : "Founder Lineage • Pt. Radheshyam Shastri • Maharshi Kanad Jyotish Kendra",
+      ? "संस्थापक एवं दैवज्ञ परंपरा • महर्षि कणाद ज्योतिष केंद्र"
+      : "Founder Lineage • Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "काशी की अविच्छिन्न सिद्धांत ज्योतिष परंपरा, ४ दशकों का शास्त्रीय अनुभव एवं संस्थापक परिचय।"
-      : "Scholarly Vedic astrology lineage and background of Pt. Radheshyam Shastri rooted in Varanasi.",
+      ? "शास्त्रसम्मत सिद्धांत ज्योतिष परंपरा, वैदिक अनुभव एवं संस्थापक परिचय।"
+      : "Scholarly Vedic astrology lineage and background of the founder.",
   };
 }
 
@@ -44,24 +44,24 @@ export default async function FounderPage({ params: { locale } }: FounderPagePro
     : null;
 
   const name = isHindi
-    ? founder?.nameHi || fallbackPage?.titleHi || "पं. राधेश्याम शास्त्री"
-    : founder?.nameEn || fallbackPage?.titleEn || "Pt. Radheshyam Shastri";
+    ? founder?.nameHi || fallbackPage?.titleHi || "संस्थापक का नाम"
+    : founder?.nameEn || fallbackPage?.titleEn || "Founder Name";
 
   const designation = isHindi
-    ? founder?.designationHi || "संस्थापक, वरिष्ठ दैवज्ञ एवं पंचांगकार"
-    : founder?.designationEn || "Founder, Senior Daivajna & Ephemeris Scholar";
+    ? founder?.designationHi || "संस्थापक एवं मुख्य ज्योतिषाचार्य"
+    : founder?.designationEn || "Founder & Chief Astrologer";
 
   const role = isHindi
-    ? founder?.roleHi || "काशी वेदांग ज्योतिष परंपरा • ४० से अधिक वर्षों का वैदिक अनुभव"
-    : founder?.roleEn || "Vedanga Jyotish Lineage of Varanasi • 40+ Years of Guidance";
+    ? founder?.roleHi || "वैदिक ज्योतिष मार्गदर्शन एवं दिशा-निर्देशन"
+    : founder?.roleEn || "Vedic Astrological Guidance & Direction";
 
   const bio = isHindi
     ? founder?.bioHi ||
       fallbackPage?.contentHi ||
-      "केंद्र के संस्थापक वरिष्ठ दैवज्ञों ने काशी हिंदू विश्वविद्यालय एवं संपूर्णानंद संस्कृत विश्वविद्यालय से वेदांग ज्योतिष में उच्च उपाधि प्राप्त कर पिछले चार दशकों में हजारों जातकों का मार्गदर्शन किया है।"
+      "केंद्र के संस्थापक का विस्तृत परिचय, शास्त्रीय पृष्ठभूमि एवं अनुभव एडमिन पैनल से संपादन योग्य है।"
     : founder?.bioEn ||
       fallbackPage?.contentEn ||
-      "Founded by senior Daivajnas trained in the classical Vedanga Jyotish tradition of Kashi, our Kendra preserves authentic Siddhanta calculations and ethical predictive consultations.";
+      "Detailed background, credentials, and astrological experience of the founder are fully editable via the Admin Panel.";
 
   const footerNote = isHindi
     ? founder?.footerNoteHi ||
@@ -127,7 +127,7 @@ export default async function FounderPage({ params: { locale } }: FounderPagePro
                 className="w-full py-3 px-4 rounded-xl bg-primary text-on-primary font-semibold text-xs sm:text-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 <Calendar className="w-4 h-4" />
-                <span>{isHindi ? "शास्त्री जी से परामर्श बुक करें" : "Book Direct Consultation"}</span>
+                <span>{isHindi ? "प्रत्यक्ष परामर्श बुक करें" : "Book Direct Consultation"}</span>
               </Link>
             </div>
           </div>

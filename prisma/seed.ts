@@ -624,18 +624,18 @@ startxref
       titleEn: "About Maharshi Kanad Jyotish Kendra",
       titleHi: "महर्षि कणाद ज्योतिष केंद्र परिचय",
       contentEn:
-        "Maharshi Kanad Jyotish Kendra is an authentic center of Vedic astronomical calculations and traditional Jyotish Siddhanta rooted in Varanasi's 42+ years lineage at Dashashwamedh Ghat. We dispell fear and superstition through pure mathematical ephemeris.",
+        "Maharshi Kanad Jyotish Kendra is an authentic center of Vedic astronomical calculations and traditional Jyotish Siddhanta rooted in Varanasi. We offer authentic mathematical ephemeris, personalized Kundli analysis, and ethical astrological consultations. Detailed center history and credentials are editable via the Admin Panel.",
       contentHi:
-        "महर्षि कणाद ज्योतिष केंद्र वाराणसी के दशाश्वमेध घाट पर ४२ से अधिक वर्षों की अविच्छिन्न परंपरा से संचालित प्रामाणिक ज्योतिष पीठ है। यहाँ समस्त भविष्य विचार अंधविश्वास से परे, विशुद्ध गणितीय गणनाओं पर आधारित हैं।",
+        "महर्षि कणाद ज्योतिष केंद्र काशी की पावन धरा पर शास्त्रसम्मत ज्योतिष सिद्धांत एवं पंचांग गणित का प्रतिष्ठित केंद्र है। यहाँ समस्त भविष्य विचार अंधविश्वास से परे, विशुद्ध गणितीय गणनाओं पर आधारित हैं। विस्तृत विवरण एडमिन पैनल से संपादन योग्य है।",
     },
     {
       slug: "founder",
       titleEn: "Founder Lineage & Scholarly Tradition",
       titleHi: "संस्थापक परंपरा एवं शास्त्रीय इतिहास",
       contentEn:
-        "Established by classical scholars educated in Kashi Hindu Vishwavidyalaya and Sampurnanand Sanskrit Vishwavidyalaya, preserving Dashashwamedh astronomical charts down to the arc-second.",
+        "Detailed scholarly lineage, credentials, and experience of the founder are maintained and customizable via Admin Panel > Founder Profile.",
       contentHi:
-        "काशी हिंदू विश्वविद्यालय एवं संपूर्णानंद संस्कृत विश्वविद्यालय के मूर्धन्य दैवज्ञों द्वारा स्थापित यह केंद्र चार दशकों से शुद्ध दृग्गणित की रक्षा कर रहा है।",
+        "संस्थापक की शास्त्रीय परंपरा, उपाधियां एवं अनुभव का विस्तृत विवरण एडमिन पैनल के 'संस्थापक विवरण' अनुभाग से संपादन योग्य है।",
     },
     {
       slug: "help",
@@ -660,9 +660,9 @@ startxref
       titleEn: "Privacy Policy & Birth Data Confidentiality",
       titleHi: "गोपनीयता नीति एवं जन्म विवरण सुरक्षा",
       contentEn:
-        "Your birth coordinates, family Gotra, and consultation queries are kept strictly confidential and never commercialized.",
+        "Your birth coordinates, family Gotra, and consultation queries are kept strictly confidential and never commercialized. Chatbot Leads: Details provided through our automated Vedic Chatbot (visitor name, phone number, and consultation requirement) are securely stored solely for customer callback and support, and are never shared with third parties.",
       contentHi:
-        "प्रत्येक जातक के जन्म समय, जन्म स्थान एवं व्यक्तिगत प्रश्नों की पूर्ण गोपनीयता रखी जाती है।",
+        "प्रत्येक जातक के जन्म समय, जन्म स्थान एवं व्यक्तिगत प्रश्नों की पूर्ण गोपनीयता रखी जाती है। चैटबॉट लीड्स: हमारे स्वचालित वैदिक चैटबॉट के माध्यम से प्रदान किया गया विवरण (नाम, फोन नंबर एवं परामर्श विषय) केवल ग्राहक संपर्क एवं सहायता हेतु सुरक्षित रूप से संगृहीत किया जाता है और किसी अन्य संस्था से साझा नहीं किया जाता।",
     },
     {
       slug: "refund",
@@ -763,40 +763,48 @@ startxref
     ],
   });
 
-  // 15. Founder Profile
+  // 15. Founder Profile (Neutral Placeholders - Editable in Admin)
   await prisma.founderProfile.upsert({
     where: { id: "default" },
-    update: {},
+    update: {
+      nameEn: "Founder Name",
+      nameHi: "संस्थापक का नाम",
+      designationEn: "Founder & Chief Astrologer",
+      designationHi: "संस्थापक एवं मुख्य ज्योतिषाचार्य",
+      roleEn: "Vedic Astrological Guidance & Direction",
+      roleHi: "वैदिक ज्योतिष मार्गदर्शन एवं दिशा-निर्देशन",
+      photoUrl: "/images/founder-placeholder.jpg",
+      bioEn:
+        "This section contains the scholarly background, lineage, and experience of the founder of Maharshi Kanad Jyotish Kendra. All details including qualifications, biographical milestones, and institutional lineage are fully configurable and editable from the Admin Panel under Site CMS > Founder Details.",
+      bioHi:
+        "यह अनुभाग महर्षि कणाद ज्योतिष केंद्र के संस्थापक के परिचय, शास्त्रीय परंपरा एवं ज्योतिषीय अनुभव हेतु निर्धारित है। समस्त विवरण, उपाधियां, अनुभव एवं विचार एडमिन पैनल के 'संस्थापक विवरण' CMS अनुभाग से पूर्णतः संपादन योग्य हैं।",
+      youtubeUrl: null,
+      additionalLinks: [],
+      footerNoteEn:
+        "Note: Consultations follow traditional codes of conduct. All services and guidance details can be configured via Admin Site Settings.",
+      footerNoteHi:
+        "नोट: समस्त परामर्श शास्त्रसम्मत मर्यादा के अंतर्गत संपन्न होते हैं। विवरण एडमिन पैनल से संपादन योग्य है।",
+      isActive: true,
+    },
     create: {
       id: "default",
-      nameEn: "Pt. Radheshyam Shastri (Shastri Ji)",
-      nameHi: "पं. राधेश्याम शास्त्री (शास्त्री जी)",
-      designationEn: "Founder, Senior Daivajna & Ephemeris Scholar",
-      designationHi: "संस्थापक, वरिष्ठ दैवज्ञ एवं पंचांगकार",
-      roleEn: "Vedanga Jyotish Lineage of Varanasi • 40+ Years of Guidance",
-      roleHi: "काशी वेदांग ज्योतिष परंपरा • 40 से अधिक वर्षों का वैदिक अनुभव",
-      photoUrl: "/images/founder-shastri.jpg",
+      nameEn: "Founder Name",
+      nameHi: "संस्थापक का नाम",
+      designationEn: "Founder & Chief Astrologer",
+      designationHi: "संस्थापक एवं मुख्य ज्योतिषाचार्य",
+      roleEn: "Vedic Astrological Guidance & Direction",
+      roleHi: "वैदिक ज्योतिष मार्गदर्शन एवं दिशा-निर्देशन",
+      photoUrl: "/images/founder-placeholder.jpg",
       bioEn:
-        "Hailing from a revered family of Siddhanta Jyotish scholars on Dashashwamedh Ghat, Pt. Radheshyam Shastri holds Shastri and Acharya titles from Sampurnanand Sanskrit University. For over four decades, he has championed ethical, unadulterated planetary guidance based strictly on classical texts (Brihat Parashara Hora Shastra, Jaimini Sutram, and Surya Siddhanta).\n\nUnder his guidance, the Kendra has preserved authentic handwritten horoscopes and trained junior scholars in ephemeris computations, rejecting fear-mongering and commercial astrology.",
+        "This section contains the scholarly background, lineage, and experience of the founder of Maharshi Kanad Jyotish Kendra. All details including qualifications, biographical milestones, and institutional lineage are fully configurable and editable from the Admin Panel under Site CMS > Founder Details.",
       bioHi:
-        "दशाश्वमेध घाट, वाराणसी की प्रतिष्ठित दैवज्ञ परंपरा से संबद्ध, पं. राधेश्याम शास्त्री जी ने संपूर्णानंद संस्कृत विश्वविद्यालय से वेदांग ज्योतिष में आचार्य उपाधि प्राप्त की है। विगत 4 दशकों से उन्होंने हजारों जातकों को महर्षि पराशर, जैमिनि एवं सूर्य सिद्धांत के सूक्ष्म गणितीय आधार पर सत्य एवं निष्पक्ष मार्गदर्शन प्रदान किया है।\n\nशास्त्री जी के निर्देशन में केंद्र ने शुद्ध हस्तलिखित कुण्डली परंपरा को जीवित रखा है और अंधविश्वास अथवा भय-व्यापार के विरुद्ध शास्त्रसम्मत समाधान की अलख जगाई है।",
-      youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      additionalLinks: [
-        {
-          labelEn: "Sister Portal: Vindhya Vivah Sanskar",
-          labelHi: "सहयोगी पोर्टल: विंध्य विवाह संस्कार",
-          url: "https://vindhyavivahsanskar.com",
-        },
-        {
-          labelEn: "Ephemeris Calculation Methodology",
-          labelHi: "पंचांग एवं सूक्ष्म ग्रह गणित पद्धति",
-          url: "https://kanadjyotishkendra.vercel.app/legal/ephemeris-sources",
-        },
-      ],
+        "यह अनुभाग महर्षि कणाद ज्योतिष केंद्र के संस्थापक के परिचय, शास्त्रीय परंपरा एवं ज्योतिषीय अनुभव हेतु निर्धारित है। समस्त विवरण, उपाधियां, अनुभव एवं विचार एडमिन पैनल के 'संस्थापक विवरण' CMS अनुभाग से पूर्णतः संपादन योग्य हैं।",
+      youtubeUrl: null,
+      additionalLinks: [],
       footerNoteEn:
-        "Note: Consultations follow the traditional Dakshina code. No black magic, fear-mongering, or misleading claims are entertained at the Kendra.",
+        "Note: Consultations follow traditional codes of conduct. All services and guidance details can be configured via Admin Site Settings.",
       footerNoteHi:
-        "नोट: समस्त परामर्श शास्त्रसम्मत दक्षिणा पद्धति से संपन्न होते हैं। केंद्र पर किसी भी प्रकार के अंधविश्वास, भय अथवा मिथ्या दावों का पूर्ण निषेध है।",
+        "नोट: समस्त परामर्श शास्त्रसम्मत मर्यादा के अंतर्गत संपन्न होते हैं। विवरण एडमिन पैनल से संपादन योग्य है।",
       isActive: true,
     },
   });
@@ -861,8 +869,8 @@ startxref
         isActive: true,
       },
       {
-        questionEn: "How do I consult with Shastri Ji directly?",
-        questionHi: "शास्त्री जी से प्रत्यक्ष व्यक्तिगत परामर्श कैसे प्राप्त करें?",
+        questionEn: "How do I consult with the Founder / Astrologer directly?",
+        questionHi: "संस्थापक अथवा मुख्य ज्योतिषाचार्य से प्रत्यक्ष व्यक्तिगत परामर्श कैसे प्राप्त करें?",
         answerEn:
           "You can select the 'Telephonic / Video Consultation' service, pick an available appointment slot, and complete the booking. Our coordinator will schedule your call via Google Meet or Phone.",
         answerHi:
@@ -881,9 +889,9 @@ startxref
       titleEn: "Privacy Policy & Data Security",
       titleHi: "गोपनीयता नीति एवं डेटा सुरक्षा",
       contentEn:
-        "At Maharshi Kanad Jyotish Kendra, we treat your birth details, family lineage, and consultation discussions with sacred confidentiality. Personal birth parameters (date, time, place of birth) are used solely for astronomical ephemeris computations and never sold or shared with any third-party marketing entities.",
+        "At Maharshi Kanad Jyotish Kendra, we treat your birth details, family lineage, and consultation discussions with sacred confidentiality. Personal birth parameters (date, time, place of birth) are used solely for astronomical ephemeris computations and never sold or shared with any third-party marketing entities.\n\nChatbot & Inbound Lead Data: Information provided through our automated Vedic Chatbot or contact forms (including your name, phone number, and brief consultation requirement) is collected solely to provide relevant astrological assistance, follow up on your requested consultation, and maintain customer support records. Chatbot lead data is stored securely in our database and is accessible only to authorized administrators for callback and fulfillment purposes.",
       contentHi:
-        "महर्षि कणाद ज्योतिष केंद्र आपके जन्म विवरण, पारिवारिक गोत्र एवं परामर्श की गोपनीयता को पवित्र मानता है। आपका जन्म समय, दिनांक एवं स्थान केवल पंचांग गणित हेतु उपयोग किया जाता है और किसी भी व्यावसायिक संस्था से साझा नहीं किया जाता।",
+        "महर्षि कणाद ज्योतिष केंद्र आपके जन्म विवरण, पारिवारिक गोत्र एवं परामर्श की गोपनीयता को पवित्र मानता है। आपका जन्म समय, दिनांक एवं स्थान केवल पंचांग गणित हेतु उपयोग किया जाता है और किसी भी व्यावसायिक संस्था से साझा नहीं किया जाता।\n\nचैटबॉट एवं संपर्क लीड डेटा: हमारे स्वचालित वैदिक चैटबॉट अथवा संपर्क प्रपत्र के माध्यम से दिया गया विवरण (आपका नाम, फोन नंबर एवं परामर्श आवश्यकता) केवल उपयुक्त ज्योतिषीय सहायता प्रदान करने, संपर्क स्थापित करने तथा ग्राहक सहायता के निमित्त सुरक्षित रूप से संग्रहीत किया जाता है। यह डेटा केवल अधिकृत व्यवस्थापकों के पास सुरक्षित रहता है और इसका किसी तृतीय-पक्ष प्रचार अथवा व्यावसायिक प्रयोजन हेतु उपयोग नहीं किया जाता।",
     },
     {
       slug: "legal/terms",

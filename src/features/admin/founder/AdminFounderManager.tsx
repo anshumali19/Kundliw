@@ -227,7 +227,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
                 required
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
-                placeholder="e.g. Pt. Radheshyam Shastri"
+                placeholder="e.g. Founder Name"
                 className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
               />
             </div>
@@ -239,7 +239,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
                 required
                 value={nameHi}
                 onChange={(e) => setNameHi(e.target.value)}
-                placeholder="उदा. पं. राधेश्याम शास्त्री"
+                placeholder="उदा. संस्थापक का नाम"
                 className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
               />
             </div>

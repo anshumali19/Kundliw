@@ -482,12 +482,12 @@ model MediaGalleryItem {
 
 model FounderProfile {
   id              String   @id @default("default")
-  nameEn          String   @default("Pt. Radheshyam Shastri")
-  nameHi          String   @default("पं. राधेश्याम शास्त्री")
+  nameEn          String   @default("Founder Name")
+  nameHi          String   @default("संस्थापक का नाम")
   designationEn   String   @default("Founder & Chief Astrologer")
   designationHi   String   @default("संस्थापक एवं मुख्य ज्योतिषाचार्य")
-  roleEn          String   @default("Vedic Ephemeris & Siddhanta Jyotish Tradition")
-  roleHi          String   @default("काशी वेदांग ज्योतिष एवं दृग्गणित सिद्धान्त परंपरा")
+  roleEn          String   @default("Vedic Astrological Guidance & Direction")
+  roleHi          String   @default("वैदिक ज्योतिष मार्गदर्शन एवं दिशा-निर्देशन")
   photoUrl        String?
   bioEn           String   @db.Text
   bioHi           String   @db.Text

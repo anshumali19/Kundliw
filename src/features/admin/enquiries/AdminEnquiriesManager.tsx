@@ -31,6 +31,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
   const [enquiries, setEnquiries] = useState<EnquiryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "resolved">("all");
+  const [sourceFilter, setSourceFilter] = useState<"ALL" | "CHATBOT_LEAD" | "CONTACT_PAGE">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -98,14 +99,20 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
 
   const filtered = enquiries.filter((e) => {
     const term = searchTerm.toLowerCase();
-    return (
+    const matchesSearch =
       !searchTerm ||
       e.name.toLowerCase().includes(term) ||
       e.phone.toLowerCase().includes(term) ||
       (e.email && e.email.toLowerCase().includes(term)) ||
       e.subject.toLowerCase().includes(term) ||
-      e.message.toLowerCase().includes(term)
-    );
+      e.message.toLowerCase().includes(term);
+
+    const matchesSource =
+      sourceFilter === "ALL" ||
+      (sourceFilter === "CHATBOT_LEAD" && (e.source === "CHATBOT_LEAD" || e.source === "CHATBOT_TICKET")) ||
+      (sourceFilter === "CONTACT_PAGE" && e.source === "CONTACT_PAGE");
+
+    return matchesSearch && matchesSource;
   });
 
   return (
@@ -171,7 +178,8 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
           />
         </div>
 
-        <div className="flex items-center gap-1.5 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
+          {/* Status Filter */}
           {(["all", "pending", "resolved"] as const).map((mode) => (
             <button
               key={mode}
@@ -182,9 +190,32 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                   : "bg-surface-container text-on-surface-variant hover:text-on-surface"
               }`}
             >
-              {mode === "all" && (isHindi ? "सभी" : "All")}
+              {mode === "all" && (isHindi ? "सभी स्थितियां" : "All Status")}
               {mode === "pending" && (isHindi ? "लंबित" : "Pending")}
               {mode === "resolved" && (isHindi ? "निस्तारित" : "Resolved")}
+            </button>
+          ))}
+
+          <span className="text-outline-variant/60 hidden sm:inline">|</span>
+
+          {/* Source Filter */}
+          {(
+            [
+              { id: "ALL", labelEn: "All Sources", labelHi: "सभी स्रोत" },
+              { id: "CHATBOT_LEAD", labelEn: "🤖 Chatbot Leads", labelHi: "🤖 चैटबॉट लीड्स" },
+              { id: "CONTACT_PAGE", labelEn: "✉️ Contact Form", labelHi: "✉️ संपर्क प्रपत्र" },
+            ] as const
+          ).map((src) => (
+            <button
+              key={src.id}
+              onClick={() => setSourceFilter(src.id)}
+              className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+                sourceFilter === src.id
+                  ? "bg-secondary text-on-secondary"
+                  : "bg-surface-container text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              {isHindi ? src.labelHi : src.labelEn}
             </button>
           ))}
         </div>
@@ -219,9 +250,19 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                     <span className="font-serif font-bold text-base text-on-surface">
                       {item.name}
                     </span>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">
-                      {item.source}
-                    </span>
+                    {item.source === "CHATBOT_LEAD" ? (
+                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30 flex items-center gap-1">
+                        🤖 {isHindi ? "चैटबॉट लीड" : "Chatbot Lead"}
+                      </span>
+                    ) : item.source === "CHATBOT_TICKET" ? (
+                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30 flex items-center gap-1">
+                        🎫 {isHindi ? "चैटबॉट टिकट" : "Chatbot Ticket"}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">
+                        {item.source}
+                      </span>
+                    )}
                     <span
                       className={`text-[11px] px-2 py-0.5 rounded font-medium ${
                         item.isResolved

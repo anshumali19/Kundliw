@@ -1,22 +1,22 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Phase 17 - Founder Page, FAQ System, Legal CMS & Gallery Enhancements", () => {
-  test("public Founder page loads with Pt. Radheshyam Shastri details, canonical pillars, and booking link", async ({
+  test("public Founder page loads with neutral placeholder details, canonical pillars, and booking link", async ({
     page,
   }) => {
     // 1. English Founder Page
     await page.goto("/en/founder");
     await expect(page).toHaveTitle(/Founder Lineage/i);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Pt\. Radheshyam Shastri/i);
-    await expect(page.getByText(/Founder, Senior Daivajna/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Founder Name/i);
+    await expect(page.getByText(/Founder & Chief Astrologer/i).first()).toBeVisible();
     await expect(page.getByText(/Surya Siddhanta/i).first()).toBeVisible();
     await expect(page.getByText(/Book Direct Consultation/i).first()).toBeVisible();
 
     // 2. Hindi Founder Page
     await page.goto("/hi/founder");
     await expect(page).toHaveTitle(/संस्थापक एवं दैवज्ञ परंपरा/i);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(/पं\. राधेश्याम शास्त्री/i);
-    await expect(page.getByText(/संस्थापक, वरिष्ठ दैवज्ञ/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/संस्थापक का नाम/i);
+    await expect(page.getByText(/संस्थापक एवं मुख्य ज्योतिषाचार्य/i).first()).toBeVisible();
     await expect(page.getByText(/सूर्य सिद्धान्त/i).first()).toBeVisible();
   });
 
@@ -104,7 +104,7 @@ test.describe("Phase 17 - Founder Page, FAQ System, Legal CMS & Gallery Enhancem
     // 3. Navigate to Founder Profile CMS
     await page.goto("/en/admin/founder");
     await expect(page.getByText(/Founder Page CMS Control/i)).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('input[value*="Radheshyam Shastri"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('input[value*="Founder Name"]')).toBeVisible({ timeout: 10000 });
     await expect(page.getByRole("button", { name: /Save Founder Profile Live/i })).toBeVisible();
   });
 });

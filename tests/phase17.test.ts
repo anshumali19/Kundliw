@@ -172,8 +172,8 @@ describe("Phase 17 - Founder Profile CMS", () => {
   it("public GET /api/founder returns founder profile", async () => {
     (prisma.founderProfile.findUnique as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
       id: "default",
-      nameEn: "Pt. Radheshyam Shastri",
-      nameHi: "पं. राधेश्याम शास्त्री",
+      nameEn: "Founder Name",
+      nameHi: "संस्थापक का नाम",
       designationEn: "Founder & Chief Astrologer",
       designationHi: "संस्थापक एवं मुख्य ज्योतिषाचार्य",
       roleEn: "Vedanga Jyotish Lineage",
@@ -188,7 +188,7 @@ describe("Phase 17 - Founder Profile CMS", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.success).toBe(true);
-    expect(body.profile.nameEn).toBe("Pt. Radheshyam Shastri");
+    expect(body.profile.nameEn).toBe("Founder Name");
   });
 
   it("admin PUT /api/admin/founder updates founder profile and additional links", async () => {
@@ -196,8 +196,8 @@ describe("Phase 17 - Founder Profile CMS", () => {
     (prisma.user.findUnique as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ADMIN_USER);
 
     const payload = {
-      nameEn: "Pt. Radheshyam Shastri",
-      nameHi: "पं. राधेश्याम शास्त्री",
+      nameEn: "Founder Name",
+      nameHi: "संस्थापक का नाम",
       designationEn: "Senior Daivajna",
       designationHi: "वरिष्ठ दैवज्ञ",
       bioEn: "Comprehensive biographical narrative over four decades in Varanasi.",

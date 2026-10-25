@@ -98,6 +98,27 @@ const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 const routeFiles = getAdminRouteFiles(root);
 const routes: RouteSpec[] = [];
 
+for (const file of routeFiles) {
+  const relative = path.relative(root, file).replace(/\\/g, "/");
+  const routeName = relative.replace(/\/route\.ts$/, "").replace(/route\.ts$/, "");
+  const mod = await import(file);
+  const methods = HTTP_METHODS.filter((m) => typeof mod[m] === "function");
+  if (methods.length > 0) {
+    const cleanPath =
+      "/api/admin/" +
+      routeName
+        .split("/")
+        .map((seg) => (seg.startsWith("[") ? "x" : seg))
+        .join("/");
+    routes.push({
+      name: routeName || "index",
+      path: cleanPath,
+      module: mod,
+      methods,
+    });
+  }
+}
+
 const ADMIN_USER = {
   id: "admin-1",
   name: "Admin",
@@ -127,29 +148,6 @@ async function callRoute(spec: RouteSpec, method: string, origin?: string) {
   return handler!(makeRequest(spec, method, origin), { params: { id: "x" } });
 }
 
-beforeAll(async () => {
-  for (const file of routeFiles) {
-    const relative = path.relative(root, file).replace(/\\/g, "/");
-    const routeName = relative.replace(/\/route\.ts$/, "").replace(/route\.ts$/, "");
-    const mod = await import(file);
-    const methods = HTTP_METHODS.filter((m) => typeof mod[m] === "function");
-    if (methods.length > 0) {
-      const cleanPath =
-        "/api/admin/" +
-        routeName
-          .split("/")
-          .map((seg) => (seg.startsWith("[") ? "x" : seg))
-          .join("/");
-      routes.push({
-        name: routeName || "index",
-        path: cleanPath,
-        module: mod,
-        methods,
-      });
-    }
-  }
-});
-
 beforeEach(() => {
   sessionState.current = null;
   vi.clearAllMocks();
@@ -162,45 +160,45 @@ describe("C1 - admin API authentication & dynamic discovery", () => {
     expect(routeFiles.length).toBe(routes.length);
   });
 
-  it("rejects unauthenticated requests to every admin route with 401", async () => {
-    for (const spec of routes) {
-      for (const method of spec.methods) {
-        const res = await callRoute(spec, method);
-        expect(res.status, `${spec.name} ${method} should return 401`).toBe(401);
-      }
+  it.each(routes.flatMap((spec) => spec.methods.map((method) => ({ spec, method }))))(
+    "rejects unauthenticated $spec.name $method with 401",
+    async ({ spec, method }) => {
+      const res = await callRoute(spec, method);
+      expect(res.status).toBe(401);
     }
-  });
+  );
 
-  it("rejects authenticated non-admin requests to every admin route with 403", async () => {
-    sessionState.current = { user: { id: "user-1" } };
-    (prisma.user.findUnique as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
-      id: "user-1",
-      name: "Customer",
-      email: "customer@example.com",
-      phone: "+919999900002",
-      role: "USER",
-    });
+  it.each(routes.flatMap((spec) => spec.methods.map((method) => ({ spec, method }))))(
+    "rejects authenticated non-admin $spec.name $method with 403",
+    async ({ spec, method }) => {
+      sessionState.current = { user: { id: "user-1" } };
+      (prisma.user.findUnique as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+        id: "user-1",
+        name: "Customer",
+        email: "customer@example.com",
+        phone: "+919999900002",
+        role: "USER",
+      });
 
-    for (const spec of routes) {
-      for (const method of spec.methods) {
-        const res = await callRoute(spec, method);
-        expect(res.status, `${spec.name} ${method} should return 403`).toBe(403);
-      }
+      const res = await callRoute(spec, method);
+      expect(res.status).toBe(403);
     }
-  });
+  );
 
-  it("rejects cross-origin admin writes to every admin route with 403", async () => {
-    sessionState.current = { user: { id: "admin-1" } };
-    (prisma.user.findUnique as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ADMIN_USER);
+  it.each(
+    routes
+      .filter((spec) => spec.methods.some((m) => m !== "GET"))
+      .flatMap((spec) => spec.methods.filter((m) => m !== "GET").map((method) => ({ spec, method })))
+  )(
+    "rejects cross-origin admin writes $spec.name $method with 403",
+    async ({ spec, method }) => {
+      sessionState.current = { user: { id: "admin-1" } };
+      (prisma.user.findUnique as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ADMIN_USER);
 
-    const writeSpecs = routes.filter((s) => s.methods.some((m) => m !== "GET"));
-    for (const spec of writeSpecs) {
-      for (const method of spec.methods.filter((m) => m !== "GET")) {
-        const res = await callRoute(spec, method, "https://evil.example.com");
-        expect(res.status, `${spec.name} ${method} should reject cross-origin with 403`).toBe(403);
-      }
+      const res = await callRoute(spec, method, "https://evil.example.com");
+      expect(res.status).toBe(403);
     }
-  });
+  );
 
   it("does not contain truthiness checks on guard results in admin routes", () => {
     const rootDir = path.resolve(__dirname, "../src/app/api/admin");
