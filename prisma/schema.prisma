@@ -436,3 +436,17 @@ model PanchangCache {
 
   @@unique([dateString, city])
 }
+
+model TranslationOverride {
+  id        String   @id @default(cuid())
+  locale    String   // "hi" or "en"
+  namespace String   // e.g. "nav", "common", "footer", "home", "services", "booking", etc.
+  key       String   // e.g. "book_consultation" or deep dot path "steps.step1"
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([locale, namespace, key])
+  @@index([locale, namespace])
+}
+

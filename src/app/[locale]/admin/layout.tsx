@@ -10,6 +10,7 @@ import {
   ShoppingBag,
   ExternalLink,
   LogOut,
+  Languages,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -134,6 +135,14 @@ export default async function AdminLayout({
             className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >
             <span>{isHindi ? "दीर्घा (Gallery)" : "Gallery"}</span>
+          </Link>
+
+          <Link
+            href="/admin/translations"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <Languages className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "अनुवाद (Translations)" : "Translations"}</span>
           </Link>
 
           <Link
