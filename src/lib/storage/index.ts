@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { put, get as getBlob } from "@vercel/blob";
 import { assertPlaceholderAllowed, isDemoMode } from "@/lib/config/demo";
 
 export interface StoredFileResult {
@@ -189,9 +190,76 @@ export class S3StorageProvider implements StorageProvider {
 }
 
 /**
+ * Vercel Blob implementation (private store) for serverless hosting, where the
+ * filesystem is read-only. Files are never exposed by a public URL: every read goes
+ * through /api/storage, which performs the ownership/role checks first.
+ * Enabled automatically when BLOB_READ_WRITE_TOKEN is set.
+ */
+export class VercelBlobStorageProvider implements StorageProvider {
+  name = "VercelBlobStorageProvider";
+
+  async saveFile(
+    fileBuffer: Buffer,
+    originalFilename: string,
+    mimeType: string,
+    subfolder = "uploads"
+  ): Promise<StoredFileResult> {
+    if (fileBuffer.length > MAX_FILE_SIZE_BYTES) {
+      throw new Error(`File size (${fileBuffer.length} bytes) exceeds 10MB limit.`);
+    }
+
+    const { isValid, detectedMime } = validateFileMagicBytes(fileBuffer);
+    if (!isValid) {
+      throw new Error("Invalid file content: signature does not match allowed types (PDF, PNG, JPEG, WEBP).");
+    }
+
+    assertAllowedSubfolder(subfolder);
+    const safeName = path.basename(originalFilename).replace(/[^a-zA-Z0-9._-]/g, "_");
+    const uniqueName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${safeName}`;
+    const storageKey = `${subfolder}/${uniqueName}`;
+
+    await put(storageKey, fileBuffer, {
+      access: "private",
+      addRandomSuffix: false,
+      contentType: detectedMime || mimeType,
+    });
+
+    return {
+      storageKey,
+      publicUrl: `/api/storage/${storageKey}`,
+      fileSize: fileBuffer.length,
+      mimeType: detectedMime || mimeType,
+    };
+  }
+
+  async getFile(storageKey: string): Promise<{ buffer: Buffer; mimeType: string }> {
+    const [subfolder, ...rest] = storageKey.split("/");
+    assertAllowedSubfolder(subfolder);
+    if (rest.length === 0 || rest.some((seg) => seg === ".." || seg === "." || seg === "")) {
+      throw new Error("Invalid storage path.");
+    }
+
+    const result = await getBlob(storageKey, { access: "private" });
+    if (!result || result.statusCode !== 200) {
+      throw new Error(`File not found: ${storageKey}`);
+    }
+
+    const buffer = Buffer.from(await new Response(result.stream).arrayBuffer());
+    const { detectedMime } = validateFileMagicBytes(buffer);
+    return {
+      buffer,
+      mimeType: detectedMime || result.blob.contentType || "application/octet-stream",
+    };
+  }
+}
+
+/**
  * Factory for storage provider.
  */
 export function getStorageProvider(): StorageProvider {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    return new VercelBlobStorageProvider();
+  }
   if (process.env.NODE_ENV === "production" && !isDemoMode()) {
     return new S3StorageProvider();
   }
