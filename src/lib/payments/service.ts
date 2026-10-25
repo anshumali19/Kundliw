@@ -19,6 +19,8 @@ export interface MarkPaidInput {
   providerPaymentId?: string;
   signature?: string;
   note?: string;
+  /** Amount actually captured by the provider, in paise. Must match the order. */
+  paidAmountPaise: number;
 }
 
 export interface ManualPaymentInput {
@@ -46,7 +48,37 @@ export async function markOrderPaid(
       throw new Error(`Order not found: ${orderId}`);
     }
 
-    // Idempotent: if already paid, return
+    // Never trust a caller-supplied success flag: the captured amount must
+    // equal the server-computed order total.
+    if (
+      !Number.isInteger(details.paidAmountPaise) ||
+      details.paidAmountPaise < 0 ||
+      details.paidAmountPaise !== order.netAmountPaise
+    ) {
+      throw new PaymentError(
+        "Captured amount does not match the order total.",
+        409
+      );
+    }
+
+    if (
+      order.paymentStatus === PaymentStatus.FAILED ||
+      order.paymentStatus === PaymentStatus.REFUNDED
+    ) {
+      throw new PaymentError(
+        "This order is no longer payable. Its reservation was released or refunded.",
+        409
+      );
+    }
+
+    if (order.expiresAt && new Date() > order.expiresAt) {
+      throw new PaymentError(
+        "This order reservation has expired. Please create a new booking.",
+        409
+      );
+    }
+
+    // Idempotent: if already paid with the verified amount, return
     if (order.paymentStatus === PaymentStatus.PAID) {
       return order;
     }
@@ -191,6 +223,17 @@ export async function approveManualPayment(
 
     if (!order) {
       throw new Error(`Order not found: ${orderId}`);
+    }
+
+    if (order.paymentStatus === PaymentStatus.PAID) {
+      return order;
+    }
+
+    if (order.paymentStatus !== PaymentStatus.AWAITING_VERIFICATION) {
+      throw new PaymentError(
+        "Only orders awaiting manual payment verification can be approved.",
+        409
+      );
     }
 
     let invoiceNumber = order.invoiceNumber;

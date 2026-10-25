@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
-import { approveManualPayment, rejectManualPayment } from "@/lib/payments/service";
+import { approveManualPayment, rejectManualPayment, PaymentError } from "@/lib/payments/service";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { z } from "zod";
 
@@ -54,6 +54,10 @@ export async function POST(
       });
     }
   } catch (error) {
+    if (error instanceof PaymentError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
     const msg = error instanceof Error ? error.message : "Verification failed";
     return NextResponse.json({ error: msg }, { status: 500 });
   }

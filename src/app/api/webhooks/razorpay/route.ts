@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
         paymentMode: PaymentMode.RAZORPAY,
         providerPaymentId: paymentId,
         signature,
+        paidAmountPaise: amount,
         note: `Payment captured via Razorpay Webhook (${eventType})`,
       });
     }

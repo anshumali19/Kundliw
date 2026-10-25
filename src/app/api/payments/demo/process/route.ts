@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
-import { markOrderPaid } from "@/lib/payments/service";
+import { markOrderPaid, PaymentError } from "@/lib/payments/service";
 import { isDemoMode } from "@/lib/config/demo";
 import { PaymentMode, PaymentStatus, Role } from "@prisma/client";
 import { z } from "zod";
@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
       const updatedOrder = await markOrderPaid(orderId, {
         paymentMode: PaymentMode.RAZORPAY,
         providerPaymentId: `demo_pay_${Date.now()}`,
+        paidAmountPaise: order.netAmountPaise,
         note: "Simulated online gateway checkout completed (Demo Mode)",
       });
 
@@ -96,6 +97,10 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
+    if (error instanceof PaymentError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+
     const msg = error instanceof Error ? error.message : "Internal error";
     return NextResponse.json({ error: msg }, { status: 500 });
   }

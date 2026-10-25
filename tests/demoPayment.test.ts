@@ -82,6 +82,7 @@ function makeOrder(overrides: Record<string, unknown> = {}) {
     razorpayPaymentId: null,
     razorpaySignature: null,
     expiresAt: null,
+    netAmountPaise: 118000,
     ...overrides,
   };
 }
