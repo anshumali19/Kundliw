@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { BookingWizard, BookingServiceSummary, AvailableSlot } from "@/features/booking/components/BookingWizard";
 
 interface BookingPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
-  searchParams?: {
+  }>;
+  searchParams?: Promise<{
     service?: string;
     plan?: string;
     offer?: string;
@@ -19,15 +19,19 @@ interface BookingPageProps {
     partnerDob?: string;
     partnerTob?: string;
     partnerPob?: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function BookingPage({
-  params: { locale },
-  searchParams,
-}: BookingPageProps) {
+export default async function BookingPage(props: BookingPageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   // Login required before booking per SRS and instructions
   const user = await requireUser(
     `/booking${

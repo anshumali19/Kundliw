@@ -8,15 +8,20 @@ import { ServiceDetailView, ServiceDetailDTO } from "@/features/services/compone
 export const dynamic = "force-dynamic";
 
 interface ServiceDetailPageProps {
-  params: {
+  params: Promise<{
     locale: string;
     slug: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({
-  params: { locale, slug },
-}: ServiceDetailPageProps): Promise<Metadata> {
+export async function generateMetadata(props: ServiceDetailPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale,
+    slug
+  } = params;
+
   const service = await prisma.service
     .findUnique({ where: { slug } })
     .catch(() => null);
@@ -33,9 +38,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function ServiceDetailPage({
-  params: { locale, slug },
-}: ServiceDetailPageProps) {
+export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
+  const params = await props.params;
+
+  const {
+    locale,
+    slug
+  } = params;
+
   // Query service and active plans from DB
   const service = await prisma.service.findUnique({
     where: { slug },
@@ -151,4 +161,5 @@ export default async function ServiceDetailPage({
         locale={locale}
       />
      </>
-  );}
+  );
+}

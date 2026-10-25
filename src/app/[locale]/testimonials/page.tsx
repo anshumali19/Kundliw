@@ -4,14 +4,20 @@ import { prisma } from "@/lib/prisma";
 import { Star, ShieldCheck, MessageSquare } from "lucide-react";
 
 interface TestimonialsPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: TestimonialsPageProps): Promise<Metadata> {
+export async function generateMetadata(props: TestimonialsPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/testimonials"),
@@ -24,7 +30,13 @@ export async function generateMetadata({ params: { locale } }: TestimonialsPageP
   };
 }
 
-export default async function TestimonialsPage({ params: { locale } }: TestimonialsPageProps) {
+export default async function TestimonialsPage(props: TestimonialsPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   const testimonials = await prisma.testimonial.findMany({
     where: { isActive: true },

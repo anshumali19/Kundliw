@@ -5,10 +5,8 @@ import { guardApiAdmin } from "@/lib/auth/guards";
 import { serviceInputSchema } from "@/features/services/validation";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const guard = await guardApiAdmin();
   if (!guard.ok) return guard.errorResponse;
 
@@ -44,10 +42,8 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const guard = await guardApiAdmin();
   if (!guard.ok) return guard.errorResponse;
 

@@ -4,14 +4,20 @@ import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { PanchangClient } from "@/features/astro/components/PanchangClient";
 
 interface PanchangPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: PanchangPageProps): Promise<Metadata> {
+export async function generateMetadata(props: PanchangPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/panchang"),
@@ -24,7 +30,13 @@ export async function generateMetadata({ params: { locale } }: PanchangPageProps
   };
 }
 
-export default async function PanchangPage({ params: { locale } }: PanchangPageProps) {
+export default async function PanchangPage(props: PanchangPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const initialPanchang = await getDailyPanchang();
 
   return (

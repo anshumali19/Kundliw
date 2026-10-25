@@ -139,7 +139,7 @@ describe("Phase 17 - FAQ System", () => {
       body: JSON.stringify({ questionEn: "Updated Question" }),
     });
 
-    const res = await adminFaqById.PUT(req, { params: { id: "faq-1" } });
+    const res = await adminFaqById.PUT(req, { params: Promise.resolve({ id: "faq-1" }) });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.success).toBe(true);
@@ -158,7 +158,7 @@ describe("Phase 17 - FAQ System", () => {
       headers: { host: "localhost:3000" },
     });
 
-    const res = await adminFaqById.DELETE(req, { params: { id: "faq-1" } });
+    const res = await adminFaqById.DELETE(req, { params: Promise.resolve({ id: "faq-1" }) });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.success).toBe(true);
@@ -274,7 +274,7 @@ describe("Phase 17 - Media Gallery Video & Links (#11)", () => {
       body: JSON.stringify(updateData),
     });
 
-    const res = await adminGalleryById.PUT(req, { params: { id: "gal-1" } });
+    const res = await adminGalleryById.PUT(req, { params: Promise.resolve({ id: "gal-1" }) });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.success).toBe(true);

@@ -7,16 +7,20 @@ import {
 import { CanonicalOrderStatus } from "@/lib/orders/status";
 
 interface AdminOrdersPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOrdersPage({
-  params: { locale },
-}: AdminOrdersPageProps) {
+export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   await requireAdmin("/admin/orders", locale);
   const isHindi = locale === "hi";
 

@@ -5,17 +5,22 @@ import { PaymentStatus, Role } from "@prisma/client";
 import { CheckoutClient } from "@/features/booking/components/CheckoutClient";
 
 interface CheckoutPageProps {
-  params: {
+  params: Promise<{
     locale: string;
     id: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function CheckoutPage({
-  params: { locale, id },
-}: CheckoutPageProps) {
+export default async function CheckoutPage(props: CheckoutPageProps) {
+  const params = await props.params;
+
+  const {
+    locale,
+    id
+  } = params;
+
   const user = await requireUser(`/booking/checkout/${id}`, locale);
   const isHindi = locale === "hi";
 

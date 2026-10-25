@@ -16,11 +16,17 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/other-services"),
@@ -33,11 +39,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function OtherServicesPage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default async function OtherServicesPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
 
   const dbItems = await prisma.otherService

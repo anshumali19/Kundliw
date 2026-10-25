@@ -2,14 +2,20 @@ import { Metadata } from "next";
 import { PrashnaRequestClient } from "@/features/astro/components/PrashnaRequestClient";
 
 interface PrashnaPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: PrashnaPageProps): Promise<Metadata> {
+export async function generateMetadata(props: PrashnaPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     title: isHindi
@@ -21,7 +27,13 @@ export async function generateMetadata({ params: { locale } }: PrashnaPageProps)
   };
 }
 
-export default function PrashnaPage({ params: { locale } }: PrashnaPageProps) {
+export default async function PrashnaPage(props: PrashnaPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return (
     <div className="w-full min-h-screen bg-surface-container-lowest py-8">
       <PrashnaRequestClient locale={locale} />

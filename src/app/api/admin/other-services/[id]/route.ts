@@ -26,10 +26,8 @@ const updateOtherServiceSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const guard = await guardApiAdmin();
   if (!guard.ok) return guard.errorResponse;
 
@@ -62,10 +60,8 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const guard = await guardApiAdmin();
   if (!guard.ok) return guard.errorResponse;
 

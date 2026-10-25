@@ -5,14 +5,20 @@ import { Link } from "@/i18n/routing";
 import { BookOpen, Calendar, ArrowRight } from "lucide-react";
 
 interface BlogsPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: BlogsPageProps): Promise<Metadata> {
+export async function generateMetadata(props: BlogsPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/blogs"),
@@ -25,7 +31,13 @@ export async function generateMetadata({ params: { locale } }: BlogsPageProps): 
   };
 }
 
-export default async function BlogsPage({ params: { locale } }: BlogsPageProps) {
+export default async function BlogsPage(props: BlogsPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
 
   const posts = await prisma.blogPost.findMany({

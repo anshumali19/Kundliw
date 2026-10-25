@@ -1,11 +1,12 @@
 import { Metadata } from "next";
 import { AdminChatbotManager } from "@/features/admin/chatbot/AdminChatbotManager";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const isHi = params?.locale === "hi";
   return {
     title: isHi
@@ -14,11 +15,12 @@ export async function generateMetadata({
   };
 }
 
-export default function AdminChatbotPage({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function AdminChatbotPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const locale = params?.locale || "hi";
   return <AdminChatbotManager locale={locale} />;
 }

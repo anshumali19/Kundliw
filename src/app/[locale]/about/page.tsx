@@ -5,14 +5,20 @@ import { Award, BookOpen, Compass, Shield, Users, ArrowRight } from "lucide-reac
 import { Link } from "@/i18n/routing";
 
 interface AboutPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: AboutPageProps): Promise<Metadata> {
+export async function generateMetadata(props: AboutPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/about"),
@@ -25,7 +31,13 @@ export async function generateMetadata({ params: { locale } }: AboutPageProps): 
   };
 }
 
-export default async function AboutPage({ params: { locale } }: AboutPageProps) {
+export default async function AboutPage(props: AboutPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
 
   const page = await prisma.staticPage

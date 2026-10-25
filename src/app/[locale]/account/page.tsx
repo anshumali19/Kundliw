@@ -18,16 +18,20 @@ import {
 } from "lucide-react";
 
 interface AccountPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function AccountPage({
-  params: { locale },
-}: AccountPageProps) {
+export default async function AccountPage(props: AccountPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const user = await requireUser("/account", locale);
   const isHindi = locale === "hi";
 

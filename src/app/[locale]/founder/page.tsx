@@ -14,14 +14,20 @@ import {
 } from "lucide-react";
 
 interface FounderPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: FounderPageProps): Promise<Metadata> {
+export async function generateMetadata(props: FounderPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/founder"),
@@ -34,7 +40,13 @@ export async function generateMetadata({ params: { locale } }: FounderPageProps)
   };
 }
 
-export default async function FounderPage({ params: { locale } }: FounderPageProps) {
+export default async function FounderPage(props: FounderPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
 
   const founder = await prisma.founderProfile

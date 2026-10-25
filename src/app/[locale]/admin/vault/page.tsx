@@ -7,16 +7,20 @@ import {
 } from "@/features/admin/components/AdminVaultManager";
 
 interface AdminVaultPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminVaultPage({
-  params: { locale },
-}: AdminVaultPageProps) {
+export default async function AdminVaultPage(props: AdminVaultPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   await requireAdmin("/admin/vault", locale);
   const isHindi = locale === "hi";
 

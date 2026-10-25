@@ -3,11 +3,12 @@ import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ContactClient } from "@/features/contact/ContactClient";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const isHi = params?.locale === "hi";
   return {
     alternates: pageAlternates(params?.locale, "/contact"),
@@ -20,11 +21,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function ContactPage({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default async function ContactPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
   const locale = params?.locale || "hi";
 
   const settings = await prisma.adminSettings

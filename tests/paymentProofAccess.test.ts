@@ -68,7 +68,7 @@ describe("M9 - payment proof key equality", () => {
   it("queries the order with an exact key instead of a substring match", async () => {
     const res = await getStorageFile(
       new NextRequest("http://localhost:3000/api/storage/payment-proofs/receipt-1.png"),
-      { params: { path: ["payment-proofs", "receipt-1.png"] } }
+      { params: Promise.resolve({ path: ["payment-proofs", "receipt-1.png"] }) }
     );
 
     expect(res.status).toBe(403);

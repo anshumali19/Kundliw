@@ -20,15 +20,22 @@ import {
 
 interface AdminLayoutProps {
   children: ReactNode;
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
-export default async function AdminLayout({
-  children,
-  params: { locale },
-}: AdminLayoutProps) {
+export default async function AdminLayout(props: AdminLayoutProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
+  const {
+    children
+  } = props;
+
   // Enforce server-side DB-verified admin check
   const admin = await requireAdmin(`/admin/services`, locale);
   const isHindi = locale === "hi";

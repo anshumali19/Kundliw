@@ -139,7 +139,7 @@ describe("C3 - invoice HTML hardening", () => {
   it("escapes customer-controlled values and derives status and GST rate", async () => {
     const res = await GET(
       new NextRequest("http://localhost:3000/api/invoice/order-1?format=html"),
-      { params: { id: "order-1" } }
+      { params: Promise.resolve({ id: "order-1" }) }
     );
 
     expect(res.status).toBe(200);
@@ -170,7 +170,7 @@ describe("C3 - invoice HTML hardening", () => {
 
     const res = await GET(
       new NextRequest("http://localhost:3000/api/invoice/order-1?format=html"),
-      { params: { id: "order-1" } }
+      { params: Promise.resolve({ id: "order-1" }) }
     );
 
     const html = await res.text();

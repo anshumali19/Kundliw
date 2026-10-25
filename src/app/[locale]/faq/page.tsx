@@ -5,14 +5,20 @@ import { FaqClient } from "@/features/faq/FaqClient";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 interface FaqPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: FaqPageProps): Promise<Metadata> {
+export async function generateMetadata(props: FaqPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/faq"),
@@ -25,7 +31,13 @@ export async function generateMetadata({ params: { locale } }: FaqPageProps): Pr
   };
 }
 
-export default async function FaqPage({ params: { locale } }: FaqPageProps) {
+export default async function FaqPage(props: FaqPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const items = await prisma.faqItem
     .findMany({
       where: { isActive: true },

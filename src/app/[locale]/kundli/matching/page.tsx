@@ -2,14 +2,20 @@ import { Metadata } from "next";
 import { MatchingCalculatorClient } from "@/features/astro/components/MatchingCalculatorClient";
 
 interface MatchingPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: MatchingPageProps): Promise<Metadata> {
+export async function generateMetadata(props: MatchingPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     title: isHindi
@@ -21,7 +27,13 @@ export async function generateMetadata({ params: { locale } }: MatchingPageProps
   };
 }
 
-export default function MatchingPage({ params: { locale } }: MatchingPageProps) {
+export default async function MatchingPage(props: MatchingPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return (
     <div className="w-full min-h-screen bg-surface-container-lowest py-8">
       <MatchingCalculatorClient locale={locale} />

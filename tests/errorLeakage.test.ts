@@ -206,7 +206,7 @@ describe("M10 - API error responses do not leak internals", () => {
   it("hides invoice generator internals", async () => {
     const res = await getInvoice(
       new NextRequest("http://localhost:3000/api/invoice/order-1"),
-      { params: { id: "order-1" } }
+      { params: Promise.resolve({ id: "order-1" }) }
     );
     const body = await res.json();
 

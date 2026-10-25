@@ -5,17 +5,22 @@ import { ShieldCheck, Scale, FileText, ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
 
 interface LegalPageProps {
-  params: {
+  params: Promise<{
     locale: string;
     slug: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params: { locale, slug },
-}: LegalPageProps): Promise<Metadata> {
+export async function generateMetadata(props: LegalPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale,
+    slug
+  } = params;
+
   const isHindi = locale === "hi";
   const fullSlug = `legal/${slug}`;
   const page = await prisma.staticPage
@@ -35,7 +40,14 @@ export async function generateMetadata({
   };
 }
 
-export default async function LegalPage({ params: { locale, slug } }: LegalPageProps) {
+export default async function LegalPage(props: LegalPageProps) {
+  const params = await props.params;
+
+  const {
+    locale,
+    slug
+  } = params;
+
   const isHindi = locale === "hi";
   const fullSlug = `legal/${slug}`;
 

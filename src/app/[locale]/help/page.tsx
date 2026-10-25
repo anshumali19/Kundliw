@@ -5,14 +5,20 @@ import { HelpCircle, Phone, Mail, Clock, MessageSquare, Search, FileText } from 
 import { Link } from "@/i18n/routing";
 
 interface HelpPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: HelpPageProps): Promise<Metadata> {
+export async function generateMetadata(props: HelpPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/help"),
@@ -25,7 +31,13 @@ export async function generateMetadata({ params: { locale } }: HelpPageProps): P
   };
 }
 
-export default async function HelpPage({ params: { locale } }: HelpPageProps) {
+export default async function HelpPage(props: HelpPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
 
   const [page, settings] = await Promise.all([

@@ -6,10 +6,16 @@ export const metadata: Metadata = {
   description: "Manage Bharat Darshan Teerth Yatra, Matrimonial Portal, and Video Discourse Cards.",
 };
 
-export default function AdminOtherServicesPage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default async function AdminOtherServicesPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return <AdminOtherServicesManager locale={locale} />;
 }

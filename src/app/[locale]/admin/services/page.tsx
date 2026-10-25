@@ -3,16 +3,20 @@ import { prisma } from "@/lib/prisma";
 import { AdminServicesManager, AdminServiceItem } from "@/features/admin/services/AdminServicesManager";
 
 interface AdminServicesPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminServicesPage({
-  params: { locale },
-}: AdminServicesPageProps) {
+export default async function AdminServicesPage(props: AdminServicesPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   // Enforce DB-verified admin check
   await requireAdmin("/admin/services", locale);
 

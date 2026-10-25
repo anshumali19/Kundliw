@@ -1,13 +1,17 @@
 import { redirect } from "next/navigation";
 
 interface AdminDashboardPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
-export default function AdminDashboardPage({
-  params: { locale },
-}: AdminDashboardPageProps) {
+export default async function AdminDashboardPage(props: AdminDashboardPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   redirect(`/${locale}/admin/services`);
 }

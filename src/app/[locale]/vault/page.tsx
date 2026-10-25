@@ -11,16 +11,20 @@ import {
 } from "lucide-react";
 
 interface VaultPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function VaultPage({
-  params: { locale },
-}: VaultPageProps) {
+export default async function VaultPage(props: VaultPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const user = await requireUser("/vault", locale);
   const isHindi = locale === "hi";
 

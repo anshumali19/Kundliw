@@ -3,14 +3,20 @@ import { Metadata } from "next";
 import { KundliCalculatorClient } from "@/features/astro/components/KundliCalculatorClient";
 
 interface KundliPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: KundliPageProps): Promise<Metadata> {
+export async function generateMetadata(props: KundliPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/kundli"),
@@ -23,7 +29,13 @@ export async function generateMetadata({ params: { locale } }: KundliPageProps):
   };
 }
 
-export default function KundliPage({ params: { locale } }: KundliPageProps) {
+export default async function KundliPage(props: KundliPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return (
     <div className="w-full min-h-screen bg-surface-container-lowest py-8">
       <KundliCalculatorClient locale={locale} />

@@ -15,10 +15,8 @@ const updateStatusSchema = z.object({
   trackingNumber: z.string().optional(),
 });
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const guard = await guardApiAdmin();
     if (!guard.ok) return guard.errorResponse;

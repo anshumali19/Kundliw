@@ -6,11 +6,17 @@ import { ServicesListingClient } from "@/features/services/components/ServicesLi
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     title: isHindi
@@ -23,11 +29,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function ServicesListingPage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default async function ServicesListingPage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const tServices = await getTranslations("servicesSection");
 
   // Query only active services and their active plans

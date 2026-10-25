@@ -16,17 +16,22 @@ import {
 } from "lucide-react";
 
 interface BookingSuccessPageProps {
-  params: {
+  params: Promise<{
     locale: string;
     id: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function BookingSuccessPage({
-  params: { locale, id },
-}: BookingSuccessPageProps) {
+export default async function BookingSuccessPage(props: BookingSuccessPageProps) {
+  const params = await props.params;
+
+  const {
+    locale,
+    id
+  } = params;
+
   // 1. Authentication required
   const user = await requireUser(`/booking/success/${id}`, locale);
   const isHindi = locale === "hi";

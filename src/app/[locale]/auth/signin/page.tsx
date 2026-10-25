@@ -1,12 +1,13 @@
 import { AuthChooser } from "@/features/auth/AuthChooser";
 
-export default function SignInChooserPage({
-  params,
-  searchParams,
-}: {
-  params: { locale: string };
-  searchParams: { callbackUrl?: string };
-}) {
+export default async function SignInChooserPage(
+  props: {
+    params: Promise<{ locale: string }>;
+    searchParams: Promise<{ callbackUrl?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   return (
     <AuthChooser
       mode="signin"

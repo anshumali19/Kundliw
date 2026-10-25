@@ -4,14 +4,20 @@ import { prisma } from "@/lib/prisma";
 import { Image as ImageIcon, Video, ExternalLink, Play } from "lucide-react";
 
 interface GalleryPageProps {
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale } }: GalleryPageProps): Promise<Metadata> {
+export async function generateMetadata(props: GalleryPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/gallery"),
@@ -24,7 +30,13 @@ export async function generateMetadata({ params: { locale } }: GalleryPageProps)
   };
 }
 
-export default async function GalleryPage({ params: { locale } }: GalleryPageProps) {
+export default async function GalleryPage(props: GalleryPageProps) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   const items = await prisma.mediaGalleryItem.findMany({
     orderBy: { orderIndex: "asc" },

@@ -5,15 +5,22 @@ import { Link } from "@/i18n/routing";
 import { BookOpen, Calendar, ArrowLeft } from "lucide-react";
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     locale: string;
     slug: string;
-  };
+  }>;
 }
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params: { locale, slug } }: BlogPostPageProps): Promise<Metadata> {
+export async function generateMetadata(props: BlogPostPageProps): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale,
+    slug
+  } = params;
+
   const isHindi = locale === "hi";
   const post = await prisma.blogPost.findUnique({ where: { slug } });
   if (!post) return { title: "Article Not Found" };
@@ -24,7 +31,14 @@ export async function generateMetadata({ params: { locale, slug } }: BlogPostPag
   };
 }
 
-export default async function BlogPostPage({ params: { locale, slug } }: BlogPostPageProps) {
+export default async function BlogPostPage(props: BlogPostPageProps) {
+  const params = await props.params;
+
+  const {
+    locale,
+    slug
+  } = params;
+
   const isHindi = locale === "hi";
   const post = await prisma.blogPost.findUnique({ where: { slug } });
 

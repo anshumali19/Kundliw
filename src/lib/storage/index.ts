@@ -127,12 +127,12 @@ export class LocalDiskStorageProvider implements StorageProvider {
     assertAllowedSubfolder(subfolder);
     const targetDir = resolveWithinBase(this.baseDir, subfolder);
 
-    if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
+    if (!fs.existsSync(/*turbopackIgnore: true*/ targetDir)) {
+      fs.mkdirSync(/*turbopackIgnore: true*/ targetDir, { recursive: true });
     }
 
     const filePath = path.join(targetDir, uniqueName);
-    fs.writeFileSync(filePath, fileBuffer);
+    fs.writeFileSync(/*turbopackIgnore: true*/ filePath, fileBuffer);
 
     const relativeKey = path.join(subfolder, uniqueName).replace(/\\/g, "/");
     return {
@@ -146,11 +146,11 @@ export class LocalDiskStorageProvider implements StorageProvider {
   async getFile(storageKey: string): Promise<{ buffer: Buffer; mimeType: string }> {
     const fullPath = resolveWithinBase(this.baseDir, storageKey);
 
-    if (!fs.existsSync(fullPath)) {
+    if (!fs.existsSync(/*turbopackIgnore: true*/ fullPath)) {
       throw new Error(`File not found: ${storageKey}`);
     }
 
-    const buffer = fs.readFileSync(fullPath);
+    const buffer = fs.readFileSync(/*turbopackIgnore: true*/ fullPath);
     const { detectedMime } = validateFileMagicBytes(buffer);
 
     return {

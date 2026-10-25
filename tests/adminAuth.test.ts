@@ -70,7 +70,7 @@ vi.mock("next-auth", () => ({
 
 import { prisma } from "@/lib/prisma";
 
-type Handler = (request: NextRequest, ctx: { params: { id: string } }) => Promise<Response>;
+type Handler = (request: NextRequest, ctx: { params: Promise<{ id: string }> }) => Promise<Response>;
 
 interface RouteSpec {
   name: string;
@@ -145,7 +145,7 @@ function makeRequest(spec: RouteSpec, method: string, origin?: string): NextRequ
 async function callRoute(spec: RouteSpec, method: string, origin?: string) {
   const handler = spec.module[method] as Handler | undefined;
   expect(handler, `${spec.name} has no ${method} handler`).toBeTypeOf("function");
-  return handler!(makeRequest(spec, method, origin), { params: { id: "x" } });
+  return handler!(makeRequest(spec, method, origin), { params: Promise.resolve({ id: "x" }) });
 }
 
 beforeEach(() => {

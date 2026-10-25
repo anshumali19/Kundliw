@@ -15,11 +15,17 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
   return {
     title: isHindi
@@ -31,11 +37,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function AstroSagePage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default async function AstroSagePage(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const isHindi = locale === "hi";
 
   const settings = await prisma.adminSettings

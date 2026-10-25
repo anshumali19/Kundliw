@@ -94,7 +94,7 @@ describe("H3 - partial offer update keeps percentage semantics", () => {
     });
 
     const res = await PUT(makeRequest({ discountValue: 30 }), {
-      params: { id: "offer-1" },
+      params: Promise.resolve({ id: "offer-1" }),
     });
 
     expect(res.status).toBe(200);
@@ -112,7 +112,7 @@ describe("H3 - partial offer update keeps percentage semantics", () => {
     });
 
     const res = await PUT(makeRequest({ discountValue: 500 }), {
-      params: { id: "offer-1" },
+      params: Promise.resolve({ id: "offer-1" }),
     });
 
     expect(res.status).toBe(200);
@@ -130,7 +130,7 @@ describe("H3 - partial offer update keeps percentage semantics", () => {
     });
 
     const res = await PUT(makeRequest({ discountType: "FLAT", discountValue: 500 }), {
-      params: { id: "offer-1" },
+      params: Promise.resolve({ id: "offer-1" }),
     });
 
     expect(res.status).toBe(200);

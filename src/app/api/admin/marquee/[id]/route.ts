@@ -19,10 +19,8 @@ const marqueeUpdateSchema = z.object({
   orderIndex: z.number().int().optional(),
 });
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const guard = await guardApiAdmin();
     if (!guard.ok) return guard.errorResponse;
@@ -51,10 +49,8 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const guard = await guardApiAdmin();
     if (!guard.ok) return guard.errorResponse;
