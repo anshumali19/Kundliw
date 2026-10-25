@@ -341,7 +341,67 @@ model AdminSettings {
   socialTwitter     String?
   socialInstagram   String?
   socialYoutube     String?
+  socialWhatsapp    String?
+  socialTelegram    String?
+  googleMapEmbedUrl String?  @db.Text
+  googleAnalyticsId String?
+  // Encrypted Third-Party Credentials (Encrypted at rest with AES-256-GCM)
+  encRazorpayKeyId         String?
+  encRazorpayKeySecret     String?
+  encRazorpayWebhookSecret String?
+  encMsg91AuthKey          String?
+  encMsg91SenderId         String?
+  encMsg91OtpTemplateId    String?
+  encSmtpHost              String?
+  encSmtpPort              Int?
+  encSmtpUser              String?
+  encSmtpPass              String?
+  encSmtpFrom              String?
+  encGoogleClientId        String?
+  encGoogleClientSecret    String?
+  encFacebookAppId         String?
+  encFacebookAppSecret     String?
+  encAstrosageUserId       String?
+  encAstrosageApiKey       String?
+  // Chatbot Settings
+  chatbotEnabled    Boolean  @default(true)
+  chatbotWelcomeEn  String?  @db.Text
+  chatbotWelcomeHi  String?  @db.Text
+  whatsappNumber    String?
   updatedAt         DateTime @updatedAt
+}
+
+model ChatbotQA {
+  id           String   @id @default(cuid())
+  questionEn   String   @db.Text
+  questionHi   String   @db.Text
+  answerEn     String   @db.Text
+  answerHi     String   @db.Text
+  keywords     String[] // Search tokens, e.g. ["pricing", "fees", "dakshina"]
+  quickReplyEn String?  // Chip button text
+  quickReplyHi String?
+  category     String   @default("GENERAL") // GENERAL, SERVICES, MUHURTA, KUNDLI, CONTACT
+  orderIndex   Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([category, isActive])
+}
+
+model ContactEnquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String
+  subject   String?
+  message   String   @db.Text
+  source    String   @default("CONTACT_PAGE") // CONTACT_PAGE, CHATBOT_TICKET, SERVICE_MODAL
+  isResolved Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isResolved, createdAt])
 }
 
 model MarqueeItem {

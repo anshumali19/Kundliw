@@ -68,16 +68,16 @@ export default function RegisterPage() {
             {tAuth("registerTitle")}
           </h1>
           <p className="text-sm text-on-surface-variant max-w-md mb-6 leading-relaxed">
-            Create your account to store family horoscopes, book astrological consultations, and receive high-precision Vedic calculations.
+            {tAuth("registerSubtitle")}
           </p>
 
           <div className="bg-surface-container-low p-4 rounded border border-outline-variant/60 space-y-2 text-xs mb-6 max-w-md">
             <div className="flex items-center gap-2 text-secondary font-semibold">
               <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
-              <span>Strict Astrological Privacy</span>
+              <span>{tAuth("privacyTitle")}</span>
             </div>
             <p className="text-on-surface-variant leading-relaxed">
-              Your birth records and consultation notes remain strictly confidential between you and the assigned Daivajna.
+              {tAuth("privacyDesc")}
             </p>
           </div>
 

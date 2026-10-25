@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import {
   Calendar,
@@ -87,6 +88,8 @@ export function BookingWizard({
   initialJataka,
 }: BookingWizardProps) {
   const router = useRouter();
+  const tBooking = useTranslations("booking");
+  const tCommon = useTranslations("common");
   const isHindi = locale === "hi";
 
   // Step 1: Selection, Step 2: Jataka Details, Step 3: Confirmation

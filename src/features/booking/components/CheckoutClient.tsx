@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   ShieldCheck,
   CreditCard,
@@ -48,6 +49,8 @@ export function CheckoutClient({
   locale,
 }: CheckoutClientProps) {
   const router = useRouter();
+  const tCheckout = useTranslations("checkout");
+  const tBooking = useTranslations("booking");
   const isHindi = locale === "hi";
 
   const [paymentMethod, setPaymentMethod] = useState<"GATEWAY" | "UPI" | "BANK">(

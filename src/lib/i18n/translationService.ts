@@ -1,13 +1,14 @@
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
-// In-memory cache for merged messages per locale
+// In-memory cache for merged messages per locale with short 5s TTL for multi-instance propagation
 interface CacheEntry {
   messages: Record<string, any>;
   timestamp: number;
 }
 
 const translationCache: Record<string, CacheEntry> = {};
-const CACHE_TTL_MS = 30 * 1000; // 30 seconds TTL
+const CACHE_TTL_MS = 5 * 1000; // 5 seconds TTL ensures near-instant propagation across serverless instances
 
 /**
  * Set a nested value on an object given a namespace and a key (supports dot-notation).
@@ -33,7 +34,8 @@ export function setDeepValue(obj: Record<string, any>, namespace: string, key: s
 }
 
 /**
- * Invalidate the translation cache for a specific locale, or all locales.
+ * Invalidate the translation cache for a specific locale, or all locales,
+ * and trigger Next.js cache revalidation across the site.
  */
 export function invalidateTranslationCache(locale?: string): void {
   if (locale) {
@@ -42,6 +44,12 @@ export function invalidateTranslationCache(locale?: string): void {
     for (const key of Object.keys(translationCache)) {
       delete translationCache[key];
     }
+  }
+
+  try {
+    revalidatePath("/", "layout");
+  } catch {
+    // Graceful fallback in non-request contexts (e.g. unit tests)
   }
 }
 

@@ -428,7 +428,65 @@ All 17 test suites pass with zero errors:
 | **Total** | **17 Test Files** | **97** | **100% Passing** |
 
 ### 2. Live Cloud Deployment & Production Verification
-- **Production URL**: [https://kanad-jyotish-kendra.vercel.app](https://kanad-jyotish-kendra.vercel.app)
-- **Deployment Status**: `READY`, aliased to production domain.
+- **Production URL**: [https://kanadjyotishkendra.vercel.app](https://kanadjyotishkendra.vercel.app)
+- **Deployment Status**: `READY`, aliased to canonical production domain.
 - **Database Engine**: Hosted PostgreSQL instance connected via Prisma Client with pooling.
 - **Build Optimization**: Standalone server target compiled via Next.js with font and asset optimizations.
+
+---
+
+## Phase 15: Translation Override Subsystem & Full Admin String CMS (Client Condition 2)
+
+### 1. Requirements & Architecture
+Every line, word, label, menu item, button text, footer text, error message, and page content in both Hindi and English must be editable from the admin panel without requiring code deployments:
+1. **Dynamic Database Override Layer**: Database table `TranslationOverride` storing `locale`, `namespace`, `key`, and custom `value`.
+2. **Deterministic Merge**: `getMergedMessages(locale)` loads the base static JSON dictionary and merges active database overrides dynamically on top.
+3. **Sub-5-Second Cache Propagation**: 5-second in-memory TTL combined with `revalidatePath("/", "layout")` and `dynamic = "force-dynamic"` ensuring instant serverless propagation across Vercel instances.
+4. **Interactive Admin CMS Console**: Dedicated portal at `/admin/translations` supporting namespace filtering, full-text search, live editing, bulk save, and JSON exports.
+5. **Committed SQL Migrations**: Switched from `prisma db push` to version-controlled `prisma migrate deploy` (`0_init`, `1_phase16_settings_chatbot`).
+
+### 2. Implementation & File Structure
+- **Prisma Schema** ([schema.prisma](file:///C:/Users/anshu/Desktop/ClientWork/prisma/schema.prisma)): Added `TranslationOverride` model with composite unique constraint `@@unique([locale, namespace, key])`.
+- **Translation Engine** ([translationService.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/i18n/translationService.ts)): Core engine functions: `getMergedMessages`, `setDeepValue`, `invalidateTranslationCache`, `getAllTranslationsWithOverrides`, `saveTranslationOverride`, `deleteTranslationOverride`, `bulkSaveTranslationOverrides`.
+- **next-intl Request Pipeline** ([request.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/i18n/request.ts)): Injected `getMergedMessages` so all `useTranslations` calls automatically serve merged database strings.
+- **Admin Translation API Routes** ([route.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/admin/translations/route.ts), [bulk/route.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/admin/translations/bulk/route.ts)): Secured administrative CRUD endpoints using `guardApiAdmin()`.
+- **Admin Management Interface** ([page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/admin/translations/page.tsx), [AdminTranslationsManager.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/admin/translations/AdminTranslationsManager.tsx)): Live broadsheet editor with language toggle, namespace dropdown, search, unsaved change indicators, and JSON override download.
+
+### 3. Verification & Tests
+- **Vitest Unit Suite** ([tests/translations.test.ts](file:///C:/Users/anshu/Desktop/ClientWork/tests/translations.test.ts)) (14 tests): Verifies deep value injection, merging over base dictionaries, database error resilience, cache invalidation, and CRUD operations.
+- **Playwright E2E Suite** ([tests-e2e/translations.spec.ts](file:///C:/Users/anshu/Desktop/ClientWork/tests-e2e/translations.spec.ts), [tests-e2e/translations-flow.spec.ts](file:///C:/Users/anshu/Desktop/ClientWork/tests-e2e/translations-flow.spec.ts)) (4 tests): Verifies public site localized strings, unauthenticated API blocking, admin login, saving an override live, verifying change reflection in a fresh browser context, and reverting to default.
+
+---
+
+## Phase 16: Extended Site Settings, AES-256-GCM Keys Vault, Rule-Based Chatbot (#43) & Maps (#27)
+
+### 1. Requirements & Architecture
+Fulfill client requirements for third-party credentials, zero-cost rule-based chatbot, and location mapping:
+1. **AES-256-GCM Credential Vault**: All API secrets (Razorpay, MSG91, SMTP, Google/Facebook OAuth, AstroSage) are encrypted at rest in PostgreSQL and never returned unmasked by GET APIs (showing only `••••••••1234`).
+2. **Two-Tier Precedence Hierarchy**: The system first resolves credentials from decrypted database settings; if unset, it falls back gracefully to `.env` variables.
+3. **Zero-API-Cost Rule-Based Vedic Chatbot (#43)**: Fully deterministic keyword and token matcher running on server without paid third-party LLMs. Supports bilingual responses, quick reply chips, hit counters, and automatic fallback to WhatsApp or enquiry ticket.
+4. **Google Maps Physical Location Page (#27)**: Dedicated `/contact` page with live Google Maps iframe embed (`GOOGLE_MAP_EMBED_URL`), physical Varanasi coordinates, consultation hours, and interactive enquiry intake form.
+5. **Floating Quick-Action Bar**: Omnipresent floating button bar providing 1-click WhatsApp messaging, direct phone call, and embedded sliding Vedic Chatbot assistant.
+6. **Inbound Enquiries Management**: Complete management console at `/admin/enquiries` for viewing, filtering, resolving, and archiving contact enquiries.
+
+### 2. Implementation & File Structure
+- **Security & Cryptographic Primitives** ([crypto.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/security/crypto.ts)): `encryptSecret`, `decryptSecret`, and `maskSecret` using Node.js `crypto` with `aes-256-gcm`, 96-bit initialization vectors, and 128-bit authentication tags.
+- **Credential Resolver** ([credentials.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/config/credentials.ts)): `getCredential(key)` and `getMaskedCredentialsSummary()` providing unified access across DB and `.env`.
+- **API Keys Admin Management** ([keys/route.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/admin/settings/keys/route.ts), [AdminKeysManager.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/admin/settings/AdminKeysManager.tsx), [page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/admin/settings/keys/page.tsx)): Encrypted admin vault with category tabs (Payments, SMS, Email, Auth, Astro, Analytics, Maps), active status badges, and plaintext reveal toggles.
+- **Chatbot Subsystem** ([schema.prisma](file:///C:/Users/anshu/Desktop/ClientWork/prisma/schema.prisma), [matcher.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/lib/chatbot/matcher.ts), [ask/route.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/chatbot/ask/route.ts), [admin/chatbot/route.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/admin/chatbot/route.ts), [AdminChatbotManager.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/admin/chatbot/AdminChatbotManager.tsx), [page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/admin/chatbot/page.tsx)): Database-backed Q&A editor and matcher with keywords, category filters, and quick reply chips.
+- **Public Contact & Maps Subsystem** ([page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/contact/page.tsx), [ContactClient.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/contact/ContactClient.tsx), [enquiry/route.ts](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/contact/enquiry/route.ts)): Full-width contact page with iframe map embed and rate-limited enquiry form.
+- **Enquiries CMS Console** ([AdminEnquiriesManager.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/features/admin/enquiries/AdminEnquiriesManager.tsx), [page.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/admin/enquiries/page.tsx), [api/admin/enquiries](file:///C:/Users/anshu/Desktop/ClientWork/src/app/api/admin/enquiries/route.ts)): Inbound message triage with status toggling (Pending/Resolved) and deletion.
+- **Floating Action Bar** ([FloatingActionBar.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/components/layout/FloatingActionBar.tsx), [layout.tsx](file:///C:/Users/anshu/Desktop/ClientWork/src/app/[locale]/layout.tsx)): Quick action bar floating widget with WhatsApp and Vedic Chatbot drawer.
+- **Deployment Blueprint** ([.env.example](file:///C:/Users/anshu/Desktop/ClientWork/.env.example)): Fully commented production deployment guide with keys checklist.
+
+### 3. Verification & Tests
+All 20 Vitest test suites and 8 Playwright E2E tests pass with zero failures:
+
+| Test Suite | File Path | Tests Passed | Focus Area |
+| :--- | :--- | :---: | :--- |
+| **Settings Keys** | [tests/settings-keys.test.ts](file:///C:/Users/anshu/Desktop/ClientWork/tests/settings-keys.test.ts) | 7 | AES-256-GCM encryption/decryption, corrupted tag rejection, secret masking, DB precedence over env |
+| **Chatbot** | [tests/chatbot.test.ts](file:///C:/Users/anshu/Desktop/ClientWork/tests/chatbot.test.ts) | 4 | Greeting on empty query, Hindi/English keyword matching, confidence scoring, WhatsApp/ticket fallback |
+| **Phase 16 E2E** | [tests-e2e/phase16.spec.ts](file:///C:/Users/anshu/Desktop/ClientWork/tests-e2e/phase16.spec.ts) | 4 | Contact form submission, map iframe, floating bar WhatsApp link, chatbot drawer Q&A, API role guards, admin keys vault |
+| **Translations E2E** | [tests-e2e/translations-flow.spec.ts](file:///C:/Users/anshu/Desktop/ClientWork/tests-e2e/translations-flow.spec.ts) | 1 | Admin login, live string edit in DB, fresh context public reflection, revert to default |
+| **All Test Suites** | **20 Vitest files + 3 Playwright specs** | **122 Unit + 8 E2E** | **100% Passing** |
+

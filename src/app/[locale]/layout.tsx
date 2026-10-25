@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
@@ -32,6 +33,9 @@ export const metadata: Metadata = {
     "Authentic Vedic Siddhanta, mathematical astronomical calculations, and traditional Horary Jyotisha rooted in ancient scriptures at Dashashwamedh Ghat, Varanasi.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function LocaleLayout({
   children,
   params: { locale },
@@ -55,6 +59,16 @@ export default async function LocaleLayout({
     })
     .catch(() => []);
 
+  const settings = await prisma.adminSettings
+    .findFirst({
+      select: {
+        phone1: true,
+        whatsappNumber: true,
+        socialWhatsapp: true,
+      },
+    })
+    .catch(() => null);
+
   return (
     <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable} w-full max-w-full overflow-x-hidden`}>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-hidden relative">
@@ -72,6 +86,15 @@ export default async function LocaleLayout({
             <MarqueeStrip />
             <Footer />
             <MobileNav />
+            <FloatingActionBar
+              phone={settings?.phone1 || undefined}
+              whatsappNumber={
+                settings?.socialWhatsapp ||
+                settings?.whatsappNumber ||
+                settings?.phone1 ||
+                undefined
+              }
+            />
           </SmoothScrollProvider>
         </NextIntlClientProvider>
       </body>

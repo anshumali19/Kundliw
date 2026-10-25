@@ -11,6 +11,9 @@ import {
   ExternalLink,
   LogOut,
   Languages,
+  MessageSquare,
+  Inbox,
+  KeyRound,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -143,6 +146,30 @@ export default async function AdminLayout({
           >
             <Languages className="w-3.5 h-3.5 text-primary" />
             <span>{isHindi ? "अनुवाद (Translations)" : "Translations"}</span>
+          </Link>
+
+          <Link
+            href="/admin/chatbot"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-secondary" />
+            <span>{isHindi ? "चैटबॉट (Chatbot)" : "Chatbot"}</span>
+          </Link>
+
+          <Link
+            href="/admin/enquiries"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <Inbox className="w-3.5 h-3.5 text-tertiary" />
+            <span>{isHindi ? "पूछताछ (Enquiries)" : "Enquiries"}</span>
+          </Link>
+
+          <Link
+            href="/admin/settings/keys"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <KeyRound className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "कुंजियाँ (API Keys)" : "API Keys"}</span>
           </Link>
 
           <Link

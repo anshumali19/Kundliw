@@ -99,7 +99,12 @@ export default function SignInPage() {
         throw new Error(res.error);
       }
 
-      router.push(callbackUrl);
+      const targetUrl =
+        callbackUrl === `/${locale}` || callbackUrl === "/"
+          ? `/${locale}/admin`
+          : callbackUrl;
+
+      router.push(targetUrl);
       router.refresh();
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Verification failed");
@@ -126,7 +131,12 @@ export default function SignInPage() {
         throw new Error("Invalid administrative credentials");
       }
 
-      router.push(callbackUrl);
+      const targetUrl =
+        callbackUrl === `/${locale}` || callbackUrl === "/"
+          ? `/${locale}/admin`
+          : callbackUrl;
+
+      router.push(targetUrl);
       router.refresh();
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Sign in failed");
@@ -154,16 +164,16 @@ export default function SignInPage() {
             {tAuth("signInTitle")}
           </h1>
           <p className="text-sm text-on-surface-variant max-w-md mb-6 leading-relaxed">
-            Sign in to access your consultations, track your handcrafted Janampatri progress, and access your private Kundli Vault.
+            {tAuth("signInSubtitle")}
           </p>
 
           <div className="bg-surface-container-low p-4 rounded border border-outline-variant/60 space-y-3 text-xs mb-6 max-w-md">
             <div className="flex items-center gap-2 text-secondary font-semibold">
               <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
-              <span>Mobile-First Instant Verification</span>
+              <span>{tAuth("mobileFirstTitle")}</span>
             </div>
             <p className="text-on-surface-variant leading-relaxed">
-              Fast, zero-password login designed specifically for seamless mobile usage and in-app web views.
+              {tAuth("mobileFirstDesc")}
             </p>
           </div>
 
@@ -195,7 +205,7 @@ export default function SignInPage() {
               }`}
             >
               <Phone className="w-4 h-4" />
-              <span>Mobile OTP (मोबाइल ओटीपी)</span>
+              <span>{tAuth("modeOtp")}</span>
             </button>
             <button
               type="button"
@@ -210,7 +220,7 @@ export default function SignInPage() {
               }`}
             >
               <Lock className="w-4 h-4" />
-              <span>Admin Login (प्रशासक)</span>
+              <span>{tAuth("modeAdmin")}</span>
             </button>
           </div>
 
@@ -297,7 +307,7 @@ export default function SignInPage() {
                       onClick={handleRequestOtp}
                       className="text-primary font-bold hover:underline disabled:opacity-50"
                     >
-                      {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
+                      {resendCooldown > 0 ? `${tAuth("resendIn")} ${resendCooldown}s` : tAuth("resendOtp")}
                     </button>
                   </div>
 
@@ -325,7 +335,7 @@ export default function SignInPage() {
 
                 {isWebView ? (
                   <div className="p-3 bg-surface-container-high rounded text-xs text-on-surface-variant leading-relaxed">
-                    <span className="font-bold text-secondary">Note for App Users:</span> External Google sign-in is disabled in in-app web views. Please use <strong>Mobile OTP</strong> above for direct login.
+                    {tAuth("appUserNote")}
                   </div>
                 ) : (
                   <button
