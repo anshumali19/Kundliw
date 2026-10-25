@@ -5,6 +5,7 @@ import { applyOffer } from "@/lib/offers/apply";
 import { calculateGst, formatPaiseToInr } from "@/lib/billing/gst";
 import { getGstSettings } from "@/lib/billing/gstSettings";
 import { getClientIp, checkDbRateLimit } from "@/lib/rateLimit";
+import { expireOverdueOrders } from "@/lib/booking/service";
 
 const GENERIC_UNAVAILABLE_MESSAGE = "Invalid or unavailable coupon code.";
 
@@ -39,6 +40,13 @@ export async function POST(request: NextRequest) {
     const { code, planId } = parsed.data;
 
     // Fetch plan from database - NEVER trust client price
+    // Release abandoned reservations first so coupon usage counts are accurate.
+    try {
+      await expireOverdueOrders();
+    } catch (error) {
+      console.error("Failed to expire overdue orders before coupon validation:", error);
+    }
+
     const plan = await prisma.plan.findUnique({
       where: { id: planId, isActive: true },
       select: {

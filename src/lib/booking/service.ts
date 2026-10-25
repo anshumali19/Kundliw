@@ -208,7 +208,10 @@ export async function createBookingOrder(
 /**
  * Checks if an order has exceeded its expiry window and releases its reserved slot and offer claim.
  */
-export async function expireUnpaidOrder(orderId: string): Promise<boolean> {
+export async function expireUnpaidOrder(
+  orderId: string,
+  now: Date = new Date()
+): Promise<boolean> {
   return await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
@@ -218,29 +221,38 @@ export async function expireUnpaidOrder(orderId: string): Promise<boolean> {
       return false;
     }
 
-    if (order.expiresAt && new Date() <= order.expiresAt) {
+    if (order.expiresAt && now <= order.expiresAt) {
       return false; // Order has not expired yet
     }
 
-    await tx.order.update({
-      where: { id: orderId },
+    // Atomic transition: only one concurrent expiry can claim the release.
+    const claimed = await tx.order.updateMany({
+      where: {
+        id: orderId,
+        paymentStatus: PaymentStatus.PENDING,
+        OR: [{ expiresAt: null }, { expiresAt: { lte: now } }],
+      },
       data: {
         paymentStatus: PaymentStatus.FAILED,
       },
     });
 
-    // Release slot bookedCount
+    if (claimed.count === 0) {
+      return false;
+    }
+
+    // Release slot bookedCount without ever going negative.
     if (order.slotId) {
-      await tx.slot.update({
-        where: { id: order.slotId },
+      await tx.slot.updateMany({
+        where: { id: order.slotId, bookedCount: { gt: 0 } },
         data: { bookedCount: { decrement: 1 } },
       });
     }
 
-    // Release coupon usedCount
+    // Release coupon usedCount without ever going negative.
     if (order.offerId) {
-      await tx.offer.update({
-        where: { id: order.offerId },
+      await tx.offer.updateMany({
+        where: { id: order.offerId, usedCount: { gt: 0 } },
         data: { usedCount: { decrement: 1 } },
       });
     }
@@ -255,4 +267,42 @@ export async function expireUnpaidOrder(orderId: string): Promise<boolean> {
 
     return true;
   });
+}
+
+export interface ExpireOverdueResult {
+  scanned: number;
+  expired: number;
+}
+
+/**
+ * Releases reservations for unpaid orders whose 30-minute window has elapsed.
+ * Safe to call from read paths and from the scheduled cron endpoint; each order
+ * is expired atomically, so concurrent callers cannot double-release.
+ */
+export async function expireOverdueOrders(
+  now: Date = new Date(),
+  take = 200
+): Promise<ExpireOverdueResult> {
+  const overdue = await prisma.order.findMany({
+    where: {
+      paymentStatus: PaymentStatus.PENDING,
+      OR: [{ expiresAt: null }, { expiresAt: { lte: now } }],
+    },
+    select: { id: true },
+    orderBy: { expiresAt: "asc" },
+    take,
+  });
+
+  let expired = 0;
+  for (const order of overdue) {
+    try {
+      if (await expireUnpaidOrder(order.id, now)) {
+        expired += 1;
+      }
+    } catch (error) {
+      console.error(`Failed to expire overdue order ${order.id}:`, error);
+    }
+  }
+
+  return { scanned: overdue.length, expired };
 }
