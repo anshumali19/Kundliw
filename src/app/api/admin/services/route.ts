@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { serviceInputSchema } from "@/features/services/validation";
@@ -69,7 +70,10 @@ export async function POST(request: NextRequest) {
     }
 
     const service = await prisma.service.create({
-      data: parsed.data,
+      data: {
+        ...parsed.data,
+        additionalLinks: parsed.data.additionalLinks ?? Prisma.JsonNull,
+      },
     });
 
     return NextResponse.json({ success: true, service }, { status: 201 });

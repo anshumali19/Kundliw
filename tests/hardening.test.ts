@@ -111,4 +111,14 @@ describe("Pre-Phase 8 Hardening & Atomic Guards", () => {
     expect(unexpiredOrder.rejectionReason).toBe(rejectionReason);
     expect(unexpiredOrder.manualPaymentRef).toBe("");
   });
+
+  it("defines strict HTTP security headers in next.config.mjs", async () => {
+    const fs = await import("fs");
+    const path = await import("path");
+    const content = fs.readFileSync(path.resolve(__dirname, "../next.config.mjs"), "utf8");
+    expect(content).toContain("poweredByHeader: false");
+    expect(content).toContain("X-Frame-Options");
+    expect(content).toContain("X-Content-Type-Options");
+    expect(content).toContain("Strict-Transport-Security");
+  });
 });

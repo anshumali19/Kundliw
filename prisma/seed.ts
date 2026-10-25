@@ -19,6 +19,34 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding Maharshi Kanad Jyotish Kendra comprehensive demo database...");
 
+  // Safety Guard: Refuse to run against remote databases or in production unless SEED_ALLOW_REMOTE=true
+  const dbUrl = process.env.DATABASE_URL || "";
+  let dbHost = "";
+  try {
+    if (dbUrl) {
+      const parsedUrl = new URL(dbUrl);
+      dbHost = parsedUrl.hostname.toLowerCase();
+    }
+  } catch {
+    const match = dbUrl.match(/@([^:/]+)/);
+    if (match) dbHost = match[1].toLowerCase();
+  }
+
+  const isLocalHost =
+    dbHost === "localhost" || dbHost === "127.0.0.1" || dbHost === "::1" || dbHost === "";
+  const isProduction = process.env.NODE_ENV === "production";
+  const allowRemote = process.env.SEED_ALLOW_REMOTE === "true";
+
+  if ((isProduction || !isLocalHost) && !allowRemote) {
+    throw new Error(
+      `[Prisma Seed Safety Guard] Refusing to seed database!\n` +
+      `  - Environment: NODE_ENV=${process.env.NODE_ENV || "development"}\n` +
+      `  - Database Host: ${dbHost || "unknown"}\n` +
+      `  - Safety Rule: Seeding a remote database or running in production is blocked by default to prevent data overwrite.\n` +
+      `  - Override: Set SEED_ALLOW_REMOTE=true in your environment if you deliberately intend to seed this database.`
+    );
+  }
+
   // 1. Counters for sequential numbering
   await prisma.counter.upsert({
     where: { id: "ORDER_SEQ" },

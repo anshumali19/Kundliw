@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { serviceInputSchema } from "@/features/services/validation";
@@ -27,7 +28,10 @@ export async function PUT(
 
     const service = await prisma.service.update({
       where: { id: params.id },
-      data: parsed.data,
+      data: {
+        ...parsed.data,
+        ...(parsed.data.additionalLinks === null ? { additionalLinks: Prisma.JsonNull } : {}),
+      } as Prisma.ServiceUpdateInput,
     });
 
     return NextResponse.json({ success: true, service });

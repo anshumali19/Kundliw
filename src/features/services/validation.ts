@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { DiscountType } from "@prisma/client";
 
+export const linkSchema = z.object({
+  labelEn: z.string().trim().min(1),
+  labelHi: z.string().trim().min(1),
+  url: z.string().trim().url(),
+});
+
 export const serviceInputSchema = z.object({
   slug: z
     .string()
@@ -9,15 +15,22 @@ export const serviceInputSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Slug must only contain lowercase letters, numbers, and hyphens"),
   titleEn: z.string().trim().min(2, "English title is required"),
   titleHi: z.string().trim().min(2, "Hindi title is required"),
-  taglineEn: z.string().trim().optional(),
-  taglineHi: z.string().trim().optional(),
+  taglineEn: z.string().trim().optional().nullable(),
+  taglineHi: z.string().trim().optional().nullable(),
   descriptionEn: z.string().trim().min(10, "English description must be at least 10 characters"),
   descriptionHi: z.string().trim().min(10, "Hindi description must be at least 10 characters"),
   highlightsEn: z.array(z.string().trim()).default([]),
   highlightsHi: z.array(z.string().trim()).default([]),
   notesEn: z.string().trim().optional().nullable(),
   notesHi: z.string().trim().optional().nullable(),
-  icon: z.string().trim().optional(),
+  icon: z.string().trim().optional().nullable(),
+  imageUrl: z.string().trim().optional().nullable(),
+  itineraryEn: z.string().trim().optional().nullable(),
+  itineraryHi: z.string().trim().optional().nullable(),
+  samagriEn: z.string().trim().optional().nullable(),
+  samagriHi: z.string().trim().optional().nullable(),
+  youtubeUrl: z.string().trim().optional().nullable(),
+  additionalLinks: z.array(linkSchema).optional().nullable(),
   orderIndex: z.coerce.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
 });
@@ -41,6 +54,14 @@ export const planInputSchema = z.object({
   callDurationMinutes: z.coerce.number().int().min(5).optional().nullable(),
   featuresEn: z.array(z.string().trim().min(1)).min(1, "At least one English feature is required"),
   featuresHi: z.array(z.string().trim().min(1)).min(1, "At least one Hindi feature is required"),
+  programEn: z.string().trim().optional().nullable(),
+  programHi: z.string().trim().optional().nullable(),
+  preparationEn: z.string().trim().optional().nullable(),
+  preparationHi: z.string().trim().optional().nullable(),
+  samagriEn: z.string().trim().optional().nullable(),
+  samagriHi: z.string().trim().optional().nullable(),
+  itineraryEn: z.string().trim().optional().nullable(),
+  itineraryHi: z.string().trim().optional().nullable(),
   isPopular: z.boolean().default(false),
   orderIndex: z.coerce.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
