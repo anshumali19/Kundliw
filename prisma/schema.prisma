@@ -49,6 +49,33 @@ enum RequestType {
   PRASHNA_KUNDLI
 }
 
+enum AssociateStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum CommissionStatus {
+  PENDING   // order created, payment not yet confirmed
+  EARNED    // order paid, available for payout
+  PAID      // included in a payout that the admin marked as paid
+  CANCELLED // order expired, failed or refunded
+}
+
+enum PayoutStatus {
+  REQUESTED
+  PAID
+  REJECTED
+}
+
+enum AppointmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
 enum BannerPosition {
   TOP
   BOTTOM
@@ -79,6 +106,7 @@ model User {
   updatedAt     DateTime           @updatedAt
 
   accounts      Account[]
+  associate     AssociateProfile?
   orders        Order[]
   vaultFiles    VaultFile[]
   statusChanges OrderStatusEvent[]
@@ -249,6 +277,13 @@ model Order {
   manualPaymentProof  String?
   manualPaymentRef    String?
 
+  // Associate referral attribution and appointment approval
+  associateId         String?
+  associate           AssociateProfile?  @relation(fields: [associateId], references: [id], onDelete: SetNull)
+  commission          Commission?
+  appointmentStatus   AppointmentStatus?
+  appointmentNote     String?            @db.Text
+
   courierName         String?
   trackingNumber      String?
   adminNotes          String?            @db.Text
@@ -259,6 +294,7 @@ model Order {
 
   @@index([userId])
   @@index([status])
+  @@index([associateId])
 }
 
 model OrderStatusEvent {
@@ -288,6 +324,70 @@ model Slot {
   orders      Order[]
 
   @@index([date, isActive])
+}
+
+model AssociateProfile {
+  id              String          @id @default(cuid())
+  userId          String          @unique
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referralCode    String          @unique
+  status          AssociateStatus @default(PENDING)
+  rejectionReason String?         @db.Text
+  reviewedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  orders          Order[]
+  commissions     Commission[]
+  payouts         PayoutRequest[]
+
+  @@index([status])
+}
+
+// Commission rule precedence: plan rule > service rule > global rule (serviceId and planId both null).
+model CommissionRule {
+  id        String       @id @default(cuid())
+  serviceId String?
+  planId    String?
+  type      DiscountType // PERCENTAGE: value is basis points (1000 = 10%). FLAT: value is paise.
+  value     Int
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([serviceId])
+  @@index([planId])
+}
+
+model Commission {
+  id          String           @id @default(cuid())
+  orderId     String           @unique
+  order       Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  associateId String
+  associate   AssociateProfile @relation(fields: [associateId], references: [id], onDelete: Cascade)
+  amountPaise Int
+  status      CommissionStatus @default(PENDING)
+  payoutId    String?
+  payout      PayoutRequest?   @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([associateId, status])
+}
+
+model PayoutRequest {
+  id               String           @id @default(cuid())
+  associateId      String
+  associate        AssociateProfile @relation(fields: [associateId], references: [id], onDelete: Cascade)
+  amountPaise      Int
+  status           PayoutStatus     @default(REQUESTED)
+  note             String?          @db.Text
+  paymentReference String?
+  createdAt        DateTime         @default(now())
+  processedAt      DateTime?
+  commissions      Commission[]
+
+  @@index([associateId, status])
 }
 
 model Counter {
@@ -380,6 +480,8 @@ model AdminSettings {
   encAstrosageUserId       String?
   encAstrosageApiKey       String?
   astrosageEmbedUrl        String?  @default("https://www.astrosage.com/freekundli/")
+  // Android app download section (website page and QR code)
+  appDownloadUrl           String?
   // Chatbot Settings
   chatbotEnabled    Boolean  @default(true)
   chatbotWelcomeEn  String?  @db.Text

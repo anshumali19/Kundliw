@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
 import * as bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { verifyOtpHash, isOtpExpired, canAttemptOtpVerification } from "./otp";
@@ -27,6 +28,17 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             allowDangerousEmailAccountLinking: false, // Explicitly disabled
+          }),
+        ]
+      : []),
+
+    // 1b. Facebook Login (same safety settings as Google)
+    ...(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET
+      ? [
+          FacebookProvider({
+            clientId: process.env.FACEBOOK_APP_ID,
+            clientSecret: process.env.FACEBOOK_APP_SECRET,
+            allowDangerousEmailAccountLinking: false,
           }),
         ]
       : []),
@@ -210,6 +222,37 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    /**
+     * Social sign-in (Google, Facebook) is for customers only. The provider
+     * account is mapped to a database user so bookings and the vault work.
+     * Associates and administrators must use their own portals.
+     */
+    async signIn({ user, account }) {
+      if (!account || (account.provider !== "google" && account.provider !== "facebook")) {
+        return true;
+      }
+      const email = user.email?.trim().toLowerCase();
+      if (!email) return false;
+
+      let dbUser = await prisma.user.findUnique({ where: { email } });
+      if (dbUser && dbUser.role !== Role.USER) return false;
+      if (!dbUser) {
+        dbUser = await prisma.user.create({
+          data: {
+            email,
+            name: user.name ?? null,
+            image: user.image ?? null,
+            emailVerified: new Date(),
+            role: Role.USER,
+          },
+        });
+      }
+      // The jwt callback receives this same object.
+      user.id = dbUser.id;
+      user.role = dbUser.role;
+      user.phone = dbUser.phone ?? undefined;
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

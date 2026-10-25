@@ -3,6 +3,7 @@ import { guardApiUser } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { createBookingOrderSchema } from "@/features/booking/validation";
 import { createBookingOrder, BookingError } from "@/lib/booking/service";
+import { REFERRAL_COOKIE } from "@/lib/associates/service";
 
 export async function POST(request: NextRequest) {
   // 1. Enforce user authentication
@@ -33,7 +34,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Create order transactionally with server-side pricing
-    const result = await createBookingOrder(user.id, parsed.data);
+    const referralCode = request.cookies.get(REFERRAL_COOKIE)?.value ?? null;
+    const result = await createBookingOrder(user.id, parsed.data, referralCode);
 
     return NextResponse.json(
       {

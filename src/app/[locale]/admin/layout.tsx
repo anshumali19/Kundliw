@@ -18,6 +18,8 @@ import {
   Award,
   HelpCircle,
   Sparkles,
+  Handshake,
+  DatabaseBackup,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -115,6 +117,14 @@ export default async function AdminLayout(props: AdminLayoutProps) {
           >
             <Users className="w-3.5 h-3.5 text-secondary" />
             <span>{isHindi ? "उपयोगकर्ता (Users)" : "Users"}</span>
+          </Link>
+
+          <Link
+            href="/admin/associates"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <Handshake className="w-3.5 h-3.5 text-secondary" />
+            <span>{isHindi ? "एसोसिएट (Associates)" : "Associates"}</span>
           </Link>
 
           <Link
@@ -221,6 +231,14 @@ export default async function AdminLayout(props: AdminLayoutProps) {
           >
             <KeyRound className="w-3.5 h-3.5 text-primary" />
             <span>{isHindi ? "कुंजियाँ (API Keys)" : "API Keys"}</span>
+          </Link>
+
+          <Link
+            href="/admin/backup"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <DatabaseBackup className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "बैकअप (Backup)" : "Backup"}</span>
           </Link>
 
           <Link

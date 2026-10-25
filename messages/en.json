@@ -213,6 +213,7 @@
     "appUserNote": "Note for App Users: External Google sign-in is disabled in in-app web views. Please use Mobile OTP above for direct login.",
     "resendIn": "Resend in",
     "resendOtp": "Resend OTP",
+    "facebookSignIn": "Continue with Facebook",
     "googleSignIn": "Continue with Google",
     "emailLabel": "Email Address",
     "passwordLabel": "Password",

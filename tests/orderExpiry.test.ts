@@ -157,6 +157,9 @@ vi.mock("@/lib/prisma", () => {
         return data;
       }),
     },
+    commission: {
+      updateMany: vi.fn(async () => ({ count: 0 })),
+    },
     rateLimit: {
       findUnique: vi.fn(async () => null),
       updateMany: vi.fn(async () => ({ count: 0 })),

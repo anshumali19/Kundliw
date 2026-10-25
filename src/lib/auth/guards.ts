@@ -138,3 +138,22 @@ export async function guardApiAdmin(): Promise<ApiAdminGuardResult> {
   }
   return { ok: true, user };
 }
+
+/**
+ * Route handler guard for APIs used by associates (partners). Admins are not
+ * associates, so they get 403 here.
+ */
+export async function guardApiAssociate(): Promise<ApiUserGuardResult> {
+  const guard = await guardApiUser();
+  if (!guard.ok) return guard;
+  if (guard.user.role !== Role.ASSOCIATE) {
+    return {
+      ok: false,
+      errorResponse: NextResponse.json(
+        { error: "Forbidden. An associate account is required." },
+        { status: 403 }
+      ),
+    };
+  }
+  return guard;
+}

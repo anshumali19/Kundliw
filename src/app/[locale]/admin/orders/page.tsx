@@ -29,6 +29,7 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
     include: {
       service: true,
       plan: true,
+      slot: true,
       user: true,
       statusEvents: {
         orderBy: { createdAt: "desc" },
@@ -41,6 +42,16 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
     },
     take: 100,
   });
+
+  const approvedAssociates = await prisma.associateProfile.findMany({
+    where: { status: "APPROVED" },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, referralCode: true, user: { select: { name: true, phone: true } } },
+  });
+  const associateOptions = approvedAssociates.map((a) => ({
+    id: a.id,
+    label: `${a.user.name || a.user.phone || "Associate"} (${a.referralCode})`,
+  }));
 
   const orders: SerializedOrder[] = rawOrders.map((o) => {
     const j = (o.jatakaDetails as Record<string, unknown>) || {};
@@ -59,6 +70,12 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
       invoiceNumber: o.invoiceNumber,
       courierName: o.courierName,
       trackingNumber: o.trackingNumber,
+      appointmentStatus: o.appointmentStatus,
+      appointmentNote: o.appointmentNote,
+      appointmentSlot: o.slot
+        ? `${o.slot.date.toISOString().slice(0, 10)}  ${o.slot.startTime} - ${o.slot.endTime}`
+        : null,
+      associateId: o.associateId,
       jatakaName: String(j.name || o.user?.name || "Customer"),
       jatakaPhone: String(j.phone || o.user?.phone || ""),
       serviceTitle: isHindi
@@ -93,7 +110,7 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
         </p>
       </div>
 
-      <AdminOrdersManager orders={orders} locale={locale} />
+      <AdminOrdersManager orders={orders} locale={locale} associates={associateOptions} />
     </div>
   );
 }

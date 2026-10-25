@@ -17,6 +17,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Short associate referral links: /r/<code> is handled by /api/r/<code>
+  if (pathname.startsWith("/r/")) {
+    return NextResponse.rewrite(new URL(`/api${pathname}`, request.url));
+  }
+
   const locale = pathname.startsWith("/en") ? "en" : "hi";
 
   // 0. Optional DEMO_ACCESS_PASSWORD Gate

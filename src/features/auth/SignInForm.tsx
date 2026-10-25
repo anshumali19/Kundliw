@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getProviders } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
@@ -35,7 +35,11 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
 
   // Landing page after sign-in when no explicit callback was requested
   const defaultTarget =
-    portal === "super-admin" ? `/${locale}/admin` : `/${locale}/account`;
+    portal === "super-admin"
+      ? `/${locale}/admin`
+      : portal === "associate"
+        ? `/${locale}/associate`
+        : `/${locale}/account`;
 
   // Mode: "OTP" | "ADMIN" (email + password). Super Admin is password-only,
   // User is OTP/Google-only, Associate may use either.
@@ -64,7 +68,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const ua = window.navigator.userAgent || "";
-      const isWv = /wv|Android.*Version\/[0-9].[0-9]/i.test(ua);
+      const isWv = /wv|KanadApp|Android.*Version\/[0-9].[0-9]/i.test(ua);
       setIsWebView(isWv);
     }
   }, []);
@@ -173,9 +177,20 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
     }
   };
 
-  // Google Sign In
+  // Social sign-in buttons are shown only for providers that are configured
+  const [socialProviders, setSocialProviders] = useState<string[]>([]);
+  useEffect(() => {
+    getProviders()
+      .then((providers) => setSocialProviders(Object.keys(providers || {})))
+      .catch(() => setSocialProviders([]));
+  }, []);
+
   const handleGoogleSignIn = () => {
     signIn("google", { callbackUrl });
+  };
+
+  const handleFacebookSignIn = () => {
+    signIn("facebook", { callbackUrl });
   };
 
   return (
@@ -363,7 +378,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
               )}
 
               {/* WebView Notice & Google Divider (customer portal only) */}
-              {portal === "user" && (
+              {portal === "user" && (socialProviders.includes("google") || socialProviders.includes("facebook")) && (
               <div className="pt-4 border-t border-outline-variant/30 space-y-3">
                 <div className="relative text-center">
                   <span className="bg-surface px-3 text-xs text-on-surface-variant uppercase">
@@ -379,6 +394,8 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                     {tAuth("appUserNote")}
                   </div>
                 ) : (
+                  <>
+                  {socialProviders.includes("google") && (
                   <button
                     type="button"
                     onClick={handleGoogleSignIn}
@@ -404,6 +421,20 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                     </svg>
                     <span>{tAuth("googleSignIn")}</span>
                   </button>
+                  )}
+                  {socialProviders.includes("facebook") && (
+                  <button
+                    type="button"
+                    onClick={handleFacebookSignIn}
+                    className="w-full py-2.5 px-4 bg-[#1877F2] hover:opacity-90 text-white text-xs font-bold rounded border border-[#1877F2] transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z" />
+                    </svg>
+                    <span>{tAuth("facebookSignIn")}</span>
+                  </button>
+                  )}
+                  </>
                 )}
               </div>
               )}

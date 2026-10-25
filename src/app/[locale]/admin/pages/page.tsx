@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FileText, Save, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
+import { DEFAULT_GUIDES, GUIDE_SLUGS, guidePageSlug } from "@/lib/guides/defaults";
 
 interface StaticPageItem {
   id: string;
@@ -20,6 +21,9 @@ const PRESET_PAGES = [
   { slug: "terms", name: "Terms of Service & Astrological Ethics (नियम व शर्तें)" },
   { slug: "privacy", name: "Privacy Policy (गोपनीयता नीति)" },
   { slug: "refund", name: "Cancellation & Refund Policy (धनवापसी नीति)" },
+  { slug: "guide-user", name: "Guide: User (उपयोगकर्ता मार्गदर्शिका)" },
+  { slug: "guide-associate", name: "Guide: Associate (एसोसिएट मार्गदर्शिका)" },
+  { slug: "guide-admin", name: "Guide: Admin (एडमिन मार्गदर्शिका)" },
 ];
 
 export default function AdminPagesPage() {
@@ -61,6 +65,12 @@ export default function AdminPagesPage() {
       setTitleHi(existing.titleHi);
       setContentEn(existing.contentEn);
       setContentHi(existing.contentHi);
+    } else if (GUIDE_SLUGS.some((g) => guidePageSlug(g) === slug)) {
+      const guide = DEFAULT_GUIDES[slug.replace("guide-", "") as keyof typeof DEFAULT_GUIDES];
+      setTitleEn(guide.titleEn);
+      setTitleHi(guide.titleHi);
+      setContentEn(guide.contentEn);
+      setContentHi(guide.contentHi);
     } else {
       const preset = PRESET_PAGES.find((p) => p.slug === slug);
       setTitleEn(preset ? preset.name.split(" (")[0] : slug);

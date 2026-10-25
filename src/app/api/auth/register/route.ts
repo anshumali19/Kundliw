@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/auth/validation";
 import * as bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
+import { ensureAssociateProfile } from "@/lib/associates/service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,6 +61,11 @@ export async function POST(request: NextRequest) {
         createdAt: true,
       },
     });
+
+    // Associates start as PENDING until the admin approves them
+    if (user.role === Role.ASSOCIATE) {
+      await ensureAssociateProfile(user.id);
+    }
 
     return NextResponse.json(
       {

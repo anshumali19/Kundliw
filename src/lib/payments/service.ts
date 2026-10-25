@@ -1,6 +1,33 @@
 import { prisma } from "@/lib/prisma";
 import { Order, PaymentMode, PaymentStatus, Role } from "@prisma/client";
 import { isServerGeneratedPaymentProofUrl } from "./proof";
+import { settleCommission } from "@/lib/associates/service";
+import { sendNotification } from "@/lib/notifications";
+
+/** Best-effort payment confirmation email. Never throws. */
+async function notifyPaymentConfirmed(orderId: string): Promise<void> {
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        orderNumber: true,
+        invoiceNumber: true,
+        netAmountPaise: true,
+        user: { select: { name: true, email: true, phone: true } },
+      },
+    });
+    if (!order?.user?.email) return;
+    const rupees = (order.netAmountPaise / 100).toLocaleString("en-IN");
+    await sendNotification({
+      email: order.user.email,
+      phone: order.user.phone,
+      subject: `Payment confirmed - ${order.orderNumber}`,
+      message: `Namaste ${order.user.name || ""}, we have received your payment of Rs. ${rupees} for order ${order.orderNumber}.${order.invoiceNumber ? ` Your invoice number is ${order.invoiceNumber}.` : ""} You can track your order in My Account.`,
+    });
+  } catch (error) {
+    console.error("[Payments] Confirmation email failed:", error);
+  }
+}
 
 export const MAX_MANUAL_PAYMENT_ATTEMPTS = 3;
 
@@ -39,7 +66,8 @@ export async function markOrderPaid(
   details: MarkPaidInput,
   adminUserId?: string
 ): Promise<Order> {
-  return await prisma.$transaction(async (tx) => {
+  let newlyPaid = false;
+  const result = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
     });
@@ -106,6 +134,8 @@ export async function markOrderPaid(
         invoiceNumber,
       },
     });
+    await settleCommission(tx, orderId);
+    newlyPaid = true;
 
     await tx.orderStatusEvent.create({
       data: {
@@ -118,6 +148,8 @@ export async function markOrderPaid(
 
     return updatedOrder;
   });
+  if (newlyPaid) await notifyPaymentConfirmed(orderId);
+  return result;
 }
 
 /**
@@ -208,7 +240,8 @@ export async function approveManualPayment(
   adminUserId: string,
   note?: string
 ): Promise<Order> {
-  return await prisma.$transaction(async (tx) => {
+  let newlyPaid = false;
+  const result = await prisma.$transaction(async (tx) => {
     const admin = await tx.user.findUnique({
       where: { id: adminUserId },
     });
@@ -255,6 +288,8 @@ export async function approveManualPayment(
         invoiceNumber,
       },
     });
+    await settleCommission(tx, orderId);
+    newlyPaid = true;
 
     await tx.orderStatusEvent.create({
       data: {
@@ -267,6 +302,8 @@ export async function approveManualPayment(
 
     return updatedOrder;
   });
+  if (newlyPaid) await notifyPaymentConfirmed(orderId);
+  return result;
 }
 
 /**

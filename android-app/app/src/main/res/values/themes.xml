@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Kanad" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#800000</item>
+        <item name="colorPrimaryDark">#800000</item>
+        <item name="colorAccent">#F4C430</item>
+        <item name="android:statusBarColor">#800000</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

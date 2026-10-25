@@ -3,6 +3,7 @@ import { Noto_Serif, Noto_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
+import { PageNavButtons } from "@/components/layout/PageNavButtons";
 import { Footer } from "@/components/layout/Footer";
 import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -38,6 +39,7 @@ export const metadata: Metadata = {
   description:
     "Vedic astrology consultations, Kundli preparation, Kundli matching and Prashna Kundli from Maharshi Kanad Jyotish Kendra, with online booking and order tracking in Hindi and English.",
   applicationName: SITE_NAME,
+  icons: { apple: "/icons/apple-touch-icon.png" },
   keywords: [
     "Vedic astrology",
     "Kundli",
@@ -197,6 +199,7 @@ export default async function LocaleLayout(
             </div>
             {topMarquee.length > 0 && <MarqueeStrip items={topMarquee} position="TOP" />}
             <main className="flex-1 w-full max-w-full overflow-x-hidden pb-6 xl:pb-0">
+              <PageNavButtons />
               {children}
             </main>
             <BannerSlot position="BOTTOM" initialBanners={bottomBanners} />

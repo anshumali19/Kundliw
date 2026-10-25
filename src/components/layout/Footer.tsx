@@ -160,6 +160,13 @@ export async function Footer() {
                   {tNav("vault")}
                 </Link>
               </li>
+              {settings?.appDownloadUrl && (
+                <li>
+                  <Link href="/app" className="hover:text-brand-hover transition-colors block py-0.5">
+                    {locale === "hi" ? "एंड्रॉइड ऐप" : "Android App"}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

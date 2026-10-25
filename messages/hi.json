@@ -213,6 +213,7 @@
     "appUserNote": "ऐप उपयोगकर्ताओं के लिए सूचना: इन-ऐप वेब व्यू में Google साइन-इन अक्षम है। कृपया सीधे प्रवेश हेतु ऊपर मोबाइल ओटीपी का उपयोग करें।",
     "resendIn": "पुनः भेजें",
     "resendOtp": "ओटीपी पुनः भेजें",
+    "facebookSignIn": "Facebook से जारी रखें",
     "googleSignIn": "Google से जारी रखें",
     "emailLabel": "ईमेल पता",
     "passwordLabel": "पासवर्ड",

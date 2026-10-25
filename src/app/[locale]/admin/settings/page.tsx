@@ -43,6 +43,7 @@ export default function AdminSettingsPage() {
   const [bankIfsc, setBankIfsc] = useState("SBIN0001234");
   const [bankName, setBankName] = useState("State Bank of India");
   const [qrCodeUrl, setQrCodeUrl] = useState("/images/qr-code.png");
+  const [appDownloadUrl, setAppDownloadUrl] = useState("");
 
   // Tax
   const [gstin, setGstin] = useState("09AAAAA0000A1Z5");
@@ -72,6 +73,7 @@ export default function AdminSettingsPage() {
         if (s.bankIfsc) setBankIfsc(s.bankIfsc);
         if (s.bankName) setBankName(s.bankName);
         if (s.qrCodeUrl) setQrCodeUrl(s.qrCodeUrl);
+        if (s.appDownloadUrl) setAppDownloadUrl(s.appDownloadUrl);
         if (s.gstin) setGstin(s.gstin);
         if (s.defaultGstRateBps !== null && s.defaultGstRateBps !== undefined)
           setDefaultGstRateBps(s.defaultGstRateBps);
@@ -145,6 +147,7 @@ export default function AdminSettingsPage() {
           bankIfsc,
           bankName,
           qrCodeUrl,
+          appDownloadUrl: appDownloadUrl.trim() || null,
           gstin,
           defaultGstRateBps: Number(defaultGstRateBps),
         }),
@@ -322,6 +325,27 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Section 3: Manual Payments & Banking */}
+        <div className="bg-surface rounded-lg p-6 border border-outline-variant/40 space-y-4">
+          <h2 className="font-serif text-base font-bold text-secondary pb-2 border-b border-outline-variant/30">
+            Android App Download (ऐप डाउनलोड)
+          </h2>
+          <div>
+            <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
+              Download link (Google Play or APK link)
+            </label>
+            <input
+              type="url"
+              value={appDownloadUrl}
+              onChange={(e) => setAppDownloadUrl(e.target.value)}
+              placeholder="https://play.google.com/store/apps/details?id=..."
+              className="w-full min-h-[44px] px-3 py-2 font-mono bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
+            />
+            <p className="text-[11px] text-on-surface-variant mt-1">
+              Leave empty until the app is published. The website then shows a download page with this link and a QR code.
+            </p>
+          </div>
+        </div>
+
         <div className="bg-surface rounded-lg p-6 border border-outline-variant/40 space-y-4">
           <h2 className="font-serif text-base font-bold text-secondary flex items-center gap-2 pb-2 border-b border-outline-variant/30">
             <Building2 className="w-4 h-4 text-primary" />

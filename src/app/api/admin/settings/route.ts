@@ -24,6 +24,14 @@ const settingsSchema = z.object({
   bankIfsc: z.string().optional().nullable(),
   bankName: z.string().optional().nullable(),
   qrCodeUrl: z.string().optional().nullable(),
+  appDownloadUrl: z
+    .string()
+    .trim()
+    .url()
+    .refine((u) => /^https?:\/\//i.test(u), "Use a web link starting with https://")
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   gstin: z.string().optional().nullable(),
   defaultGstRateBps: z.number().int().optional().nullable(),
 });

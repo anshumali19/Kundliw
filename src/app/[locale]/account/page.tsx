@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { Role } from "@prisma/client";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
@@ -33,6 +35,9 @@ export default async function AccountPage(props: AccountPageProps) {
   } = params;
 
   const user = await requireUser("/account", locale);
+  if (user.role === Role.ASSOCIATE) {
+    redirect(`/${locale}/associate`);
+  }
   const isHindi = locale === "hi";
 
   const orders = await prisma.order.findMany({
@@ -186,6 +191,28 @@ export default async function AccountPage(props: AccountPageProps) {
                       </span>
                     </div>
                   </div>
+
+                  {/* Appointment status (orders with a booked slot) */}
+                  {order.appointmentStatus && order.slot && (
+                    <div className="p-3 rounded bg-surface-container-low border border-outline-variant/40 text-sm flex flex-wrap items-center justify-between gap-2">
+                      <span>
+                        <strong>{isHindi ? "अपॉइंटमेंट:" : "Appointment:"}</strong>{" "}
+                        {order.slot.date.toISOString().slice(0, 10)} {order.slot.startTime} - {order.slot.endTime}
+                      </span>
+                      <span className="font-bold text-primary">
+                        {order.appointmentStatus === "PENDING"
+                          ? isHindi ? "स्वीकृति की प्रतीक्षा" : "Awaiting approval"
+                          : order.appointmentStatus === "APPROVED"
+                            ? isHindi ? "स्वीकृत" : "Approved"
+                            : order.appointmentStatus === "COMPLETED"
+                              ? isHindi ? "पूर्ण" : "Completed"
+                              : isHindi ? "अस्वीकृत" : "Not approved"}
+                      </span>
+                      {order.appointmentNote && (
+                        <span className="basis-full text-xs text-on-surface-variant">{order.appointmentNote}</span>
+                      )}
+                    </div>
+                  )}
 
                   {/* 6-step Tracker Stepper */}
                   <div>

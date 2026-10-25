@@ -32,6 +32,10 @@ export interface SerializedOrder {
   invoiceNumber?: string | null;
   courierName?: string | null;
   trackingNumber?: string | null;
+  appointmentStatus?: string | null;
+  appointmentNote?: string | null;
+  appointmentSlot?: string | null;
+  associateId?: string | null;
   jatakaName: string;
   jatakaPhone: string;
   serviceTitle: string;
@@ -48,6 +52,7 @@ export interface SerializedOrder {
 interface AdminOrdersManagerProps {
   orders: SerializedOrder[];
   locale: string;
+  associates?: Array<{ id: string; label: string }>;
 }
 
 const ALL_STATUSES: CanonicalOrderStatus[] = [
@@ -62,6 +67,7 @@ const ALL_STATUSES: CanonicalOrderStatus[] = [
 export function AdminOrdersManager({
   orders: initialOrders,
   locale,
+  associates = [],
 }: AdminOrdersManagerProps) {
   const isHindi = locale === "hi";
   const [orders, setOrders] = useState<SerializedOrder[]>(initialOrders);
@@ -139,6 +145,55 @@ export function AdminOrdersManager({
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error verifying payment";
       setActionError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleAppointment = async (orderId: string, status: "APPROVED" | "REJECTED" | "COMPLETED") => {
+    let note = "";
+    if (status === "REJECTED") {
+      const reason = window.prompt(
+        isHindi ? "अस्वीकृति का कारण लिखें:" : "Please enter the reason for rejecting this appointment:"
+      );
+      if (!reason) return;
+      note = reason;
+    }
+    setSubmitting(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/appointment`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, note: note || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update appointment");
+      const patch = { appointmentStatus: status, appointmentNote: note || null };
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, ...patch } : o)));
+      setSelectedOrder((prev) => (prev && prev.id === orderId ? { ...prev, ...patch } : prev));
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : "Error updating appointment");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleAssignAssociate = async (orderId: string, associateId: string | null) => {
+    setSubmitting(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/assign-associate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ associateId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to assign associate");
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, associateId } : o)));
+      setSelectedOrder((prev) => (prev && prev.id === orderId ? { ...prev, associateId } : prev));
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : "Error assigning associate");
     } finally {
       setSubmitting(false);
     }
@@ -445,6 +500,77 @@ export function AdminOrdersManager({
                   </div>
                 </div>
               )}
+
+              {/* Appointment approval (orders with a booked slot) */}
+              {selectedOrder.appointmentStatus && (
+                <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/60 space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold uppercase tracking-wider text-secondary">
+                      {isHindi ? "अपॉइंटमेंट" : "Appointment"}
+                    </span>
+                    <span className="font-bold text-primary">{selectedOrder.appointmentStatus}</span>
+                  </div>
+                  {selectedOrder.appointmentSlot && (
+                    <p className="text-xs text-on-surface">{selectedOrder.appointmentSlot}</p>
+                  )}
+                  {selectedOrder.appointmentNote && (
+                    <p className="text-xs text-on-surface-variant">{selectedOrder.appointmentNote}</p>
+                  )}
+                  {(selectedOrder.appointmentStatus === "PENDING" ||
+                    selectedOrder.appointmentStatus === "APPROVED") && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {selectedOrder.appointmentStatus === "PENDING" && (
+                        <button
+                          type="button"
+                          disabled={submitting}
+                          onClick={() => handleAppointment(selectedOrder.id, "APPROVED")}
+                          className="min-h-[44px] px-2 py-2 bg-brand hover:bg-brand-hover text-on-brand text-xs font-bold uppercase rounded disabled:opacity-50"
+                        >
+                          {isHindi ? "स्वीकृत" : "Approve"}
+                        </button>
+                      )}
+                      {selectedOrder.appointmentStatus === "APPROVED" && (
+                        <button
+                          type="button"
+                          disabled={submitting}
+                          onClick={() => handleAppointment(selectedOrder.id, "COMPLETED")}
+                          className="min-h-[44px] px-2 py-2 bg-brand hover:bg-brand-hover text-on-brand text-xs font-bold uppercase rounded disabled:opacity-50"
+                        >
+                          {isHindi ? "पूर्ण" : "Complete"}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        disabled={submitting}
+                        onClick={() => handleAppointment(selectedOrder.id, "REJECTED")}
+                        className="min-h-[44px] px-2 py-2 bg-surface border border-error text-on-error-container text-xs font-bold uppercase rounded disabled:opacity-50"
+                      >
+                        {isHindi ? "अस्वीकृत" : "Reject"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Associate assignment */}
+              <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/60 space-y-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-secondary block">
+                  {isHindi ? "एसोसिएट" : "Associate"}
+                </span>
+                <select
+                  value={selectedOrder.associateId || ""}
+                  disabled={submitting}
+                  onChange={(e) => handleAssignAssociate(selectedOrder.id, e.target.value || null)}
+                  className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs font-semibold"
+                >
+                  <option value="">{isHindi ? "कोई नहीं" : "None"}</option>
+                  {associates.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {/* Status Update Form */}
               <form onSubmit={handleStatusUpdate} className="space-y-4 pt-3 border-t border-outline-variant/40">

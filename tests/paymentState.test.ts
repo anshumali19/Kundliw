@@ -47,6 +47,9 @@ vi.mock("@/lib/prisma", () => {
     counter: {
       upsert: vi.fn(async () => ({ id: "INVOICE_2026", seq: 7 })),
     },
+    commission: {
+      updateMany: vi.fn(async () => ({ count: 0 })),
+    },
   };
 
   const client = new Proxy(tx as Record<string, unknown>, {

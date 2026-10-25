@@ -3,7 +3,19 @@ import { CreateBookingOrderInput } from "@/features/booking/validation";
 import { calculateGst } from "@/lib/billing/gst";
 import { getGstSettings } from "@/lib/billing/gstSettings";
 import { claimOfferInTransaction } from "@/lib/offers/apply";
-import { OrderStatus, PaymentStatus, PaymentMode, RequestType, Prisma } from "@prisma/client";
+import {
+  attachReferralToOrder,
+  cancelCommission,
+  resolveApprovedReferral,
+} from "@/lib/associates/service";
+import {
+  AppointmentStatus,
+  OrderStatus,
+  PaymentStatus,
+  PaymentMode,
+  RequestType,
+  Prisma,
+} from "@prisma/client";
 
 export class BookingError extends Error {
   constructor(message: string) {
@@ -48,7 +60,8 @@ export interface CreateOrderResult {
  */
 export async function createBookingOrder(
   userId: string,
-  input: CreateBookingOrderInput
+  input: CreateBookingOrderInput,
+  referralCode?: string | null
 ): Promise<CreateOrderResult> {
   return await prisma.$transaction(async (tx) => {
     // 0. Idempotency Key check: if already processed, return existing order
@@ -175,6 +188,7 @@ export async function createBookingOrder(
         serviceId: service.id,
         planId: plan.id,
         slotId: reservedSlotId,
+        appointmentStatus: reservedSlotId ? AppointmentStatus.PENDING : null,
         offerId: claimedOfferId,
         offerCode: claimedOfferCode,
         idempotencyKey: input.idempotencyKey?.trim() || null,
@@ -203,6 +217,14 @@ export async function createBookingOrder(
         changedById: userId,
       },
     });
+
+    // 11. Attribute the order to the referring associate (cookie set by /r/<code>)
+    if (referralCode) {
+      const associate = await resolveApprovedReferral(referralCode, tx);
+      if (associate) {
+        await attachReferralToOrder(tx, order, associate.id);
+      }
+    }
 
     return {
       orderId: order.id,
@@ -255,6 +277,8 @@ export async function expireUnpaidOrder(
         data: { bookedCount: { decrement: 1 } },
       });
     }
+
+    await cancelCommission(tx, orderId);
 
     // Release coupon usedCount without ever going negative.
     if (order.offerId) {
