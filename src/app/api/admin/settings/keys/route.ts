@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import {
   getMaskedCredentialsSummary,
@@ -13,7 +14,7 @@ const updateKeysSchema = z.record(z.string().nullable().optional());
 
 export async function GET() {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   try {
     const summary = await getMaskedCredentialsSummary();
@@ -29,7 +30,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(req);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await req.json();

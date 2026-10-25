@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -18,7 +19,7 @@ const chatbotQASchema = z.object({
 
 export async function GET() {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
 
   try {
     const list = await prisma.chatbotQA.findMany({
@@ -36,7 +37,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(req);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await req.json();

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
+import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -21,7 +22,10 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(req);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     const body = await req.json();
@@ -53,7 +57,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const guard = await guardApiAdmin();
-  if (guard.errorResponse) return guard.errorResponse;
+  if (!guard.ok) return guard.errorResponse;
+
+  const csrf = validateCsrfOrigin(req);
+  if (!csrf.isValid) return csrf.errorResponse;
 
   try {
     await prisma.chatbotQA.delete({
