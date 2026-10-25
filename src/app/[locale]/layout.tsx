@@ -101,6 +101,25 @@ export default async function LocaleLayout(
     })
     .catch(() => []);
 
+  const marqueeItems = await prisma.marqueeItem
+    .findMany({
+      where: { isActive: true },
+      orderBy: { orderIndex: "asc" },
+      select: {
+        id: true,
+        textEn: true,
+        textHi: true,
+        speedSec: true,
+        fontSize: true,
+        bgColor: true,
+        textColor: true,
+        position: true,
+      },
+    })
+    .catch(() => []);
+  const topMarquee = marqueeItems.filter((m) => m.position === "TOP");
+  const bottomMarquee = marqueeItems.filter((m) => m.position === "BOTTOM");
+
   const settings = await prisma.adminSettings
     .findFirst({
       select: {
@@ -176,12 +195,15 @@ export default async function LocaleLayout(
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>
-            <main className="flex-1 w-full max-w-full overflow-x-hidden pb-16 xl:pb-0">
+            {topMarquee.length > 0 && <MarqueeStrip items={topMarquee} position="TOP" />}
+            <main className="flex-1 w-full max-w-full overflow-x-hidden pb-6 xl:pb-0">
               {children}
             </main>
             <BannerSlot position="BOTTOM" initialBanners={bottomBanners} />
-            <MarqueeStrip />
-            <Footer />
+            <MarqueeStrip items={bottomMarquee} position="BOTTOM" />
+            <div className="pb-32 xl:pb-14">
+              <Footer />
+            </div>
             <MobileNav />
             <FloatingActionBar
               phone={settings?.phone1 || undefined}

@@ -42,7 +42,7 @@ export function MobileNav() {
             >
               <Icon className="w-5 h-5" />
               <span className="text-[11px] mt-1 max-w-full px-0.5 text-center leading-tight break-words">
-                {tab.label}
+                {tab.label.split(" (")[0]}
               </span>
             </Link>
           );

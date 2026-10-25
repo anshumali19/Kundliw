@@ -32,6 +32,28 @@ interface FloatingActionBarProps {
 
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
 
+const FAB_CIRCLE =
+  "flex items-center justify-center w-14 h-14 rounded-full border-2 border-white text-white transition-transform active:scale-95 hover:scale-105";
+
+/** Renders **bold** segments from chat text without exposing the asterisks. */
+function renderBold(text: string): React.ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") && part.length > 4 ? (
+      <strong key={i}>{part.slice(2, -2)}</strong>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    )
+  );
+}
+
+function FabLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-white text-xs font-bold leading-none whitespace-nowrap">
+      {children}
+    </span>
+  );
+}
+
 export function FloatingActionBar({
   phone,
   whatsappNumber,
@@ -40,6 +62,9 @@ export function FloatingActionBar({
   const isHindi = locale === "hi";
 
   const [isOpen, setIsOpen] = useState(false);
+  // "chat": talk to the Kendra team (collects name and phone first)
+  // "ai": instant answers from the Kendra knowledge base, no sign-up
+  const [mode, setMode] = useState<"chat" | "ai">("chat");
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,6 +73,7 @@ export function FloatingActionBar({
   const [leadPhone, setLeadPhone] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const callHref = (phone || "").replace(/[^\d+]/g, "") ? `tel:${(phone || "").replace(/[^\d+]/g, "")}` : "";
   const cleanWhatsapp = (whatsappNumber || "").replace(/[^\d]/g, "");
   const defaultWhatsappUrl = cleanWhatsapp
     ? `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
@@ -56,6 +82,16 @@ export function FloatingActionBar({
           : "Namaste, I would like to inquire about Maharshi Kanad Jyotish Kendra services."
       )}`
     : "";
+
+  const openAssistant = (next: "chat" | "ai") => {
+    if (isOpen && mode === next) {
+      setIsOpen(false);
+      return;
+    }
+    setMode(next);
+    setMessages([]);
+    setIsOpen(true);
+  };
 
   // Scroll to bottom when messages update
   const scrollToBottom = () => {
@@ -93,7 +129,7 @@ export function FloatingActionBar({
     setLoading(true);
 
     // If visitor lead is not yet collected, start with polite name request
-    if (leadStep === "ASK_NAME") {
+    if (mode === "chat" && leadStep === "ASK_NAME") {
       setMessages([
         {
           id: "welcome-lead-name",
@@ -135,7 +171,7 @@ export function FloatingActionBar({
     } finally {
       setLoading(false);
     }
-  }, [locale, isHindi, leadStep]);
+  }, [locale, isHindi, leadStep, mode]);
 
   // Load initial welcome message on first open
   useEffect(() => {
@@ -158,7 +194,7 @@ export function FloatingActionBar({
     setLoading(true);
 
     // Lead capture state machine
-    if (leadStep === "ASK_NAME") {
+    if (mode === "chat" && leadStep === "ASK_NAME") {
       if (textToSend.length < 2) {
         setMessages((prev) => [
           ...prev,
@@ -190,7 +226,7 @@ export function FloatingActionBar({
       return;
     }
 
-    if (leadStep === "ASK_PHONE") {
+    if (mode === "chat" && leadStep === "ASK_PHONE") {
       const digitsOnly = textToSend.replace(/[^\d]/g, "");
       if (digitsOnly.length < 10) {
         setMessages((prev) => [
@@ -223,7 +259,7 @@ export function FloatingActionBar({
       return;
     }
 
-    if (leadStep === "ASK_NEED") {
+    if (mode === "chat" && leadStep === "ASK_NEED") {
       // Save visitor lead to backend as ContactEnquiry with source "CHATBOT_LEAD"
       try {
         await fetch("/api/contact/enquiry", {
@@ -303,69 +339,76 @@ export function FloatingActionBar({
 
   return (
     <>
-      {/* Floating Action Trigger Stack */}
+      {/* Floating quick actions: Call + WhatsApp on the left, AI + Chat on the right (mobile).
+          They sit above the fixed marquee strip and the bottom navigation. */}
       <div
-        className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 flex flex-col items-end gap-2.5"
+        className="pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-auto sm:right-6 z-40 flex items-end justify-between sm:flex-col sm:items-end sm:gap-4"
         role="region"
         aria-label="Quick contact and assistance"
       >
-        {/* WhatsApp Direct Button */}
-        {defaultWhatsappUrl && (
-          <a
-            href={defaultWhatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-[#25D366] text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all text-xs font-semibold"
-            aria-label="Chat with Astrologer on WhatsApp"
-          >
-            <svg
-              className="w-4 h-4 fill-current shrink-0"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
+        <div className="pointer-events-auto flex flex-col gap-4">
+          {callHref && (
+            <a
+              href={callHref}
+              className="relative pb-2 flex flex-col items-center"
+              aria-label={isHindi ? "कॉल करें" : "Call us"}
             >
-              <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.97.57 3.805 1.554 5.352L2.016 22l4.773-1.523c1.5 0.922 3.266 1.453 5.242 1.453 5.536 0 10.031-4.495 10.031-10.031S17.567 2 12.031 2zm0 18.234c-1.742 0-3.359-0.5-4.734-1.375l-0.344-0.219-3.328 1.062 1.094-3.234-0.234-0.375c-0.969-1.422-1.516-3.125-1.516-4.938 0-4.523 3.68-8.203 8.203-8.203 4.523 0 8.203 3.68 8.203 8.203 0 4.523-3.68 8.203-8.203 8.203zm4.531-6.141c-0.25-0.125-1.469-0.727-1.703-0.812-0.234-0.086-0.406-0.125-0.578 0.125s-0.664 0.812-0.812 0.984c-0.156 0.172-0.305 0.187-0.555 0.062s-1.055-0.391-2.016-1.242c-0.742-0.664-1.242-1.484-1.391-1.734s-0.016-0.383 0.109-0.508c0.109-0.109 0.25-0.281 0.375-0.422s0.172-0.234 0.25-0.391c0.078-0.156 0.039-0.297-0.02-0.422s-0.578-1.391-0.797-1.906c-0.211-0.5-0.43-0.43-0.594-0.438-0.156-0.008-0.336-0.008-0.516-0.008s-0.469 0.062-0.719 0.336c-0.25 0.266-0.953 0.93-0.953 2.273s0.977 2.641 1.109 2.82c0.141 0.18 1.922 2.938 4.656 4.117 0.656 0.281 1.164 0.453 1.562 0.578 0.656 0.211 1.258 0.18 1.734 0.109 0.531-0.078 1.469-0.602 1.68-1.188s0.211-1.086 0.148-1.188c-0.062-0.109-0.234-0.172-0.484-0.297z" />
-            </svg>
-            <span className="hidden sm:inline font-sans">
-              {isHindi ? "व्हाट्सएप परामर्श" : "WhatsApp"}
-            </span>
-          </a>
-        )}
-
-        {/* Vedic Chatbot Toggle Button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-on-primary shadow-xl hover:shadow-2xl hover:scale-105 transition-all text-xs font-semibold"
-          aria-expanded={isOpen}
-          aria-label={
-            isOpen
-              ? isHindi
-                ? "सहायक बंद करें"
-                : "Close assistant"
-              : isHindi
-              ? "सहायता चैट खोलें"
-              : "Open help chat"
-          }
-        >
-          {isOpen ? (
-            <>
-              <X className="w-4 h-4" />
-              <span className="font-sans">{isHindi ? "बंद करें" : "Close"}</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 text-tertiary animate-pulse" />
-              <span className="font-sans">
-                {isHindi ? "सहायता चैट" : "Help Chat"}
+              <span className={`${FAB_CIRCLE} bg-secondary`}>
+                <Phone className="w-6 h-6" />
               </span>
-            </>
+              <FabLabel>{isHindi ? "कॉल" : "Call"}</FabLabel>
+            </a>
           )}
-        </button>
+          {defaultWhatsappUrl && (
+            <a
+              href={defaultWhatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative pb-2 flex flex-col items-center"
+              aria-label={isHindi ? "व्हाट्सएप पर संदेश भेजें" : "Message us on WhatsApp"}
+            >
+              <span className={`${FAB_CIRCLE} bg-[#178a45]`}>
+                <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.97.57 3.805 1.554 5.352L2.016 22l4.773-1.523c1.5 0.922 3.266 1.453 5.242 1.453 5.536 0 10.031-4.495 10.031-10.031S17.567 2 12.031 2zm0 18.234c-1.742 0-3.359-0.5-4.734-1.375l-0.344-0.219-3.328 1.062 1.094-3.234-0.234-0.375c-0.969-1.422-1.516-3.125-1.516-4.938 0-4.523 3.68-8.203 8.203-8.203 4.523 0 8.203 3.68 8.203 8.203 0 4.523-3.68 8.203-8.203 8.203zm4.531-6.141c-0.25-0.125-1.469-0.727-1.703-0.812-0.234-0.086-0.406-0.125-0.578 0.125s-0.664 0.812-0.812 0.984c-0.156 0.172-0.305 0.187-0.555 0.062s-1.055-0.391-2.016-1.242c-0.742-0.664-1.242-1.484-1.391-1.734s-0.016-0.383 0.109-0.508c0.109-0.109 0.25-0.281 0.375-0.422s0.172-0.234 0.25-0.391c0.078-0.156 0.039-0.297-0.02-0.422s-0.578-1.391-0.797-1.906c-0.211-0.5-0.43-0.43-0.594-0.438-0.156-0.008-0.336-0.008-0.516-0.008s-0.469 0.062-0.719 0.336c-0.25 0.266-0.953 0.93-0.953 2.273s0.977 2.641 1.109 2.82c0.141 0.18 1.922 2.938 4.656 4.117 0.656 0.281 1.164 0.453 1.562 0.578 0.656 0.211 1.258 0.18 1.734 0.109 0.531-0.078 1.469-0.602 1.68-1.188s0.211-1.086 0.148-1.188c-0.062-0.109-0.234-0.172-0.484-0.297z" />
+                </svg>
+              </span>
+              <FabLabel>WA</FabLabel>
+            </a>
+          )}
+        </div>
+
+        <div className="pointer-events-auto flex flex-col gap-4">
+          <button
+            type="button"
+            onClick={() => openAssistant("ai")}
+            className="relative pb-2 flex flex-col items-center"
+            aria-expanded={isOpen && mode === "ai"}
+            aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
+          >
+            <span className={`${FAB_CIRCLE} bg-tertiary`}>
+              <Sparkles className="w-6 h-6" />
+            </span>
+            <FabLabel>AI</FabLabel>
+          </button>
+          <button
+            type="button"
+            onClick={() => openAssistant("chat")}
+            className="relative pb-2 flex flex-col items-center"
+            aria-expanded={isOpen && mode === "chat"}
+            aria-label={isHindi ? "चैट खोलें" : "Open chat"}
+          >
+            <span className={`${FAB_CIRCLE} bg-primary`}>
+              {isOpen && mode === "chat" ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
+            </span>
+            <FabLabel>{isHindi ? "चैट" : "Chat"}</FabLabel>
+          </button>
+        </div>
       </div>
 
       {/* Vedic Assistant Dialog Modal */}
       {isOpen && (
         <div
-          className="fixed bottom-24 sm:bottom-20 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-96 max-w-sm h-[520px] max-h-[80vh] bg-surface rounded-2xl border border-outline-variant shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed inset-x-3 bottom-[7.75rem] sm:inset-x-auto sm:bottom-24 sm:right-6 z-50 sm:w-96 h-[520px] max-h-[70vh] sm:max-h-[80vh] bg-surface rounded-2xl border border-outline-variant shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
           role="dialog"
           aria-modal="true"
           aria-labelledby="chatbot-heading"
@@ -381,13 +424,17 @@ export function FloatingActionBar({
                   id="chatbot-heading"
                   className="font-serif font-bold text-xs sm:text-sm text-on-surface leading-tight"
                 >
-                  {isHindi
-                    ? "केंद्र सहायता चैट"
-                    : "Kendra Help Chat"}
+                  {mode === "ai"
+                    ? isHindi
+                      ? "एआई से पूछें"
+                      : "Ask AI"
+                    : isHindi
+                      ? "केंद्र सहायता चैट"
+                      : "Kendra Help Chat"}
                 </h3>
                 <span className="text-[10px] text-secondary flex items-center gap-1 font-sans">
                   <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
-                  <span>{isHindi ? "ऑनलाइन • निःशुल्क" : "Online • Instant"}</span>
+                  <span>{mode === "ai" ? (isHindi ? "तुरंत उत्तर • निःशुल्क" : "Instant answers • Free") : (isHindi ? "ऑनलाइन • निःशुल्क" : "Online • Free")}</span>
                 </span>
               </div>
             </div>
@@ -419,7 +466,7 @@ export function FloatingActionBar({
                         : "bg-primary text-on-primary rounded-tr-sm shadow"
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">{m.text}</p>
+                    <p className="whitespace-pre-wrap">{renderBold(m.text)}</p>
                   </div>
 
                   {/* Fallback actions if provided by bot */}
@@ -473,8 +520,8 @@ export function FloatingActionBar({
                 <RefreshCw className="w-3 h-3 animate-spin text-primary" />
                 <span>
                   {isHindi
-                    ? "सिद्धांत ग्रंथों एवं पंचांग से गणना कर रहे हैं..."
-                    : "Computing astrological reply..."}
+                    ? "कृपया प्रतीक्षा करें..."
+                    : "Please wait..."}
                 </span>
               </div>
             )}
