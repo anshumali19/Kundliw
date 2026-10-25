@@ -13,9 +13,9 @@ those are listed in section 7.
 | Area | State |
 | :--- | :--- |
 | Requirement points (1 to 48) | 29 built, 16 partly built, 3 not built |
-| Added requirement 49 (Associate panel) | Partly built: separate registration and login only |
-| Added conditions (backups, PDF guides, Android app) | Not built |
-| Automated tests | 425 unit tests pass. Browser (Playwright) tests exist but were not run in this review |
+| Added requirement 49 (Associate panel) | Built (see row 49) |
+| Added conditions (backups, PDF guides, Android app) | Built or partly built (see rows C3 to C5) |
+| Automated tests | 479 unit tests pass. Browser (Playwright) tests exist but were not run in this review |
 | Production build, type check, lint | Pass |
 | Deployment | Live on Vercel, database connected, health check passes |
 | Security review of dependencies | Open: Next.js 14 has known advisories (see section 6) |
@@ -27,20 +27,20 @@ real users until the client provides a key, account or content (section 7).
 
 | # | Requirement | Status | Notes |
 | :-: | :--- | :-: | :--- |
-| 1 | Dynamic custom CMS, admin control | Partial | Admin covers services, plans, offers, orders, vault, banners, marquee, blogs, gallery, founder, FAQ, testimonials, pages, translations, settings, keys, chatbot, enquiries, other services. Missing: reporting dashboard, backups, guides |
+| 1 | Dynamic custom CMS, admin control | Built | Admin covers services, plans, offers, orders, appointments, associates, vault, banners, marquee, blogs, gallery, founder, FAQ, testimonials, pages and guides, translations, settings, keys, chatbot, enquiries, other services, backup |
 | 2 | Mobile responsive, usable in an Android app | Partial | Responsive and tested at 375px. The Android WebView project is not built |
 | 3 | Hindi and English | Built | Language switch and editable text overrides. Some admin screens still contain fixed bilingual strings |
 | 4 | Theme: saffron, yellow, maroon, high contrast | Built | Contrast measured, two fixes applied (section 5) |
 | 5 | Menu items | Built | All listed items present |
 | 6 | User panel, registration | Built | User and Associate registration are now separate |
-| 7 | Login options (Gmail, OTP, Google, Facebook) | Partial | Mobile OTP and email login built. Google works once keys are added. Facebook login is not built (only the key fields exist). Needs client |
+| 7 | Login options (Gmail, OTP, Google, Facebook) | Built, needs client keys | Mobile OTP and email login work. Google and Facebook sign-in create or match a customer account and show their buttons only when GOOGLE_CLIENT_ID/SECRET or FACEBOOK_APP_ID/SECRET are set as Vercel environment variables. Not tested against the live providers |
 | 8 | Founder page and CMS | Built | |
 | 9 | Admin panel with full CMS control | Partial | See point 1 |
 | 10 | Dashboard with service reporting and analysis | Not built | The admin home redirects to the services list. No charts or reports |
 | 11 | Gallery with image and video upload, links, YouTube | Built | |
 | 12 | Service content: image, itinerary, samagri, links, YouTube | Partial | Database and API done. The admin form for these fields is still being finished |
 | 13 | Other services (Bharat Darshan, Matrimonial) | Built | Both entries are live with the client's URLs |
-| 14 | Appointment reporting and approval | Partial | Orders manager exists. No appointment calendar or approval workflow |
+| 14 | Appointment reporting and approval | Built | Each booked slot starts as pending. Admin approves, rejects (frees the slot) or completes it, with an email to the customer. The customer sees the status in My Account |
 | 15 | Service, plan, offer, payment flow with add, remove, activate | Built | |
 | 16 | Service booking integrated with all services | Built | |
 | 17 | Plan details: program, preparation, samagri | Partial | Same as point 12 |
@@ -61,24 +61,24 @@ real users until the client provides a key, account or content (section 7).
 | 32 | Footer: quick links, address, legal, other services, contact | Built | |
 | 33 | Site settings with full control | Partial | Extensive, but not every element of the layout is editable |
 | 34 | GST invoice | Built | Needs the company GST details from the client |
-| 35 | Service, booking, appointment, enquiry | Partial | Booking and enquiry exist. No appointment slot approval |
+| 35 | Service, booking, appointment, enquiry | Built | Booking, appointment approval and enquiry are connected |
 | 36 | Service list view and grid view | Built | Toggle on the services page |
 | 37 | Date, time, day, tithi on the home page | Partial | Date, time and day are live. The tithi is labelled DEMO sample data until a real panchang source is connected. Needs client |
 | 38 | Founder details page and CMS | Built | |
 | 39 | File upload and URL link options | Partial | Works on Vercel with Blob storage. Not every admin form offers both options |
 | 40 | Admin PDF upload for a user, user download | Built | |
-| 41 | Android app download page with link and QR, admin control | Not built | |
+| 41 | Android app download page with link and QR, admin control | Built | /app shows the link and a QR code from Admin > Settings. Shows a coming-soon note until a link is saved |
 | 42 | "Free API Ask" integration | Not built | The requirement is unclear and needs the client's explanation |
 | 43 | Free assistance chatbot | Built | Rule-based, answers editable in admin. It is not an AI model |
 | 44 | Social media integration | Built | |
-| 45 | Back and Next icons on pages | Partial | Present on services, other services and AstroSage pages. Not yet on every page |
-| 46 | Notifications by email, SMS, OTP | Partial | SMS OTP adapter exists. Email sending and order-status notifications are not built. Needs client |
+| 45 | Back and Next icons on pages | Built | Shown on every page except the home page |
+| 46 | Notifications by email, SMS, OTP | Partial, needs client | OTP SMS adapter exists. Email is sent for payment confirmation, appointment decisions, associate approval and payouts once SMTP details are saved under API Keys. Status SMS needs DLT-approved templates. Needs client |
 | 47 | Additional links and YouTube links | Partial | Done for services, gallery and blog data. Some admin forms do not expose them yet |
 | 48 | Google Analytics | Built | Needs the client's measurement ID |
-| 49 | Associate panel | Partial | Separate registration and login exist. No associate dashboard, approval, referral or commission |
-| C3 | Automated and manual backups | Not built | |
-| C4 | PDF guides for admin, user, associate | Not built | |
-| C5 | Android WebView app and download page | Not built | |
+| 49 | Associate panel | Built, awaiting client confirmation of rules | Registration with admin approval, own login and dashboard, referral link /r/code (30 days), admin assignment of bookings, commission rules per service or plan, earnings, payout requests (admin marks paid, money moves outside the system), admin console. Detailed functions still to be confirmed against vindhyavivahsanskar.com |
+| C3 | Automated and manual backups | Partial | Admin > Backup downloads a JSON copy (no secrets). Automatic backups rely on the database provider's own backup feature |
+| C4 | PDF guides for admin, user, associate | Built | Starter guides in Hindi and English at /guides/user, /guides/associate and /guides/admin, editable under Admin > Pages, saved as PDF from the Print button |
+| C5 | Android WebView app and download page | Partial | Project in android-app/ and installable web app manifest. It still has to be built, signed and published by the client's Play Console |
 
 ## 3. Frontend
 
