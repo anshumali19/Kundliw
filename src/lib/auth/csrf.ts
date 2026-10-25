@@ -4,10 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
  * Validates request origin against Host / Forwarded-Host header for state-changing HTTP requests.
  * Protects mutation APIs (POST, PUT, DELETE, PATCH) against cross-site request forgery.
  */
-export function validateCsrfOrigin(request: NextRequest): {
-  isValid: boolean;
-  errorResponse?: NextResponse;
-} {
+export type CsrfValidationResult =
+  | { isValid: true }
+  | { isValid: false; errorResponse: NextResponse };
+
+export function validateCsrfOrigin(request: NextRequest): CsrfValidationResult {
   const method = request.method.toUpperCase();
   const safeMethods = ["GET", "HEAD", "OPTIONS"];
   if (safeMethods.includes(method)) {

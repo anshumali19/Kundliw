@@ -40,8 +40,23 @@ export async function PUT(
       updateData.discountType = discountType;
     }
     if (discountValue !== undefined) {
+      // For a partial update the request may omit discountType. Resolve it from
+      // the stored offer so percentages stay integers instead of being
+      // multiplied by 100 by rupeesToPaise().
+      let effectiveType = discountType;
+      if (effectiveType === undefined) {
+        const existing = await prisma.offer.findUnique({
+          where: { id: params.id },
+          select: { discountType: true },
+        });
+        if (!existing) {
+          return NextResponse.json({ error: "Offer not found" }, { status: 404 });
+        }
+        effectiveType = existing.discountType;
+      }
+
       updateData.discountValuePaise =
-        discountType === DiscountType.PERCENTAGE
+        effectiveType === DiscountType.PERCENTAGE
           ? discountValue
           : rupeesToPaise(discountValue);
     }

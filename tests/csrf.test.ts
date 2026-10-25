@@ -9,7 +9,7 @@ describe("CSRF Origin Validation for Mutating Routes", () => {
     });
     const result = validateCsrfOrigin(req);
     expect(result.isValid).toBe(true);
-    expect(result.errorResponse).toBeUndefined();
+    expect("errorResponse" in result).toBe(false);
   });
 
   it("allows state-changing requests when Origin matches Host header", () => {
@@ -46,8 +46,8 @@ describe("CSRF Origin Validation for Mutating Routes", () => {
     });
     const result = validateCsrfOrigin(req);
     expect(result.isValid).toBe(false);
-    expect(result.errorResponse).toBeDefined();
-    expect(result.errorResponse?.status).toBe(403);
+    if (result.isValid) throw new Error("expected CSRF rejection");
+    expect(result.errorResponse.status).toBe(403);
   });
 
   it("blocks state-changing requests when Referer belongs to an unauthorized cross-site domain", () => {
@@ -60,6 +60,7 @@ describe("CSRF Origin Validation for Mutating Routes", () => {
     });
     const result = validateCsrfOrigin(req);
     expect(result.isValid).toBe(false);
-    expect(result.errorResponse?.status).toBe(403);
+    if (result.isValid) throw new Error("expected CSRF rejection");
+    expect(result.errorResponse.status).toBe(403);
   });
 });
