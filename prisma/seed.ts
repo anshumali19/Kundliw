@@ -995,6 +995,10 @@ startxref
     update: {},
   });
 
+  // SRS cross-promotion portals (idempotent; never overwrites admin edits)
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  await require("../scripts/upsert-other-services.js").ensureOtherServices(prisma);
+
   console.log("Database seeded successfully with all 6 order statuses, customer vault document, CMS models, and demo dataset!");
 }
 
