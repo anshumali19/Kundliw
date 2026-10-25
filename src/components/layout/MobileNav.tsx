@@ -41,7 +41,7 @@ export function MobileNav() {
               }`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[11px] mt-1 truncate max-w-[80px]">
+              <span className="text-[11px] mt-1 max-w-full px-0.5 text-center leading-tight break-words">
                 {tab.label}
               </span>
             </Link>

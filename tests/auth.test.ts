@@ -51,6 +51,30 @@ describe("Auth Validation Schemas", () => {
     expect(parsed.name).toBe("Aditya Sharma");
     expect(parsed.phone).toBe("+919827991224");
     expect(parsed.email).toBe("aditya@example.com");
+    expect(parsed.accountType).toBe("USER");
+  });
+
+  it("requires a password for Associate registration", () => {
+    const base = {
+      accountType: "ASSOCIATE",
+      name: "Rohit Verma",
+      phone: "9827991224",
+      email: "rohit@example.com",
+    };
+    expect(() => registerSchema.parse(base)).toThrow("Password is required");
+    expect(registerSchema.parse({ ...base, password: "longenough1" }).accountType).toBe("ASSOCIATE");
+  });
+
+  it("never allows self-registration as ADMIN", () => {
+    expect(() =>
+      registerSchema.parse({
+        accountType: "ADMIN",
+        name: "Mallory",
+        phone: "9827991224",
+        email: "m@example.com",
+        password: "longenough1",
+      })
+    ).toThrow();
   });
 });
 

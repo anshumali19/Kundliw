@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, phone, email, password } = parsed.data;
+    const { accountType, name, phone, email, password } = parsed.data;
 
     // Check if email or phone already registered
     const existingEmail = await prisma.user.findUnique({ where: { email } });
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         phone,
         email,
         passwordHash,
-        role: Role.USER,
+        role: accountType === "ASSOCIATE" ? Role.ASSOCIATE : Role.USER,
       },
       select: {
         id: true,

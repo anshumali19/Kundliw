@@ -84,8 +84,8 @@ test.describe("Phase 16 - Contact Page, Vedic Chatbot & Encrypted Keys Vault", (
     page,
   }) => {
     // Sign in as admin with callbackUrl to admin keys
-    await page.goto("/en/auth/signin?callbackUrl=/en/admin/settings/keys");
-    await page.getByRole("button", { name: /Admin Login/i }).click();
+    await page.goto("/en/auth/signin/super-admin?callbackUrl=/en/admin/settings/keys");
+    
     await page.fill('input[type="email"]', "admin@kanad-jyotish.in");
     await page.fill('input[type="password"]', "ChangeMeInAdminSettings@2026");
     await page.locator('button[type="submit"]').click();

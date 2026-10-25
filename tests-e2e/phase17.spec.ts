@@ -90,8 +90,8 @@ test.describe("Phase 17 - Founder Page, FAQ System, Legal CMS & Gallery Enhancem
     page.on("dialog", (dialog) => dialog.accept());
 
     // 1. Sign in as admin
-    await page.goto("/en/auth/signin?callbackUrl=/en/admin/faq");
-    await page.getByRole("button", { name: /Admin Login/i }).click();
+    await page.goto("/en/auth/signin/super-admin?callbackUrl=/en/admin/faq");
+    
     await page.fill('input[type="email"]', "admin@kanad-jyotish.in");
     await page.fill('input[type="password"]', "ChangeMeInAdminSettings@2026");
     await page.locator('button[type="submit"]').click();

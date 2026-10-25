@@ -8,6 +8,9 @@ import { verifyOtpSchema, emailPasswordLoginSchema } from "./validation";
 import { checkDbRateLimit, resetDbRateLimit, getClientIp } from "@/lib/rateLimit";
 import { Role } from "@prisma/client";
 
+const WRONG_PORTAL_MESSAGE =
+  "This account cannot sign in on this page. Please use the correct login for your account type.";
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -35,12 +38,16 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         phone: { label: "Mobile Number", type: "text" },
         otp: { label: "One-Time Password", type: "text" },
+        portal: { label: "Login Portal", type: "text" },
       },
       async authorize(credentials) {
         const parsed = verifyOtpSchema.safeParse(credentials);
         if (!parsed.success) {
           throw new Error("Invalid mobile number or OTP format");
         }
+
+        // OTP login serves the User and Associate portals only; Super Admin never uses OTP.
+        const portal = credentials?.portal === "associate" ? "associate" : "user";
 
         const { phone, otp } = parsed.data;
 
@@ -84,6 +91,13 @@ export const authOptions: NextAuthOptions = {
         await resetDbRateLimit("OTP_PHONE", phone);
 
         let user = await prisma.user.findUnique({ where: { phone } });
+        const expectedRole = portal === "associate" ? Role.ASSOCIATE : Role.USER;
+        if (user && user.role !== expectedRole) {
+          throw new Error(WRONG_PORTAL_MESSAGE);
+        }
+        if (!user && portal === "associate") {
+          throw new Error("No Associate account found. Please register as an Associate first.");
+        }
         if (!user) {
           user = await prisma.user.create({
             data: {
@@ -111,12 +125,16 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        portal: { label: "Login Portal", type: "text" },
       },
       async authorize(credentials, req) {
         const parsed = emailPasswordLoginSchema.safeParse(credentials);
         if (!parsed.success) {
           throw new Error("Invalid email or password format");
         }
+
+        // Password login serves Associate and Super Admin portals; defaults to Super Admin.
+        const requiredRole = credentials?.portal === "associate" ? Role.ASSOCIATE : Role.ADMIN;
 
         const { email, password } = parsed.data;
 
@@ -166,16 +184,15 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        // Strict customer access guard: customers must sign in via Mobile OTP only
-        if (user.role !== Role.ADMIN) {
-          throw new Error(
-            "Customer access is via Mobile OTP only. Email and password login is reserved for Kendra administration."
-          );
-        }
-
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
           throw new Error("Invalid email or password");
+        }
+
+        // Role gate runs only after the password is verified, so it cannot be used
+        // to probe which emails belong to which role.
+        if (user.role !== requiredRole) {
+          throw new Error(WRONG_PORTAL_MESSAGE);
         }
 
         // Success: clear rate limits for both email and IP

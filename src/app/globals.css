@@ -57,6 +57,24 @@
   --on-error-container: #93000a;
 }
 
+/* Mobile / Android WebView readability: lift the smallest type steps.
+   Declared after the utilities layer so these win at equal specificity. */
+@media (max-width: 767px) {
+  body { font-size: 1.0625rem; line-height: 1.6; }
+  .text-xs { font-size: 0.875rem; line-height: 1.35rem; }
+  .text-sm { font-size: 1rem; line-height: 1.55rem; }
+  .text-base { font-size: 1.0625rem; line-height: 1.65rem; }
+  .text-lg { font-size: 1.1875rem; line-height: 1.75rem; }
+  .text-xl { font-size: 1.3125rem; line-height: 1.8rem; }
+  .text-\[8px\],
+  .text-\[9px\],
+  .text-\[9\.5px\],
+  .text-\[10px\],
+  .text-\[10\.5px\],
+  .text-\[11px\] { font-size: 0.8125rem; line-height: 1.25rem; }
+  input, select, textarea { font-size: 1rem; }
+}
+
 @layer base {
   html, body {
     margin: 0;

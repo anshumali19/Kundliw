@@ -9,8 +9,8 @@ test.describe("Phase 15 - Admin Translation Live Edit & Public Reflection E2E", 
     page.on("dialog", (dialog) => dialog.accept());
 
     // 1. Sign in as admin with callbackUrl to translations manager
-    await page.goto("/en/auth/signin?callbackUrl=/en/admin/translations");
-    await page.getByRole("button", { name: /Admin Login/i }).click();
+    await page.goto("/en/auth/signin/super-admin?callbackUrl=/en/admin/translations");
+    
     await page.fill('input[type="email"]', "admin@kanad-jyotish.in");
     await page.fill('input[type="password"]', "ChangeMeInAdminSettings@2026");
     await page.locator('button[type="submit"]').click();

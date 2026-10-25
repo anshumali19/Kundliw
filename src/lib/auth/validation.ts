@@ -44,12 +44,26 @@ export const nameSchema = z
   .min(2, "Name must be at least 2 characters")
   .max(100, "Name cannot exceed 100 characters");
 
-export const registerSchema = z.object({
-  name: nameSchema,
-  phone: phoneSchema,
-  email: emailSchema,
-  password: z.string().min(8, "Password must be at least 8 characters").optional(),
-});
+const passwordSchema = z.string().min(8, "Password must be at least 8 characters");
+
+/**
+ * Public self-registration is limited to USER and ASSOCIATE accounts.
+ * ADMIN (Super Admin) accounts are never created through this schema.
+ */
+export const registerSchema = z
+  .object({
+    accountType: z.enum(["USER", "ASSOCIATE"]).default("USER"),
+    name: nameSchema,
+    phone: phoneSchema,
+    email: emailSchema,
+    password: passwordSchema.optional(),
+  })
+  .refine((v) => v.accountType !== "ASSOCIATE" || !!v.password, {
+    message: "Password is required for Associate accounts",
+    path: ["password"],
+  });
+
+export const loginPortalSchema = z.enum(["user", "associate", "super-admin"]);
 
 export const requestOtpSchema = z.object({
   phone: phoneSchema,

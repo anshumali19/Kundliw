@@ -180,15 +180,15 @@ export function Header({ phone }: HeaderProps = {}) {
       <div className="bg-surface">
         <div className="h-20 w-full px-4 sm:px-6 xl:px-6 2xl:px-10 flex items-center justify-between gap-2 sm:gap-4 xl:gap-2 2xl:gap-6">
           {/* Logo & Kendra Identity */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0 shrink sm:shrink-0">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded border border-secondary flex items-center justify-center bg-surface-container-low text-secondary shrink-0">
               <span className="font-serif text-lg sm:text-xl font-bold">ॐ</span>
             </div>
             <div className="flex flex-col text-left min-w-0">
-              <span className="font-serif text-sm sm:text-base lg:text-lg font-bold tracking-tight text-secondary leading-tight whitespace-nowrap">
+              <span className="font-serif text-sm sm:text-base lg:text-lg font-bold tracking-tight text-secondary leading-tight whitespace-nowrap truncate">
                 {tCommon("siteNameHi")}
               </span>
-              <span className="text-[8px] sm:text-[9px] xl:text-[9.5px] 2xl:text-[10.5px] font-semibold text-primary tracking-wider uppercase mt-0.5 whitespace-nowrap">
+              <span className="text-[8px] sm:text-[9px] xl:text-[9.5px] 2xl:text-[10.5px] font-semibold text-primary tracking-normal sm:tracking-wider uppercase mt-0.5 whitespace-nowrap truncate">
                 {tCommon("siteName")}
               </span>
             </div>
