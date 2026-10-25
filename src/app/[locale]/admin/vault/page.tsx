@@ -68,7 +68,7 @@ export default async function AdminVaultPage({
           {isHindi ? "प्रशासनिक अभिलेखागार" : "Administrative Console"}
         </span>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-secondary mt-1">
-          {isHindi ? "कुण्डली वॉल्ट प्रबंधन" : "Customer Vault Dossier Management"}
+          {isHindi ? "कुण्डली वॉल्ट प्रबंधन" : "Customer Vault Management"}
         </h1>
         <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
           {isHindi

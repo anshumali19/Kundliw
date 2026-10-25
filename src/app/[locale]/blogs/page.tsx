@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: BlogsPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/blogs"),
     title: isHindi
       ? "वैदिक ज्योतिष शोध एवं आलेख • महर्षि कणाद ज्योतिष केंद्र"
       : "Vedic Astrology Research & Articles • Maharshi Kanad Jyotish Kendra",

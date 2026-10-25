@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
@@ -23,6 +24,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: FounderPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/founder"),
     title: isHindi
       ? "संस्थापक एवं दैवज्ञ परंपरा • महर्षि कणाद ज्योतिष केंद्र"
       : "Founder Lineage • Maharshi Kanad Jyotish Kendra",
@@ -176,7 +178,7 @@ export default async function FounderPage({ params: { locale } }: FounderPagePro
           <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-outline-variant/40 shadow-sm space-y-4">
             <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
               <BookOpen className="w-4 h-4" />
-              <span>{isHindi ? "जीवन दर्शन एवं दैवज्ञ यात्रा" : "Philosophy & Scholarly Journey"}</span>
+              <span>{isHindi ? "जीवन दर्शन एवं दैवज्ञ यात्रा" : "Philosophy and Background"}</span>
             </div>
             <div className="text-sm sm:text-base leading-relaxed text-on-surface whitespace-pre-line space-y-4">
               {bio}

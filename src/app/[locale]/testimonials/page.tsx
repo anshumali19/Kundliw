@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Star, ShieldCheck, MessageSquare } from "lucide-react";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: TestimonialsPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/testimonials"),
     title: isHindi
       ? "ग्राहक अनुभव एवं संस्तुतियाँ • महर्षि कणाद ज्योतिष केंद्र"
       : "Client Experiences & Testimonials • Maharshi Kanad Jyotish Kendra",

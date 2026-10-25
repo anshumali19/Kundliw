@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ContactClient } from "@/features/contact/ContactClient";
@@ -9,6 +10,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const isHi = params?.locale === "hi";
   return {
+    alternates: pageAlternates(params?.locale, "/contact"),
     title: isHi
       ? "संपर्क करें एवं स्थान | महर्षि कणाद ज्योतिष केंद्र"
       : "Contact Us & Location | Maharshi Kanad Jyotish Kendra",

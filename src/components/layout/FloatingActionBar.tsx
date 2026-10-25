@@ -342,8 +342,8 @@ export function FloatingActionBar({
                 ? "सहायक बंद करें"
                 : "Close assistant"
               : isHindi
-              ? "वैदिक चैटबॉट सहायक खोलें"
-              : "Open Vedic AI Assistant"
+              ? "सहायता चैट खोलें"
+              : "Open help chat"
           }
         >
           {isOpen ? (
@@ -355,7 +355,7 @@ export function FloatingActionBar({
             <>
               <Sparkles className="w-4 h-4 text-tertiary animate-pulse" />
               <span className="font-sans">
-                {isHindi ? "वैदिक सहायक" : "Ask Vedic AI"}
+                {isHindi ? "सहायता चैट" : "Help Chat"}
               </span>
             </>
           )}
@@ -382,8 +382,8 @@ export function FloatingActionBar({
                   className="font-serif font-bold text-xs sm:text-sm text-on-surface leading-tight"
                 >
                   {isHindi
-                    ? "महर्षि कणाद वैदिक सहायक"
-                    : "Maharshi Kanad Vedic AI"}
+                    ? "केंद्र सहायता चैट"
+                    : "Kendra Help Chat"}
                 </h3>
                 <span className="text-[10px] text-secondary flex items-center gap-1 font-sans">
                   <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />

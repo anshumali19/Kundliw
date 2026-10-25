@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { PanchangClient } from "@/features/astro/components/PanchangClient";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: PanchangPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/panchang"),
     title: isHindi
       ? "दैनिक पंचांग एवं शुभ मुहूर्त • महर्षि कणाद ज्योतिष केंद्र"
       : "Daily Vedic Panchang & Shubh Muhurat • Maharshi Kanad Jyotish Kendra",

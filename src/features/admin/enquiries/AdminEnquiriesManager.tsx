@@ -202,8 +202,8 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
           {(
             [
               { id: "ALL", labelEn: "All Sources", labelHi: "सभी स्रोत" },
-              { id: "CHATBOT_LEAD", labelEn: "🤖 Chatbot Leads", labelHi: "🤖 चैटबॉट लीड्स" },
-              { id: "CONTACT_PAGE", labelEn: "✉️ Contact Form", labelHi: "✉️ संपर्क प्रपत्र" },
+              { id: "CHATBOT_LEAD", labelEn: "Chatbot Leads", labelHi: "चैटबॉट लीड्स" },
+              { id: "CONTACT_PAGE", labelEn: "Contact Form", labelHi: "संपर्क प्रपत्र" },
             ] as const
           ).map((src) => (
             <button
@@ -252,11 +252,11 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                     </span>
                     {item.source === "CHATBOT_LEAD" ? (
                       <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 border border-indigo-500/30 flex items-center gap-1">
-                        🤖 {isHindi ? "चैटबॉट लीड" : "Chatbot Lead"}
+                        {isHindi ? "चैटबॉट लीड" : "Chatbot Lead"}
                       </span>
                     ) : item.source === "CHATBOT_TICKET" ? (
                       <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30 flex items-center gap-1">
-                        🎫 {isHindi ? "चैटबॉट टिकट" : "Chatbot Ticket"}
+                        {isHindi ? "चैटबॉट टिकट" : "Chatbot Ticket"}
                       </span>
                     ) : (
                       <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">

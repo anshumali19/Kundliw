@@ -309,12 +309,12 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
             </div>
           )}
 
-          {/* Success State for Registered Dossier Request */}
+          {/* Success State for Registered Kundli Request */}
           {orderCreated && (
             <div className="p-6 rounded-lg bg-emerald-50 border-2 border-emerald-400 text-emerald-950 space-y-3">
               <div className="flex items-center gap-2 font-bold text-sm text-emerald-800">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <span>{isHindi ? "जन्मपत्रिका समीक्षा अनुरोध दर्ज" : "Kundli Dossier Request Registered"}</span>
+                <span>{isHindi ? "जन्मपत्रिका समीक्षा अनुरोध दर्ज" : "Kundli Request Registered"}</span>
               </div>
               <p className="text-xs">
                 {isHindi ? "आदेश संदर्भ संख्या:" : "Tracking Token:"}{" "}
@@ -323,7 +323,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
               <p className="text-xs text-emerald-800">
                 {isHindi
                   ? "आपकी जन्मपत्रिका विवरण केंद्र के वरिष्ठ दैवज्ञ के संज्ञान में दर्ज कर ली गई है।"
-                  : "Your birth coordinates have been registered for complete archival bound Janampatri preparation."}
+                  : "Your birth coordinates have been registered for full Janampatri preparation."}
               </p>
               <div className="pt-2">
                 <Link
@@ -576,7 +576,7 @@ export function KundliCalculatorClient({ locale }: KundliCalculatorClientProps) 
                 className="min-h-[44px] px-6 py-2.5 bg-[#e8751a] hover:bg-[#d06410] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 text-center shadow-sm"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>{isHindi ? "४५-पृष्ठीय सम्पूर्ण जन्मपत्रिका मँगवाएं" : "Order 45-Page Kendra Dossier"}</span>
+                <span>{isHindi ? "सम्पूर्ण जन्मपत्रिका मँगवाएं" : "Order Full Janampatri"}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 

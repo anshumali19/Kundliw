@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { SubPageNav } from "@/components/layout/SubPageNav";
@@ -22,6 +23,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/other-services"),
     title: isHindi
       ? "अन्य धार्मिक एवं आध्यात्मिक सेवाएँ • महर्षि कणाद ज्योतिष केंद्र"
       : "Other Vedic & Allied Services • Maharshi Kanad Jyotish Kendra",

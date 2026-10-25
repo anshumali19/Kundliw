@@ -70,7 +70,7 @@ const STEP_DEFINITIONS: Array<{
     status: "DELIVERED",
     labelEn: "Delivered",
     labelHi: "ग्राहक को प्राप्त",
-    descEn: "Pothi received by Customer / Vault dossier ready.",
+    descEn: "Pothi received by Customer / Vault report ready.",
     descHi: "पत्रिका ग्राहक को ससम्मान प्राप्त।",
     icon: Package,
   },

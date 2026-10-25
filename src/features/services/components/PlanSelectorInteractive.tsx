@@ -179,7 +179,7 @@ export function PlanSelectorInteractive({
             <p className="text-xs sm:text-sm text-on-surface-variant mt-1 max-w-2xl">
               {isHindi
                 ? "डिजिटल फलित प्रतिवेदन से लेकर प्रत्यक्ष केंद्र परामर्श एवं हस्तनिर्मित पोथी ग्रंथ तक — प्रमाणिक वैदिक विकल्प।"
-                : "From digital computational dossiers to live Kendra team dialogues and handcrafted archival manuscript books."}
+                : "From a digital report to a live consultation with the Kendra team and a printed book."}
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs text-secondary bg-surface-container-low px-3 py-1.5 rounded border border-secondary/20 shrink-0 self-start md:self-auto">
@@ -233,7 +233,7 @@ export function PlanSelectorInteractive({
                           : "Advisory + Report"
                         : isHindi
                         ? "डिजिटल फलित प्रतिवेदन"
-                        : "Digital Dossier"}
+                        : "Digital Report"}
                     </span>
                     {isSelected && (
                       <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary-container text-on-primary flex items-center gap-1">
@@ -432,7 +432,7 @@ export function PlanSelectorInteractive({
                 ))}
               </tr>
 
-              {/* Row: Archival Vault Access */}
+              {/* Row: Vault Access */}
               <tr className="bg-surface-container-low/30 hover:bg-surface-container-low transition-colors">
                 <td className="py-3 px-4 font-medium text-on-surface">
                   {isHindi ? "आजीवन कुण्डली तिजोरी (Vault Access)" : "Lifetime Digital Vault Access"}

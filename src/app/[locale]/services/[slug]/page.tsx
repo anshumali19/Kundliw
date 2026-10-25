@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { SITE_URL, absoluteUrl, localizedPath, pageAlternates } from "@/lib/seo";
 import { ServiceDetailView, ServiceDetailDTO } from "@/features/services/components/ServiceDetailView";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +11,25 @@ interface ServiceDetailPageProps {
   params: {
     locale: string;
     slug: string;
+  };
+}
+
+export async function generateMetadata({
+  params: { locale, slug },
+}: ServiceDetailPageProps): Promise<Metadata> {
+  const service = await prisma.service
+    .findUnique({ where: { slug } })
+    .catch(() => null);
+  if (!service || !service.isActive) return {};
+
+  const isHindi = locale === "hi";
+  const title = isHindi ? service.titleHi : service.titleEn;
+  const summary = (isHindi ? service.taglineHi : service.taglineEn) || (isHindi ? service.descriptionHi : service.descriptionEn);
+  return {
+    title: `${title} | ${isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "Maharshi Kanad Jyotish Kendra"}`,
+    description: summary.length > 160 ? `${summary.slice(0, 157)}...` : summary,
+    alternates: pageAlternates(locale, `/services/${slug}`),
+    openGraph: service.imageUrl ? { images: [service.imageUrl] } : undefined,
   };
 }
 
@@ -90,18 +112,43 @@ export default async function ServiceDetailPage({
     })),
   };
 
+  const prices = service.plans.map((p) => p.pricePaise / 100);
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: isHindi ? service.titleHi : service.titleEn,
+    description: isHindi ? service.descriptionHi : service.descriptionEn,
+    url: absoluteUrl(localizedPath(locale, `/services/${service.slug}`)),
+    provider: { "@id": `${SITE_URL}/#organization` },
+    areaServed: "IN",
+    ...(service.imageUrl ? { image: service.imageUrl } : {}),
+    ...(prices.length
+      ? {
+          offers: {
+            "@type": "AggregateOffer",
+            priceCurrency: "INR",
+            lowPrice: Math.min(...prices),
+            highPrice: Math.max(...prices),
+            offerCount: prices.length,
+          },
+        }
+      : {}),
+  };
+
   return (
-    <ServiceDetailView
-      service={serviceDto}
-      nextService={
-        nextService
-          ? {
-              slug: nextService.slug,
-              title: isHindi ? nextService.titleHi : nextService.titleEn,
-            }
-          : null
-      }
-      locale={locale}
-    />
-  );
-}
+    <>
+      <JsonLd data={serviceJsonLd} />
+      <ServiceDetailView
+        service={serviceDto}
+        nextService={
+          nextService
+            ? {
+                slug: nextService.slug,
+                title: isHindi ? nextService.titleHi : nextService.titleEn,
+              }
+            : null
+        }
+        locale={locale}
+      />
+     </>
+  );}

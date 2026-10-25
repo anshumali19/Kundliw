@@ -1,8 +1,27 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { pageAlternates } from "@/lib/seo";
 import { ServicesListingClient } from "@/features/services/components/ServicesListingClient";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  const isHindi = locale === "hi";
+  return {
+    title: isHindi
+      ? "ज्योतिष सेवाएँ एवं प्लान | महर्षि कणाद ज्योतिष केंद्र"
+      : "Astrology Services and Plans | Maharshi Kanad Jyotish Kendra",
+    description: isHindi
+      ? "कुंडली, कुंडली मिलान, प्रश्न कुंडली और परामर्श सेवाएँ देखें, अपना प्लान चुनें और ऑनलाइन बुकिंग करें।"
+      : "Browse Kundli, Kundli matching, Prashna Kundli and consultation services, choose a plan and book online.",
+    alternates: pageAlternates(locale, "/services"),
+  };
+}
 
 export default async function ServicesListingPage({
   params: { locale },

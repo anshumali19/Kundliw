@@ -1,0 +1,51 @@
+import type { MetadataRoute } from "next";
+import { prisma } from "@/lib/prisma";
+import { LOCALES, absoluteUrl, localizedPath } from "@/lib/seo";
+
+export const dynamic = "force-dynamic";
+
+const STATIC_ROUTES: { path: string; priority: number; changeFrequency: "daily" | "weekly" | "monthly" }[] = [
+  { path: "", priority: 1, changeFrequency: "daily" },
+  { path: "/services", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/kundli", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/kundli/matching", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/kundli/prashna", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/panchang", priority: 0.7, changeFrequency: "daily" },
+  { path: "/about", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/founder", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/gallery", priority: 0.5, changeFrequency: "weekly" },
+  { path: "/blogs", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/testimonials", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/help", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/contact", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/other-services", priority: 0.5, changeFrequency: "monthly" },
+];
+
+function entriesFor(path: string, lastModified: Date | undefined, priority: number, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]): MetadataRoute.Sitemap {
+  const languages = Object.fromEntries(LOCALES.map((l) => [l, absoluteUrl(localizedPath(l, path))]));
+  return LOCALES.map((locale) => ({
+    url: absoluteUrl(localizedPath(locale, path)),
+    lastModified,
+    changeFrequency,
+    priority,
+    alternates: { languages },
+  }));
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [services, posts] = await Promise.all([
+    prisma.service
+      .findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } })
+      .catch(() => []),
+    prisma.blogPost
+      .findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } })
+      .catch(() => []),
+  ]);
+
+  return [
+    ...STATIC_ROUTES.flatMap((r) => entriesFor(r.path, undefined, r.priority, r.changeFrequency)),
+    ...services.flatMap((s) => entriesFor(`/services/${s.slug}`, s.updatedAt, 0.8, "weekly")),
+    ...posts.flatMap((p) => entriesFor(`/blogs/${p.slug}`, p.updatedAt, 0.6, "monthly")),
+  ];
+}

@@ -109,7 +109,7 @@ export function AdminVaultManager({
       setSuccess(
         isHindi
           ? "कुण्डली दस्तावेज सफलतापूर्वक ग्राहक वॉल्ट में अपलोड किया गया।"
-          : "Kundli dossier successfully uploaded to customer vault."
+          : "Kundli PDF uploaded to the customer vault."
       );
 
       // Add to list
@@ -213,7 +213,7 @@ export function AdminVaultManager({
               <input
                 type="text"
                 required
-                placeholder="e.g. Lifetime Janampatri Dossier"
+                placeholder="e.g. Lifetime Janampatri"
                 value={titleEn}
                 onChange={(e) => setTitleEn(e.target.value)}
                 className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"

@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Image as ImageIcon, Video, ExternalLink, Play } from "lucide-react";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: GalleryPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/gallery"),
     title: isHindi
       ? "चित्र एवं वीडियो दीर्घा • महर्षि कणाद ज्योतिष केंद्र"
       : "Sanctum Gallery & Discourses • Maharshi Kanad Jyotish Kendra",

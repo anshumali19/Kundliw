@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { HelpCircle, Phone, Mail, Clock, MessageSquare, Search, FileText } from "lucide-react";
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: HelpPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/help"),
     title: isHindi
       ? "सहायता एवं ग्राहक समर्थन • महर्षि कणाद ज्योतिष केंद्र"
       : "Help & Customer Support • Maharshi Kanad Jyotish Kendra",

@@ -1,3 +1,4 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { KundliCalculatorClient } from "@/features/astro/components/KundliCalculatorClient";
 
@@ -12,6 +13,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: KundliPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/kundli"),
     title: isHindi
       ? "नि:शुल्क वैदिक जन्मपत्रिका एवं ग्रह स्पष्ट | महर्षि कणाद ज्योतिष केंद्र"
       : "Free Vedic Janampatri & Planetary Calculator | Maharshi Kanad Jyotish Kendra",

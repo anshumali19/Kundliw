@@ -1,6 +1,8 @@
+import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { FaqClient } from "@/features/faq/FaqClient";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 interface FaqPageProps {
   params: {
@@ -13,6 +15,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params: { locale } }: FaqPageProps): Promise<Metadata> {
   const isHindi = locale === "hi";
   return {
+    alternates: pageAlternates(locale, "/faq"),
     title: isHindi
       ? "प्रायः पूछे जाने वाले प्रश्न (FAQ) • महर्षि कणाद ज्योतिष केंद्र"
       : "Frequently Asked Questions (FAQ) • Maharshi Kanad Jyotish Kendra",
@@ -30,5 +33,23 @@ export default async function FaqPage({ params: { locale } }: FaqPageProps) {
     })
     .catch(() => []);
 
-  return <FaqClient initialItems={items} locale={locale} />;
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: locale === "hi" ? item.questionHi : item.questionEn,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: locale === "hi" ? item.answerHi : item.answerEn,
+      },
+    })),
+  };
+
+  return (
+    <>
+      {items.length > 0 && <JsonLd data={faqJsonLd} />}
+      <FaqClient initialItems={items} locale={locale} />
+    </>
+  );
 }

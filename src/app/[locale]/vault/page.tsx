@@ -101,7 +101,7 @@ export default async function VaultPage({
             <p className="text-xs sm:text-sm text-on-surface-variant max-w-md mx-auto">
               {isHindi
                 ? "आपके परामर्श आदेश की गणितीय गणना पूर्ण होने के उपरांत दैवज्ञ द्वारा तैयार पत्रिका यहाँ डाउनलोड हेतु उपलब्ध करा दी जाएगी।"
-                : "Once your horoscope calculations and chart audit are finalized by our scholars, your personalized PDF dossier will appear here for download."}
+                : "Once your horoscope calculations and chart audit are finalized by our scholars, your personalized PDF report will appear here for download."}
             </p>
             <div className="pt-2">
               <Link
@@ -155,7 +155,7 @@ export default async function VaultPage({
                     className="min-h-[44px] px-5 py-2.5 bg-secondary hover:bg-secondary/90 text-on-secondary text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-2 text-center"
                   >
                     <Download className="w-4 h-4" />
-                    <span>{isHindi ? "कुण्डली PDF डाउनलोड" : "Download PDF Dossier"}</span>
+                    <span>{isHindi ? "कुण्डली PDF डाउनलोड" : "Download PDF Report"}</span>
                   </a>
                 </div>
               </div>
