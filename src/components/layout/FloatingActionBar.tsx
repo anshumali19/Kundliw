@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useLocale } from "next-intl";
+import { usePathname } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import {
   MessageSquare,
@@ -59,7 +60,10 @@ export function FloatingActionBar({
   whatsappNumber,
 }: FloatingActionBarProps) {
   const locale = useLocale();
+  const pathname = usePathname();
   const isHindi = locale === "hi";
+  // The admin console is a working screen: no floating visitor widgets over its forms
+  const hideOnAdmin = /\/admin(\/|$)/.test(pathname || "");
 
   const [isOpen, setIsOpen] = useState(false);
   // "chat": talk to the Kendra team (collects name and phone first)
@@ -387,6 +391,8 @@ export function FloatingActionBar({
   };
 
   const barHint = topics[hintIdx]?.query || (isHindi ? "अपना प्रश्न पूछें..." : "Ask your question...");
+
+  if (hideOnAdmin) return null;
 
   return (
     <>
