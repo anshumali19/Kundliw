@@ -42,12 +42,15 @@ interface CheckoutClientProps {
     qrCodeUrl?: string | null;
   };
   locale: string;
+  /** "demo" only on a developer machine; a live site shows manual UPI / bank payment until a real gateway is connected. */
+  gatewayMode?: "demo" | "off";
 }
 
 export function CheckoutClient({
   order,
   adminSettings,
   locale,
+  gatewayMode = "off",
 }: CheckoutClientProps) {
   const router = useRouter();
   const tCheckout = useTranslations("checkout");
@@ -55,7 +58,7 @@ export function CheckoutClient({
   const isHindi = locale === "hi";
 
   const [paymentMethod, setPaymentMethod] = useState<"GATEWAY" | "UPI" | "BANK">(
-    "GATEWAY"
+    gatewayMode === "demo" ? "GATEWAY" : adminSettings.upiVpa || adminSettings.qrCodeUrl ? "UPI" : "BANK"
   );
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -275,6 +278,8 @@ export function CheckoutClient({
             {isHindi ? "भुगतान प्रणाली चयन" : "Select Auspicious Payment Mode"}
           </h2>
 
+          {gatewayMode === "demo" && (
+          <>
           {/* Mode 1: Online Gateway (Demo) */}
           <div
             onClick={() => setPaymentMethod("GATEWAY")}
@@ -344,6 +349,8 @@ export function CheckoutClient({
               </div>
             )}
           </div>
+          </>
+          )}
 
           {/* Mode 2: Direct UPI */}
           <div
@@ -369,9 +376,6 @@ export function CheckoutClient({
                       {isHindi
                         ? "प्रत्यक्ष केंद्र यूपीआई (Direct Kendra UPI VPA)"
                         : "Direct Kendra UPI VPA"}
-                    </span>
-                    <span className="px-2 py-0.5 bg-brand/20 text-primary border border-brand rounded text-[10px] font-bold uppercase tracking-wider">
-                      Demo
                     </span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
@@ -491,9 +495,6 @@ export function CheckoutClient({
                       {isHindi
                         ? "बैंक अंतरण (NEFT / RTGS / IMPS)"
                         : "Bank Wire Transfer (NEFT / RTGS / IMPS)"}
-                    </span>
-                    <span className="px-2 py-0.5 bg-brand/20 text-primary border border-brand rounded text-[10px] font-bold uppercase tracking-wider">
-                      Demo
                     </span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">

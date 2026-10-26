@@ -31,11 +31,11 @@ interface MarqueeItem {
 
 // Site colours the admin can pick with one click (any other colour can be chosen with the picker)
 const COLOR_PRESETS: Array<{ name: string; bg: string; text: string }> = [
-  { name: "Orange", bg: "#F96706", text: "#FFFFFF" },
-  { name: "Gold", bg: "#FFC105", text: "#261B17" },
-  { name: "Maroon", bg: "#661919", text: "#FFFFFF" },
-  { name: "Cream", bg: "#FFF2E5", text: "#261B17" },
-  { name: "Dark", bg: "#261B17", text: "#FFC105" },
+  { name: "Yellow", bg: "#F4C65D", text: "#4B1724" },
+  { name: "Saffron", bg: "#E77B18", text: "#271B1B" },
+  { name: "Maroon", bg: "#641E2B", text: "#FFF8EC" },
+  { name: "Red", bg: "#C62828", text: "#FFFFFF" },
+  { name: "Cream", bg: "#FFF3DF", text: "#4B1724" },
 ];
 
 /** The colour picker needs a #rrggbb value; older entries stored site colour names. */
@@ -45,10 +45,10 @@ function toHex(value: string, fallback: string): string {
     return "#" + value.slice(1).split("").map((c) => c + c).join("");
   }
   const named: Record<string, string> = {
-    "var(--brand)": "#F96706",
+    "var(--brand)": "#641E2B",
     "var(--on-brand)": "#FFFFFF",
-    "var(--gold)": "#FFC105",
-    "var(--maroon)": "#661919",
+    "var(--gold)": "#F4C65D",
+    "var(--maroon)": "#641E2B",
   };
   return named[value] ?? fallback;
 }
@@ -319,7 +319,7 @@ export default function AdminMarqueePage() {
                 <label className="flex items-center gap-3 text-xs font-semibold">
                   <input
                     type="color"
-                    value={toHex(bgColor, "#F96706")}
+                    value={toHex(bgColor, "#F4C65D")}
                     onChange={(e) => setBgColor(e.target.value)}
                     className="w-14 h-11 rounded border border-outline-variant bg-transparent cursor-pointer"
                     aria-label="Background colour"
@@ -355,7 +355,7 @@ export default function AdminMarqueePage() {
               </div>
               <div
                 className="rounded px-3 py-2 font-semibold overflow-hidden whitespace-nowrap"
-                style={{ background: toHex(bgColor, "#F96706"), color: toHex(textColor, "#FFFFFF"), fontSize: `${fontSize}px` }}
+                style={{ background: toHex(bgColor, "#F4C65D"), color: toHex(textColor, "#FFFFFF"), fontSize: `${fontSize}px` }}
                 aria-label="Preview"
               >
                 {textEn || "Preview of the announcement text"}

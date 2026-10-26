@@ -2,27 +2,8 @@ import { ReactNode } from "react";
 import { Link } from "@/i18n/routing";
 import { requireAdmin } from "@/lib/auth/guards";
 import { SignOutButton } from "@/components/ui/SignOutButton";
-import {
-  LayoutDashboard,
-  ShieldAlert,
-  Layers,
-  Tag,
-  Settings,
-  Users,
-  ShoppingBag,
-  ExternalLink,
-  LogOut,
-  Languages,
-  MessageSquare,
-  Inbox,
-  KeyRound,
-  Award,
-  HelpCircle,
-  Sparkles,
-  Handshake,
-  DatabaseBackup,
-  BadgeCheck,
-} from "lucide-react";
+import { ShieldAlert, ExternalLink } from "lucide-react";
+import { AdminNav } from "@/components/layout/AdminNav";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -49,10 +30,10 @@ export default async function AdminLayout(props: AdminLayoutProps) {
   return (
     <div className="w-full min-h-[calc(100vh-120px)] bg-surface text-on-surface text-left">
       {/* Admin Command Bar */}
-      <div className="w-full bg-brand text-on-brand border-b border-secondary/50 py-3 px-4 sm:px-6">
+      <div className="w-full bg-maroon-deep text-on-maroon border-b border-gold/30 py-3 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
           <div className="flex items-center gap-3">
-            <span className="p-1 rounded bg-secondary-fixed text-on-brand font-bold text-xs uppercase tracking-widest flex items-center gap-1.5">
+            <span className="px-2 py-1 rounded bg-gold text-on-gold font-bold text-xs uppercase tracking-widest flex items-center gap-1.5">
               <ShieldAlert className="w-3.5 h-3.5" />
               <span>CMS Admin</span>
             </span>
@@ -69,7 +50,7 @@ export default async function AdminLayout(props: AdminLayoutProps) {
             </span>
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-tertiary-fixed hover:underline"
+              className="inline-flex items-center gap-1 text-gold hover:underline"
             >
               <span>{isHindi ? "सार्वजनिक पोर्टल" : "Public Site"}</span>
               <ExternalLink className="w-3 h-3" />
@@ -79,208 +60,11 @@ export default async function AdminLayout(props: AdminLayoutProps) {
         </div>
       </div>
 
-      {/* Admin Broadsheet Secondary Navigation */}
-      <div className="w-full bg-surface-container-low border-b border-outline-variant/40 py-2 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto">
-          <Link
-            href="/admin"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-secondary hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <LayoutDashboard className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "डैशबोर्ड (Dashboard)" : "Dashboard"}</span>
-          </Link>
-
-          <Link
-            href="/admin/services"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-secondary hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Layers className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "सेवाएँ (Services)" : "Services"}</span>
-          </Link>
-
-          <Link
-            href="/admin/other-services"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-tertiary" />
-            <span>{isHindi ? "अन्य सेवाएँ (Other Services)" : "Other Services"}</span>
-          </Link>
-
-          <Link
-            href="/admin/offers"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Tag className="w-3.5 h-3.5 text-tertiary" />
-            <span>{isHindi ? "कूपन (Offers)" : "Offers"}</span>
-          </Link>
-
-          <Link
-            href="/admin/users"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Users className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "उपयोगकर्ता (Users)" : "Users"}</span>
-          </Link>
-
-          <Link
-            href="/admin/associates"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Handshake className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "एसोसिएट (Associates)" : "Associates"}</span>
-          </Link>
-
-          <Link
-            href="/admin/orders"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <ShoppingBag className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "आदेश (Orders)" : "Orders"}</span>
-          </Link>
-
-          <Link
-            href="/admin/vault"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <ShieldAlert className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "वॉल्ट (Vault)" : "Vault"}</span>
-          </Link>
-
-          <Link
-            href="/admin/banners"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <span>{isHindi ? "बैनर (Banners)" : "Banners"}</span>
-          </Link>
-
-          <Link
-            href="/admin/marquee"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <span>{isHindi ? "मार्की (Marquee)" : "Marquee"}</span>
-          </Link>
-
-          <Link
-            href="/admin/founder"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Award className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "संस्थापक (Founder)" : "Founder"}</span>
-          </Link>
-
-          <Link
-            href="/admin/faq"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <HelpCircle className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "प्रश्नोत्तरी (FAQ)" : "FAQ"}</span>
-          </Link>
-
-          <Link
-            href="/admin/pages"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <span>{isHindi ? "स्थैतिक पृष्ठ (Pages)" : "Pages"}</span>
-          </Link>
-
-          <Link
-            href="/admin/blogs"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <span>{isHindi ? "लेख (Articles)" : "Articles"}</span>
-          </Link>
-
-          <Link
-            href="/admin/testimonials"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <span>{isHindi ? "संस्तुतियाँ (Reviews)" : "Testimonials"}</span>
-          </Link>
-
-          <Link
-            href="/admin/gallery"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <span>{isHindi ? "दीर्घा (Gallery)" : "Gallery"}</span>
-          </Link>
-
-          <Link
-            href="/admin/translations"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Languages className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "अनुवाद (Translations)" : "Translations"}</span>
-          </Link>
-
-          <Link
-            href="/admin/chatbot"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <MessageSquare className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "चैटबॉट (Chatbot)" : "Chatbot"}</span>
-          </Link>
-
-          <Link
-            href="/admin/enquiries"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Inbox className="w-3.5 h-3.5 text-tertiary" />
-            <span>{isHindi ? "पूछताछ (Enquiries)" : "Enquiries"}</span>
-          </Link>
-
-          <Link
-            href="/admin/settings/keys"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <KeyRound className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "कुंजियाँ (API Keys)" : "API Keys"}</span>
-          </Link>
-
-          <Link
-            href="/admin/credentials"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <BadgeCheck className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "प्रमाणपत्र (Credentials)" : "Credentials"}</span>
-          </Link>
-
-          <Link
-            href="/admin/backup"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <DatabaseBackup className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "बैकअप (Backup)" : "Backup"}</span>
-          </Link>
-
-          <Link
-
-                      href="/admin/website"
-
-                      className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-
-          >
-
-            <Settings className="w-3.5 h-3.5 text-secondary" />
-
-            <span>{isHindi ? "वेबसाइट सेटिंग (Website)" : "Website"}</span>
-
-          </Link>
-
-
-          <Link
-            href="/admin/settings"
-            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
-          >
-            <Settings className="w-3.5 h-3.5 text-secondary" />
-            <span>{isHindi ? "सेटिंग्स (Settings)" : "Settings"}</span>
-          </Link>
-        </div>
+      {/* Menu + content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6 items-start">
+        <AdminNav isHindi={isHindi} />
+        <main className="flex-1 min-w-0 w-full text-left">{children}</main>
       </div>
-
-      {/* Admin Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left">
-        {children}
-      </main>
     </div>
   );
 }

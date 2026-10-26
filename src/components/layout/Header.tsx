@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useHiddenTools } from "@/components/providers/ToolsProvider";
+import { SocialIcon } from "@/components/content/SocialIcon";
 import { DateStrip, type DateStripData } from "./DateStrip";
 import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -28,10 +29,11 @@ import {
 
 interface HeaderProps {
   panchang?: { parts?: DateStripData } | null;
+  social?: Array<{ id: string; name: string; url: string }>;
   phone?: string;
 }
 
-export function Header({ phone, panchang }: HeaderProps = {}) {
+export function Header({ phone, panchang, social = [] }: HeaderProps = {}) {
   const isHindi = useLocale() === "hi";
   const tNav = useTranslations("nav");
   const tHeader = useTranslations("header");
@@ -142,6 +144,17 @@ export function Header({ phone, panchang }: HeaderProps = {}) {
           <DateStrip data={panchang?.parts ?? null} isHindi={isHindi} />
 
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            {social.length > 0 && (
+              <ul className="hidden xl:flex items-center gap-2" aria-label="Social media">
+                {social.map((l) => (
+                  <li key={l.id}>
+                    <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} className="inline-flex items-center justify-center w-6 h-6 rounded-full hover:bg-white/15">
+                      <SocialIcon id={l.id} className="w-3.5 h-3.5 text-gold" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
             {hideTools([{ href: "/panchang" }]).length > 0 && (
             <Link
               href="/panchang"

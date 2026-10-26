@@ -34,7 +34,7 @@ interface FloatingActionBarProps {
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
 
 const FAB_CIRCLE =
-  "flex items-center justify-center w-14 h-14 rounded-full border-2 border-maroon transition-transform active:scale-95 hover:scale-105";
+  "flex items-center justify-center w-11 h-11 sm:w-14 sm:h-14 rounded-full border-2 border-maroon transition-transform active:scale-95 hover:scale-105";
 
 /** Renders **bold** segments from chat text without exposing the asterisks. */
 function renderBold(text: string): React.ReactNode[] {
@@ -49,7 +49,7 @@ function renderBold(text: string): React.ReactNode[] {
 
 function FabLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-brand text-xs font-bold leading-none whitespace-nowrap">
+    <span className="hidden sm:block absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-brand text-xs font-bold leading-none whitespace-nowrap">
       {children}
     </span>
   );
@@ -400,7 +400,7 @@ export function FloatingActionBar({
       {!isOpen && (
         <form
           onSubmit={submitBar}
-          className="pointer-events-auto fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden sm:flex items-center gap-2 w-[min(34rem,calc(100vw-16rem))] bg-surface rounded-full border-2 border-maroon p-1.5 shadow-lg"
+          className="pointer-events-auto fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden lg:flex items-center gap-2 w-[min(25rem,calc(100vw-18rem))] bg-surface rounded-full border-2 border-maroon p-1.5 shadow-lg"
           aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
         >
           <span className="w-9 h-9 shrink-0 rounded-full bg-brand text-white flex items-center justify-center">

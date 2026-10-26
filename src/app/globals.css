@@ -15,21 +15,21 @@
   .text-\[11px\] { font-size: 0.75rem; line-height: 1.15rem; }
 }
 
-/* Mobile / Android WebView: larger type for comfortable reading */
+/* Mobile / Android WebView: comfortable but compact reading size */
 @media (max-width: 767px) {
-  body { font-size: 1.125rem; line-height: 1.65; }
-  .text-xs { font-size: 0.9375rem; line-height: 1.45rem; }
-  .text-sm { font-size: 1.0625rem; line-height: 1.6rem; }
-  .text-base { font-size: 1.125rem; line-height: 1.7rem; }
-  .text-lg { font-size: 1.25rem; line-height: 1.8rem; }
-  .text-xl { font-size: 1.375rem; line-height: 1.9rem; }
+  body { font-size: 1rem; line-height: 1.6; }
+  .text-xs { font-size: 0.8125rem; line-height: 1.3rem; }
+  .text-sm { font-size: 0.9375rem; line-height: 1.5rem; }
+  .text-base { font-size: 1rem; line-height: 1.6rem; }
+  .text-lg { font-size: 1.125rem; line-height: 1.7rem; }
+  .text-xl { font-size: 1.25rem; line-height: 1.8rem; }
   .text-\[8px\],
   .text-\[9px\],
   .text-\[9\.5px\],
   .text-\[10px\],
   .text-\[10\.5px\],
-  .text-\[11px\] { font-size: 0.875rem; line-height: 1.35rem; }
-  input, select, textarea { font-size: 1.0625rem; }
+  .text-\[11px\] { font-size: 0.75rem; line-height: 1.1rem; }
+  input, select, textarea { font-size: 1rem; }
 }
 
 /* Soft divider under the fixed header */
@@ -69,16 +69,12 @@ header { border-bottom: 1px solid var(--outline-variant); }
     }
   }
 
-  /* No raw drop shadows - use borders per DESIGN.md */
-  * {
-    box-shadow: none !important;
-  }
 }
 
 /* Orange to gold flow used for accent words, bands and the top strip */
-.bg-brand-gradient { background-image: linear-gradient(90deg, #F96706 0%, #FF9A00 55%, #FFC105 100%); }
+.bg-brand-gradient { background-image: linear-gradient(90deg, #E77B18 0%, #F0A33A 55%, #F4C65D 100%); }
 .text-brand-gradient {
-  background-image: linear-gradient(90deg, #F96706, #FFB000);
+  background-image: linear-gradient(90deg, #E77B18, #F4C65D);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

@@ -35,7 +35,7 @@ export default async function AppDownloadPage(props: AppPageProps) {
 
   // The QR is generated on the server from the link the admin saved.
   const qr = url
-    ? await QRCode.toDataURL(url, { margin: 1, width: 280, color: { dark: "#661919", light: "#FFFFFF" } })
+    ? await QRCode.toDataURL(url, { margin: 1, width: 280, color: { dark: "#641E2B", light: "#FFFFFF" } })
     : null;
 
   return (

@@ -49,7 +49,7 @@ export default async function HomePage(
   const locale = params?.locale || "hi";
   const isHindi = locale === "hi";
   const t = await getTranslations("home");
-  const [homeCfg, heroCfg, animCfg] = await Promise.all([getSection("home"), getSection("hero"), getSection("heroAnimation")]);
+  const [homeCfg, heroCfg, animCfg, toolsCfg] = await Promise.all([getSection("home"), getSection("hero"), getSection("heroAnimation"), getSection("tools")]);
   const pick = (cfg: Record<string, string | boolean | number>, k: string, fallback: string) =>
     String(cfg[k + (isHindi ? "Hi" : "En")] || "").trim() || fallback;
 
@@ -85,7 +85,9 @@ export default async function HomePage(
     { href: "/kundli/matching", icon: HeartHandshake, title: t("toolMatching"), desc: t("toolMatchingDesc") },
     { href: "/kundli/prashna", icon: HelpCircle, title: t("toolPrashna"), desc: t("toolPrashnaDesc") },
     { href: "/track", icon: Compass, title: t("toolTrack"), desc: t("toolTrackDesc") },
-  ];
+  ].filter(
+    (x) => !((x.href === "/kundli" && toolsCfg.kundliEnabled === false) || (x.href === "/kundli/matching" && toolsCfg.matchingEnabled === false))
+  );
 
   const steps = [
     { title: t("step1Title"), desc: t("step1Desc") },
@@ -102,39 +104,42 @@ export default async function HomePage(
       )}
 
       {/* Hero */}
-      <section className="w-full bg-surface border-b border-outline-variant/40">
-        <div className="w-full px-4 sm:px-8 lg:px-12 py-10 lg:py-14">
+      <section className="relative w-full overflow-hidden bg-[linear-gradient(120deg,#4B1724_0%,#792D2B_56%,#BD5B23_100%)] text-on-maroon">
+        <span aria-hidden="true" className="pointer-events-none select-none absolute -right-6 -top-10 font-serif text-[22rem] leading-none text-white/[0.05]">ॐ</span>
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12 lg:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 text-left">
               
-              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">
+              <p className="text-xs sm:text-sm font-bold text-gold uppercase tracking-[0.25em] mb-3">
                 {pick(heroCfg, "eyebrow", t("heroEyebrow"))}
               </p>
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary tracking-tight leading-tight mb-4">
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-on-maroon tracking-tight leading-[1.1] mb-5">
                 {pick(heroCfg, "title", t("heroTitle"))}
               </h1>
-              <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed mb-6">
+              <p className="text-base sm:text-lg text-on-maroon/85 max-w-2xl leading-relaxed mb-8">
                 {pick(heroCfg, "lead", t("heroLead"))}
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Link
                   href="/services"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-brand hover:bg-brand-hover text-on-brand text-sm uppercase tracking-wider rounded font-bold transition-colors border border-primary min-h-[44px]"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gold hover:bg-saffron text-on-gold text-sm uppercase tracking-wider rounded-lg font-bold transition-colors min-h-[48px]"
                 >
                   <Calendar className="w-4 h-4" />
                   {t("ctaBook")}
                 </Link>
-                <Link
+                {toolsCfg.kundliEnabled !== false && (
+<Link
                   href="/kundli"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-surface hover:bg-surface-container-high text-secondary text-sm uppercase tracking-wider rounded font-bold transition-colors border border-secondary min-h-[44px]"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-transparent hover:bg-white/10 text-on-maroon text-sm uppercase tracking-wider rounded-lg font-bold transition-colors border border-gold/70 min-h-[48px]"
                 >
                   {t("ctaKundli")}
                 </Link>
+)}
               </div>
-              {homeCfg.showSocialStrip !== false && <SocialLinks className="mt-5" />}
+              {homeCfg.showSocialStrip !== false && <SocialLinks tone="light" className="mt-6" />}
             </div>
 
-            <div className="lg:col-span-5 bg-surface-container-low p-5 rounded border border-secondary/30 border-t-4 border-t-signal text-left">
+            <div className="lg:col-span-5 bg-surface-container-lowest text-on-surface p-6 rounded-2xl border border-gold/60 border-t-4 border-t-saffron shadow-[0_14px_40px_rgba(0,0,0,0.25)] text-left">
               <h2 className="font-serif text-lg font-bold text-secondary pb-2 mb-2 border-b border-outline-variant/50">
                 {t("toolsTitle")}
               </h2>

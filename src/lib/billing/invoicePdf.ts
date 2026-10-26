@@ -50,7 +50,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.on("error", (err) => reject(err));
 
       // DEMO WATERMARK (if DEMO_MODE is on)
-      if (isDemoMode()) {
+      if (isDemoMode() && process.env.NODE_ENV !== "production") {
         doc.save();
         doc.rotate(-35, { origin: [300, 420] });
         doc.fontSize(52);

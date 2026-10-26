@@ -16,6 +16,8 @@ export interface DateStripData {
 const DAYS_HI = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
 const DAYS_EN = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS_HI = ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"];
+const DAYS_SHORT_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS_SHORT_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTHS_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -65,9 +67,11 @@ export function DateStrip({ data, isHindi }: { data: DateStripData | null; isHin
         {p ? `${pad(p.h12)}:${pad(p.m)}:${pad(p.s)} ${p.ap}` : "--:--:--"}
       </span>
       {sep}
-      <span className="shrink-0">{p ? (isHindi ? DAYS_HI : DAYS_EN)[p.weekday] : ""}</span>
       <span className="shrink-0">
-        {p ? `${p.day} ${(isHindi ? MONTHS_HI : MONTHS_EN)[p.month]} ${p.year}` : ""}
+        {p ? (isHindi ? DAYS_HI[p.weekday] : <><span className="sm:hidden">{DAYS_SHORT_EN[p.weekday]}</span><span className="hidden sm:inline">{DAYS_EN[p.weekday]}</span></>) : ""}
+      </span>
+      <span className="shrink-0">
+        {p ? (isHindi ? `${p.day} ${MONTHS_HI[p.month]} ${p.year}` : <><span className="sm:hidden">{`${p.day} ${MONTHS_SHORT_EN[p.month]} ${p.year}`}</span><span className="hidden sm:inline">{`${p.day} ${MONTHS_EN[p.month]} ${p.year}`}</span></>) : ""}
       </span>
       {data && (
         <>

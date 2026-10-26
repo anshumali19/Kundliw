@@ -56,8 +56,9 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
   const LEGACY_MAROON = new Set(["var(--secondary)", "var(--primary)", "var(--maroon)", "#800000", "#6b1d1d"]);
   const configuredBg = style?.bgColor?.trim().toLowerCase();
   const useBrand = !configuredBg || LEGACY_MAROON.has(configuredBg);
-  const background = useBrand ? "var(--brand)" : safeColor(style?.bgColor, "var(--brand)");
-  const color = useBrand ? "var(--on-brand)" : safeColor(style?.textColor, "var(--on-brand)");
+  // Default strip: yellow with maroon text (as in the client's sample site).
+  const background = useBrand ? "var(--gold)" : safeColor(style?.bgColor, "var(--gold)");
+  const color = useBrand ? "var(--maroon-deep)" : safeColor(style?.textColor, "var(--maroon-deep)");
   const fontSize = Math.min(Math.max(style?.fontSize ?? 14, 12), 28);
   const speed = Math.min(Math.max(style?.speedSec ?? 30, 8), 120);
   const pauseOnHover = style?.pauseOnHover ?? true;

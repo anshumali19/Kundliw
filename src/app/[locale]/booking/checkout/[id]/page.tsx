@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/guards";
+import { isDemoMode } from "@/lib/config/demo";
 import { prisma } from "@/lib/prisma";
 import { PaymentStatus, Role } from "@prisma/client";
 import { CheckoutClient } from "@/features/booking/components/CheckoutClient";
@@ -87,6 +88,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
       order={orderData}
       adminSettings={adminSettings}
       locale={locale}
+      gatewayMode={isDemoMode() && process.env.NODE_ENV !== "production" ? "demo" : "off"}
     />
   );
 }

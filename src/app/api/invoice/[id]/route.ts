@@ -130,7 +130,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
 </head>
 <body>
   <div class="invoice-card">
-    ${isDemoMode() ? '<div class="demo-watermark">DEMO INVOICE (नमूना)</div>' : ""}
+    ${isDemoMode() && process.env.NODE_ENV !== "production" ? '<div class="demo-watermark">DEMO INVOICE (नमूना)</div>' : ""}
     <div class="header">
       <h1 class="title">${safe.siteName}</h1>
       <div class="subtitle">Vedic Astrological Heritage & Mathematical Computation Centre</div>

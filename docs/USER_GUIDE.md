@@ -68,3 +68,13 @@ Sign in at the *Super Admin* portal (email/mobile + password, or OTP). Use **Adm
 - Keep your password private; log out on shared phones.
 
 *Support: contact the developer for changes or restore requests.*
+
+---
+
+## 5. What is new in the admin panel (Oct 2026)
+
+- **Left menu, grouped:** Overview · Bookings & money · People · Website · System. On a phone it folds into one "Admin menu" button.
+- **Website settings** (Website group): social media links (Active/Hide), logo, home page strip, hero text, SEO, features on/off, Panchang / Kundli / Matching pages on/off, mobile app links, analytics.
+- **Promo codes:** each code can be limited to chosen services, a minimum order, a total number of uses and a number of uses per customer. Customers see the exact reason when a code does not apply.
+- **Google Analytics:** paste the Measurement ID in *API keys & Analytics*. See `docs/FREE_AND_PAID_SERVICES.md`.
+- **Date bar:** the top line shows time, day, date, month, paksha, tithi and Vikram Samvat automatically.

@@ -157,9 +157,6 @@ export function PrashnaRequestClient({ locale }: PrashnaRequestClientProps) {
             <span className="text-xs font-bold uppercase tracking-widest text-primary">
               {isHindi ? "दैवज्ञ प्रश्न शास्त्र" : "VEDIC PRASHNA SHASTRA"}
             </span>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand/20 text-primary border border-brand">
-              Demo
-            </span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary tracking-tight">
             {isHindi ? "तात्कालिक प्रश्न कुण्डली परामर्श" : "Horary Vedic Query (Prashna Kundli)"}

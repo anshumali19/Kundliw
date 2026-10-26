@@ -10,7 +10,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
 import { ToolsProvider } from "@/components/providers/ToolsProvider";
-import { getSection } from "@/lib/siteConfig/service";
+import { getActiveSocialLinks, getSection } from "@/lib/siteConfig/service";
 import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
@@ -164,6 +164,7 @@ export default async function LocaleLayout(
     .catch(() => []);
   const features = await getSection("features");
   const panchang = await getDailyPanchang();
+  const social = (await getActiveSocialLinks()).map(({ id, name, url }) => ({ id, name, url }));
   const toolsCfg = await getSection("tools");
   const hiddenTools = [
     ...(toolsCfg.panchangEnabled === false ? ["/panchang"] : []),
@@ -246,7 +247,7 @@ export default async function LocaleLayout(
           <AuthProvider>
           <ToolsProvider hidden={hiddenTools}>
           <SmoothScrollProvider>
-            <Header phone={settings?.phone1 ?? undefined} panchang={panchang} />
+            <Header phone={settings?.phone1 ?? undefined} panchang={panchang} social={social} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>

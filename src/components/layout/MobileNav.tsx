@@ -114,7 +114,7 @@ export function MobileNav() {
             className="flex flex-col items-center justify-center min-h-[44px] text-on-surface-variant hover:text-on-surface"
           >
             <Menu className="w-5 h-5" />
-            <span className="text-[11px] mt-1 leading-tight">{tNav("menu")}</span>
+            <span className="text-[11px] mt-1 leading-tight max-w-full truncate">{tNav("menu")}</span>
           </button>
           {tabs.slice(1).map((tab) => (
             <TabLink key={tab.key} tab={tab} active={isActive(tab.href)} />

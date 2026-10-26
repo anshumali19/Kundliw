@@ -154,7 +154,7 @@ export const SECTIONS: SectionDef[] = [
     fields: [
       { key: "enabled", en: "Show live clock and moving effects", hi: "लाइव घड़ी/एनिमेशन दिखाएँ", type: "toggle", def: true },
       { key: "marqueeLike", en: "Soft glow behind headline", hi: "शीर्षक के पीछे हल्की चमक", type: "toggle", def: false },
-      { key: "accent", en: "Highlight colour", hi: "हाइलाइट रंग", type: "color", def: "#C2610C" },
+      { key: "accent", en: "Highlight colour", hi: "हाइलाइट रंग", type: "color", def: "#E77B18" },
     ],
   },
   {
@@ -318,7 +318,7 @@ export function normalizeSection(
       if (s.length > (f.max ?? 300)) return { ok: false, error: `${f.en} is too long.` };
       if (f.type === "url" && s && !/^https?:\/\//i.test(s)) return { ok: false, error: `${f.en}: enter a full address starting with https://` };
       if (f.type === "image" && s && !validAddress(s)) return { ok: false, error: `${f.en}: use an uploaded image or an https:// address.` };
-      if (f.type === "color" && s && !/^#[0-9a-fA-F]{6}$/.test(s)) return { ok: false, error: `${f.en}: colour must look like #C2610C.` };
+      if (f.type === "color" && s && !/^#[0-9a-fA-F]{6}$/.test(s)) return { ok: false, error: `${f.en}: colour must look like #E77B18.` };
       values[f.key] = s;
     }
   }

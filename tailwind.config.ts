@@ -17,69 +17,74 @@ import plugin from "tailwindcss/plugin";
  *  - Body text is dark brown (#261B17) on cream (16:1).
  */
 const PALETTE: Record<string, string> = {
-  // Brand
-  brand: "#F96706",
-  "brand-hover": "#D95705",
+  // Brand: the four colours the client chose (saffron, maroon, yellow, red) on a warm cream page.
+  // Filled buttons are maroon with white text (12:1); saffron and yellow are accents and fills
+  // with dark text; red is for offers, badges and errors.
+  brand: "#641E2B",
+  "brand-hover": "#4B1724",
   "on-brand": "#FFFFFF",
-  gold: "#FFC105",
-  "on-gold": "#261B17",
-  signal: "#E83A3A",
+  saffron: "#E77B18",
+  "on-saffron": "#271B1B",
+  gold: "#F4C65D",
+  "on-gold": "#271B1B",
+  signal: "#C62828",
   "on-signal": "#FFFFFF",
-  maroon: "#661919",
-  "on-maroon": "#FFFFFF",
-  yellow: "#FFC105",
+  maroon: "#641E2B",
+  "maroon-deep": "#4B1724",
+  "on-maroon": "#FFF8EC",
+  yellow: "#F4C65D",
 
-  // Surfaces: warm cream with peach tints
-  surface: "#FCFAF8",
-  "surface-dim": "#F0E4D8",
+  // Surfaces: cream page, white cards
+  surface: "#FFF8EC",
+  "surface-dim": "#F1E3CD",
   "surface-bright": "#FFFFFF",
   "surface-container-lowest": "#FFFFFF",
-  "surface-container-low": "#FFF8F1",
-  "surface-container": "#FFF2E5",
-  "surface-container-high": "#FBE6D2",
-  "surface-container-highest": "#F5D9BF",
-  "on-surface": "#261B17",
-  "on-surface-variant": "#5F4F49",
-  "inverse-surface": "#261B17",
-  "inverse-on-surface": "#FFFFFF",
-  outline: "#7E6D67",
-  "outline-variant": "#E8E0D9",
-  "surface-tint": "#F96706",
+  "surface-container-low": "#FFFDF9",
+  "surface-container": "#FFF3DF",
+  "surface-container-high": "#FBE9CC",
+  "surface-container-highest": "#F6DDB4",
+  "on-surface": "#271B1B",
+  "on-surface-variant": "#5E4F4B",
+  "inverse-surface": "#271B1B",
+  "inverse-on-surface": "#FFF8EC",
+  outline: "#7A6A64",
+  "outline-variant": "#EADBCA",
+  "surface-tint": "#E77B18",
 
-  // Primary: deep orange for accent text; fills use brand
-  primary: "#B04600",
+  // Primary: deep saffron for accent text (5:1 on cream); fills use brand or saffron
+  primary: "#A4510A",
   "on-primary": "#FFFFFF",
-  "primary-container": "#FFE4CC",
-  "on-primary-container": "#7A2E00",
-  "primary-fixed": "#FFE4CC",
-  "primary-fixed-dim": "#F96706",
-  "on-primary-fixed": "#261B17",
-  "on-primary-fixed-variant": "#7A2E00",
+  "primary-container": "#FFE3C2",
+  "on-primary-container": "#6B3000",
+  "primary-fixed": "#FFE3C2",
+  "primary-fixed-dim": "#E77B18",
+  "on-primary-fixed": "#271B1B",
+  "on-primary-fixed-variant": "#6B3000",
 
-  // Secondary: dark brown for headings
-  secondary: "#2B1A14",
+  // Secondary: maroon for headings
+  secondary: "#5A1A26",
   "on-secondary": "#FFFFFF",
-  "secondary-container": "#FFE9D0",
-  "on-secondary-container": "#2B1A14",
-  "secondary-fixed": "#FFE9D0",
-  "secondary-fixed-dim": "#F96706",
-  "on-secondary-fixed": "#261B17",
-  "on-secondary-fixed-variant": "#2B1A14",
+  "secondary-container": "#FBE9CC",
+  "on-secondary-container": "#4B1724",
+  "secondary-fixed": "#FBE9CC",
+  "secondary-fixed-dim": "#E77B18",
+  "on-secondary-fixed": "#271B1B",
+  "on-secondary-fixed-variant": "#4B1724",
 
-  // Tertiary: maroon text, gold fills
-  tertiary: "#661919",
+  // Tertiary: maroon text, yellow fills
+  tertiary: "#641E2B",
   "on-tertiary": "#FFFFFF",
-  "tertiary-container": "#FFC105",
-  "on-tertiary-container": "#261B17",
-  "tertiary-fixed": "#FFC105",
-  "tertiary-fixed-dim": "#F96706",
-  "on-tertiary-fixed": "#261B17",
-  "on-tertiary-fixed-variant": "#661919",
+  "tertiary-container": "#F4C65D",
+  "on-tertiary-container": "#271B1B",
+  "tertiary-fixed": "#F4C65D",
+  "tertiary-fixed-dim": "#E77B18",
+  "on-tertiary-fixed": "#271B1B",
+  "on-tertiary-fixed-variant": "#641E2B",
 
-  // Errors: red accent, dark red text on a pale red tint
-  error: "#E83A3A",
+  // Errors: red on a pale red tint
+  error: "#C62828",
   "on-error": "#FFFFFF",
-  "error-container": "#FDE3E3",
+  "error-container": "#FDE3E1",
   "on-error-container": "#7A1212",
 };
 
