@@ -96,15 +96,15 @@ export function FloatingActionBar({
   const [pendingQuestion, setPendingQuestion] = useState("");
   const [hintIdx, setHintIdx] = useState(0);
 
-  const callHref = (phone || "").replace(/[^\d+]/g, "") ? `tel:${(phone || "").replace(/[^\d+]/g, "")}` : "";
-  const cleanWhatsapp = (whatsappNumber || "").replace(/[^\d]/g, "");
-  const defaultWhatsappUrl = cleanWhatsapp
-    ? `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
-        isHindi
-          ? whatsappMessage.hi || "सादर प्रणाम, मुझे महर्षि कणाद ज्योतिष केंद्र की सेवाओं के बारे में जानकारी चाहिए।"
-          : whatsappMessage.en || "Namaste, I would like to inquire about Maharshi Kanad Jyotish Kendra services."
-      )}`
-    : "";
+  const activePhone = phone || "+91-9827991224";
+  const activeWhatsapp = whatsappNumber || phone || "+91-9827991224";
+  const callHref = `tel:${activePhone.replace(/[^\d+]/g, "")}`;
+  const cleanWhatsapp = activeWhatsapp.replace(/[^\d]/g, "");
+  const defaultWhatsappUrl = `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
+    isHindi
+      ? whatsappMessage.hi || "सादर प्रणाम, मुझे महर्षि कणाद ज्योतिष केंद्र की सेवाओं के बारे में जानकारी चाहिए।"
+      : whatsappMessage.en || "Namaste, I would like to inquire about Maharshi Kanad Jyotish Kendra services."
+  )}`;
 
   const openAssistant = (next: "chat" | "ai") => {
     if (isOpen && mode === next) {
@@ -465,7 +465,7 @@ export function FloatingActionBar({
       {/* Floating quick actions: Call + WhatsApp on the left, AI + Chat on the right (mobile).
           They sit above the fixed marquee strip and the bottom navigation. */}
       <div
-        className={`pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between transition-all duration-200 ${tuckedAway && !isOpen ? "opacity-0 translate-y-6" : "opacity-100 translate-y-0"}`}
+        className="pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between transition-all duration-200 opacity-100 translate-y-0"
         role="region"
         aria-label="Quick contact and assistance"
       >

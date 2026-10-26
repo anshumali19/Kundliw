@@ -54,7 +54,7 @@ export async function Footer() {
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={String(logoCfg.logoUrl || "") || "https://placehold.co/200x80/8B4513/ffffff?text=Logo"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
+              <img src={String(logoCfg.logoUrl || "") || "/Logo.jpeg"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
               <div className="flex flex-col">
                 <span className="font-serif text-base font-bold text-gold leading-tight">
                   {t("title")}
