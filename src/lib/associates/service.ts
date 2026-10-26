@@ -39,6 +39,40 @@ export function normalizeReferralCode(raw: unknown): string | null {
   return /^[A-Z0-9]{6,16}$/.test(code) ? code : null;
 }
 
+export interface AssociateRules {
+  enabled: boolean;
+  autoApprove: boolean;
+  minPayoutPaise: number;
+  referralDays: number;
+  termsEn: string | null;
+  termsHi: string | null;
+}
+
+/** The associate programme rules the admin sets under Admin > Associates > Settings. */
+export async function getAssociateRules(db: Db = prisma): Promise<AssociateRules> {
+  const s = await db.adminSettings
+    .findUnique({
+      where: { id: "default" },
+      select: {
+        associatesEnabled: true,
+        associateAutoApprove: true,
+        associateMinPayoutPaise: true,
+        associateReferralDays: true,
+        associateTermsEn: true,
+        associateTermsHi: true,
+      },
+    })
+    .catch(() => null);
+  return {
+    enabled: s?.associatesEnabled ?? true,
+    autoApprove: s?.associateAutoApprove ?? false,
+    minPayoutPaise: s?.associateMinPayoutPaise ?? 50000,
+    referralDays: s?.associateReferralDays ?? 30,
+    termsEn: s?.associateTermsEn ?? null,
+    termsHi: s?.associateTermsHi ?? null,
+  };
+}
+
 /** Creates the associate profile for a user if missing. Retries on a code collision. */
 export async function ensureAssociateProfile(userId: string, db: Db = prisma) {
   const existing = await db.associateProfile.findUnique({ where: { userId } });
@@ -67,6 +101,7 @@ export async function ensureAssociateProfile(userId: string, db: Db = prisma) {
 export async function resolveApprovedReferral(rawCode: unknown, db: Db = prisma) {
   const code = normalizeReferralCode(rawCode);
   if (!code) return null;
+  if (!(await getAssociateRules(db)).enabled) return null;
   const profile = await db.associateProfile.findUnique({ where: { referralCode: code } });
   return profile && profile.status === AssociateStatus.APPROVED ? profile : null;
 }
@@ -132,14 +167,28 @@ export async function attachReferralToOrder(
 
   await tx.order.update({ where: { id: order.id }, data: { associateId: associate.id } });
 
-  const amountPaise = await computeCommissionPaise(
-    {
-      serviceId: order.serviceId,
-      planId: order.planId,
-      taxableAmountPaise: order.taxableAmountPaise,
-    },
-    tx
-  );
+  // An associate can have their own commission, which replaces the service and plan rules.
+  const custom = await tx.associateProfile.findUnique({
+    where: { id: associate.id },
+    select: { customCommissionType: true, customCommissionValue: true },
+  });
+  let amountPaise: number;
+  if (custom?.customCommissionType && custom.customCommissionValue != null) {
+    const raw =
+      custom.customCommissionType === DiscountType.PERCENTAGE
+        ? Math.floor((order.taxableAmountPaise * custom.customCommissionValue) / 10000)
+        : custom.customCommissionValue;
+    amountPaise = Math.max(0, Math.min(raw, order.taxableAmountPaise));
+  } else {
+    amountPaise = await computeCommissionPaise(
+      {
+        serviceId: order.serviceId,
+        planId: order.planId,
+        taxableAmountPaise: order.taxableAmountPaise,
+      },
+      tx
+    );
+  }
 
   await tx.commission.upsert({
     where: { orderId: order.id },
@@ -224,6 +273,13 @@ export async function requestPayout(associateId: string, note?: string) {
     const total = earned.reduce((acc, c) => acc + c.amountPaise, 0);
     if (earned.length === 0 || total <= 0) {
       throw new AssociateError("There are no earned commissions available to request.", 409);
+    }
+    const rules = await getAssociateRules(tx);
+    if (total < rules.minPayoutPaise) {
+      throw new AssociateError(
+        `The minimum payout request is Rs. ${(rules.minPayoutPaise / 100).toLocaleString("en-IN")}. You have Rs. ${(total / 100).toLocaleString("en-IN")} available.`,
+        409
+      );
     }
 
     const payout = await tx.payoutRequest.create({

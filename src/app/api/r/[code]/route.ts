@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  REFERRAL_COOKIE,
-  REFERRAL_COOKIE_MAX_AGE_SECONDS,
-  resolveApprovedReferral,
-} from "@/lib/associates/service";
+import { REFERRAL_COOKIE, getAssociateRules, resolveApprovedReferral } from "@/lib/associates/service";
 
 export const dynamic = "force-dynamic";
 
@@ -21,12 +17,13 @@ export async function GET(
   try {
     const associate = await resolveApprovedReferral(code);
     if (associate) {
+      const rules = await getAssociateRules();
       response.cookies.set(REFERRAL_COOKIE, associate.referralCode, {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
         path: "/",
-        maxAge: REFERRAL_COOKIE_MAX_AGE_SECONDS,
+        maxAge: Math.max(1, rules.referralDays) * 24 * 60 * 60,
       });
     }
   } catch (error) {

@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { AssociateDetailsModal, AssociateSettingsPanel } from "./AssociateExtras";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 
-type Tab = "associates" | "rules" | "payouts";
+type Tab = "associates" | "rules" | "payouts" | "settings";
 type AssociateStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
 
 interface AssociateRow {
@@ -17,6 +18,13 @@ interface AssociateRow {
   earnedPaise: number;
   paidPaise: number;
   pendingPaise: number;
+  notes: string | null;
+  customCommissionType: "PERCENTAGE" | "FLAT" | null;
+  customCommissionValue: number | null;
+  payoutUpi: string | null;
+  payoutAccountHolder: string | null;
+  payoutAccountNumber: string | null;
+  payoutIfsc: string | null;
 }
 
 interface RuleRow {
@@ -65,6 +73,7 @@ export function AdminAssociatesManager({ locale }: { locale: string }) {
   const [rules, setRules] = useState<RuleRow[]>([]);
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [payouts, setPayouts] = useState<PayoutRow[]>([]);
+  const [detail, setDetail] = useState<AssociateRow | null>(null);
 
   // New / updated commission rule form
   const [ruleService, setRuleService] = useState("");
@@ -249,6 +258,7 @@ export function AdminAssociatesManager({ locale }: { locale: string }) {
             ["associates", t("Associates", "एसोसिएट")],
             ["rules", t("Commission rules", "कमीशन नियम")],
             ["payouts", t("Payout requests", "भुगतान अनुरोध")],
+            ["settings", t("Settings", "सेटिंग्स")],
           ] as Array<[Tab, string]>
         ).map(([id, label]) => (
           <button
@@ -327,6 +337,9 @@ export function AdminAssociatesManager({ locale }: { locale: string }) {
                     <td className="px-3 py-2.5">{formatPaiseToInr(a.paidPaise)}</td>
                     <td className="px-3 py-2.5">
                       <div className="flex flex-wrap gap-2 justify-end">
+                        <button type="button" className={btn} onClick={() => setDetail(a)}>
+                          {t("Details", "विवरण")}
+                        </button>
                         {a.status !== "APPROVED" && (
                           <button type="button" disabled={busy} className={btn} onClick={() => setStatus(a, "APPROVED")}>
                             {t("Approve", "स्वीकृत करें")}
@@ -463,6 +476,20 @@ export function AdminAssociatesManager({ locale }: { locale: string }) {
             </table>
           </div>
         </div>
+      )}
+
+      {tab === "settings" && <AssociateSettingsPanel isHindi={isHindi} />}
+
+      {detail && (
+        <AssociateDetailsModal
+          associate={detail}
+          isHindi={isHindi}
+          onClose={() => setDetail(null)}
+          onSaved={() => {
+            setMessage({ type: "ok", text: t("Associate updated.", "एसोसिएट अपडेट हुआ।") });
+            loadAssociates();
+          }}
+        />
       )}
 
       {tab === "payouts" && (

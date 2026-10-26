@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { AssociateStatus } from "@prisma/client";
+import { AssociateStatus, DiscountType } from "@prisma/client";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { sendNotification } from "@/lib/notifications";
 
 const bodySchema = z.object({
-  status: z.nativeEnum(AssociateStatus),
+  status: z.nativeEnum(AssociateStatus).optional(),
   rejectionReason: z.string().trim().max(500).optional(),
+  notes: z.string().trim().max(4000).nullable().optional(),
+  // The associate's own commission: PERCENTAGE is basis points (1000 = 10%), FLAT is paise. null clears it.
+  customCommission: z
+    .object({ type: z.nativeEnum(DiscountType), value: z.number().int().min(0).max(100_000_000) })
+    .nullable()
+    .optional(),
 });
 
 export async function PATCH(
@@ -28,7 +34,10 @@ export async function PATCH(
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid status." }, { status: 400 });
     }
-    const { status, rejectionReason } = parsed.data;
+    const { status, rejectionReason, notes, customCommission } = parsed.data;
+    if (customCommission && customCommission.type === DiscountType.PERCENTAGE && customCommission.value > 10000) {
+      return NextResponse.json({ error: "Percentage cannot exceed 100%." }, { status: 400 });
+    }
     if (status === AssociateStatus.REJECTED && !rejectionReason) {
       return NextResponse.json({ error: "Please give a reason for rejection." }, { status: 400 });
     }
@@ -44,9 +53,20 @@ export async function PATCH(
     const profile = await prisma.associateProfile.update({
       where: { id },
       data: {
-        status,
-        rejectionReason: status === AssociateStatus.REJECTED ? rejectionReason : null,
-        reviewedAt: new Date(),
+        ...(status
+          ? {
+              status,
+              rejectionReason: status === AssociateStatus.REJECTED ? rejectionReason : null,
+              reviewedAt: new Date(),
+            }
+          : {}),
+        ...(notes !== undefined ? { notes: notes || null } : {}),
+        ...(customCommission !== undefined
+          ? {
+              customCommissionType: customCommission ? customCommission.type : null,
+              customCommissionValue: customCommission ? customCommission.value : null,
+            }
+          : {}),
       },
     });
 

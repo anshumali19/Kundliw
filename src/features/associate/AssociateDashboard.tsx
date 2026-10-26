@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { Copy, Share2, Wallet, FileDown } from "lucide-react";
 import { SignOutButton } from "@/components/ui/SignOutButton";
+import { PayoutDetails } from "./PayoutDetails";
 
 interface Summary {
   profile: { status: "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED"; referralCode: string; rejectionReason: string | null };
@@ -226,6 +227,8 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
           </button>
         </div>
       )}
+
+      {approved && <PayoutDetails isHindi={isHindi} />}
 
       <div className={card}>
         <h2 className="font-bold text-secondary mb-3">{t("Referred bookings and commission", "रेफ़र किए बुकिंग और कमीशन")}</h2>

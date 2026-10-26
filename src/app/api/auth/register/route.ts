@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/auth/validation";
 import * as bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
-import { ensureAssociateProfile } from "@/lib/associates/service";
+import { ensureAssociateProfile, getAssociateRules } from "@/lib/associates/service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,6 +21,14 @@ export async function POST(request: NextRequest) {
     }
 
     const { accountType, name, phone, email, password } = parsed.data;
+
+    const rules = accountType === "ASSOCIATE" ? await getAssociateRules() : null;
+    if (rules && !rules.enabled) {
+      return NextResponse.json(
+        { error: "New associate registrations are closed right now. Please contact the Kendra." },
+        { status: 403 }
+      );
+    }
 
     // Check if email or phone already registered
     const existingEmail = await prisma.user.findUnique({ where: { email } });
@@ -64,7 +72,13 @@ export async function POST(request: NextRequest) {
 
     // Associates start as PENDING until the admin approves them
     if (user.role === Role.ASSOCIATE) {
-      await ensureAssociateProfile(user.id);
+      const profile = await ensureAssociateProfile(user.id);
+      if (rules?.autoApprove) {
+        await prisma.associateProfile.update({
+          where: { id: profile.id },
+          data: { status: "APPROVED", reviewedAt: new Date() },
+        });
+      }
     }
 
     return NextResponse.json(

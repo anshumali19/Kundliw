@@ -146,6 +146,7 @@ describe("payout requests", () => {
     await withPrisma({
       associateProfile: { findUnique: vi.fn(async () => ({ id: "a1", status: "APPROVED" })) },
       payoutRequest: { count: vi.fn(async () => 0), create },
+      adminSettings: { findUnique: vi.fn(async () => ({ associateMinPayoutPaise: 1000 })) },
       commission: {
         findMany: vi.fn(async () => [
           { id: "c1", amountPaise: 10000 },
@@ -161,6 +162,16 @@ describe("payout requests", () => {
       data: { payoutId: "p1" },
     });
     expect(payout.id).toBe("p1");
+  });
+
+  it("refuses a request below the minimum payout set by the admin", async () => {
+    await withPrisma({
+      associateProfile: { findUnique: vi.fn(async () => ({ id: "a1", status: "APPROVED" })) },
+      payoutRequest: { count: vi.fn(async () => 0) },
+      adminSettings: { findUnique: vi.fn(async () => ({ associateMinPayoutPaise: 50000 })) },
+      commission: { findMany: vi.fn(async () => [{ id: "c1", amountPaise: 10000 }]) },
+    });
+    await expect(requestPayout("a1")).rejects.toMatchObject({ status: 409 });
   });
 
   it("refuses when nothing is earned", async () => {
