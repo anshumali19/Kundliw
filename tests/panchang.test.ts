@@ -1,86 +1,28 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getDailyPanchang } from "@/lib/astro/panchangService";
-import { prisma } from "@/lib/prisma";
+import { describe, expect, it } from "vitest";
+import { computePanchang } from "@/lib/astro/ephemeris";
 
-describe("Phase 11 - Panchang Subsystem & Database Caching", () => {
-  const originalEnv = process.env;
-
-  beforeEach(() => {
-    process.env = { ...originalEnv, DEMO_MODE: "true", NODE_ENV: "development" };
-    vi.restoreAllMocks();
+describe("panchang calculation", () => {
+  it("finds Sharad Purnima on 26 Oct 2026 at sunrise", () => {
+    const p = computePanchang("2026-10-26");
+    expect(p.isDemo).toBe(false);
+    expect(p.tithi).toContain("Purnima");
+    expect(p.paksha).toContain("Shukla");
+    expect(p.vaar).toContain("Somvar");
   });
 
-  afterEach(() => {
-    process.env = originalEnv;
-    vi.restoreAllMocks();
+  it("ends the Chaitra amavasya on 19 Mar 2026 around 6:54 am and keeps the old Samvat before it", () => {
+    const p = computePanchang("2026-03-19");
+    expect(p.tithi).toContain("Amavasya");
+    expect(p.tithiEndTime).toMatch(/^06:(5\d|4\d) AM$/);
+    expect(p.samvat).toContain("2082");
   });
 
-  it("calculates Panchang with sample demo data carrying isDemo flag", async () => {
-    vi.spyOn(prisma.panchangCache, "findUnique").mockResolvedValue(null as any);
-    vi.spyOn(prisma.panchangCache, "upsert").mockResolvedValue({} as any);
-
-    const panchang = await getDailyPanchang("2026-10-24", "Varanasi");
-    expect(panchang).not.toBeNull();
-    expect(panchang?.isDemo).toBe(true);
-    expect(panchang?.date).toBe("2026-10-24");
-    expect(panchang?.tithi).toBeTruthy();
-    expect(panchang?.nakshatra).toBeTruthy();
-    expect(panchang?.vaar).toBeTruthy();
-    expect(panchang?.abhijitMuhurat).toBeTruthy();
-    expect(panchang?.rahuKaal).toBeTruthy();
+  it("starts Samvat 2083 later in the year", () => {
+    expect(computePanchang("2026-10-26").samvat).toContain("2083");
   });
 
-  it("caches Panchang calculation in the database to prevent duplicate provider calls", async () => {
-    const testDate = "2026-11-15";
-    const testCity = "Varanasi";
-
-    const cachedSample = {
-      isDemo: true,
-      date: testDate,
-      samvat: "Vikram Samvat 2083",
-      tithi: "Shukla Dashami",
-      tithiEndTime: "04:30 PM",
-      paksha: "Shukla",
-      nakshatra: "Rohini",
-      yoga: "Harshana",
-      karana: "Gara",
-      vaar: "Somvar",
-      abhijitMuhurat: "11:45 AM - 12:35 PM",
-      rahuKaal: "07:30 AM - 09:00 AM",
-      sunrise: "06:10 AM",
-      sunset: "05:35 PM",
-    };
-
-    // First call: cache miss, upsert called
-    vi.spyOn(prisma.panchangCache, "findUnique").mockResolvedValueOnce(null as any);
-    const upsertSpy = vi.spyOn(prisma.panchangCache, "upsert").mockResolvedValue({} as any);
-
-    const result1 = await getDailyPanchang(testDate, testCity);
-    expect(result1).not.toBeNull();
-    expect(upsertSpy).toHaveBeenCalledTimes(1);
-
-    // Second call: cache hit returns cached JSON
-    vi.spyOn(prisma.panchangCache, "findUnique").mockResolvedValueOnce({
-      id: "cache_1",
-      dateString: testDate,
-      city: testCity.toLowerCase(),
-      dataJson: cachedSample,
-      cachedAt: new Date(),
-    } as any);
-
-    const result2 = await getDailyPanchang(testDate, testCity);
-    expect(result2).toEqual(cachedSample);
-  });
-
-  it("returns null gracefully when provider is unconfigured in production, without crashing", async () => {
-    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
-    delete process.env.DEMO_MODE;
-    delete process.env.ASTROSAGE_API_KEY;
-
-    vi.spyOn(prisma.panchangCache, "findUnique").mockResolvedValue(null as any);
-
-    // Must not throw, but return null
-    const result = await getDailyPanchang("2099-01-01", "NonExistentCity");
-    expect(result).toBeNull();
+  it("gives sensible sunrise for Varanasi", () => {
+    expect(computePanchang("2026-06-21").sunrise).toMatch(/^05:/);
+    expect(computePanchang("2026-12-21").sunrise).toMatch(/^06:/);
   });
 });

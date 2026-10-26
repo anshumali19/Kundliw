@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getAstroProvider } from "./factory";
+import { computePanchang } from "./ephemeris";
 import { PanchangResult } from "./types";
 import { Prisma } from "@prisma/client";
 
@@ -28,16 +28,13 @@ export async function getDailyPanchang(
       // DB cache read failed (e.g. in offline unit test or DB restart); proceed to calculate
     }
 
-    if (cached && cached.dataJson) {
+    // Older cached sample (demo) entries are ignored and replaced by the real calculation.
+    if (cached && cached.dataJson && (cached.dataJson as { isDemo?: boolean }).isDemo !== true) {
       return cached.dataJson as unknown as PanchangResult;
     }
 
-    // 2. Compute via AstroProvider
-    const provider = getAstroProvider();
-    const result = await provider.calculatePanchang({
-      date: effectiveDate,
-      city: normalizedCity,
-    });
+    // 2. Calculate from the Sun and Moon positions (no outside service needed)
+    const result = computePanchang(effectiveDate);
 
     // 3. Try saving result in database cache
     try {
