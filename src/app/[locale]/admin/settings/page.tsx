@@ -43,7 +43,7 @@ export default function AdminSettingsPage() {
   const [bankAccountNumber, setBankAccountNumber] = useState("987654321012");
   const [bankIfsc, setBankIfsc] = useState("SBIN0001234");
   const [bankName, setBankName] = useState("State Bank of India");
-  const [qrCodeUrl, setQrCodeUrl] = useState("/images/qr-code.png");
+  const [qrCodeUrl, setQrCodeUrl] = useState("https://placehold.co/300x300/333333/ffffff?text=QR+Code");
   const [appDownloadUrl, setAppDownloadUrl] = useState("");
 
   // Location map

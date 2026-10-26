@@ -211,7 +211,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0 shrink sm:shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={logoUrl || "/logo.webp"}
+              src={logoUrl || "https://placehold.co/200x80/8B4513/ffffff?text=Logo"}
               alt={tCommon("siteNameHi")}
               width={64}
               height={48}

@@ -96,11 +96,11 @@ const baseMetadata: Metadata = {
       "Book Vedic astrology consultations, Kundli and Kundli matching online, and track your order until delivery.",
     locale: "hi_IN",
     alternateLocale: ["en_IN"],
-    images: [{ url: "/ref/hero-1.webp", width: 734, height: 416, alt: SITE_NAME }],
+    images: [{ url: "https://placehold.co/1200x600/8B4513/ffffff?text=Site+Image", width: 734, height: 416, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/ref/hero-1.webp"],
+    images: ["https://placehold.co/1200x600/8B4513/ffffff?text=Site+Image"],
     title: `${SITE_NAME} | ${SITE_NAME_HI}`,
     description:
       "Vedic astrology consultations, Kundli and Kundli matching with online booking.",

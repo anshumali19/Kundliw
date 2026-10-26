@@ -91,11 +91,11 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     key: s.slug,
     title: isHindi ? s.titleHi : s.titleEn,
     desc: (isHindi ? s.taglineHi : s.taglineEn) || "",
-    image: s.imageUrl || (s.slug === "prashna-kundli" ? "/ref/hero-1.webp" : s.slug === "kundli-matching" ? "/ref/hero-2.webp" : "/ref/astrology.webp"),
+    image: s.imageUrl || (s.slug === "prashna-kundli" ? "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1" : s.slug === "kundli-matching" ? "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2" : "https://placehold.co/800x600/8B4513/ffffff?text=Astrology"),
     href: `/services/${s.slug}`,
     external: null as string | null,
   }));
-  const FALLBACK_IMAGES = ["/ref/astrology.webp", "/ref/hero-1.webp", "/ref/vastu.webp", "/ref/hero-2.webp"];
+  const FALLBACK_IMAGES = ["https://placehold.co/800x600/8B4513/ffffff?text=Astrology", "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1", "https://placehold.co/800x600/8B4513/ffffff?text=Vastu", "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2"];
   const otherCards = others.map((o, idx) => ({
     key: o.slug,
     title: isHindi ? o.titleHi : o.titleEn,
@@ -110,11 +110,11 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     gallery.length > 0
       ? gallery.map((g) => ({ src: g.imageUrl, caption: isHindi ? g.titleHi : g.titleEn }))
       : [
-          { src: "/ref/about.webp", caption: "Maharshi Kanad Jyotish Kendra" },
-          { src: "/ref/hero-1.webp", caption: tr("Vedic Astrology", "वैदिक ज्योतिष") },
-          { src: "/ref/hero-2.webp", caption: tr("Spiritual Guidance", "आध्यात्मिक मार्गदर्शन") },
-          { src: "/ref/astrology.webp", caption: tr("Astrology", "ज्योतिष") },
-          { src: "/ref/vastu.webp", caption: tr("Vastu", "वास्तु") },
+          { src: "https://placehold.co/800x600/6B3A2A/ffffff?text=About+Us", caption: "Maharshi Kanad Jyotish Kendra" },
+          { src: "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1", caption: tr("Vedic Astrology", "वैदिक ज्योतिष") },
+          { src: "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2", caption: tr("Spiritual Guidance", "आध्यात्मिक मार्गदर्शन") },
+          { src: "https://placehold.co/800x600/8B4513/ffffff?text=Astrology", caption: tr("Astrology", "ज्योतिष") },
+          { src: "https://placehold.co/800x600/8B4513/ffffff?text=Vastu", caption: tr("Vastu", "वास्तु") },
         ];
 
   const faqList = faqs.map((f) => ({ q: isHindi ? f.questionHi : f.questionEn, a: isHindi ? f.answerHi : f.answerEn }));
@@ -126,8 +126,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const card = "bg-surface-container-lowest border border-outline-variant shadow-[0_18px_45px_rgba(73,38,24,0.09)]";
   const telHref = `tel:${phone.replace(/[^\d+]/g, "")}`;
 
-  const heroImg1 = String(heroBox.image1 || "").trim() || "/ref/hero-1.webp";
-  const heroImg2 = String(heroBox.image2 || "").trim() || "/ref/hero-2.webp";
+  const heroImg1 = String(heroBox.image1 || "").trim() || "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1";
+  const heroImg2 = String(heroBox.image2 || "").trim() || "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2";
   const overlay = Math.min(90, Math.max(0, Number(heroBox.overlay ?? 60)));
   const cta1Url = link(heroBox.cta1Url, "/services");
   const cta2Url = link(heroBox.cta2Url, "/kundli");
@@ -279,7 +279,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
             <div className="relative pb-8 pl-8">
               <div className="absolute bottom-0 left-0 h-3/4 w-[70%] bg-saffron" aria-hidden="true" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={String(cardsCfg.aboutImage || "").trim() || "/ref/about.webp"} alt={tr("Maharshi Kanad Jyotish Kendra", "महर्षि कणाद ज्योतिष केंद्र")} className="relative h-[360px] sm:h-[480px] lg:h-[540px] w-full object-cover" />
+              <img src={String(cardsCfg.aboutImage || "").trim() || "https://placehold.co/800x600/6B3A2A/ffffff?text=About+Us"} alt={tr("Maharshi Kanad Jyotish Kendra", "महर्षि कणाद ज्योतिष केंद्र")} className="relative h-[360px] sm:h-[480px] lg:h-[540px] w-full object-cover" />
             </div>
             <div>
               <SectionHead

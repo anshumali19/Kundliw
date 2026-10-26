@@ -6,6 +6,11 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "placehold.co" },
+    ],
+  },
   // PDFKit (invoices) loads font files at runtime and cannot be bundled
   serverExternalPackages: ["pdfkit", "fontkit"],
   async headers() {
