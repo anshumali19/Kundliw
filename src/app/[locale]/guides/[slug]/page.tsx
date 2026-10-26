@@ -1,3 +1,4 @@
+import { RichText } from "@/components/content/RichText";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Role } from "@prisma/client";
@@ -53,7 +54,7 @@ export default async function GuidePage(props: GuidePageProps) {
         </div>
         <PrintButton label={isHindi ? "प्रिंट / PDF सहेजें" : "Print / Save as PDF"} />
       </header>
-      <div className="whitespace-pre-line leading-relaxed text-base text-on-surface">{content}</div>
+      <div className="leading-relaxed text-base text-on-surface space-y-3"><RichText text={content} /></div>
     </article>
   );
 }

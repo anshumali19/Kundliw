@@ -15,6 +15,7 @@ import {
   Clock,
 } from "lucide-react";
 import { directionsUrl, mapIframeSrc } from "@/lib/content/map";
+import { RichText } from "@/components/content/RichText";
 import { SocialIcon } from "@/components/content/SocialIcon";
 
 interface ContactClientProps {
@@ -234,7 +235,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
                 </div>
               )}
 
-              {extra?.note && <p className="text-xs text-on-surface-variant leading-relaxed">{extra.note}</p>}
+              {extra?.note && <div className="text-xs text-on-surface-variant leading-relaxed space-y-2"><RichText text={extra.note} /></div>}
 
               {extra?.social && extra.social.length > 0 && (
                 <div>

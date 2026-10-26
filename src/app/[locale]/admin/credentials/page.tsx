@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useEffect, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, Pencil, Plus, Trash2, X, ExternalLink } from "lucide-react";
 import { CREDENTIAL_KINDS, CREDENTIAL_LABEL, CredentialKind } from "@/lib/content/credentials";
@@ -228,11 +229,11 @@ export default function AdminCredentialsPage() {
               </div>
               <div>
                 <label className={label}>Short note (English)</label>
-                <textarea rows={2} value={form.descriptionEn} onChange={(e) => set("descriptionEn", e.target.value)} className={field} />
+                <LinkTextarea rows={2} value={form.descriptionEn} onChange={(v) => set("descriptionEn", v)} className={field} />
               </div>
               <div>
                 <label className={label}>संक्षिप्त टिप्पणी (हिन्दी)</label>
-                <textarea rows={2} value={form.descriptionHi} onChange={(e) => set("descriptionHi", e.target.value)} className={field} />
+                <LinkTextarea rows={2} value={form.descriptionHi} onChange={(v) => set("descriptionHi", v)} className={field} />
               </div>
             </div>
 

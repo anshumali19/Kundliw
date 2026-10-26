@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import { useState } from "react";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { paiseToRupees } from "@/lib/billing/money";
@@ -927,26 +928,14 @@ export function AdminServicesManager({
                 <label className="block text-xs font-bold uppercase text-secondary mb-1">
                   Description (English) *
                 </label>
-                <textarea
-                  required
-                  rows={3}
-                  value={serviceForm.descriptionEn}
-                  onChange={(e) => setServiceForm({ ...serviceForm, descriptionEn: e.target.value })}
-                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                />
+                <LinkTextarea rows={3} value={serviceForm.descriptionEn} onChange={(v) => setServiceForm({ ...serviceForm, descriptionEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" required />
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase text-secondary mb-1">
                   विवरण (हिन्दी) *
                 </label>
-                <textarea
-                  required
-                  rows={3}
-                  value={serviceForm.descriptionHi}
-                  onChange={(e) => setServiceForm({ ...serviceForm, descriptionHi: e.target.value })}
-                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                />
+                <LinkTextarea rows={3} value={serviceForm.descriptionHi} onChange={(v) => setServiceForm({ ...serviceForm, descriptionHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" required />
               </div>
 
               {/* Bilingual Highlights */}
@@ -955,26 +944,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Highlights (English, one per line)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={serviceForm.highlightsEnText}
-                    onChange={(e) => setServiceForm({ ...serviceForm, highlightsEnText: e.target.value })}
-                    placeholder="Natal chart audit&#10;Dasha transition timeline"
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={3} value={serviceForm.highlightsEnText} onChange={(v) => setServiceForm({ ...serviceForm, highlightsEnText: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Natal chart audit&#10;Dasha transition timeline" />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     मुख्य सेवा विशेषताएँ (हिन्दी, प्रति पंक्ति एक)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={serviceForm.highlightsHiText}
-                    onChange={(e) => setServiceForm({ ...serviceForm, highlightsHiText: e.target.value })}
-                    placeholder="लग्न एवं नवम भाव सूक्ष्म विचार&#10;दशा महादशा क्रम"
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={3} value={serviceForm.highlightsHiText} onChange={(v) => setServiceForm({ ...serviceForm, highlightsHiText: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="लग्न एवं नवम भाव सूक्ष्म विचार&#10;दशा महादशा क्रम" />
                 </div>
               </div>
 
@@ -984,26 +961,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Editorial Notes / Sanskrit Verse (English)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={serviceForm.notesEn}
-                    onChange={(e) => setServiceForm({ ...serviceForm, notesEn: e.target.value })}
-                    placeholder="Optional editorial notes or quote..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={serviceForm.notesEn} onChange={(v) => setServiceForm({ ...serviceForm, notesEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Optional editorial notes or quote..." />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     संपादकीय टिप्पणी / श्लोक (हिन्दी)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={serviceForm.notesHi}
-                    onChange={(e) => setServiceForm({ ...serviceForm, notesHi: e.target.value })}
-                    placeholder="वैकल्पिक शास्त्रीय सूत्र अथवा टिप्पणी..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={serviceForm.notesHi} onChange={(v) => setServiceForm({ ...serviceForm, notesHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="वैकल्पिक शास्त्रीय सूत्र अथवा टिप्पणी..." />
                 </div>
               </div>
 
@@ -1064,26 +1029,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Itinerary / Step-by-Step Schedule (English)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={serviceForm.itineraryEn}
-                    onChange={(e) => setServiceForm({ ...serviceForm, itineraryEn: e.target.value })}
-                    placeholder="Day 1: Sankalp & Pooja&#10;Day 2: Havan & Abhishek"
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono"
-                  />
+                  <LinkTextarea rows={3} value={serviceForm.itineraryEn} onChange={(v) => setServiceForm({ ...serviceForm, itineraryEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono" placeholder="Day 1: Sankalp & Pooja&#10;Day 2: Havan & Abhishek" />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     यात्रा क्रम / दैनिक कार्ययोजना (हिन्दी)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={serviceForm.itineraryHi}
-                    onChange={(e) => setServiceForm({ ...serviceForm, itineraryHi: e.target.value })}
-                    placeholder="दिन १: संकल्प एवं गणेश पूजन&#10;दिन २: रुद्राभिषेक एवं हवन"
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono"
-                  />
+                  <LinkTextarea rows={3} value={serviceForm.itineraryHi} onChange={(v) => setServiceForm({ ...serviceForm, itineraryHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono" placeholder="दिन १: संकल्प एवं गणेश पूजन&#10;दिन २: रुद्राभिषेक एवं हवन" />
                 </div>
               </div>
 
@@ -1093,26 +1046,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Puja Samagri / Required Materials (English)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={serviceForm.samagriEn}
-                    onChange={(e) => setServiceForm({ ...serviceForm, samagriEn: e.target.value })}
-                    placeholder="Gangajal, Roli, Akshat, Belpatra, Dhoop..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={3} value={serviceForm.samagriEn} onChange={(v) => setServiceForm({ ...serviceForm, samagriEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Gangajal, Roli, Akshat, Belpatra, Dhoop..." />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     पूजन सामग्री / आवश्यक द्रव्य (हिन्दी)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={serviceForm.samagriHi}
-                    onChange={(e) => setServiceForm({ ...serviceForm, samagriHi: e.target.value })}
-                    placeholder="गंगाजल, रोली, अक्षत, बिल्वपत्र, धूप, दीप..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={3} value={serviceForm.samagriHi} onChange={(v) => setServiceForm({ ...serviceForm, samagriHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="गंगाजल, रोली, अक्षत, बिल्वपत्र, धूप, दीप..." />
                 </div>
               </div>
 
@@ -1319,26 +1260,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Features (English, one per line)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={planForm.featuresEnText}
-                    onChange={(e) => setPlanForm({ ...planForm, featuresEnText: e.target.value })}
-                    placeholder="18-Page PDF&#10;D1 + D9 Charts"
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={3} value={planForm.featuresEnText} onChange={(v) => setPlanForm({ ...planForm, featuresEnText: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="18-Page PDF&#10;D1 + D9 Charts" />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     विशेषताएँ (हिन्दी, प्रति पंक्ति एक)
                   </label>
-                  <textarea
-                    rows={3}
-                    value={planForm.featuresHiText}
-                    onChange={(e) => setPlanForm({ ...planForm, featuresHiText: e.target.value })}
-                    placeholder="१८ पृष्ठ PDF&#10;D1 + D9 चक्र"
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={3} value={planForm.featuresHiText} onChange={(v) => setPlanForm({ ...planForm, featuresHiText: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="१८ पृष्ठ PDF&#10;D1 + D9 चक्र" />
                 </div>
               </div>
 
@@ -1348,26 +1277,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Program / Ritual Details (English)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.programEn}
-                    onChange={(e) => setPlanForm({ ...planForm, programEn: e.target.value })}
-                    placeholder="Detailed order of rituals, mantra japa count..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.programEn} onChange={(v) => setPlanForm({ ...planForm, programEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Detailed order of rituals, mantra japa count..." />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     अनुष्ठान / कार्यक्रम विवरण (हिन्दी)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.programHi}
-                    onChange={(e) => setPlanForm({ ...planForm, programHi: e.target.value })}
-                    placeholder="अनुष्ठान प्रक्रिया, मंत्र जप संख्या, आहुति विधान..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.programHi} onChange={(v) => setPlanForm({ ...planForm, programHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="अनुष्ठान प्रक्रिया, मंत्र जप संख्या, आहुति विधान..." />
                 </div>
               </div>
 
@@ -1377,26 +1294,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Preparation Instructions for Devotee (English)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.preparationEn}
-                    onChange={(e) => setPlanForm({ ...planForm, preparationEn: e.target.value })}
-                    placeholder="Fasting guidelines, dress code, purity rules..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.preparationEn} onChange={(v) => setPlanForm({ ...planForm, preparationEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Fasting guidelines, dress code, purity rules..." />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     यजमान हेतु पूर्व तैयारी निर्देश (हिन्दी)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.preparationHi}
-                    onChange={(e) => setPlanForm({ ...planForm, preparationHi: e.target.value })}
-                    placeholder="व्रत नियम, शुद्ध वस्त्र, शुचिता विधान..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.preparationHi} onChange={(v) => setPlanForm({ ...planForm, preparationHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="व्रत नियम, शुद्ध वस्त्र, शुचिता विधान..." />
                 </div>
               </div>
 
@@ -1406,26 +1311,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Tier Samagri (English)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.samagriEn}
-                    onChange={(e) => setPlanForm({ ...planForm, samagriEn: e.target.value })}
-                    placeholder="Tier-specific samagri kit included..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.samagriEn} onChange={(v) => setPlanForm({ ...planForm, samagriEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Tier-specific samagri kit included..." />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     संस्करण पूजन सामग्री (हिन्दी)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.samagriHi}
-                    onChange={(e) => setPlanForm({ ...planForm, samagriHi: e.target.value })}
-                    placeholder="इस संस्करण में सम्मिलित विशेष पूजन सामग्री..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.samagriHi} onChange={(v) => setPlanForm({ ...planForm, samagriHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="इस संस्करण में सम्मिलित विशेष पूजन सामग्री..." />
                 </div>
               </div>
 
@@ -1435,26 +1328,14 @@ export function AdminServicesManager({
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     Tier Schedule / Timeline (English)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.itineraryEn}
-                    onChange={(e) => setPlanForm({ ...planForm, itineraryEn: e.target.value })}
-                    placeholder="Specific delivery timeline or ritual schedule..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.itineraryEn} onChange={(v) => setPlanForm({ ...planForm, itineraryEn: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Specific delivery timeline or ritual schedule..." />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
                     संस्करण समय-सारणी (हिन्दी)
                   </label>
-                  <textarea
-                    rows={2}
-                    value={planForm.itineraryHi}
-                    onChange={(e) => setPlanForm({ ...planForm, itineraryHi: e.target.value })}
-                    placeholder="इस संस्करण की विशेष समय-सारणी..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
+                  <LinkTextarea rows={2} value={planForm.itineraryHi} onChange={(v) => setPlanForm({ ...planForm, itineraryHi: v })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="इस संस्करण की विशेष समय-सारणी..." />
                 </div>
               </div>
 

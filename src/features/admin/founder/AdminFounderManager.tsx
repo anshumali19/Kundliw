@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect } from "react";
 import {
   Award,
@@ -351,26 +352,12 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
           <div className="space-y-4">
             <div>
               <label className="font-semibold block mb-1">Biography (English) *</label>
-              <textarea
-                required
-                rows={5}
-                value={bioEn}
-                onChange={(e) => setBioEn(e.target.value)}
-                placeholder="Detailed background, degrees, lineage, and experience in English..."
-                className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface leading-relaxed"
-              />
+              <LinkTextarea rows={5} value={bioEn} onChange={(v) => setBioEn(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface leading-relaxed" placeholder="Detailed background, degrees, lineage, and experience in English..." required />
             </div>
 
             <div>
               <label className="font-semibold block mb-1">Biography (Hindi) *</label>
-              <textarea
-                required
-                rows={5}
-                value={bioHi}
-                onChange={(e) => setBioHi(e.target.value)}
-                placeholder="विस्तृत परिचय, विश्वविद्यालय उपाधियां, अनुभव एवं परंपरा हिंदी में..."
-                className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface leading-relaxed"
-              />
+              <LinkTextarea rows={5} value={bioHi} onChange={(v) => setBioHi(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface leading-relaxed" placeholder="विस्तृत परिचय, विश्वविद्यालय उपाधियां, अनुभव एवं परंपरा हिंदी में..." required />
             </div>
           </div>
         </div>
@@ -454,24 +441,12 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="font-semibold block mb-1">Footer Note (English)</label>
-              <textarea
-                rows={2}
-                value={footerNoteEn}
-                onChange={(e) => setFooterNoteEn(e.target.value)}
-                placeholder="Note on Dakshina, ethics, or disclaimer in English..."
-                className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-              />
+              <LinkTextarea rows={2} value={footerNoteEn} onChange={(v) => setFooterNoteEn(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" placeholder="Note on Dakshina, ethics, or disclaimer in English..." />
             </div>
 
             <div>
               <label className="font-semibold block mb-1">Footer Note (Hindi)</label>
-              <textarea
-                rows={2}
-                value={footerNoteHi}
-                onChange={(e) => setFooterNoteHi(e.target.value)}
-                placeholder="दक्षिणा, आचार संहिता अथवा अस्वीकरण हिंदी में..."
-                className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-              />
+              <LinkTextarea rows={2} value={footerNoteHi} onChange={(v) => setFooterNoteHi(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" placeholder="दक्षिणा, आचार संहिता अथवा अस्वीकरण हिंदी में..." />
             </div>
           </div>
         </div>

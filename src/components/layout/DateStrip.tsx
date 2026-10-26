@@ -43,7 +43,19 @@ function istParts(now: Date) {
  * One line with everything: time, day, date, month, paksha, tithi and Vikram Samvat.
  * Dark maroon background with cream text keeps it clear on every screen.
  */
-export function DateStrip({ data, isHindi }: { data: DateStripData | null; isHindi: boolean }) {
+export interface StripShow {
+  time?: boolean;
+  seconds?: boolean;
+  day?: boolean;
+  date?: boolean;
+  paksha?: boolean;
+  tithi?: boolean;
+  masa?: boolean;
+  samvat?: boolean;
+}
+
+export function DateStrip({ data, isHindi, show = {} }: { data: DateStripData | null; isHindi: boolean; show?: StripShow }) {
+  const on = (k: keyof StripShow) => show[k] !== false;
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -63,30 +75,42 @@ export function DateStrip({ data, isHindi }: { data: DateStripData | null; isHin
       className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto whitespace-nowrap min-w-0 text-[11px] sm:text-xs font-semibold text-on-maroon [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       aria-label={isHindi ? "आज की तिथि और समय" : "Today's date and time"}
     >
-      <span className="inline-flex items-center gap-1 tabular-nums shrink-0">
-        <Clock className="w-3 h-3 text-gold" aria-hidden="true" />
-        <span>{p ? <>{`${pad(p.h12)}:${pad(p.m)}`}<span className="hidden sm:inline">{`:${pad(p.s)}`}</span>{` ${p.ap}`}</> : "--:--"}</span>
-      </span>
-      {sep}
-      <span className="shrink-0">
-        {p ? (isHindi ? DAYS_HI[p.weekday] : <><span className="sm:hidden">{DAYS_SHORT_EN[p.weekday]}</span><span className="hidden sm:inline">{DAYS_EN[p.weekday]}</span></>) : ""}
-      </span>
-      <span className="shrink-0">
-        {p ? (isHindi ? `${p.day} ${MONTHS_HI[p.month]} ${p.year}` : <><span className="sm:hidden">{`${p.day} ${MONTHS_SHORT_EN[p.month]} ${p.year}`}</span><span className="hidden sm:inline">{`${p.day} ${MONTHS_EN[p.month]} ${p.year}`}</span></>) : ""}
-      </span>
+      {on("time") && (
+        <span className="inline-flex items-center gap-1 tabular-nums shrink-0">
+          <Clock className="w-3 h-3 text-gold" aria-hidden="true" />
+          <span>{p ? <>{`${pad(p.h12)}:${pad(p.m)}`}{on("seconds") && <span className="hidden sm:inline">{`:${pad(p.s)}`}</span>}{` ${p.ap}`}</> : "--:--"}</span>
+        </span>
+      )}
+      {on("time") && (on("day") || on("date")) && sep}
+      {on("day") && (
+        <span className="shrink-0">
+          {p ? (isHindi ? DAYS_HI[p.weekday] : <><span className="sm:hidden">{DAYS_SHORT_EN[p.weekday]}</span><span className="hidden sm:inline">{DAYS_EN[p.weekday]}</span></>) : ""}
+        </span>
+      )}
+      {on("date") && (
+        <span className="shrink-0">
+          {p ? (isHindi ? `${p.day} ${MONTHS_HI[p.month]} ${p.year}` : <><span className="sm:hidden">{`${p.day} ${MONTHS_SHORT_EN[p.month]} ${p.year}`}</span><span className="hidden sm:inline">{`${p.day} ${MONTHS_EN[p.month]} ${p.year}`}</span></>) : ""}
+        </span>
+      )}
       {data && (
         <>
-          {sep}
-          <span className="shrink-0">{isHindi ? data.pakshaHi : data.pakshaEn}</span>
-          <span className="shrink-0 text-gold">
-            {isHindi ? data.tithiHi : data.tithiEn}
-            {data.tithiEnd && <span className="hidden md:inline text-on-maroon/80 font-medium">{isHindi ? ` (${data.tithiEnd} तक)` : ` (till ${data.tithiEnd})`}</span>}
-          </span>
-          <span className="shrink-0">{isHindi ? data.masaHi : data.masaEn}</span>
-          {sep}
-          <span className="shrink-0">
-            {isHindi ? `विक्रम संवत ${data.samvat}` : <><span className="sm:hidden">{`VS ${data.samvat}`}</span><span className="hidden sm:inline">{`Vikram Samvat ${data.samvat}`}</span></>}
-          </span>
+          {(on("paksha") || on("tithi") || on("masa")) && (on("time") || on("day") || on("date")) && sep}
+          {on("paksha") && <span className="shrink-0">{isHindi ? data.pakshaHi : data.pakshaEn}</span>}
+          {on("tithi") && (
+            <span className="shrink-0 text-gold">
+              {isHindi ? data.tithiHi : data.tithiEn}
+              {data.tithiEnd && <span className="hidden md:inline text-on-maroon/80 font-medium">{isHindi ? ` (${data.tithiEnd} तक)` : ` (till ${data.tithiEnd})`}</span>}
+            </span>
+          )}
+          {on("masa") && <span className="shrink-0">{isHindi ? data.masaHi : data.masaEn}</span>}
+          {on("samvat") && (
+            <>
+              {(on("paksha") || on("tithi") || on("masa")) && sep}
+              <span className="shrink-0">
+                {isHindi ? `विक्रम संवत ${data.samvat}` : <><span className="sm:hidden">{`VS ${data.samvat}`}</span><span className="hidden sm:inline">{`Vikram Samvat ${data.samvat}`}</span></>}
+              </span>
+            </>
+          )}
         </>
       )}
     </div>

@@ -32,9 +32,14 @@ interface HeaderProps {
   social?: Array<{ id: string; name: string; url: string }>;
   logoUrl?: string;
   phone?: string;
+  /** Admin > Website settings > Top bar */
+  topbar?: Record<string, boolean | string | number>;
+  /** Admin menu (when the admin has changed it) */
+  menu?: Array<{ href: string; labelEn: string; labelHi: string }>;
 }
 
-export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = {}) {
+export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, menu }: HeaderProps = {}) {
+  const tb = (k: string) => topbar[k] !== false;
   const isHindi = useLocale() === "hi";
   const tNav = useTranslations("nav");
   const tHeader = useTranslations("header");
@@ -68,7 +73,8 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
   }, []);
 
   // Primary desktop bar links
-  const primaryLinks = hideTools([
+  const customMenu = menu && menu.length > 0 ? menu.map((m) => ({ href: m.href, label: isHindi ? m.labelHi || m.labelEn : m.labelEn || m.labelHi })) : null;
+  const primaryLinks = customMenu ? hideTools(customMenu) : hideTools([
     { href: "/", label: tNav("home") },
     { href: "/about", label: tNav("about") },
     { href: "/services", label: tNav("services") },
@@ -121,7 +127,7 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
   const isAnyKendraActive = kendraLinks.some((k) => pathname === k.href || pathname.startsWith(`${k.href}/`));
 
   // Complete SRS 13-item navigation list for mobile drawer
-  const srsMobileMenu = hideTools([
+  const srsMobileMenu = customMenu ? hideTools(customMenu) : hideTools([
     { href: "/services", label: tNav("services") },
     { href: "/services#plans", label: tNav("pricingPlans") },
     { href: "/kundli", label: tNav("kundli") },
@@ -143,12 +149,16 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
       {/* 1. One-line bar: time, day, date, month, paksha, tithi and Samvat; contact and sign-in on the right */}
-      <div className="bg-maroon">
+      <div className={tb("showBar") ? "bg-maroon" : "hidden"}>
         <div className="w-full px-3 sm:px-6 xl:px-6 2xl:px-10 h-9 flex items-center justify-between gap-3 text-xs text-on-maroon font-medium [&_a]:!text-on-maroon">
-          <DateStrip data={panchang?.parts ?? null} isHindi={isHindi} />
+          <DateStrip
+            data={panchang?.parts ?? null}
+            isHindi={isHindi}
+            show={{ time: tb("showTime"), seconds: tb("showSeconds"), day: tb("showDay"), date: tb("showDate"), paksha: tb("showPaksha"), tithi: tb("showTithi"), masa: tb("showMasa"), samvat: tb("showSamvat") }}
+          />
 
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {social.length > 0 && (
+            {tb("showSocial") && social.length > 0 && (
               <ul className="hidden xl:flex items-center gap-2" aria-label="Social media">
                 {social.map((l) => (
                   <li key={l.id}>
@@ -159,7 +169,7 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
                 ))}
               </ul>
             )}
-            {hideTools([{ href: "/panchang" }]).length > 0 && (
+            {tb("showPanchangButton") && hideTools([{ href: "/panchang" }]).length > 0 && (
             <Link
               href="/panchang"
               className="hidden sm:inline-flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-[11px] font-bold !text-on-gold hover:opacity-90 whitespace-nowrap"
@@ -168,7 +178,7 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
               <span className="!text-on-gold">{tNav("panchangCalendar")}</span>
             </Link>
             )}
-            {phone && (
+            {tb("showPhone") && phone && (
               <a
                 href={`tel:${phone.replace(/[^d+]/g, "")}`}
                 className="hidden lg:inline-flex items-center gap-1.5 hover:underline text-xs"
@@ -177,6 +187,8 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
                 <span className="font-semibold">{phone}</span>
               </a>
             )}
+            {tb("showAuthLinks") && (
+              <>
             <Link href="/auth/signin" className="hidden md:inline-flex items-center gap-1 hover:underline text-xs font-semibold">
               <LogIn className="w-3 h-3 text-gold shrink-0" />
               <span>{tNav("signIn")}</span>
@@ -185,6 +197,8 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
               <UserPlus className="w-3 h-3 text-gold shrink-0" />
               <span>{tNav("register")}</span>
             </Link>
+              </>
+            )}
             <span className="hidden sm:inline-flex"><LanguageSwitcher tone="dark" /></span>
           </div>
         </div>

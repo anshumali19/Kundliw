@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   HelpCircle,
@@ -395,26 +396,12 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
 
               <div>
                 <label className="font-semibold block mb-1">Answer (English) *</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={answerEn}
-                  onChange={(e) => setAnswerEn(e.target.value)}
-                  placeholder="Detailed answer in English..."
-                  className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-                />
+                <LinkTextarea rows={3} value={answerEn} onChange={(v) => setAnswerEn(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" placeholder="Detailed answer in English..." required />
               </div>
 
               <div>
                 <label className="font-semibold block mb-1">Answer (Hindi) *</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={answerHi}
-                  onChange={(e) => setAnswerHi(e.target.value)}
-                  placeholder="विस्तृत उत्तर हिंदी में..."
-                  className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-                />
+                <LinkTextarea rows={3} value={answerHi} onChange={(v) => setAnswerHi(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" placeholder="विस्तृत उत्तर हिंदी में..." required />
               </div>
 
               <div className="sticky bottom-0 z-10 bg-surface -mx-6 -mb-6 px-6 py-3 flex items-center justify-end gap-2 border-t border-outline-variant/30">

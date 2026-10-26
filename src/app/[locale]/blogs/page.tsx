@@ -1,3 +1,4 @@
+import { stripRich } from "@/lib/content/richText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -110,7 +111,7 @@ export default async function BlogsPage(props: BlogsPageProps) {
                     </h2>
                     {excerpt && (
                       <p className="text-xs text-on-surface-variant line-clamp-3 leading-relaxed">
-                        {excerpt}
+                        {stripRich(excerpt)}
                       </p>
                     )}
                   </div>

@@ -1,3 +1,4 @@
+import { stripRich } from "@/lib/content/richText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -87,7 +88,7 @@ export default async function TestimonialsPage(props: TestimonialsPageProps) {
                   </div>
 
                   <p className="text-xs sm:text-sm italic text-on-surface leading-relaxed">
-                    &ldquo;{quote}&rdquo;
+                    &ldquo;{stripRich(quote)}&rdquo;
                   </p>
                   <YouTubeEmbed url={t.youtubeUrl} title={author} isHindi={isHindi} />
                   <LinkList links={normalizeLinks(t.additionalLinks)} isHindi={isHindi} />

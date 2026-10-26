@@ -1,3 +1,4 @@
+import { RichText } from "@/components/content/RichText";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -39,7 +40,7 @@ export default async function CustomPage(props: CustomPageProps) {
       <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary border-b border-outline-variant/30 pb-4">
         {title}
       </h1>
-      <div className="leading-relaxed text-base text-on-surface whitespace-pre-line">{content}</div>
+      <div className="leading-relaxed text-base text-on-surface space-y-3"><RichText text={content} /></div>
       <BlocksView blocks={normalizeBlocks(page.blocks)} isHindi={isHindi} />
     </div>
   );

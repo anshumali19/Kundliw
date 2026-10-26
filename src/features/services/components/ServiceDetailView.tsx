@@ -1,5 +1,6 @@
 "use client";
 
+import { RichText } from "@/components/content/RichText";
 import React, { useState } from "react";
 import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
@@ -176,8 +177,8 @@ export function ServiceDetailView({
             )}
 
             {/* Service Main Description */}
-            <div className="text-sm sm:text-base text-on-surface leading-relaxed text-left whitespace-pre-line">
-              {description}
+            <div className="text-sm sm:text-base text-on-surface leading-relaxed text-left space-y-3">
+              <RichText text={description} />
             </div>
 
             {/* Service Highlights */}
@@ -208,9 +209,9 @@ export function ServiceDetailView({
                   <ListOrdered className="w-4 h-4 text-primary" />
                   <span>{isHindi ? "परामर्श एवं अनुष्ठान कार्ययोजना (Itinerary)" : "Service Execution Itinerary"}</span>
                 </h2>
-                <p className="text-xs text-on-surface-variant leading-relaxed whitespace-pre-line">
-                  {itinerary}
-                </p>
+                <div className="text-xs text-on-surface-variant leading-relaxed space-y-2">
+                  <RichText text={itinerary} />
+                </div>
               </div>
             )}
 
@@ -221,9 +222,9 @@ export function ServiceDetailView({
                   <Package className="w-4 h-4 text-primary" />
                   <span>{isHindi ? "आवश्यक शास्त्रसम्मत पूजन सामग्री (Sacred Samagri)" : "Sacred Puja Samagri & Requirements"}</span>
                 </h2>
-                <p className="text-xs text-on-surface-variant leading-relaxed whitespace-pre-line">
-                  {samagri}
-                </p>
+                <div className="text-xs text-on-surface-variant leading-relaxed space-y-2">
+                  <RichText text={samagri} />
+                </div>
               </div>
             )}
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect } from "react";
 import { Link } from "@/i18n/routing";
 import { Plus, Trash2, CheckCircle2, AlertCircle, ExternalLink, Pencil, X } from "lucide-react";
@@ -234,19 +235,19 @@ export default function AdminBlogsPage() {
             </div>
             <div>
               <label className={label}>Excerpt (English)</label>
-              <textarea rows={2} value={form.excerptEn} onChange={(e) => set("excerptEn", e.target.value)} className={area} />
+              <LinkTextarea rows={2} value={form.excerptEn} onChange={(v) => set("excerptEn", v)} className={area} />
             </div>
             <div>
               <label className={label}>सार (हिन्दी)</label>
-              <textarea rows={2} value={form.excerptHi} onChange={(e) => set("excerptHi", e.target.value)} className={area} />
+              <LinkTextarea rows={2} value={form.excerptHi} onChange={(v) => set("excerptHi", v)} className={area} />
             </div>
             <div>
               <label className={label}>Content (English) *</label>
-              <textarea required rows={8} value={form.contentEn} onChange={(e) => set("contentEn", e.target.value)} className={area} />
+              <LinkTextarea rows={8} value={form.contentEn} onChange={(v) => set("contentEn", v)} className={area} required />
             </div>
             <div>
               <label className={label}>सामग्री (हिन्दी) *</label>
-              <textarea required rows={8} value={form.contentHi} onChange={(e) => set("contentHi", e.target.value)} className={area} />
+              <LinkTextarea rows={8} value={form.contentHi} onChange={(v) => set("contentHi", v)} className={area} required />
             </div>
           </div>
 

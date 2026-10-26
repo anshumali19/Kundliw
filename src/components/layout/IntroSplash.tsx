@@ -10,14 +10,32 @@ const KEY = "kjk_intro_seen";
  * Shown once per visit, on the home page only. An inline script in the page head hides it straight away for
  * returning visits and other pages, so there is no flash.
  */
-export function IntroSplash({ isHindi }: { isHindi: boolean }) {
+export function IntroSplash({
+  isHindi,
+  enabled = true,
+  seconds = 3,
+  title = "",
+  titleHi = "",
+  tagline = "",
+  sub = "",
+  symbol = "",
+}: {
+  isHindi: boolean;
+  enabled?: boolean;
+  seconds?: number;
+  title?: string;
+  titleHi?: string;
+  tagline?: string;
+  sub?: string;
+  symbol?: string;
+}) {
   const pathname = usePathname() || "/";
   const onHome = /^\/(hi|en)?\/?$/.test(pathname);
   const [done, setDone] = useState(false);
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    if (!onHome) return;
+    if (!onHome || !enabled) return;
     let seen = false;
     try {
       seen = sessionStorage.getItem(KEY) === "1";
@@ -30,7 +48,7 @@ export function IntroSplash({ isHindi }: { isHindi: boolean }) {
     }
     document.body.style.overflow = "hidden";
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timer = setTimeout(() => finish(), reduce ? 700 : 2900);
+    const timer = setTimeout(() => finish(), reduce ? 700 : Math.min(8, Math.max(1, seconds)) * 1000 - 100);
     function finish() {
       setDone(true);
       document.body.style.overflow = "";
@@ -46,20 +64,20 @@ export function IntroSplash({ isHindi }: { isHindi: boolean }) {
       clearTimeout(timer);
       document.body.style.overflow = "";
     };
-  }, [onHome]);
+  }, [onHome, enabled, seconds]);
 
-  if (!onHome || gone) return null;
+  if (!onHome || !enabled || gone) return null;
 
   return (
     <div className={`intro-screen${done ? " is-done" : ""}`} role="dialog" aria-label="Maharshi Kanad Jyotish Kendra" aria-hidden={done}>
       <div className="intro-glow" />
       <div className="intro-ring" />
       <div className="intro-ring-inner" />
-      <div className="intro-symbol" aria-hidden="true">ॐ</div>
+      <div className="intro-symbol" aria-hidden="true">{symbol || "ॐ"}</div>
       <div className="intro-copy">
-        <div className="intro-title">Maharshi Kanad Jyotish Kendra</div>
-        <div className="intro-hindi">{isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "ज्योतिष • ज्ञान • मार्गदर्शन"}</div>
-        <div className="intro-sub">VEDIC ASTROLOGY &amp; GUIDANCE</div>
+        <div className="intro-title">{(isHindi && titleHi) || title || "Maharshi Kanad Jyotish Kendra"}</div>
+        <div className="intro-hindi">{tagline || (isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "ज्योतिष • ज्ञान • मार्गदर्शन")}</div>
+        <div className="intro-sub">{sub || "VEDIC ASTROLOGY & GUIDANCE"}</div>
         <div className="intro-loader" />
       </div>
       <button type="button" className="intro-skip" onClick={() => (window as unknown as { __introFinish?: () => void }).__introFinish?.()}>

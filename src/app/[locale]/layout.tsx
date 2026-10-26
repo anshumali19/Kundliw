@@ -11,7 +11,8 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
 import { ToolsProvider } from "@/components/providers/ToolsProvider";
 import { IntroSplash } from "@/components/layout/IntroSplash";
-import { getActiveSocialLinks, getSection } from "@/lib/siteConfig/service";
+import { themeCss } from "@/lib/siteConfig/theme";
+import { getActiveSocialLinks, getLinkList, getSection } from "@/lib/siteConfig/service";
 import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
@@ -62,15 +63,31 @@ const baseMetadata: Metadata = {
   icons: { apple: "/icons/apple-touch-icon.png" },
   keywords: [
     "Vedic astrology",
-    "Kundli",
+    "Janam Kundli",
+    "Kundli online",
+    "free Kundli",
     "Kundli matching",
-    "Prashna Kundli",
+    "Prashn Kundli",
     "Jyotish consultation",
-    "Panchang",
-    "कुंडली",
+    "astrologer",
+    "Vastu Shastra",
+    "Puja",
+    "Paath",
+    "Yagya",
+    "Panchang today",
+    "Hindi Panchang",
+    "जन्म कुंडली",
+    "कुंडली मिलान",
+    "प्रश्न कुंडली",
     "ज्योतिष परामर्श",
+    "वास्तु शास्त्र",
+    "आज का पंचांग",
   ],
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
@@ -79,9 +96,11 @@ const baseMetadata: Metadata = {
       "Book Vedic astrology consultations, Kundli and Kundli matching online, and track your order until delivery.",
     locale: "hi_IN",
     alternateLocale: ["en_IN"],
+    images: [{ url: "/ref/hero-1.webp", width: 734, height: 416, alt: SITE_NAME }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
+    images: ["/ref/hero-1.webp"],
     title: `${SITE_NAME} | ${SITE_NAME_HI}`,
     description:
       "Vedic astrology consultations, Kundli and Kundli matching with online booking.",
@@ -168,6 +187,15 @@ export default async function LocaleLayout(
   const panchang = await getDailyPanchang();
   const social = (await getActiveSocialLinks()).map(({ id, name, url }) => ({ id, name, url }));
   const toolsCfg = await getSection("tools");
+  const [themeCfg, topbarCfg, floatCfg, introCfg, menuRows] = await Promise.all([
+    getSection("theme"),
+    getSection("topbar"),
+    getSection("floating"),
+    getSection("intro"),
+    getLinkList("menu"),
+  ]);
+  const themeStyles = themeCss(themeCfg);
+  const introOn = introCfg.enabled !== false;
   const hiddenTools = [
     ...(toolsCfg.panchangEnabled === false ? ["/panchang"] : []),
     ...(toolsCfg.kundliEnabled === false ? ["/kundli", "/kundli/astrosage"] : []),
@@ -195,12 +223,14 @@ export default async function LocaleLayout(
     })
     .catch(() => null);
 
-  const sameAs = [
-    settings?.socialFacebook,
-    settings?.socialInstagram,
-    settings?.socialTwitter,
-    settings?.socialYoutube,
-  ].filter((u): u is string => !!u && /^https?:\/\//.test(u));
+  const sameAs = social.map((l) => l.url).filter((u) => /^https?:\/\//.test(u));
+  const catalogue = await prisma.service
+    .findMany({
+      where: { isActive: true },
+      orderBy: { orderIndex: "asc" },
+      select: { slug: true, titleEn: true, plans: { where: { isActive: true }, select: { titleEn: true, pricePaise: true } } },
+    })
+    .catch(() => []);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -228,6 +258,26 @@ export default async function LocaleLayout(
             }
           : {}),
         areaServed: "IN",
+        ...(catalogue.length
+          ? {
+              hasOfferCatalog: {
+                "@type": "OfferCatalog",
+                name: "Vedic astrology services",
+                itemListElement: catalogue.map((svc) => ({
+                  "@type": "OfferCatalog",
+                  name: svc.titleEn,
+                  url: `${SITE_URL}/en/services/${svc.slug}`,
+                  itemListElement: svc.plans.map((p) => ({
+                    "@type": "Offer",
+                    name: p.titleEn,
+                    price: (p.pricePaise / 100).toFixed(2),
+                    priceCurrency: "INR",
+                    availability: "https://schema.org/InStock",
+                  })),
+                })),
+              },
+            }
+          : {}),
         availableLanguage: ["Hindi", "English"],
         ...(sameAs.length ? { sameAs } : {}),
       },
@@ -245,11 +295,12 @@ export default async function LocaleLayout(
   return (
     <html lang={locale} className={`${poppins.variable} ${notoSans.variable} ${cormorant.variable} ${notoSerifDeva.variable} w-full max-w-full overflow-x-clip`} suppressHydrationWarning>
       <head>
+        {themeStyles && <style dangerouslySetInnerHTML={{ __html: themeStyles }} />}
         {/* Opening screen: skipped at once for returning visits and for every page except the home page */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{if(!/^\\/(hi|en)?\\/?$/.test(location.pathname)||sessionStorage.getItem("kjk_intro_seen")==="1")document.documentElement.classList.add("intro-seen")}catch(e){}',
+              (introOn ? '' : 'document.documentElement.classList.add("intro-seen");') + 'try{if(!/^\\/(hi|en)?\\/?$/.test(location.pathname)||sessionStorage.getItem("kjk_intro_seen")==="1")document.documentElement.classList.add("intro-seen")}catch(e){}',
           }}
         />
       </head>
@@ -259,9 +310,22 @@ export default async function LocaleLayout(
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
           <ToolsProvider hidden={hiddenTools}>
-            <IntroSplash isHindi={locale === "hi"} />
+            <IntroSplash
+              isHindi={locale === "hi"}
+              enabled={introOn}
+              seconds={Number(introCfg.seconds) || 3}
+              title={String(introCfg.titleEn || "")}
+              titleHi={String(introCfg.titleHi || "")}
+              tagline={String(introCfg[locale === "hi" ? "taglineHi" : "taglineEn"] || "")}
+              sub={String(introCfg[locale === "hi" ? "subHi" : "subEn"] || "")}
+              symbol={String(introCfg.symbol || "")}
+            />
           <SmoothScrollProvider>
-            <Header phone={settings?.phone1 ?? undefined} panchang={panchang} social={social} logoUrl={String((await getSection("logo")).logoUrl || "") || undefined} />
+            <Header
+              topbar={topbarCfg as Record<string, boolean | string | number>}
+              menu={menuRows.map((m) => ({ href: m.href, labelEn: m.labelEn, labelHi: m.labelHi }))}
+              phone={settings?.phone1 ?? undefined}
+              panchang={panchang} social={social} logoUrl={String((await getSection("logo")).logoUrl || "") || undefined} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>
@@ -278,13 +342,16 @@ export default async function LocaleLayout(
             <MobileNav />
             {features.showFloatingButtons !== false && (
             <FloatingActionBar
-              phone={settings?.phone1 || undefined}
+              phone={String(floatCfg.callNumber || "").trim() || settings?.phone1 || undefined}
               whatsappNumber={
+                String(floatCfg.whatsappNumber || "").trim() ||
                 settings?.socialWhatsapp ||
                 settings?.whatsappNumber ||
                 settings?.phone1 ||
                 undefined
               }
+              show={{ call: floatCfg.showCall !== false, whatsapp: floatCfg.showWhatsapp !== false, ai: floatCfg.showAi !== false, chat: floatCfg.showChat !== false, askBar: floatCfg.showAskBar !== false }}
+              whatsappMessage={{ en: String(floatCfg.whatsappMessageEn || ""), hi: String(floatCfg.whatsappMessageHi || "") }}
             />
             )}
           </SmoothScrollProvider>

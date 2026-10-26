@@ -1,5 +1,6 @@
 "use client";
 
+import { stripRich } from "@/lib/content/richText";
 import { useState } from "react";
 import { Download, Eye, Printer, BadgeCheck } from "lucide-react";
 import { FileViewerModal, printFile, viewKindOf } from "@/components/content/FileViewer";
@@ -52,7 +53,7 @@ export function CredentialsGrid({
                   <h2 className="font-bold text-lg text-secondary leading-snug">{c.title}</h2>
                 </div>
               </div>
-              {c.description && <p className="text-sm text-on-surface-variant leading-relaxed">{c.description}</p>}
+              {c.description && <p className="text-sm text-on-surface-variant leading-relaxed">{stripRich(c.description)}</p>}
               {c.documentNumber && (
                 <p className="text-xs text-on-surface-variant">
                   {labels.number}: <span className="font-mono font-semibold text-secondary">{c.documentNumber}</span>

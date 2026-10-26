@@ -1,5 +1,6 @@
 "use client";
 
+import { RichText } from "@/components/content/RichText";
 import React, { useState } from "react";
 import {
   HelpCircle,
@@ -156,8 +157,8 @@ export function FaqClient({ initialItems, locale }: FaqClientProps) {
                 </button>
 
                 {isOpen && (
-                  <div className="px-4 sm:px-5 pb-5 pt-1 text-xs sm:text-sm text-on-surface-variant leading-relaxed border-t border-outline-variant/20 whitespace-pre-line bg-surface-container-lowest">
-                    {a}
+                  <div className="px-4 sm:px-5 pb-5 pt-1 text-xs sm:text-sm text-on-surface-variant leading-relaxed border-t border-outline-variant/20 space-y-3 bg-surface-container-lowest">
+                    <RichText text={a} />
                   </div>
                 )}
               </div>

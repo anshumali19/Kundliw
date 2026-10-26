@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect, useCallback } from "react";
 import { LinkItem, normalizeLinks } from "@/lib/content/media";
 import { ImageUrlField, LinksEditor, YouTubeUrlField } from "@/components/admin/MediaFields";
@@ -456,23 +457,11 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="font-semibold block mb-1">Description (English) *</label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={descriptionEn}
-                    onChange={(e) => setDescriptionEn(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-                  />
+                  <LinkTextarea rows={3} value={descriptionEn} onChange={(v) => setDescriptionEn(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" required />
                 </div>
                 <div>
                   <label className="font-semibold block mb-1">विवरण (हिन्दी) *</label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={descriptionHi}
-                    onChange={(e) => setDescriptionHi(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-                  />
+                  <LinkTextarea rows={3} value={descriptionHi} onChange={(v) => setDescriptionHi(v)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" required />
                 </div>
               </div>
 

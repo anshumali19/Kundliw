@@ -29,6 +29,9 @@ interface Message {
 interface FloatingActionBarProps {
   phone?: string;
   whatsappNumber?: string;
+  /** From Admin > Website settings > Floating buttons */
+  show?: { call?: boolean; whatsapp?: boolean; ai?: boolean; chat?: boolean; askBar?: boolean };
+  whatsappMessage?: { en?: string; hi?: string };
 }
 
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
@@ -60,7 +63,14 @@ function FabLabel({ children, side = "right" }: { children: React.ReactNode; sid
 export function FloatingActionBar({
   phone,
   whatsappNumber,
+  show = {},
+  whatsappMessage = {},
 }: FloatingActionBarProps) {
+  const showCall = show.call !== false;
+  const showWhatsapp = show.whatsapp !== false;
+  const showAi = show.ai !== false;
+  const showChat = show.chat !== false;
+  const showAskBar = show.askBar !== false;
   const locale = useLocale();
   const pathname = usePathname();
   const isHindi = locale === "hi";
@@ -91,8 +101,8 @@ export function FloatingActionBar({
   const defaultWhatsappUrl = cleanWhatsapp
     ? `https://wa.me/${cleanWhatsapp}?text=${encodeURIComponent(
         isHindi
-          ? "सादर प्रणाम, मुझे महर्षि कणाद ज्योतिष केंद्र की सेवाओं के बारे में जानकारी चाहिए।"
-          : "Namaste, I would like to inquire about Maharshi Kanad Jyotish Kendra services."
+          ? whatsappMessage.hi || "सादर प्रणाम, मुझे महर्षि कणाद ज्योतिष केंद्र की सेवाओं के बारे में जानकारी चाहिए।"
+          : whatsappMessage.en || "Namaste, I would like to inquire about Maharshi Kanad Jyotish Kendra services."
       )}`
     : "";
 
@@ -424,7 +434,7 @@ export function FloatingActionBar({
   return (
     <>
       {/* Ask AI bar (tablet and desktop): shows a rotating suggested question */}
-      {!isOpen && (
+      {!isOpen && showAskBar && (
         <form
           onSubmit={submitBar}
           className={`fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden lg:flex items-center gap-2 w-[min(25rem,calc(100vw-18rem))] bg-white/90 backdrop-blur-md rounded-full border border-gold/60 shadow-[0_8px_24px_rgba(64,36,28,0.14)] p-1.5 transition-all duration-200 ${tuckedAway && !isOpen ? "opacity-0 translate-y-4 pointer-events-none" : "pointer-events-auto opacity-100"}`}
@@ -460,7 +470,7 @@ export function FloatingActionBar({
         aria-label="Quick contact and assistance"
       >
         <div className="pointer-events-auto flex flex-col gap-3">
-          {callHref && (
+          {showCall && callHref && (
             <a
               href={callHref}
               className="group relative flex items-center"
@@ -472,7 +482,7 @@ export function FloatingActionBar({
               <FabLabel>{isHindi ? "कॉल करें" : "Call us"}</FabLabel>
             </a>
           )}
-          {defaultWhatsappUrl && (
+          {showWhatsapp && defaultWhatsappUrl && (
             <a
               href={defaultWhatsappUrl}
               target="_blank"
@@ -489,6 +499,7 @@ export function FloatingActionBar({
         </div>
 
         <div className="pointer-events-auto flex flex-col gap-3">
+          {showAi && (
           <button
             type="button"
             onClick={() => openAssistant("ai")}
@@ -501,6 +512,8 @@ export function FloatingActionBar({
             </span>
             <FabLabel side="left">{isHindi ? "एआई से पूछें" : "Ask AI"}</FabLabel>
           </button>
+          )}
+          {showChat && (
           <button
             type="button"
             onClick={() => openAssistant("chat")}
@@ -513,6 +526,7 @@ export function FloatingActionBar({
             </span>
             <FabLabel side="left">{isHindi ? "चैट करें" : "Chat with us"}</FabLabel>
           </button>
+          )}
         </div>
       </div>
 

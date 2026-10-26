@@ -3,7 +3,7 @@ import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/siteConfig/service";
-import { SECTIONS, normalizeSection, normalizeSocial } from "@/lib/siteConfig/definitions";
+import { LINK_LIST_IDS, SECTIONS, normalizeLinkList, normalizeSection, normalizeSocial } from "@/lib/siteConfig/definitions";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +32,10 @@ export async function PUT(request: NextRequest) {
     let value: unknown;
     if (id === "social") {
       const r = normalizeSocial(body.values);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: 400 });
+      value = { items: r.items };
+    } else if ((LINK_LIST_IDS as readonly string[]).includes(id)) {
+      const r = normalizeLinkList(body.values);
       if (!r.ok) return NextResponse.json({ error: r.error }, { status: 400 });
       value = { items: r.items };
     } else {

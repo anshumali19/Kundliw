@@ -1,3 +1,4 @@
+import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
 import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
@@ -122,9 +123,9 @@ export default async function OtherServicesPage(
                     </h2>
                   </div>
 
-                  <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">
-                    {description}
-                  </p>
+                  <div className="text-sm text-on-surface-variant leading-relaxed space-y-2">
+                    <RichText text={description} />
+                  </div>
 
                   {item.actionUrl && (
                     <div className="pt-2">

@@ -408,6 +408,7 @@ function buildText(meta, blocks) {
   const jobs = [
     ["01_PROJECT_DOCUMENTATION.md", "Maharshi_Kanad_Project_Documentation"],
     ["02_ADMIN_PANEL_MANUAL.md", "Maharshi_Kanad_Admin_Panel_Manual"],
+    ["03_USER_GUIDE.md", "Maharshi_Kanad_User_Guide"],
   ];
   for (const [src, base] of jobs) {
     const raw = fs.readFileSync(path.join(SRC, src), "utf8").replace(/\r\n/g, "\n");

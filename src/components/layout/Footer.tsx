@@ -1,7 +1,9 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { SocialLinks } from "@/components/content/SocialLinks";
 import { Link } from "@/i18n/routing";
-import { getSection } from "@/lib/siteConfig/service";
+import { getLinkList, getSection } from "@/lib/siteConfig/service";
+import { RichText } from "@/components/content/RichText";
+import { safeHref } from "@/lib/content/richText";
 import { prisma } from "@/lib/prisma";
 import { LocationMap } from "@/components/content/LocationMap";
 import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
@@ -13,6 +15,7 @@ export async function Footer() {
   const tNav = await getTranslations("nav");
   const tools = await getSection("tools");
   const featureCfg = await getSection("features");
+  const extraLinks = await getLinkList("footerLinks");
   const general = await getSection("general");
   const logoCfg = await getSection("logo");
   const legalCfg = await getSection("legal");
@@ -61,9 +64,9 @@ export async function Footer() {
                 </span>
               </div>
             </div>
-            <p className="text-xs text-on-maroon leading-relaxed">
-              {pickG(general, "footerNote") || t("bio")}
-            </p>
+            <div className="text-xs text-on-maroon leading-relaxed space-y-2 [&_a]:!text-gold">
+              <RichText text={pickG(general, "footerNote") || t("bio")} />
+            </div>
             {(business.ownerName || business.msmeNumber || Number(business.foundedYear) > 0) && (
               <p className="text-[11px] text-on-maroon/80">
                 {[business.ownerName ? `${locale === "hi" ? "संचालक" : "Proprietor"}: ${business.ownerName}` : "", business.msmeNumber ? `MSME: ${business.msmeNumber}` : "", Number(business.foundedYear) > 0 ? `${locale === "hi" ? "स्थापना" : "Since"} ${business.foundedYear}` : ""].filter(Boolean).join(" · ")}
@@ -324,6 +327,22 @@ export async function Footer() {
             </div>
           </div>
         </div>
+
+        {extraLinks.length > 0 && (
+          <nav aria-label={locale === "hi" ? "और लिंक" : "More links"} className="py-4 border-b border-gold/30 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+            <span className="font-semibold text-gold uppercase tracking-wider text-[11px]">{locale === "hi" ? "और लिंक" : "More links"}</span>
+            {extraLinks.map((l, i) => {
+              const ok = safeHref(l.href);
+              if (!ok) return null;
+              const label = (locale === "hi" ? l.labelHi || l.labelEn : l.labelEn || l.labelHi) || l.href;
+              return (
+                <a key={i} href={ok.href} {...(ok.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="text-on-maroon hover:text-gold underline-offset-2 hover:underline">
+                  {label}
+                </a>
+              );
+            })}
+          </nav>
+        )}
 
         {/* Bottom Bar: Broadsheet Copyright & Lineage Seal */}
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-on-maroon">

@@ -1,3 +1,4 @@
+import { RichText } from "@/components/content/RichText";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -101,8 +102,8 @@ export default async function LegalPage(props: LegalPageProps) {
       </div>
 
       {/* Content Container */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-outline-variant/40 shadow-sm leading-relaxed text-sm sm:text-base text-on-surface whitespace-pre-line space-y-4">
-        {content}
+      <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-outline-variant/40 shadow-sm leading-relaxed text-sm sm:text-base text-on-surface space-y-3 space-y-4">
+        <RichText text={content} />
       </div>
 
       <BlocksView blocks={normalizeBlocks(page.blocks)} isHindi={isHindi} />

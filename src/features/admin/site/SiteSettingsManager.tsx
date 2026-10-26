@@ -2,8 +2,17 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { ExternalLink, Loader2, Save, Upload } from "lucide-react";
-import { SECTIONS, type FieldDef, type SectionValues, type SocialLink } from "@/lib/siteConfig/definitions";
+import { SECTIONS, type FieldDef, type LinkRow, type SectionValues, type SocialLink } from "@/lib/siteConfig/definitions";
 import { SocialIcon } from "@/components/content/SocialIcon";
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
+
+const NAV_GROUPS: Array<{ en: string; hi: string; ids: string[] }> = [
+  { en: "Home page", hi: "होम पेज", ids: ["homeHero", "homeSections", "homeCards", "homeServices", "homeProcess", "homeContact", "home", "hero", "heroAnimation"] },
+  { en: "Menus, links and buttons", hi: "मेन्यू, लिंक और बटन", ids: ["menu", "footerLinks", "social", "topbar", "floating"] },
+  { en: "Look of the site", hi: "साइट का रूप", ids: ["theme", "logo", "intro", "general"] },
+  { en: "Pages and content", hi: "पेज और कंटेंट", ids: ["contact", "content", "features", "tools", "technology", "mobileApp", "legal"] },
+  { en: "Business, Google and notes", hi: "व्यवसाय, गूगल और नोट", ids: ["business", "seo", "analytics", "admin"] },
+];
 
 const field = "w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-sm";
 const btn =
@@ -16,6 +25,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
   const [active, setActive] = useState("social");
   const [sections, setSections] = useState<Record<string, SectionValues>>({});
   const [social, setSocial] = useState<SocialLink[]>([]);
+  const [lists, setLists] = useState<Record<string, LinkRow[]>>({ menu: [], footerLinks: [] });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
@@ -27,6 +37,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
       if (!res.ok) throw new Error(data.error || "Failed");
       setSections(data.sections);
       setSocial(data.social);
+      setLists({ menu: data.menu ?? [], footerLinks: data.footerLinks ?? [] });
     } catch (e) {
       setMsg({ type: "err", text: e instanceof Error ? e.message : "Failed to load." });
     } finally {
@@ -86,13 +97,35 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
         </label>
       );
     }
+    if (f.type === "textarea" && f.rich) {
+      return (
+        <div key={f.key} className="text-sm">
+          <LinkTextarea label={label} rows={3} maxLength={f.max} value={String(v ?? "")} onChange={(x) => set(f.key, x)} isHindi={isHindi} />
+        </div>
+      );
+    }
+    if (f.type === "color") {
+      const cur = String(v || "");
+      return (
+        <div key={f.key} className="text-sm space-y-1">
+          <span className="font-semibold text-secondary">{label}</span>
+          <div className="flex items-center gap-3">
+            <input type="color" aria-label={label} className="block h-11 w-20 rounded border border-outline-variant" value={cur || "#888888"} onChange={(e) => set(f.key, e.target.value)} />
+            <span className="font-mono text-xs text-on-surface-variant">{cur || tr("Standard colour", "डिफ़ॉल्ट रंग")}</span>
+            {cur && (
+              <button type="button" onClick={() => set(f.key, "")} className="min-h-[36px] px-3 rounded border border-outline-variant text-xs font-semibold hover:bg-surface-container-high">
+                {tr("Use standard colour", "डिफ़ॉल्ट रंग लगाएँ")}
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
     return (
       <label key={f.key} className="block text-sm space-y-1">
         <span className="font-semibold text-secondary">{label}</span>
         {f.type === "textarea" ? (
           <textarea className={field} rows={3} maxLength={f.max} value={String(v ?? "")} onChange={(e) => set(f.key, e.target.value)} />
-        ) : f.type === "color" ? (
-          <input type="color" className="block h-11 w-24 rounded border border-outline-variant" value={String(v || "#C2610C")} onChange={(e) => set(f.key, e.target.value)} />
         ) : f.type === "number" ? (
           <input type="number" min={0} className={field} value={Number(v ?? 0)} onChange={(e) => set(f.key, Number(e.target.value))} />
         ) : (
@@ -101,7 +134,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
               className={field}
               maxLength={f.max}
               inputMode={f.type === "url" ? "url" : undefined}
-              placeholder={f.type === "url" || f.type === "image" ? "https://" : ""}
+              placeholder={f.type === "url" || f.type === "image" ? "https://" : f.type === "link" ? "/services   https://...   tel:+91..." : ""}
               value={String(v ?? "")}
               onChange={(e) => set(f.key, e.target.value)}
             />
@@ -148,22 +181,33 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
-        <nav aria-label="Sections" className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2">
-          {SECTIONS.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => {
-                setActive(s.id);
-                setMsg(null);
-              }}
-              className={`shrink-0 min-h-[44px] px-3 rounded text-left text-sm font-semibold border ${
-                active === s.id ? "bg-brand text-on-brand border-maroon" : "bg-surface text-secondary border-outline-variant/60 hover:bg-surface-container-high"
-              }`}
-            >
-              {tr(s.en, s.hi)}
-            </button>
-          ))}
+        <nav aria-label="Sections" className="lg:max-h-[75vh] lg:overflow-y-auto lg:pr-1 space-y-4">
+          {NAV_GROUPS.map((g) => {
+            const items = g.ids.map((id) => SECTIONS.find((x) => x.id === id)).filter((x): x is (typeof SECTIONS)[number] => !!x);
+            if (items.length === 0) return null;
+            return (
+              <div key={g.en}>
+                <div className="px-1 pb-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-primary">{tr(g.en, g.hi)}</div>
+                <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1">
+                  {items.map((sec) => (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      onClick={() => {
+                        setActive(sec.id);
+                        setMsg(null);
+                      }}
+                      className={`shrink-0 min-h-[42px] px-3 rounded text-left text-sm font-semibold border ${
+                        active === sec.id ? "bg-brand text-on-brand border-maroon" : "bg-surface text-secondary border-outline-variant/60 hover:bg-surface-container-high"
+                      }`}
+                    >
+                      {tr(sec.en, sec.hi)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </nav>
 
         <section className="bg-surface border border-outline-variant/60 rounded-lg p-5 space-y-4 min-w-0">
@@ -184,7 +228,16 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
 
           {def && (def.noteEn || def.noteHi) && <p className="text-sm text-on-surface-variant">{tr(def.noteEn || "", def.noteHi || "")}</p>}
 
-          {active === "social" ? (
+          {active === "menu" || active === "footerLinks" ? (
+            <LinkListEditor
+              rows={lists[active] ?? []}
+              onChange={(rows) => setLists((l) => ({ ...l, [active]: rows }))}
+              onSave={() => save(active, { items: lists[active] ?? [] })}
+              saving={saving}
+              isHindi={isHindi}
+              onUseDefault={active === "menu" ? () => setLists((l) => ({ ...l, menu: [] })) : undefined}
+            />
+          ) : active === "social" ? (
             <div className="space-y-3">
               <p className="text-sm text-on-surface-variant">
                 {tr(
@@ -254,6 +307,69 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
             )
           )}
         </section>
+      </div>
+    </div>
+  );
+}
+
+function LinkListEditor({
+  rows,
+  onChange,
+  onSave,
+  saving,
+  isHindi,
+  onUseDefault,
+}: {
+  rows: LinkRow[];
+  onChange: (rows: LinkRow[]) => void;
+  onSave: () => void;
+  saving: boolean;
+  isHindi: boolean;
+  onUseDefault?: () => void;
+}) {
+  const tr = (en: string, hi: string) => (isHindi ? hi : en);
+  const upd = (i: number, patch: Partial<LinkRow>) => onChange(rows.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  const move = (i: number, d: number) => {
+    const j = i + d;
+    if (j < 0 || j >= rows.length) return;
+    const next = rows.slice();
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
+  return (
+    <div className="space-y-3">
+      {rows.length === 0 && (
+        <p className="text-sm text-on-surface-variant">{tr("Nothing added: the standard links are used. Press 'Add link' to make your own list.", "कुछ नहीं जोड़ा: डिफ़ॉल्ट लिंक लगे हैं। अपनी सूची बनाने के लिए 'लिंक जोड़ें' दबाएँ।")}</p>
+      )}
+      {rows.map((r, i) => (
+        <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1.4fr_auto] gap-2 items-center rounded-lg border border-outline-variant/50 bg-surface-container-low p-2">
+          <input className={field} aria-label={tr("Name in English", "अंग्रेज़ी में नाम")} placeholder={tr("Name (English)", "नाम (अंग्रेज़ी)")} value={r.labelEn} onChange={(e) => upd(i, { labelEn: e.target.value })} maxLength={60} />
+          <input className={field} aria-label={tr("Name in Hindi", "हिंदी में नाम")} placeholder={tr("Name (Hindi)", "नाम (हिंदी)")} value={r.labelHi} onChange={(e) => upd(i, { labelHi: e.target.value })} maxLength={60} />
+          <input className={field} aria-label={tr("Goes to", "कहाँ जाएगा")} placeholder="/services   https://...   tel:+91..." inputMode="url" value={r.href} onChange={(e) => upd(i, { href: e.target.value })} maxLength={400} />
+          <div className="flex items-center gap-1">
+            <label className="inline-flex items-center gap-1.5 text-xs px-2 min-h-[40px]">
+              <input type="checkbox" checked={r.show} onChange={(e) => upd(i, { show: e.target.checked })} />
+              {tr("Show", "दिखाएँ")}
+            </label>
+            <button type="button" onClick={() => move(i, -1)} aria-label={tr("Move up", "ऊपर")} className="min-h-[40px] min-w-[36px] rounded border border-outline-variant hover:bg-surface-container-high">↑</button>
+            <button type="button" onClick={() => move(i, 1)} aria-label={tr("Move down", "नीचे")} className="min-h-[40px] min-w-[36px] rounded border border-outline-variant hover:bg-surface-container-high">↓</button>
+            <button type="button" onClick={() => onChange(rows.filter((_, j) => j !== i))} aria-label={tr("Remove", "हटाएँ")} className="min-h-[40px] min-w-[36px] rounded border border-error text-on-error-container hover:bg-error-container">✕</button>
+          </div>
+        </div>
+      ))}
+      <div className="flex flex-wrap gap-3">
+        <button type="button" onClick={() => onChange([...rows, { labelEn: "", labelHi: "", href: "", show: true }])} className={`${btn} !bg-surface !text-secondary`}>
+          {tr("Add link", "लिंक जोड़ें")}
+        </button>
+        {onUseDefault && rows.length > 0 && (
+          <button type="button" onClick={onUseDefault} className={`${btn} !bg-surface !text-secondary`}>
+            {tr("Go back to the standard menu", "डिफ़ॉल्ट मेन्यू पर लौटें")}
+          </button>
+        )}
+        <button type="button" disabled={saving} onClick={onSave} className={btn}>
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {tr("Save", "सहेजें")}
+        </button>
       </div>
     </div>
   );

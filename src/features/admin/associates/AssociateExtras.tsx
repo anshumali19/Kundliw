@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import { useEffect, useState } from "react";
 import { CheckCircle2, AlertCircle, X } from "lucide-react";
 
@@ -104,11 +105,11 @@ export function AssociateSettingsPanel({ isHindi }: { isHindi: boolean }) {
         </label>
         <label className="text-xs font-bold uppercase text-on-surface-variant">
           {t("Terms for associates (English)", "एसोसिएट के लिए शर्तें (अंग्रेज़ी)")}
-          <textarea rows={6} value={form.termsEn} onChange={(e) => setForm({ ...form, termsEn: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
+          <LinkTextarea rows={6} value={form.termsEn} onChange={(v) => setForm({ ...form, termsEn: v })} className={`${input} mt-1 normal-case font-normal`} />
         </label>
         <label className="text-xs font-bold uppercase text-on-surface-variant">
           {t("Terms for associates (Hindi)", "एसोसिएट के लिए शर्तें (हिन्दी)")}
-          <textarea rows={6} value={form.termsHi} onChange={(e) => setForm({ ...form, termsHi: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
+          <LinkTextarea rows={6} value={form.termsHi} onChange={(v) => setForm({ ...form, termsHi: v })} className={`${input} mt-1 normal-case font-normal`} />
         </label>
       </div>
 
@@ -236,7 +237,7 @@ export function AssociateDetailsModal({
 
         <label className="block text-xs font-bold uppercase text-on-surface-variant">
           {t("Private notes (only administrators see these)", "निजी टिप्पणियाँ (केवल एडमिन देख सकते हैं)")}
-          <textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} className={`${input} mt-1 normal-case font-normal`} />
+          <LinkTextarea rows={4} value={notes} onChange={(v) => setNotes(v)} className={`${input} mt-1 normal-case font-normal`} />
         </label>
 
         {error && <p className="text-sm text-on-error-container">{error}</p>}

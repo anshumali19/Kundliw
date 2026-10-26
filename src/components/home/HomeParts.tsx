@@ -9,7 +9,7 @@ export function SectionHead({
 }: {
   label: string;
   title: string;
-  intro?: string;
+  intro?: ReactNode;
   dark?: boolean;
 }) {
   return (
@@ -17,7 +17,7 @@ export function SectionHead({
       <span className={`block text-xs font-bold uppercase tracking-[0.2em] mb-3 ${dark ? "text-gold" : "text-primary"}`}>{label}</span>
       <div className={`h-0.5 w-[76px] mb-5 ${dark ? "bg-gold" : "bg-saffron"}`} />
       <h2 className={`font-serif font-semibold text-4xl sm:text-5xl lg:text-6xl leading-[1.04] mb-4 ${dark ? "text-white" : "text-secondary"}`}>{title}</h2>
-      {intro && <p className={`text-sm sm:text-[15px] leading-[1.85] ${dark ? "text-white/75" : "text-on-surface-variant"}`}>{intro}</p>}
+      {intro && <div className={`text-sm sm:text-[15px] leading-[1.85] space-y-2 ${dark ? "text-white/75 [&_a]:!text-gold" : "text-on-surface-variant"}`}>{intro}</div>}
     </div>
   );
 }

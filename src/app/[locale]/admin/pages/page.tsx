@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect } from "react";
 import { Save, CheckCircle2, AlertCircle, Plus, Trash2, ExternalLink } from "lucide-react";
 import { DEFAULT_GUIDES, GUIDE_SLUGS, guidePageSlug } from "@/lib/guides/defaults";
@@ -299,7 +300,7 @@ export default function AdminPagesPage() {
             </div>
             <div>
               <label className={label}>Page text (English) *</label>
-              <textarea required rows={12} value={contentEn} onChange={(e) => setContentEn(e.target.value)} className="w-full p-3 text-xs bg-surface-container-low border border-outline-variant rounded focus:border-secondary focus:outline-none" />
+              <LinkTextarea rows={12} value={contentEn} onChange={(v) => setContentEn(v)} className="w-full p-3 text-xs bg-surface-container-low border border-outline-variant rounded focus:border-secondary focus:outline-none" required />
             </div>
           </div>
           <div className="space-y-3">
@@ -309,7 +310,7 @@ export default function AdminPagesPage() {
             </div>
             <div>
               <label className={label}>पृष्ठ का पाठ (हिन्दी) *</label>
-              <textarea required rows={12} value={contentHi} onChange={(e) => setContentHi(e.target.value)} className="w-full p-3 text-xs bg-surface-container-low border border-outline-variant rounded focus:border-secondary focus:outline-none" />
+              <LinkTextarea rows={12} value={contentHi} onChange={(v) => setContentHi(v)} className="w-full p-3 text-xs bg-surface-container-low border border-outline-variant rounded focus:border-secondary focus:outline-none" required />
             </div>
           </div>
         </div>

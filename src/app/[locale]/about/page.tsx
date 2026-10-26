@@ -1,3 +1,4 @@
+import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -88,14 +89,14 @@ export default async function AboutPage(props: AboutPageProps) {
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-secondary">{title}</h1>
       </div>
 
-      <div className="p-6 sm:p-8 rounded-lg bg-surface border border-outline-variant/40 leading-relaxed text-base text-on-surface whitespace-pre-line">
-        {aboutShort || content}
+      <div className="p-6 sm:p-8 rounded-lg bg-surface border border-outline-variant/40 leading-relaxed text-base text-on-surface space-y-3">
+        <RichText text={aboutShort || content} />
       </div>
 
       {mission && (
-        <div className="p-6 sm:p-8 rounded-lg bg-surface-container border border-gold/60 leading-relaxed text-base text-on-surface whitespace-pre-line">
+        <div className="p-6 sm:p-8 rounded-lg bg-surface-container border border-gold/60 leading-relaxed text-base text-on-surface space-y-3">
           <div className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{isHindi ? "हमारा उद्देश्य" : "Our mission"}</div>
-          {mission}
+          <RichText text={mission} />
         </div>
       )}
 

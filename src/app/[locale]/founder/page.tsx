@@ -1,3 +1,4 @@
+import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { BlocksView, LinkList, YouTubeEmbed } from "@/components/content/MediaView";
 import { isSafeImageSrc, normalizeBlocks, normalizeLinks } from "@/lib/content/media";
@@ -128,7 +129,7 @@ export default async function FounderPage(props: FounderPageProps) {
               <BookOpen className="w-4 h-4" />
               <span>{isHindi ? "परिचय" : "Background"}</span>
             </div>
-            <div className="text-base leading-relaxed text-on-surface whitespace-pre-line">{bio}</div>
+            <div className="text-base leading-relaxed text-on-surface space-y-3"><RichText text={bio} /></div>
           </div>
 
           {additionalLinks.length > 0 && (

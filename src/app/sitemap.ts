@@ -19,7 +19,10 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: "daily" 
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
   { path: "/help", priority: 0.5, changeFrequency: "monthly" },
   { path: "/contact", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/other-services", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/other-services", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/offers", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/credentials", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/app", priority: 0.4, changeFrequency: "monthly" },
 ];
 
 function entriesFor(path: string, lastModified: Date | undefined, priority: number, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]): MetadataRoute.Sitemap {
@@ -34,12 +37,15 @@ function entriesFor(path: string, lastModified: Date | undefined, priority: numb
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [services, posts] = await Promise.all([
+  const [services, posts, legal] = await Promise.all([
     prisma.service
       .findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } })
       .catch(() => []),
     prisma.blogPost
       .findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } })
+      .catch(() => []),
+    prisma.staticPage
+      .findMany({ where: { isActive: true, slug: { startsWith: "legal/" } }, select: { slug: true, updatedAt: true } })
       .catch(() => []),
   ]);
 
@@ -47,5 +53,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...STATIC_ROUTES.flatMap((r) => entriesFor(r.path, undefined, r.priority, r.changeFrequency)),
     ...services.flatMap((s) => entriesFor(`/services/${s.slug}`, s.updatedAt, 0.8, "weekly")),
     ...posts.flatMap((p) => entriesFor(`/blogs/${p.slug}`, p.updatedAt, 0.6, "monthly")),
+    ...legal.flatMap((p) => entriesFor(`/${p.slug}`, p.updatedAt, 0.3, "yearly")),
   ];
 }

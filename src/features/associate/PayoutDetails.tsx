@@ -1,5 +1,6 @@
 "use client";
 
+import { stripRich } from "@/lib/content/richText";
 import { useEffect, useState } from "react";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
@@ -99,7 +100,7 @@ export function PayoutDetails({ isHindi }: { isHindi: boolean }) {
       {terms && (
         <details className="bg-surface border border-outline-variant/60 rounded-lg p-4">
           <summary className="cursor-pointer font-bold text-secondary min-h-[44px] flex items-center">{t("Associate terms", "एसोसिएट की शर्तें")}</summary>
-          <p className="whitespace-pre-line text-sm text-on-surface-variant mt-2">{terms}</p>
+          <p className="whitespace-pre-line text-sm text-on-surface-variant mt-2">{stripRich(terms)}</p>
         </details>
       )}
     </div>

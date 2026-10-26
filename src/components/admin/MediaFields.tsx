@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import { useRef, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 import { BLOCK_TYPES, BlockType, ContentBlock, LinkItem } from "@/lib/content/media";
@@ -307,19 +308,22 @@ export function BlocksEditor({
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <textarea
+            <LinkTextarea
               rows={b.type === "text" ? 4 : 2}
               value={b.textEn}
-              onChange={(e) => update(i, { textEn: e.target.value })}
+              onChange={(v) => update(i, { textEn: v })}
               placeholder={b.type === "text" ? "Text (English)" : "Caption (English, optional)"}
               className={inputCls}
+              label={b.type === "text" ? "English" : undefined}
             />
-            <textarea
+            <LinkTextarea
               rows={b.type === "text" ? 4 : 2}
               value={b.textHi}
-              onChange={(e) => update(i, { textHi: e.target.value })}
+              onChange={(v) => update(i, { textHi: v })}
               placeholder={b.type === "text" ? "पाठ (हिंदी)" : "कैप्शन (हिंदी, वैकल्पिक)"}
               className={inputCls}
+              label={b.type === "text" ? "हिंदी" : undefined}
+              isHindi
             />
           </div>
         </div>

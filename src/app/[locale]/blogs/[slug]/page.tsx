@@ -1,3 +1,5 @@
+import { stripRich } from "@/lib/content/richText";
+import { RichText } from "@/components/content/RichText";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -29,7 +31,7 @@ export async function generateMetadata(props: BlogPostPageProps): Promise<Metada
 
   return {
     title: `${isHindi ? post.titleHi : post.titleEn} • Maharshi Kanad Jyotish Kendra`,
-    description: (isHindi ? post.excerptHi : post.excerptEn) || undefined,
+    description: stripRich((isHindi ? post.excerptHi : post.excerptEn) || "") || undefined,
   };
 }
 
@@ -92,8 +94,8 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
         </div>
       )}
 
-      <div className="p-6 sm:p-10 rounded-lg bg-surface border border-outline-variant/40 shadow-sm leading-relaxed whitespace-pre-line text-sm sm:text-base text-on-surface space-y-4">
-        {content}
+      <div className="p-6 sm:p-10 rounded-lg bg-surface border border-outline-variant/40 shadow-sm leading-relaxed space-y-3 text-sm sm:text-base text-on-surface space-y-4">
+        <RichText text={content} />
       </div>
 
       <YouTubeEmbed url={post.youtubeUrl} title={title} isHindi={isHindi} />

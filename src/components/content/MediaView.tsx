@@ -1,4 +1,5 @@
 import { ExternalLink, Video } from "lucide-react";
+import { RichText } from "@/components/content/RichText";
 import {
   ContentBlock,
   LinkItem,
@@ -94,9 +95,9 @@ export function BlocksView({ blocks, isHindi }: { blocks: ContentBlock[]; isHind
         const text = (isHindi ? b.textHi || b.textEn : b.textEn || b.textHi).trim();
         if (b.type === "text") {
           return (
-            <p key={b.id} className="whitespace-pre-line leading-relaxed text-base text-on-surface">
-              {text}
-            </p>
+            <div key={b.id} className="space-y-3 leading-relaxed text-base text-on-surface">
+              <RichText text={text} />
+            </div>
           );
         }
         if (b.type === "image") {

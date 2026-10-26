@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect } from "react";
 import {
   Plus,
@@ -281,11 +282,11 @@ export default function AdminTestimonialsPage() {
             </div>
             <div className="sm:col-span-2 lg:col-span-3">
               <label className={label}>Feedback Quote (English) *</label>
-              <textarea required rows={2} value={form.quoteEn} onChange={(e) => set("quoteEn", e.target.value)} className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none" />
+              <LinkTextarea rows={2} value={form.quoteEn} onChange={(v) => set("quoteEn", v)} className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none" required />
             </div>
             <div className="sm:col-span-2 lg:col-span-3">
               <label className={label}>प्रशस्ति वाक्य (हिन्दी) *</label>
-              <textarea required rows={2} value={form.quoteHi} onChange={(e) => set("quoteHi", e.target.value)} className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none" />
+              <LinkTextarea rows={2} value={form.quoteHi} onChange={(v) => set("quoteHi", v)} className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none" required />
             </div>
           </div>
 
