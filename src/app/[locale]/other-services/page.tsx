@@ -1,4 +1,6 @@
 import { pageAlternates } from "@/lib/seo";
+import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
+import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { SubPageNav } from "@/components/layout/SubPageNav";
@@ -139,50 +141,21 @@ export default async function OtherServicesPage(
                   )}
                 </div>
 
-                {/* Right Column: YouTube Video Embed or Image (#13, #47) */}
+                {/* Right Column: image, YouTube video and extra links (#13, #47) */}
                 <div className="w-full lg:w-96 shrink-0 space-y-3">
-                  {item.youtubeUrl ? (
-                    <div className="rounded-xl overflow-hidden border border-outline-variant/40 bg-black aspect-video shadow-xs">
-                      {item.youtubeUrl.includes("youtube.com") || item.youtubeUrl.includes("youtu.be") ? (
-                        <iframe
-                          src={
-                            item.youtubeUrl.includes("embed")
-                              ? item.youtubeUrl
-                              : item.youtubeUrl.replace("watch?v=", "embed/").split("&")[0]
-                          }
-                          title={title}
-                          className="w-full h-full border-0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-xs text-on-surface-variant">
-                          <a
-                            href={item.youtubeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary underline flex items-center gap-1"
-                          >
-                            <span>{isHindi ? "वीडियो देखें" : "Watch Video"}</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  ) : item.imageUrl ? (
+                  {isSafeImageSrc(item.imageUrl) && (
                     <div className="rounded-xl overflow-hidden border border-outline-variant/40 aspect-video bg-surface-container shadow-xs">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.imageUrl}
-                        alt={title}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={item.imageUrl} alt={title} loading="lazy" className="w-full h-full object-cover" />
                     </div>
-                  ) : (
+                  )}
+                  <YouTubeEmbed url={item.youtubeUrl} title={title} isHindi={isHindi} />
+                  {!isSafeImageSrc(item.imageUrl) && !item.youtubeUrl && (
                     <div className="rounded-xl border border-secondary/20 bg-surface-container-low aspect-video flex items-center justify-center font-serif text-3xl text-secondary font-bold">
                       ॐ
                     </div>
                   )}
+                  <LinkList links={normalizeLinks(item.additionalLinks)} isHindi={isHindi} />
                 </div>
               </div>
             );

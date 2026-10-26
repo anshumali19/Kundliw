@@ -57,9 +57,9 @@ enum AssociateStatus {
 }
 
 enum CommissionStatus {
-  PENDING   // order created, payment not yet confirmed
-  EARNED    // order paid, available for payout
-  PAID      // included in a payout that the admin marked as paid
+  PENDING // order created, payment not yet confirmed
+  EARNED // order paid, available for payout
+  PAID // included in a payout that the admin marked as paid
   CANCELLED // order expired, failed or refunded
 }
 
@@ -94,16 +94,16 @@ enum MarqueePosition {
 }
 
 model User {
-  id            String             @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?            @unique
-  phone         String?            @unique
+  email         String?   @unique
+  phone         String?   @unique
   passwordHash  String?
   emailVerified DateTime?
   image         String?
-  role          Role               @default(USER)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   accounts      Account[]
   associate     AssociateProfile?
@@ -127,6 +127,7 @@ model Account {
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
@@ -134,6 +135,7 @@ model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+
   @@unique([identifier, token])
 }
 
@@ -169,14 +171,14 @@ model Service {
   samagriEn       String?  @db.Text
   samagriHi       String?  @db.Text
   youtubeUrl      String?
-  additionalLinks Json?    // Array of { labelEn: string, labelHi: string, url: string }
+  additionalLinks Json? // Array of { labelEn: string, labelHi: string, url: string }
   orderIndex      Int      @default(0)
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  plans           Plan[]
-  orders          Order[]
+  plans  Plan[]
+  orders Order[]
 }
 
 model Plan {
@@ -188,8 +190,8 @@ model Plan {
   titleHi             String
   descriptionEn       String   @db.Text
   descriptionHi       String   @db.Text
-  pricePaise          Int      // Price in paise (e.g. 110000 = Rs 1100.00)
-  originalPricePaise  Int?     // Strike-through original price in paise
+  pricePaise          Int // Price in paise (e.g. 110000 = Rs 1100.00)
+  originalPricePaise  Int? // Strike-through original price in paise
   deliveryDays        Int      @default(3)
   pages               Int?
   hasCall             Boolean  @default(false)
@@ -204,13 +206,17 @@ model Plan {
   samagriHi           String?  @db.Text
   itineraryEn         String?  @db.Text
   itineraryHi         String?  @db.Text
+  imageUrl            String?
+  youtubeUrl          String?
+  additionalLinks     Json?
   isPopular           Boolean  @default(false)
   orderIndex          Int      @default(0)
   isActive            Boolean  @default(true)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  orders              Order[]
+  orders Order[]
+
   @@unique([serviceId, slug])
 }
 
@@ -220,8 +226,8 @@ model Offer {
   titleEn            String
   titleHi            String
   discountType       DiscountType @default(FLAT)
-  discountValuePaise Int          // Amount in paise for FLAT (e.g. 50000 for Rs 500) or integer percent for PERCENTAGE (e.g. 25)
-  maxDiscountPaise   Int?         // Max discount ceiling in paise
+  discountValuePaise Int // Amount in paise for FLAT (e.g. 50000 for Rs 500) or integer percent for PERCENTAGE (e.g. 25)
+  maxDiscountPaise   Int? // Max discount ceiling in paise
   minOrderValuePaise Int          @default(0)
   usageLimit         Int?
   usedCount          Int          @default(0)
@@ -230,67 +236,67 @@ model Offer {
   isActive           Boolean      @default(true)
   createdAt          DateTime     @default(now())
 
-  orders             Order[]
+  orders Order[]
 }
 
 model Order {
-  id                  String             @id @default(cuid())
-  orderNumber         String             @unique // Sequential e.g. "MKJK-2026-0001"
-  userId              String?
-  user                User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
-  serviceId           String?
-  service             Service?           @relation(fields: [serviceId], references: [id])
-  planId              String?
-  plan                Plan?              @relation(fields: [planId], references: [id])
-  offerId             String?
-  offer               Offer?             @relation(fields: [offerId], references: [id])
-  offerCode           String?            // Snapshot of coupon used
-  slotId              String?
-  slot                Slot?              @relation(fields: [slotId], references: [id])
-  requestType         RequestType        @default(SERVICE_BOOKING)
+  id          String      @id @default(cuid())
+  orderNumber String      @unique // Sequential e.g. "MKJK-2026-0001"
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  serviceId   String?
+  service     Service?    @relation(fields: [serviceId], references: [id])
+  planId      String?
+  plan        Plan?       @relation(fields: [planId], references: [id])
+  offerId     String?
+  offer       Offer?      @relation(fields: [offerId], references: [id])
+  offerCode   String? // Snapshot of coupon used
+  slotId      String?
+  slot        Slot?       @relation(fields: [slotId], references: [id])
+  requestType RequestType @default(SERVICE_BOOKING)
 
-  status              OrderStatus        @default(ORDER_RECEIVED)
-  statusEvents        OrderStatusEvent[]
+  status       OrderStatus        @default(ORDER_RECEIVED)
+  statusEvents OrderStatusEvent[]
 
   // Astrological / Jataka details
-  jatakaDetails       Json               // { name, phone, email, gender, dob, tob, pob, lat, lng, gotra, nakshatra, gemstones, language, queries, partnerDetails }
+  jatakaDetails Json // { name, phone, email, gender, dob, tob, pob, lat, lng, gotra, nakshatra, gemstones, language, queries, partnerDetails }
 
   // Billing & GST (all in paise)
   baseAmountPaise     Int
-  discountAmountPaise Int                @default(0)
+  discountAmountPaise Int     @default(0)
   taxableAmountPaise  Int
-  gstRateBasisPoints  Int                @default(1800) // 18.00% = 1800 bps
+  gstRateBasisPoints  Int     @default(1800) // 18.00% = 1800 bps
   gstAmountPaise      Int
   netAmountPaise      Int
-  invoiceNumber       String?            @unique // Sequential e.g. "INV-2026-0001"
-  gstin               String?            // Snapshot of Kendra GSTIN at order time
+  invoiceNumber       String? @unique // Sequential e.g. "INV-2026-0001"
+  gstin               String? // Snapshot of Kendra GSTIN at order time
 
   // Payment
-  paymentMode         PaymentMode        @default(RAZORPAY)
-  paymentStatus       PaymentStatus      @default(PENDING)
-  idempotencyKey      String?            @unique
-  expiresAt           DateTime?
-  rejectionReason     String?            @db.Text
-  razorpayOrderId     String?
-  razorpayPaymentId   String?
-  razorpaySignature   String?
-  manualPaymentProof  String?
-  manualPaymentRef    String?
+  paymentMode        PaymentMode   @default(RAZORPAY)
+  paymentStatus      PaymentStatus @default(PENDING)
+  idempotencyKey     String?       @unique
+  expiresAt          DateTime?
+  rejectionReason    String?       @db.Text
+  razorpayOrderId    String?
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  manualPaymentProof String?
+  manualPaymentRef   String?
 
   // Associate referral attribution and appointment approval
-  associateId         String?
-  associate           AssociateProfile?  @relation(fields: [associateId], references: [id], onDelete: SetNull)
-  commission          Commission?
-  appointmentStatus   AppointmentStatus?
-  appointmentNote     String?            @db.Text
+  associateId       String?
+  associate         AssociateProfile?  @relation(fields: [associateId], references: [id], onDelete: SetNull)
+  commission        Commission?
+  appointmentStatus AppointmentStatus?
+  appointmentNote   String?            @db.Text
 
-  courierName         String?
-  trackingNumber      String?
-  adminNotes          String?            @db.Text
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  courierName    String?
+  trackingNumber String?
+  adminNotes     String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  vaultFiles          VaultFile[]
+  vaultFiles VaultFile[]
 
   @@index([userId])
   @@index([status])
@@ -313,15 +319,15 @@ model OrderStatusEvent {
 model Slot {
   id          String   @id @default(cuid())
   date        DateTime // Slot calendar date
-  startTime   String   // e.g. "10:00"
-  endTime     String   // e.g. "10:30"
+  startTime   String // e.g. "10:00"
+  endTime     String // e.g. "10:30"
   capacity    Int      @default(1)
   bookedCount Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  orders      Order[]
+  orders Order[]
 
   @@index([date, isActive])
 }
@@ -337,9 +343,9 @@ model AssociateProfile {
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  orders          Order[]
-  commissions     Commission[]
-  payouts         PayoutRequest[]
+  orders      Order[]
+  commissions Commission[]
+  payouts     PayoutRequest[]
 
   @@index([status])
 }
@@ -403,26 +409,26 @@ model ProcessedWebhookEvent {
 }
 
 model VaultFile {
-  id          String   @id @default(cuid())
-  orderId     String?
-  order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  titleEn     String
-  titleHi     String
-  fileName    String
-  storageKey  String   // Internal private storage path
-  fileSize    Int
-  mimeType    String   @default("application/pdf")
-  uploadedAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  orderId    String?
+  order      Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  titleEn    String
+  titleHi    String
+  fileName   String
+  storageKey String // Internal private storage path
+  fileSize   Int
+  mimeType   String   @default("application/pdf")
+  uploadedAt DateTime @default(now())
 
   @@index([userId])
 }
 
 model RateLimit {
   id         String   @id @default(cuid())
-  scope      String   // e.g. "OTP_PHONE", "OTP_IP", "ADMIN_LOGIN_EMAIL", "ADMIN_LOGIN_IP"
-  identifier String   // e.g. Phone number, IP address, or email
+  scope      String // e.g. "OTP_PHONE", "OTP_IP", "ADMIN_LOGIN_EMAIL", "ADMIN_LOGIN_IP"
+  identifier String // e.g. Phone number, IP address, or email
   count      Int      @default(1)
   windowEnd  DateTime
   createdAt  DateTime @default(now())
@@ -433,34 +439,34 @@ model RateLimit {
 }
 
 model AdminSettings {
-  id                String   @id @default("default")
-  siteNameEn        String?
-  siteNameHi        String?
-  phone1            String?
-  phone2            String?
-  email             String?
-  addressEn         String?  @db.Text
-  addressHi         String?  @db.Text
-  city              String?
-  latitude          Float?
-  longitude         Float?
-  timezone          String?
-  upiVpa            String?
-  bankAccountName   String?
-  bankAccountNumber String?
-  bankIfsc          String?
-  bankName          String?
-  qrCodeUrl         String?
-  gstin             String?
-  defaultGstRateBps Int?     @default(1800)
-  socialFacebook    String?
-  socialTwitter     String?
-  socialInstagram   String?
-  socialYoutube     String?
-  socialWhatsapp    String?
-  socialTelegram    String?
-  googleMapEmbedUrl String?  @db.Text
-  googleAnalyticsId String?
+  id                       String   @id @default("default")
+  siteNameEn               String?
+  siteNameHi               String?
+  phone1                   String?
+  phone2                   String?
+  email                    String?
+  addressEn                String?  @db.Text
+  addressHi                String?  @db.Text
+  city                     String?
+  latitude                 Float?
+  longitude                Float?
+  timezone                 String?
+  upiVpa                   String?
+  bankAccountName          String?
+  bankAccountNumber        String?
+  bankIfsc                 String?
+  bankName                 String?
+  qrCodeUrl                String?
+  gstin                    String?
+  defaultGstRateBps        Int?     @default(1800)
+  socialFacebook           String?
+  socialTwitter            String?
+  socialInstagram          String?
+  socialYoutube            String?
+  socialWhatsapp           String?
+  socialTelegram           String?
+  googleMapEmbedUrl        String?  @db.Text
+  googleAnalyticsId        String?
   // Encrypted Third-Party Credentials (Encrypted at rest with AES-256-GCM)
   encRazorpayKeyId         String?
   encRazorpayKeySecret     String?
@@ -483,11 +489,11 @@ model AdminSettings {
   // Android app download section (website page and QR code)
   appDownloadUrl           String?
   // Chatbot Settings
-  chatbotEnabled    Boolean  @default(true)
-  chatbotWelcomeEn  String?  @db.Text
-  chatbotWelcomeHi  String?  @db.Text
-  whatsappNumber    String?
-  updatedAt         DateTime @updatedAt
+  chatbotEnabled           Boolean  @default(true)
+  chatbotWelcomeEn         String?  @db.Text
+  chatbotWelcomeHi         String?  @db.Text
+  whatsappNumber           String?
+  updatedAt                DateTime @updatedAt
 }
 
 model ChatbotQA {
@@ -497,7 +503,7 @@ model ChatbotQA {
   answerEn     String   @db.Text
   answerHi     String   @db.Text
   keywords     String[] // Search tokens, e.g. ["pricing", "fees", "dakshina"]
-  quickReplyEn String?  // Chip button text
+  quickReplyEn String? // Chip button text
   quickReplyHi String?
   category     String   @default("GENERAL") // GENERAL, SERVICES, MUHURTA, KUNDLI, CONTACT
   orderIndex   Int      @default(0)
@@ -509,16 +515,16 @@ model ChatbotQA {
 }
 
 model ContactEnquiry {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?
-  phone     String
-  subject   String?
-  message   String   @db.Text
-  source    String   @default("CONTACT_PAGE") // CONTACT_PAGE, CHATBOT_TICKET, SERVICE_MODAL
-  isResolved Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  name       String
+  email      String?
+  phone      String
+  subject    String?
+  message    String   @db.Text
+  source     String   @default("CONTACT_PAGE") // CONTACT_PAGE, CHATBOT_TICKET, SERVICE_MODAL
+  isResolved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([isResolved, createdAt])
 }
@@ -563,7 +569,7 @@ model BlogPost {
   contentHi       String    @db.Text
   coverImage      String?
   youtubeUrl      String?
-  additionalLinks Json?     // Array of { labelEn: string, labelHi: string, url: string }
+  additionalLinks Json? // Array of { labelEn: string, labelHi: string, url: string }
   isPublished     Boolean   @default(false)
   publishedAt     DateTime?
   createdAt       DateTime  @default(now())
@@ -571,54 +577,60 @@ model BlogPost {
 }
 
 model OtherService {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  titleEn       String
-  titleHi       String
-  taglineEn     String?
-  taglineHi     String?
-  descriptionEn String   @db.Text
-  descriptionHi String   @db.Text
-  imageUrl      String?
-  actionUrl     String?
-  actionTextEn  String?  @default("Visit Portal / Learn More")
-  actionTextHi  String?  @default("पोर्टल पर जाएं / विवरण देखें")
-  youtubeUrl    String?
-  orderIndex    Int      @default(0)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  titleEn         String
+  titleHi         String
+  taglineEn       String?
+  taglineHi       String?
+  descriptionEn   String   @db.Text
+  descriptionHi   String   @db.Text
+  imageUrl        String?
+  actionUrl       String?
+  actionTextEn    String?  @default("Visit Portal / Learn More")
+  actionTextHi    String?  @default("पोर्टल पर जाएं / विवरण देखें")
+  youtubeUrl      String?
+  additionalLinks Json?
+  orderIndex      Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Testimonial {
-  id            String   @id @default(cuid())
-  authorNameEn  String
-  authorNameHi  String
-  authorTitleEn String
-  authorTitleHi String
-  cityEn        String
-  cityHi        String
-  quoteEn       String   @db.Text
-  quoteHi       String   @db.Text
-  rating        Int      @default(5)
-  isVerified    Boolean  @default(true)
-  isActive      Boolean  @default(true)
-  orderIndex    Int      @default(0)
-  createdAt     DateTime @default(now())
+  id              String   @id @default(cuid())
+  authorNameEn    String
+  authorNameHi    String
+  authorTitleEn   String
+  authorTitleHi   String
+  cityEn          String
+  cityHi          String
+  quoteEn         String   @db.Text
+  quoteHi         String   @db.Text
+  rating          Int      @default(5)
+  isVerified      Boolean  @default(true)
+  photoUrl        String?
+  youtubeUrl      String?
+  additionalLinks Json?
+  isActive        Boolean  @default(true)
+  orderIndex      Int      @default(0)
+  createdAt       DateTime @default(now())
 }
 
 model MediaGalleryItem {
-  id           String   @id @default(cuid())
-  titleEn      String
-  titleHi      String
-  captionEn    String?
-  captionHi    String?
-  imageUrl     String
-  videoUrl     String?
-  mediaType    String   @default("IMAGE") // IMAGE, VIDEO, YOUTUBE
-  externalLink String?
-  orderIndex   Int      @default(0)
-  createdAt    DateTime @default(now())
+  id              String   @id @default(cuid())
+  titleEn         String
+  titleHi         String
+  captionEn       String?
+  captionHi       String?
+  imageUrl        String
+  videoUrl        String?
+  mediaType       String   @default("IMAGE") // IMAGE, VIDEO, YOUTUBE
+  externalLink    String?
+  additionalLinks Json?
+  isActive        Boolean  @default(true)
+  orderIndex      Int      @default(0)
+  createdAt       DateTime @default(now())
 }
 
 model FounderProfile {
@@ -633,7 +645,8 @@ model FounderProfile {
   bioEn           String   @db.Text
   bioHi           String   @db.Text
   youtubeUrl      String?
-  additionalLinks Json?    // Array of { labelEn: string, labelHi: string, url: string }
+  additionalLinks Json? // Array of { labelEn: string, labelHi: string, url: string }
+  blocks          Json?
   footerNoteEn    String?  @db.Text
   footerNoteHi    String?  @db.Text
   isActive        Boolean  @default(true)
@@ -641,34 +654,37 @@ model FounderProfile {
 }
 
 model FaqItem {
-  id          String   @id @default(cuid())
-  questionEn  String
-  questionHi  String
-  answerEn    String   @db.Text
-  answerHi    String   @db.Text
-  category    String   @default("GENERAL") // GENERAL, KUNDLI, PUJA, PAYMENT
-  orderIndex  Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  questionEn String
+  questionHi String
+  answerEn   String   @db.Text
+  answerHi   String   @db.Text
+  category   String   @default("GENERAL") // GENERAL, KUNDLI, PUJA, PAYMENT
+  orderIndex Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([category, isActive, orderIndex])
 }
 
 model StaticPage {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  titleEn   String
-  titleHi   String
-  contentEn String   @db.Text
-  contentHi String   @db.Text
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  titleEn      String
+  titleHi      String
+  contentEn    String   @db.Text
+  contentHi    String   @db.Text
+  blocks       Json?
+  isActive     Boolean  @default(true)
+  showInFooter Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
 }
 
 model PanchangCache {
   id         String   @id @default(cuid())
-  dateString String   // e.g. "2026-10-23"
-  city       String   // e.g. "varanasi"
+  dateString String // e.g. "2026-10-23"
+  city       String // e.g. "varanasi"
   dataJson   Json
   cachedAt   DateTime @default(now())
 
@@ -677,9 +693,9 @@ model PanchangCache {
 
 model TranslationOverride {
   id        String   @id @default(cuid())
-  locale    String   // "hi" or "en"
-  namespace String   // e.g. "nav", "common", "footer", "home", "services", "booking", etc.
-  key       String   // e.g. "book_consultation" or deep dot path "steps.step1"
+  locale    String // "hi" or "en"
+  namespace String // e.g. "nav", "common", "footer", "home", "services", "booking", etc.
+  key       String // e.g. "book_consultation" or deep dot path "steps.step1"
   value     String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -687,4 +703,3 @@ model TranslationOverride {
   @@unique([locale, namespace, key])
   @@index([locale, namespace])
 }
-

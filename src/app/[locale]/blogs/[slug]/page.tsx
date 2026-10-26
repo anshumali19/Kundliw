@@ -2,7 +2,9 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
-import { BookOpen, Calendar, ArrowLeft } from "lucide-react";
+import { Calendar, ArrowLeft } from "lucide-react";
+import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
+import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -42,7 +44,7 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
   const isHindi = locale === "hi";
   const post = await prisma.blogPost.findUnique({ where: { slug } });
 
-  if (!post || (!post.isPublished && process.env.NODE_ENV === "production")) {
+  if (!post || !post.isPublished) {
     notFound();
   }
 
@@ -79,7 +81,7 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
         </h1>
       </div>
 
-      {post.coverImage && (
+      {isSafeImageSrc(post.coverImage) && (
         <div className="w-full h-72 sm:h-96 rounded-lg overflow-hidden bg-surface-container">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -93,6 +95,13 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
       <div className="p-6 sm:p-10 rounded-lg bg-surface border border-outline-variant/40 shadow-sm leading-relaxed whitespace-pre-line text-sm sm:text-base text-on-surface space-y-4">
         {content}
       </div>
+
+      <YouTubeEmbed url={post.youtubeUrl} title={title} isHindi={isHindi} />
+      <LinkList
+        links={normalizeLinks(post.additionalLinks)}
+        isHindi={isHindi}
+        heading={isHindi ? "अतिरिक्त लिंक" : "Additional links"}
+      />
     </div>
   );
 }

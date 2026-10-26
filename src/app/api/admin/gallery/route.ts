@@ -6,6 +6,9 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
+import { linksInputSchema } from "@/lib/content/media";
+import { withJsonLinks } from "@/lib/content/json";
+
 const gallerySchema = z.object({
   titleEn: z.string().min(2),
   titleHi: z.string().min(2),
@@ -15,6 +18,8 @@ const gallerySchema = z.object({
   videoUrl: z.string().optional().nullable(),
   mediaType: z.enum(["IMAGE", "VIDEO", "YOUTUBE"]).default("IMAGE"),
   externalLink: z.string().optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
+  isActive: z.boolean().default(true),
   orderIndex: z.number().int().default(0),
 });
 
@@ -51,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     const item = await prisma.mediaGalleryItem.create({
-      data: parsed.data,
+      data: withJsonLinks(parsed.data),
     });
 
     return NextResponse.json({ success: true, item }, { status: 201 });

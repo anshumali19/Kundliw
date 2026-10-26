@@ -6,12 +6,18 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
+import { blocksInputSchema } from "@/lib/content/media";
+import { isCorePageSlug } from "@/lib/content/pages";
+
 const pageSchema = z.object({
   slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
   titleEn: z.string().min(2),
   titleHi: z.string().min(2),
   contentEn: z.string().min(10),
   contentHi: z.string().min(10),
+  blocks: blocksInputSchema.optional(),
+  isActive: z.boolean().optional(),
+  showInFooter: z.boolean().optional(),
 });
 
 export async function GET() {
@@ -46,10 +52,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Built-in pages are always shown; only custom pages can be hidden or placed in the footer.
+    const core = isCorePageSlug(parsed.data.slug);
+    const data = {
+      ...parsed.data,
+      ...(core ? { isActive: true, showInFooter: false } : {}),
+    };
     const page = await prisma.staticPage.upsert({
       where: { slug: parsed.data.slug },
-      create: parsed.data,
-      update: parsed.data,
+      create: data,
+      update: data,
     });
 
     return NextResponse.json({ success: true, page });

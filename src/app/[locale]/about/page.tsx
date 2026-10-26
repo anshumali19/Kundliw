@@ -1,6 +1,8 @@
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { BlocksView } from "@/components/content/MediaView";
+import { normalizeBlocks } from "@/lib/content/media";
 import { ArrowRight, CalendarCheck, ScrollText, Truck } from "lucide-react";
 import { Link } from "@/i18n/routing";
 
@@ -84,6 +86,8 @@ export default async function AboutPage(props: AboutPageProps) {
       <div className="p-6 sm:p-8 rounded-lg bg-surface border border-outline-variant/40 leading-relaxed text-base text-on-surface whitespace-pre-line">
         {content}
       </div>
+
+      <BlocksView blocks={normalizeBlocks(page?.blocks)} isHindi={isHindi} />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         {points.map(({ icon: Icon, title: pointTitle, text }) => (

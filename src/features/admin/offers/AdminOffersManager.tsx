@@ -185,6 +185,24 @@ export function AdminOffersManager({
     }
   };
 
+  // Removes an offer. Offers already used on orders are switched off instead, so order records stay intact.
+  const handleDeleteOffer = async (offer: AdminOfferItem) => {
+    if (!window.confirm(isHindi ? `"${offer.code}" हटाएँ?` : `Remove the offer "${offer.code}"?`)) return;
+    try {
+      const res = await fetch(`/api/admin/offers/${offer.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to remove offer");
+      setOffers((prev) =>
+        data.deactivated
+          ? prev.map((o) => (o.id === offer.id ? { ...o, isActive: false } : o))
+          : prev.filter((o) => o.id !== offer.id)
+      );
+      if (data.message) window.alert(data.message);
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Failed to remove offer");
+    }
+  };
+
   return (
     <div className="w-full flex flex-col text-left space-y-6">
       {/* Header Bar */}
@@ -335,6 +353,15 @@ export function AdminOffersManager({
                           className="min-h-[36px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand transition-colors"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteOffer(offer)}
+                          aria-label={isHindi ? "हटाएँ" : "Remove offer"}
+                          className="min-h-[36px] px-2.5 py-1 text-xs bg-surface border border-error text-on-error-container rounded hover:bg-error-container transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>

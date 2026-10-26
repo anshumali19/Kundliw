@@ -3,12 +3,8 @@ import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-
-const linkSchema = z.object({
-  labelEn: z.string().trim().min(1),
-  labelHi: z.string().trim().min(1),
-  url: z.string().trim().url(),
-});
+import { Prisma } from "@prisma/client";
+import { blocksInputSchema, linksInputSchema } from "@/lib/content/media";
 
 const updateFounderSchema = z.object({
   nameEn: z.string().trim().min(2).optional(),
@@ -21,7 +17,8 @@ const updateFounderSchema = z.object({
   bioEn: z.string().trim().min(10).optional(),
   bioHi: z.string().trim().min(10).optional(),
   youtubeUrl: z.string().trim().nullable().optional(),
-  additionalLinks: z.array(linkSchema).optional(),
+  additionalLinks: linksInputSchema.optional(),
+  blocks: blocksInputSchema.optional(),
   footerNoteEn: z.string().trim().nullable().optional(),
   footerNoteHi: z.string().trim().nullable().optional(),
   isActive: z.boolean().optional(),
@@ -64,7 +61,7 @@ export async function PUT(req: NextRequest) {
 
     const updated = await prisma.founderProfile.upsert({
       where: { id: "default" },
-      update: parsed.data as any,
+      update: parsed.data as Prisma.FounderProfileUpdateInput,
       create: {
         id: "default",
         nameEn: parsed.data.nameEn || "Founder Name",
@@ -77,7 +74,8 @@ export async function PUT(req: NextRequest) {
         bioEn: parsed.data.bioEn || "Vedic Astrologer and Kendra Founder.",
         bioHi: parsed.data.bioHi || "केंद्र के संस्थापक एवं मुख्य ज्योतिषाचार्य।",
         youtubeUrl: parsed.data.youtubeUrl,
-        additionalLinks: (parsed.data.additionalLinks as any) || [],
+        additionalLinks: parsed.data.additionalLinks ?? [],
+        blocks: parsed.data.blocks ?? [],
         footerNoteEn: parsed.data.footerNoteEn,
         footerNoteHi: parsed.data.footerNoteHi,
         isActive: parsed.data.isActive ?? true,

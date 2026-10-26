@@ -4,6 +4,7 @@ import { guardApiAdmin } from "@/lib/auth/guards";
 import { planInputSchema } from "@/features/services/validation";
 import { rupeesToPaise } from "@/lib/billing/money";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
+import { jsonOrNull } from "@/lib/content/json";
 
 export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -27,6 +28,9 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
     const { priceRupees, originalPriceRupees, ...rest } = parsed.data;
 
     const updateData: Record<string, unknown> = { ...rest };
+    if (rest.additionalLinks !== undefined) {
+      updateData.additionalLinks = jsonOrNull(rest.additionalLinks);
+    }
     if (priceRupees !== undefined) {
       updateData.pricePaise = rupeesToPaise(priceRupees);
     }
@@ -77,15 +81,12 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
       });
     }
 
-    await prisma.plan.update({
-      where: { id: params.id },
-      data: { isActive: false },
-    });
+    await prisma.plan.delete({ where: { id: params.id } });
 
     return NextResponse.json({
       success: true,
-      message: "Plan deactivated successfully.",
-      deactivated: true,
+      message: "Plan removed.",
+      deactivated: false,
     });
   } catch (error) {
     console.error("Error deactivating plan:", error);

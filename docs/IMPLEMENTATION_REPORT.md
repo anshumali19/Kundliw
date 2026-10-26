@@ -65,7 +65,7 @@ real users until the client provides a key, account or content (section 7).
 | 36 | Service list view and grid view | Built | Toggle on the services page |
 | 37 | Date, time, day, tithi on the home page | Partial | Date, time and day are live. The tithi is labelled DEMO sample data until a real panchang source is connected. Needs client |
 | 38 | Founder details page and CMS | Built | |
-| 39 | File upload and URL link options | Partial | Works on Vercel with Blob storage. Not every admin form offers both options |
+| 39 | File upload and URL link options | Built | Every image field accepts a link or an uploaded file (needs Blob storage on Vercel) |
 | 40 | Admin PDF upload for a user, user download | Built | |
 | 41 | Android app download page with link and QR, admin control | Built | /app shows the link and a QR code from Admin > Settings. Shows a coming-soon note until a link is saved |
 | 42 | "Free API Ask" integration | Not built | The requirement is unclear and needs the client's explanation |
@@ -73,7 +73,7 @@ real users until the client provides a key, account or content (section 7).
 | 44 | Social media integration | Built | |
 | 45 | Back and Next icons on pages | Built | Shown on every page except the home page |
 | 46 | Notifications by email, SMS, OTP | Partial, needs client | OTP SMS adapter exists. Email is sent for payment confirmation, appointment decisions, associate approval and payouts once SMTP details are saved under API Keys. Status SMS needs DLT-approved templates. Needs client |
-| 47 | Additional links and YouTube links | Partial | Done for services, gallery and blog data. Some admin forms do not expose them yet |
+| 47 | Additional links and YouTube links | Built | Services, plans, other services, gallery, blog, testimonials and founder have a YouTube field and several links with Hindi and English labels. About, Help, Legal, custom pages and founder have content blocks (text, image, YouTube, link) |
 | 48 | Google Analytics | Built | Needs the client's measurement ID |
 | 49 | Associate panel | Built, awaiting client confirmation of rules | Registration with admin approval, own login and dashboard, referral link /r/code (30 days), admin assignment of bookings, commission rules per service or plan, earnings, payout requests (admin marks paid, money moves outside the system), admin console. Detailed functions still to be confirmed against vindhyavivahsanskar.com |
 | C3 | Automated and manual backups | Partial | Admin > Backup downloads a JSON copy (no secrets). Automatic backups rely on the database provider's own backup feature |

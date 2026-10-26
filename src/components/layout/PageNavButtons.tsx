@@ -16,7 +16,12 @@ export function PageNavButtons() {
 
   // Hidden on the home page, which has nothing to go back to
   const isHome = pathname === "/" || pathname === `/${locale}` || pathname === `/${locale}/`;
-  if (isHome) return null;
+  // These pages already show their own breadcrumb bar with Back and Next
+  const bare = (pathname || "").replace(/^\/(hi|en)(?=\/|$)/, "") || "/";
+  const hasOwnNav = ["/services", "/other-services", "/kundli/astrosage"].some(
+    (p) => bare === p || bare.startsWith(p + "/")
+  );
+  if (isHome || hasOwnNav) return null;
 
   const btn =
     "inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded border border-maroon bg-surface hover:bg-brand text-secondary text-sm font-bold transition-colors";

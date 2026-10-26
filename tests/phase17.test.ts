@@ -254,8 +254,9 @@ describe("Phase 17 - Media Gallery Video & Links (#11)", () => {
     expect(res.status).toBe(201);
     const body = await res.json();
     expect(body.success).toBe(true);
+    // New gallery items are active unless the admin switches them off.
     expect(prisma.mediaGalleryItem.create).toHaveBeenCalledWith({
-      data: galleryData,
+      data: { ...galleryData, isActive: true },
     });
   });
 

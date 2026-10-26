@@ -1,11 +1,7 @@
 import { z } from "zod";
 import { DiscountType } from "@prisma/client";
+import { linksInputSchema } from "@/lib/content/media";
 
-export const linkSchema = z.object({
-  title: z.string().trim().min(1),
-  url: z.string().trim().url(),
-  description: z.string().trim().optional(),
-});
 
 export const serviceInputSchema = z.object({
   slug: z
@@ -30,7 +26,7 @@ export const serviceInputSchema = z.object({
   samagriEn: z.string().trim().optional().nullable(),
   samagriHi: z.string().trim().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),
-  additionalLinks: z.array(linkSchema).optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
   orderIndex: z.coerce.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
 });
@@ -62,6 +58,9 @@ export const planInputSchema = z.object({
   samagriHi: z.string().trim().optional().nullable(),
   itineraryEn: z.string().trim().optional().nullable(),
   itineraryHi: z.string().trim().optional().nullable(),
+  imageUrl: z.string().trim().optional().nullable(),
+  youtubeUrl: z.string().trim().optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
   isPopular: z.boolean().default(false),
   orderIndex: z.coerce.number().int().min(0).default(0),
   isActive: z.boolean().default(true),

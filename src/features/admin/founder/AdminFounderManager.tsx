@@ -14,6 +14,9 @@ import {
   Globe,
 } from "lucide-react";
 
+import { ContentBlock, normalizeBlocks } from "@/lib/content/media";
+import { BlocksEditor } from "@/components/admin/MediaFields";
+
 interface LinkItem {
   labelEn: string;
   labelHi: string;
@@ -41,6 +44,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
   const [footerNoteEn, setFooterNoteEn] = useState("");
   const [footerNoteHi, setFooterNoteHi] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [blocks, setBlocks] = useState<ContentBlock[]>([]);
 
   // New Link input temporary state
   const [newLabelEn, setNewLabelEn] = useState("");
@@ -68,6 +72,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
         setFooterNoteEn(p.footerNoteEn || "");
         setFooterNoteHi(p.footerNoteHi || "");
         setIsActive(p.isActive ?? true);
+        setBlocks(normalizeBlocks(p.blocks));
       }
     } catch {
       setStatus({ type: "error", text: "Failed to load founder profile." });
@@ -147,6 +152,7 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
       additionalLinks,
       footerNoteEn: footerNoteEn || null,
       footerNoteHi: footerNoteHi || null,
+      blocks,
       isActive,
     };
 
@@ -429,6 +435,14 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Extra content blocks: text, images, YouTube videos and links */}
+        <div className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-4 shadow-sm">
+          <div className="font-serif font-bold text-sm text-secondary">
+            Additional content blocks
+          </div>
+          <BlocksEditor blocks={blocks} onChange={setBlocks} />
         </div>
 
         {/* Ethical Footer Note */}

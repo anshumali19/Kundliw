@@ -4,6 +4,9 @@ import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+import { linksInputSchema } from "@/lib/content/media";
+import { withJsonLinks } from "@/lib/content/json";
+
 const otherServiceInputSchema = z.object({
   slug: z
     .string()
@@ -21,6 +24,7 @@ const otherServiceInputSchema = z.object({
   actionTextEn: z.string().trim().optional().nullable(),
   actionTextHi: z.string().trim().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
   orderIndex: z.coerce.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
 });
@@ -71,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     const item = await prisma.otherService.create({
-      data: parsed.data,
+      data: withJsonLinks(parsed.data),
     });
 
     return NextResponse.json({ success: true, item }, { status: 201 });

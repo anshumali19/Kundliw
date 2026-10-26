@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { paiseToRupees } from "@/lib/billing/money";
+import { LinkItem, normalizeLinks } from "@/lib/content/media";
+import { ImageUrlField, LinksEditor, YouTubeUrlField } from "@/components/admin/MediaFields";
 import {
   Plus,
   Edit2,
@@ -45,6 +47,9 @@ export interface AdminPlanItem {
   samagriHi?: string | null;
   itineraryEn?: string | null;
   itineraryHi?: string | null;
+  imageUrl?: string | null;
+  youtubeUrl?: string | null;
+  additionalLinks?: unknown;
 }
 
 export interface AdminServiceItem {
@@ -67,7 +72,7 @@ export interface AdminServiceItem {
   samagriEn?: string | null;
   samagriHi?: string | null;
   youtubeUrl?: string | null;
-  additionalLinks?: Array<{ title: string; url: string; description?: string }> | null;
+  additionalLinks?: unknown;
   orderIndex: number;
   isActive: boolean;
   plans: AdminPlanItem[];
@@ -113,7 +118,7 @@ export function AdminServicesManager({
     samagriEn: "",
     samagriHi: "",
     youtubeUrl: "",
-    additionalLinksText: "",
+    additionalLinks: [] as LinkItem[],
     orderIndex: 0,
     isActive: true,
   });
@@ -147,6 +152,9 @@ export function AdminServicesManager({
     samagriHi: "",
     itineraryEn: "",
     itineraryHi: "",
+    imageUrl: "",
+    youtubeUrl: "",
+    additionalLinks: [] as LinkItem[],
   });
 
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -198,9 +206,7 @@ export function AdminServicesManager({
         samagriEn: service.samagriEn || "",
         samagriHi: service.samagriHi || "",
         youtubeUrl: service.youtubeUrl || "",
-        additionalLinksText: (service.additionalLinks || [])
-          .map((l) => [l.title, l.url, l.description].filter(Boolean).join(" | "))
-          .join("\n"),
+        additionalLinks: normalizeLinks(service.additionalLinks),
         orderIndex: service.orderIndex,
         isActive: service.isActive,
       });
@@ -225,7 +231,7 @@ export function AdminServicesManager({
         samagriEn: "",
         samagriHi: "",
         youtubeUrl: "",
-        additionalLinksText: "",
+        additionalLinks: [],
         orderIndex: services.length + 1,
         isActive: true,
       });
@@ -241,19 +247,7 @@ export function AdminServicesManager({
     setSuccessMsg(null);
 
     try {
-      const parsedLinks = serviceForm.additionalLinksText
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .map((line) => {
-          const parts = line.split("|").map((p) => p.trim());
-          return {
-            title: parts[0] || "",
-            url: parts[1] || "",
-            description: parts[2] || undefined,
-          };
-        })
-        .filter((l) => l.title && l.url);
+      const parsedLinks = serviceForm.additionalLinks.filter((l) => l.url.trim());
 
       const payload = {
         slug: serviceForm.slug,
@@ -370,6 +364,9 @@ export function AdminServicesManager({
         samagriHi: plan.samagriHi || "",
         itineraryEn: plan.itineraryEn || "",
         itineraryHi: plan.itineraryHi || "",
+        imageUrl: plan.imageUrl || "",
+        youtubeUrl: plan.youtubeUrl || "",
+        additionalLinks: normalizeLinks(plan.additionalLinks),
       });
     } else {
       setEditingPlan(null);
@@ -399,6 +396,9 @@ export function AdminServicesManager({
         samagriHi: "",
         itineraryEn: "",
         itineraryHi: "",
+        imageUrl: "",
+        youtubeUrl: "",
+        additionalLinks: [],
       });
     }
     setPlanModalOpen(true);
@@ -450,6 +450,9 @@ export function AdminServicesManager({
         samagriHi: planForm.samagriHi ? planForm.samagriHi.trim() : null,
         itineraryEn: planForm.itineraryEn ? planForm.itineraryEn.trim() : null,
         itineraryHi: planForm.itineraryHi ? planForm.itineraryHi.trim() : null,
+        imageUrl: planForm.imageUrl ? planForm.imageUrl.trim() : null,
+        youtubeUrl: planForm.youtubeUrl ? planForm.youtubeUrl.trim() : null,
+        additionalLinks: planForm.additionalLinks.filter((l) => l.url.trim()),
       };
 
       const url = editingPlan
@@ -511,6 +514,63 @@ export function AdminServicesManager({
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  // Remove a service. Services with past orders are switched off instead, so order records stay intact.
+  const handleDeleteService = async (service: AdminServiceItem) => {
+    if (
+      !window.confirm(
+        isHindi
+          ? `"${service.titleHi}" हटाएँ? इसके सभी संस्करण भी हट जाएँगे।`
+          : `Remove "${service.titleEn}"? Its plans are removed too.`
+      )
+    )
+      return;
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const res = await fetch(`/api/admin/services/${service.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to remove service");
+      if (data.deactivated) {
+        setServices((prev) => prev.map((s) => (s.id === service.id ? { ...s, isActive: false } : s)));
+      } else {
+        setServices((prev) => prev.filter((s) => s.id !== service.id));
+      }
+      setSuccessMsg(data.message || "Service removed.");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to remove service");
+    }
+  };
+
+  const handleDeletePlan = async (serviceId: string, plan: AdminPlanItem) => {
+    if (
+      !window.confirm(
+        isHindi ? `"${plan.titleHi}" संस्करण हटाएँ?` : `Remove the plan "${plan.titleEn}"?`
+      )
+    )
+      return;
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const res = await fetch(`/api/admin/plans/${plan.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to remove plan");
+      setServices((prev) =>
+        prev.map((s) => {
+          if (s.id !== serviceId) return s;
+          return {
+            ...s,
+            plans: data.deactivated
+              ? s.plans.map((p) => (p.id === plan.id ? { ...p, isActive: false } : p))
+              : s.plans.filter((p) => p.id !== plan.id),
+          };
+        })
+      );
+      setSuccessMsg(data.message || "Plan removed.");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to remove plan");
     }
   };
 
@@ -634,6 +694,15 @@ export function AdminServicesManager({
 
                     <button
                       type="button"
+                      onClick={() => handleDeleteService(service)}
+                      className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-error text-on-error-container rounded hover:bg-error-container transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>{isHindi ? "हटाएँ" : "Remove"}</span>
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => handleOpenPlanModal(service.id)}
                       className="min-h-[38px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded transition-colors flex items-center gap-1"
                     >
@@ -725,6 +794,15 @@ export function AdminServicesManager({
                                 className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary font-medium rounded hover:bg-brand-hover hover:text-on-brand transition-colors"
                               >
                                 {isHindi ? "संपादित करें" : "Edit Plan"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePlan(service.id, plan)}
+                                className="min-h-[36px] text-xs px-2 py-1 border border-error text-on-error-container rounded hover:bg-error-container flex items-center gap-1"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                {isHindi ? "हटाएँ" : "Remove"}
                               </button>
                             </div>
                           </div>
@@ -1039,18 +1117,11 @@ export function AdminServicesManager({
               </div>
 
               {/* Additional Links (#47) */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-secondary mb-1">
-                  Additional External Links (One per line: Title | URL | Description)
-                </label>
-                <textarea
-                  rows={2}
-                  value={serviceForm.additionalLinksText}
-                  onChange={(e) => setServiceForm({ ...serviceForm, additionalLinksText: e.target.value })}
-                  placeholder="Vedic Guidelines | https://example.com/guide | Important instructions"
-                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary font-mono"
-                />
-              </div>
+              <LinksEditor
+                links={serviceForm.additionalLinks}
+                onChange={(additionalLinks) => setServiceForm({ ...serviceForm, additionalLinks })}
+                label="Additional links (Hindi and English labels)"
+              />
 
               <div className="flex items-center gap-2">
                 <input
@@ -1386,6 +1457,21 @@ export function AdminServicesManager({
                   />
                 </div>
               </div>
+
+              <ImageUrlField
+                label="Plan image (optional)"
+                value={planForm.imageUrl}
+                onChange={(imageUrl) => setPlanForm({ ...planForm, imageUrl })}
+              />
+              <YouTubeUrlField
+                value={planForm.youtubeUrl}
+                onChange={(youtubeUrl) => setPlanForm({ ...planForm, youtubeUrl })}
+              />
+              <LinksEditor
+                links={planForm.additionalLinks}
+                onChange={(additionalLinks) => setPlanForm({ ...planForm, additionalLinks })}
+                label="Additional links for this plan"
+              />
 
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">

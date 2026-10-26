@@ -6,6 +6,9 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
+import { linksInputSchema } from "@/lib/content/media";
+import { withJsonLinks } from "@/lib/content/json";
+
 const testimonialSchema = z.object({
   authorNameEn: z.string().min(2),
   authorNameHi: z.string().min(2),
@@ -18,6 +21,9 @@ const testimonialSchema = z.object({
   rating: z.number().int().min(1).max(5).default(5),
   isVerified: z.boolean().default(false),
   isActive: z.boolean().default(true),
+  photoUrl: z.string().trim().optional().nullable(),
+  youtubeUrl: z.string().trim().optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
   orderIndex: z.number().int().default(0),
 });
 
@@ -54,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     const testimonial = await prisma.testimonial.create({
-      data: parsed.data,
+      data: withJsonLinks(parsed.data),
     });
 
     return NextResponse.json({ success: true, testimonial }, { status: 201 });

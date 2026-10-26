@@ -4,6 +4,7 @@ import { guardApiAdmin } from "@/lib/auth/guards";
 import { planInputSchema } from "@/features/services/validation";
 import { rupeesToPaise } from "@/lib/billing/money";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
+import { jsonOrNull } from "@/lib/content/json";
 
 export async function POST(request: NextRequest) {
   const guard = await guardApiAdmin();
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
         pricePaise,
         originalPricePaise,
         ...rest,
+        additionalLinks: jsonOrNull(rest.additionalLinks),
       },
     });
 

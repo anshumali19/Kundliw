@@ -6,6 +6,8 @@ import { formatPaiseToInr } from "@/lib/billing/gst";
 import { PlanSelectorInteractive, PlanDTO } from "./PlanSelectorInteractive";
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
+import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
+import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
 import {
   CheckCircle2,
   Clock,
@@ -42,7 +44,7 @@ export interface ServiceDetailDTO {
   samagriEn?: string | null;
   samagriHi?: string | null;
   youtubeUrl?: string | null;
-  additionalLinks?: Array<{ labelEn: string; labelHi: string; url: string }> | null;
+  additionalLinks?: unknown;
   plans: Array<{
     id: string;
     slug: string;
@@ -68,6 +70,9 @@ export interface ServiceDetailDTO {
     itineraryHi?: string | null;
     isPopular: boolean;
     orderIndex: number;
+    imageUrl?: string | null;
+    youtubeUrl?: string | null;
+    additionalLinks?: unknown;
   }>;
 }
 
@@ -229,61 +234,42 @@ export function ServiceDetailView({
                   <Video className="w-4 h-4 text-primary" />
                   <span>{isHindi ? "सेवा संबंधी व्याख्यान / वीडियो" : "Video Discourse & Explanation"}</span>
                 </h2>
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-black border border-outline-variant/30">
-                  {service.youtubeUrl.includes("youtube.com") || service.youtubeUrl.includes("youtu.be") ? (
-                    <iframe
-                      src={
-                        service.youtubeUrl.includes("embed")
-                          ? service.youtubeUrl
-                          : service.youtubeUrl.replace("watch?v=", "embed/").split("&")[0]
-                      }
-                      title="Service Video"
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-xs text-on-surface-variant">
-                      <a
-                        href={service.youtubeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary underline flex items-center gap-1"
-                      >
-                        <span>{isHindi ? "वीडियो देखें" : "Watch Video"}</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                  )}
-                </div>
+                <YouTubeEmbed url={service.youtubeUrl} title="Service Video" isHindi={isHindi} />
               </div>
             )}
 
             {/* Additional Links & References (#12, #47) */}
-            {service.additionalLinks && service.additionalLinks.length > 0 && (
+            {normalizeLinks(service.additionalLinks).length > 0 && (
               <div className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 shadow-xs">
-                <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-secondary flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4 text-primary" />
-                  <span>{isHindi ? "अतिरिक्त संदर्भ एवं सहयोगी लिंक" : "Additional References & Links"}</span>
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  {service.additionalLinks.map((link, idx) => (
-                    <a
-                      key={idx}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 transition-all flex items-center justify-between text-xs text-on-surface group"
-                    >
-                      <span className="font-medium group-hover:text-primary transition-colors">
-                        {isHindi ? link.labelHi : link.labelEn}
-                      </span>
-                      <ExternalLink className="w-3.5 h-3.5 text-on-surface-variant group-hover:text-primary transition-colors" />
-                    </a>
-                  ))}
-                </div>
+                <LinkList
+                  links={normalizeLinks(service.additionalLinks)}
+                  isHindi={isHindi}
+                  heading={isHindi ? "अतिरिक्त संदर्भ एवं सहयोगी लिंक" : "Additional References & Links"}
+                />
               </div>
             )}
+
+            {/* Plan images, videos and links */}
+            {service.plans
+              .filter((p) => p.imageUrl || p.youtubeUrl || normalizeLinks(p.additionalLinks).length > 0)
+              .map((p) => (
+                <div key={p.id} className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 shadow-xs">
+                  <h2 className="font-serif text-base font-bold text-secondary">
+                    {isHindi ? p.titleHi : p.titleEn}
+                  </h2>
+                  {isSafeImageSrc(p.imageUrl) && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={p.imageUrl}
+                      alt={isHindi ? p.titleHi : p.titleEn}
+                      loading="lazy"
+                      className="w-full max-h-[420px] object-cover rounded-xl border border-outline-variant/40"
+                    />
+                  )}
+                  <YouTubeEmbed url={p.youtubeUrl} title={isHindi ? p.titleHi : p.titleEn} isHindi={isHindi} />
+                  <LinkList links={normalizeLinks(p.additionalLinks)} isHindi={isHindi} />
+                </div>
+              ))}
           </div>
 
           {/* Right Pane (30% ~ 4 cols): Overview Data */}

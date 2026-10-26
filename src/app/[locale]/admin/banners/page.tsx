@@ -12,6 +12,8 @@ import {
   ExternalLink,
   Eye,
   Layers,
+  Pencil,
+  X,
 } from "lucide-react";
 
 interface BannerItem {
@@ -47,6 +49,7 @@ export default function AdminBannersPage() {
 
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchBanners = async () => {
     setLoading(true);
@@ -99,6 +102,33 @@ export default function AdminBannersPage() {
     }
   };
 
+  const startEdit = (b: BannerItem) => {
+    setEditingId(b.id);
+    setTitleEn(b.titleEn);
+    setTitleHi(b.titleHi);
+    setSubtitleEn(b.subtitleEn || "");
+    setSubtitleHi(b.subtitleHi || "");
+    setImageUrl(b.imageUrl);
+    setLinkUrl(b.linkUrl || "");
+    setPosition(b.position);
+    setType(b.type);
+    setOrderIndex(b.orderIndex);
+    setError(null);
+    setSuccess(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setTitleEn("");
+    setTitleHi("");
+    setSubtitleEn("");
+    setSubtitleHi("");
+    setImageUrl("");
+    setLinkUrl("/services");
+    setOrderIndex(0);
+  };
+
   const handleCreateBanner = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -106,8 +136,8 @@ export default function AdminBannersPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch("/api/admin/banners", {
-        method: "POST",
+      const res = await fetch(editingId ? `/api/admin/banners/${editingId}` : "/api/admin/banners", {
+        method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           titleEn,
@@ -124,12 +154,8 @@ export default function AdminBannersPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setSuccess("Banner created successfully");
-        setTitleEn("");
-        setTitleHi("");
-        setSubtitleEn("");
-        setSubtitleHi("");
-        setImageUrl("");
+        setSuccess(editingId ? "Banner updated" : "Banner created successfully");
+        cancelEdit();
         fetchBanners();
       } else {
         setError(data.error || "Failed to create banner");
@@ -203,7 +229,12 @@ export default function AdminBannersPage() {
       <div className="bg-surface rounded-lg p-6 border-2 border-secondary/20 shadow-sm space-y-4">
         <h2 className="font-serif text-base font-bold text-secondary flex items-center gap-2">
           <Plus className="w-4 h-4 text-primary" />
-          <span>नया बैनर जोड़ें • Add New Banner</span>
+          <span>{editingId ? "बैनर संपादित करें • Edit Banner" : "नया बैनर जोड़ें • Add New Banner"}</span>
+          {editingId && (
+            <button type="button" onClick={cancelEdit} className="ml-auto min-h-[44px] px-3 inline-flex items-center gap-1 rounded border border-maroon text-xs font-bold">
+              <X className="w-4 h-4" /> Cancel edit
+            </button>
+          )}
         </h2>
 
         <form onSubmit={handleCreateBanner} className="space-y-4">
@@ -350,7 +381,7 @@ export default function AdminBannersPage() {
             className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
-            <span>{submitting ? "Saving..." : "Create Banner"}</span>
+            <span>{submitting ? "Saving..." : editingId ? "Save changes" : "Create Banner"}</span>
           </button>
           </div>
         </form>
@@ -393,13 +424,22 @@ export default function AdminBannersPage() {
                     </p>
                   </div>
 
-                  <button
-                    onClick={() => handleDeleteBanner(banner.id)}
-                    className="p-1.5 rounded hover:bg-error-container/20 text-on-error-container transition-colors"
-                    title="Delete banner"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex">
+                    <button
+                      onClick={() => startEdit(banner)}
+                      className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-brand text-secondary"
+                      aria-label="Edit banner"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBanner(banner.id)}
+                      className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-error-container/20 text-on-error-container transition-colors"
+                      aria-label="Delete banner"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {banner.imageUrl && (

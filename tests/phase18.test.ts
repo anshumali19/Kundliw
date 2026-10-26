@@ -315,7 +315,7 @@ describe("Phase 18 - Admin /api/admin/other-services Route", () => {
     );
   });
 
-  it("DELETE deactivates an other service item", async () => {
+  it("DELETE removes an other service item", async () => {
     sessionState.current = { user: { id: ADMIN_USER.id } };
     (prisma.user.findUnique as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(ADMIN_USER);
 
@@ -331,12 +331,7 @@ describe("Phase 18 - Admin /api/admin/other-services Route", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.success).toBe(true);
-    expect(prisma.otherService.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: "os-1" },
-        data: { isActive: false },
-      })
-    );
+    expect(prisma.otherService.delete).toHaveBeenCalledWith({ where: { id: "os-1" } });
   });
 });
 

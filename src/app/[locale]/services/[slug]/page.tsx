@@ -93,7 +93,7 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     samagriEn: service.samagriEn,
     samagriHi: service.samagriHi,
     youtubeUrl: service.youtubeUrl,
-    additionalLinks: service.additionalLinks as any,
+    additionalLinks: service.additionalLinks,
     plans: service.plans.map((p) => ({
       id: p.id,
       slug: p.slug,
@@ -119,6 +119,9 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
       itineraryHi: p.itineraryHi,
       isPopular: p.isPopular,
       orderIndex: p.orderIndex,
+      imageUrl: p.imageUrl,
+      youtubeUrl: p.youtubeUrl,
+      additionalLinks: p.additionalLinks,
     })),
   };
 

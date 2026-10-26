@@ -1,4 +1,6 @@
 import { pageAlternates } from "@/lib/seo";
+import { BlocksView, LinkList, YouTubeEmbed } from "@/components/content/MediaView";
+import { isSafeImageSrc, normalizeBlocks, normalizeLinks } from "@/lib/content/media";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
@@ -73,15 +75,8 @@ export default async function FounderPage(props: FounderPageProps) {
   const bio = isHindi ? founder.bioHi || founder.bioEn : founder.bioEn;
   const footerNote = isHindi ? founder.footerNoteHi : founder.footerNoteEn;
 
-  const additionalLinks =
-    (founder.additionalLinks as Array<{ labelEn: string; labelHi: string; url: string }> | null) || [];
-
-  const isYoutube = !!founder.youtubeUrl && /youtube\.com|youtu\.be/.test(founder.youtubeUrl);
-  const embedUrl = founder.youtubeUrl
-    ? founder.youtubeUrl.includes("embed")
-      ? founder.youtubeUrl
-      : founder.youtubeUrl.replace("watch?v=", "embed/").split("&")[0]
-    : null;
+  const additionalLinks = normalizeLinks(founder.additionalLinks);
+  const blocks = normalizeBlocks(founder.blocks);
 
   return (
     <div className="w-full min-h-[75vh] py-10 px-4 sm:px-6 lg:px-12 text-left space-y-10 max-w-7xl mx-auto">
@@ -95,7 +90,7 @@ export default async function FounderPage(props: FounderPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-5 space-y-6">
           <div className="rounded-lg overflow-hidden border border-outline-variant/50 bg-surface">
-            {founder.photoUrl ? (
+            {isSafeImageSrc(founder.photoUrl) ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={founder.photoUrl} alt={name} className="w-full h-80 sm:h-96 object-cover object-top" />
             ) : (
@@ -116,35 +111,13 @@ export default async function FounderPage(props: FounderPageProps) {
             </div>
           </div>
 
-          {embedUrl && (
+          {founder.youtubeUrl && (
             <div className="p-5 rounded-lg bg-surface border border-outline-variant/40 space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold text-secondary uppercase tracking-wider">
                 <Video className="w-4 h-4 text-primary" />
                 <span>{isHindi ? "वीडियो" : "Video"}</span>
               </div>
-              <div className="aspect-video w-full rounded overflow-hidden bg-black border border-outline-variant/30">
-                {isYoutube ? (
-                  <iframe
-                    src={embedUrl}
-                    title={name}
-                    className="w-full h-full border-0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-sm">
-                    <a
-                      href={founder.youtubeUrl!}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-tertiary-fixed underline flex items-center gap-1"
-                    >
-                      <span>{isHindi ? "वीडियो देखें" : "Watch video"}</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                )}
-              </div>
+              <YouTubeEmbed url={founder.youtubeUrl} title={name} isHindi={isHindi} />
             </div>
           )}
         </div>
@@ -159,26 +132,16 @@ export default async function FounderPage(props: FounderPageProps) {
           </div>
 
           {additionalLinks.length > 0 && (
-            <div className="p-5 rounded-lg bg-surface border border-outline-variant/40 space-y-3">
-              <div className="text-xs font-bold text-secondary uppercase tracking-wider">
-                {isHindi ? "अतिरिक्त लिंक" : "Related links"}
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                {additionalLinks.map((link, idx) => (
-                  <a
-                    key={idx}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 transition-colors flex items-center justify-between text-sm text-on-surface min-h-[44px]"
-                  >
-                    <span className="font-medium">{isHindi ? link.labelHi : link.labelEn}</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-on-surface-variant" />
-                  </a>
-                ))}
-              </div>
+            <div className="p-5 rounded-lg bg-surface border border-outline-variant/40">
+              <LinkList
+                links={additionalLinks}
+                isHindi={isHindi}
+                heading={isHindi ? "अतिरिक्त लिंक" : "Related links"}
+              />
             </div>
           )}
+
+          <BlocksView blocks={blocks} isHindi={isHindi} />
 
           {footerNote && (
             <p className="p-5 rounded-lg bg-surface-container-low border border-outline-variant/40 text-sm text-on-surface-variant leading-relaxed">

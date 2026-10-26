@@ -10,6 +10,8 @@ import {
   Clock,
   Type,
   Palette,
+  Pencil,
+  X,
 } from "lucide-react";
 
 interface MarqueeItem {
@@ -42,6 +44,7 @@ export default function AdminMarqueePage() {
   const [orderIndex, setOrderIndex] = useState(0);
 
   const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -64,6 +67,27 @@ export default function AdminMarqueePage() {
     fetchItems();
   }, []);
 
+  const startEdit = (item: MarqueeItem) => {
+    setEditingId(item.id);
+    setTextEn(item.textEn);
+    setTextHi(item.textHi);
+    setSpeedSec(item.speedSec);
+    setFontSize(item.fontSize);
+    setBgColor(item.bgColor);
+    setTextColor(item.textColor);
+    setPosition(item.position);
+    setOrderIndex(item.orderIndex);
+    setError(null);
+    setSuccess(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setTextEn("");
+    setTextHi("");
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -71,8 +95,8 @@ export default function AdminMarqueePage() {
     setSuccess(null);
 
     try {
-      const res = await fetch("/api/admin/marquee", {
-        method: "POST",
+      const res = await fetch(editingId ? `/api/admin/marquee/${editingId}` : "/api/admin/marquee", {
+        method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           textEn,
@@ -88,9 +112,8 @@ export default function AdminMarqueePage() {
 
       const data = await res.json();
       if (res.ok) {
-        setSuccess("Marquee announcement created");
-        setTextEn("");
-        setTextHi("");
+        setSuccess(editingId ? "Marquee announcement updated" : "Marquee announcement created");
+        cancelEdit();
         fetchItems();
       } else {
         setError(data.error || "Failed to create announcement");
@@ -164,7 +187,12 @@ export default function AdminMarqueePage() {
       <div className="bg-surface rounded-lg p-6 border-2 border-secondary/20 shadow-sm space-y-4">
         <h2 className="font-serif text-base font-bold text-secondary flex items-center gap-2">
           <Plus className="w-4 h-4 text-primary" />
-          <span>नई सूचना पट्टी जोड़ें • Add Marquee Announcement</span>
+          <span>{editingId ? "सूचना पट्टी संपादित करें • Edit Marquee Announcement" : "नई सूचना पट्टी जोड़ें • Add Marquee Announcement"}</span>
+          {editingId && (
+            <button type="button" onClick={cancelEdit} className="ml-auto min-h-[44px] px-3 inline-flex items-center gap-1 rounded border border-maroon text-xs font-bold">
+              <X className="w-4 h-4" /> Cancel edit
+            </button>
+          )}
         </h2>
 
         <form onSubmit={handleCreate} className="space-y-4">
@@ -259,7 +287,7 @@ export default function AdminMarqueePage() {
             className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
-            <span>{submitting ? "Saving..." : "Add Marquee Notice"}</span>
+            <span>{submitting ? "Saving..." : editingId ? "Save changes" : "Add Marquee Notice"}</span>
           </button>
           </div>
         </form>
@@ -310,8 +338,16 @@ export default function AdminMarqueePage() {
                   </button>
 
                   <button
+                    onClick={() => startEdit(item)}
+                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-brand text-secondary"
+                    aria-label="Edit announcement"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-1.5 rounded hover:bg-error-container/20 text-on-error-container transition-colors"
+                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-error-container/20 text-on-error-container transition-colors"
+                    aria-label="Delete announcement"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

@@ -6,11 +6,17 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
+import { blocksInputSchema } from "@/lib/content/media";
+import { isCorePageSlug } from "@/lib/content/pages";
+
 const pageUpdateSchema = z.object({
   titleEn: z.string().min(2).optional(),
   titleHi: z.string().min(2).optional(),
   contentEn: z.string().min(10).optional(),
   contentHi: z.string().min(10).optional(),
+  blocks: blocksInputSchema.optional(),
+  isActive: z.boolean().optional(),
+  showInFooter: z.boolean().optional(),
 });
 
 export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
@@ -31,9 +37,18 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
       );
     }
 
+    const existing = await prisma.staticPage.findUnique({ where: { id: params.id }, select: { slug: true } });
+    if (!existing) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
+    const data = { ...parsed.data };
+    if (isCorePageSlug(existing.slug)) {
+      delete data.isActive;
+      delete data.showInFooter;
+    }
     const page = await prisma.staticPage.update({
       where: { id: params.id },
-      data: parsed.data,
+      data,
     });
 
     return NextResponse.json({ success: true, page });
@@ -51,6 +66,17 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
 
     const csrf = validateCsrfOrigin(request);
     if (!csrf.isValid) return csrf.errorResponse;
+
+    const existing = await prisma.staticPage.findUnique({ where: { id: params.id }, select: { slug: true } });
+    if (!existing) {
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    }
+    if (isCorePageSlug(existing.slug)) {
+      return NextResponse.json(
+        { error: "Built-in pages cannot be removed. Edit their text and blocks instead." },
+        { status: 409 }
+      );
+    }
 
     await prisma.staticPage.delete({
       where: { id: params.id },

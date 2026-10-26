@@ -2,14 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  MessageSquare,
   Plus,
   Trash2,
   CheckCircle2,
   AlertCircle,
-  Star,
   ShieldCheck,
+  Pencil,
+  X,
 } from "lucide-react";
+import { LinkItem, normalizeLinks } from "@/lib/content/media";
+import { ImageUrlField, LinksEditor, YouTubeUrlField } from "@/components/admin/MediaFields";
 
 interface TestimonialItem {
   id: string;
@@ -25,28 +27,62 @@ interface TestimonialItem {
   isVerified: boolean;
   isActive: boolean;
   orderIndex: number;
+  photoUrl?: string | null;
+  youtubeUrl?: string | null;
+  additionalLinks?: unknown;
 }
+
+interface FormState {
+  authorNameEn: string;
+  authorNameHi: string;
+  authorTitleEn: string;
+  authorTitleHi: string;
+  cityEn: string;
+  cityHi: string;
+  quoteEn: string;
+  quoteHi: string;
+  rating: number;
+  isVerified: boolean;
+  isActive: boolean;
+  orderIndex: number;
+  photoUrl: string;
+  youtubeUrl: string;
+  additionalLinks: LinkItem[];
+}
+
+const EMPTY: FormState = {
+  authorNameEn: "",
+  authorNameHi: "",
+  authorTitleEn: "Consultation Client",
+  authorTitleHi: "परामर्शार्थी",
+  cityEn: "",
+  cityHi: "",
+  quoteEn: "",
+  quoteHi: "",
+  rating: 5,
+  isVerified: false,
+  isActive: true,
+  orderIndex: 0,
+  photoUrl: "",
+  youtubeUrl: "",
+  additionalLinks: [],
+};
+
+const field =
+  "w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none";
+const label = "block text-xs font-bold uppercase text-on-surface-variant mb-1";
 
 export default function AdminTestimonialsPage() {
   const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-  // Form
-  const [authorNameEn, setAuthorNameEn] = useState("");
-  const [authorNameHi, setAuthorNameHi] = useState("");
-  const [authorTitleEn, setAuthorTitleEn] = useState("Consultation Client");
-  const [authorTitleHi, setAuthorTitleHi] = useState("परामर्शार्थी");
-  const [cityEn, setCityEn] = useState("");
-  const [cityHi, setCityHi] = useState("");
-  const [quoteEn, setQuoteEn] = useState("");
-  const [quoteHi, setQuoteHi] = useState("");
-  const [rating, setRating] = useState(5);
-  const [isVerified, setIsVerified] = useState(false);
-  const [orderIndex, setOrderIndex] = useState(0);
-
+  const [form, setForm] = useState<FormState>(EMPTY);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
 
   const fetchTestimonials = async () => {
     setLoading(true);
@@ -69,46 +105,67 @@ export default function AdminTestimonialsPage() {
     fetchTestimonials();
   }, []);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const startEdit = (t: TestimonialItem) => {
+    setEditingId(t.id);
+    setForm({
+      authorNameEn: t.authorNameEn,
+      authorNameHi: t.authorNameHi,
+      authorTitleEn: t.authorTitleEn,
+      authorTitleHi: t.authorTitleHi,
+      cityEn: t.cityEn,
+      cityHi: t.cityHi,
+      quoteEn: t.quoteEn,
+      quoteHi: t.quoteHi,
+      rating: t.rating,
+      isVerified: t.isVerified,
+      isActive: t.isActive,
+      orderIndex: t.orderIndex,
+      photoUrl: t.photoUrl || "",
+      youtubeUrl: t.youtubeUrl || "",
+      additionalLinks: normalizeLinks(t.additionalLinks),
+    });
+    setError(null);
+    setSuccess(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(EMPTY);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
     setSuccess(null);
 
-    try {
-      const res = await fetch("/api/admin/testimonials", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          authorNameEn,
-          authorNameHi,
-          authorTitleEn,
-          authorTitleHi,
-          cityEn,
-          cityHi,
-          quoteEn,
-          quoteHi,
-          rating,
-          isVerified,
-          orderIndex,
-        }),
-      });
+    const payload = {
+      ...form,
+      photoUrl: form.photoUrl.trim() || null,
+      youtubeUrl: form.youtubeUrl.trim() || null,
+      additionalLinks: form.additionalLinks.filter((l) => l.url.trim()),
+    };
 
+    try {
+      const res = await fetch(
+        editingId ? `/api/admin/testimonials/${editingId}` : "/api/admin/testimonials",
+        {
+          method: editingId ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
       const data = await res.json();
       if (res.ok) {
-        setSuccess("Testimonial recorded successfully");
-        setAuthorNameEn("");
-        setAuthorNameHi("");
-        setCityEn("");
-        setCityHi("");
-        setQuoteEn("");
-        setQuoteHi("");
+        setSuccess(editingId ? "Testimonial updated" : "Testimonial added");
+        cancelEdit();
         fetchTestimonials();
       } else {
-        setError(data.error || "Failed to create testimonial");
+        setError(data.error || "Failed to save testimonial");
       }
     } catch {
-      setError("Error creating testimonial");
+      setError("Error saving testimonial");
     } finally {
       setSubmitting(false);
     }
@@ -120,6 +177,7 @@ export default function AdminTestimonialsPage() {
       const res = await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
       if (res.ok) {
         setTestimonials((prev) => prev.filter((t) => t.id !== id));
+        if (editingId === id) cancelEdit();
         setSuccess("Testimonial deleted");
       } else {
         const data = await res.json();
@@ -130,37 +188,18 @@ export default function AdminTestimonialsPage() {
     }
   };
 
-  const handleToggleVerified = async (item: TestimonialItem) => {
+  const toggle = async (item: TestimonialItem, key: "isVerified" | "isActive") => {
     try {
       const res = await fetch(`/api/admin/testimonials/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isVerified: !item.isVerified }),
+        body: JSON.stringify({ [key]: !item[key] }),
       });
       if (res.ok) {
-        setTestimonials((prev) =>
-          prev.map((t) => (t.id === item.id ? { ...t, isVerified: !t.isVerified } : t))
-        );
+        setTestimonials((prev) => prev.map((t) => (t.id === item.id ? { ...t, [key]: !t[key] } : t)));
       }
     } catch {
-      setError("Error toggling verification status");
-    }
-  };
-
-  const handleToggleActive = async (item: TestimonialItem) => {
-    try {
-      const res = await fetch(`/api/admin/testimonials/${item.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !item.isActive }),
-      });
-      if (res.ok) {
-        setTestimonials((prev) =>
-          prev.map((t) => (t.id === item.id ? { ...t, isActive: !t.isActive } : t))
-        );
-      }
-    } catch {
-      setError("Error toggling status");
+      setError("Error updating testimonial");
     }
   };
 
@@ -171,7 +210,7 @@ export default function AdminTestimonialsPage() {
           परामर्शार्थी अनुभव • Testimonials CMS
         </h1>
         <p className="text-xs text-on-surface-variant mt-1">
-          Manage client feedback, ratings, and authenticity verification badges.
+          Add, edit, hide or remove client feedback. Each one can have a photo, a YouTube video and extra links.
         </p>
       </div>
 
@@ -181,7 +220,6 @@ export default function AdminTestimonialsPage() {
           <span>{error}</span>
         </div>
       )}
-
       {success && (
         <div className="p-3 rounded bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
@@ -189,161 +227,96 @@ export default function AdminTestimonialsPage() {
         </div>
       )}
 
-      {/* Form */}
       <div className="bg-surface rounded-lg p-6 border-2 border-secondary/20 shadow-sm space-y-4">
-        <h2 className="font-serif text-base font-bold text-secondary flex items-center gap-2">
-          <Plus className="w-4 h-4 text-primary" />
-          <span>नया अनुभव जोड़ें • Add Testimonial</span>
-        </h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-serif text-base font-bold text-secondary flex items-center gap-2">
+            {editingId ? <Pencil className="w-4 h-4 text-primary" /> : <Plus className="w-4 h-4 text-primary" />}
+            <span>{editingId ? "अनुभव संपादित करें • Edit Testimonial" : "नया अनुभव जोड़ें • Add Testimonial"}</span>
+          </h2>
+          {editingId && (
+            <button
+              type="button"
+              onClick={cancelEdit}
+              className="min-h-[44px] px-3 inline-flex items-center gap-1 rounded border border-maroon text-xs font-bold"
+            >
+              <X className="w-4 h-4" /> Cancel edit
+            </button>
+          )}
+        </div>
 
-        <form onSubmit={handleCreate} className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                Client Name (English) *
-              </label>
-              <input
-                type="text"
-                required
-                value={authorNameEn}
-                onChange={(e) => setAuthorNameEn(e.target.value)}
-                placeholder="e.g. Alok Verma"
-                className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-              />
+              <label className={label}>Client Name (English) *</label>
+              <input type="text" required value={form.authorNameEn} onChange={(e) => set("authorNameEn", e.target.value)} placeholder="e.g. Alok Verma" className={field} />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                ग्राहक नाम (हिन्दी) *
-              </label>
-              <input
-                type="text"
-                required
-                value={authorNameHi}
-                onChange={(e) => setAuthorNameHi(e.target.value)}
-                placeholder="उदा: आलोक वर्मा"
-                className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-              />
+              <label className={label}>ग्राहक नाम (हिन्दी) *</label>
+              <input type="text" required value={form.authorNameHi} onChange={(e) => set("authorNameHi", e.target.value)} placeholder="उदा: आलोक वर्मा" className={field} />
             </div>
-
             <div>
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                Star Rating (1 - 5)
-              </label>
-              <select
-                value={rating}
-                onChange={(e) => setRating(Number(e.target.value))}
-                className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none font-medium"
-              >
+              <label className={label}>Star Rating (1 - 5)</label>
+              <select value={form.rating} onChange={(e) => set("rating", Number(e.target.value))} className={field + " font-medium"}>
                 <option value={5}>5 Stars ★★★★★</option>
                 <option value={4}>4 Stars ★★★★</option>
                 <option value={3}>3 Stars ★★★</option>
+                <option value={2}>2 Stars ★★</option>
+                <option value={1}>1 Star ★</option>
               </select>
             </div>
-
             <div>
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                Title / Occupation (English) *
-              </label>
-              <input
-                type="text"
-                required
-                value={authorTitleEn}
-                onChange={(e) => setAuthorTitleEn(e.target.value)}
-                className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-              />
+              <label className={label}>Title / Occupation (English) *</label>
+              <input type="text" required value={form.authorTitleEn} onChange={(e) => set("authorTitleEn", e.target.value)} className={field} />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                पद / कार्यक्षेत्र (हिन्दी) *
-              </label>
-              <input
-                type="text"
-                required
-                value={authorTitleHi}
-                onChange={(e) => setAuthorTitleHi(e.target.value)}
-                className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-              />
+              <label className={label}>पद / कार्यक्षेत्र (हिन्दी) *</label>
+              <input type="text" required value={form.authorTitleHi} onChange={(e) => set("authorTitleHi", e.target.value)} className={field} />
             </div>
-
             <div>
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                City / Location (English / हिन्दी) *
-              </label>
+              <label className={label}>City / Location (English / हिन्दी) *</label>
               <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Lucknow"
-                  value={cityEn}
-                  onChange={(e) => setCityEn(e.target.value)}
-                  className="w-full min-h-[44px] px-2.5 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-                />
-                <input
-                  type="text"
-                  required
-                  placeholder="उदा: लखनऊ"
-                  value={cityHi}
-                  onChange={(e) => setCityHi(e.target.value)}
-                  className="w-full min-h-[44px] px-2.5 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-                />
+                <input type="text" required placeholder="e.g. Lucknow" value={form.cityEn} onChange={(e) => set("cityEn", e.target.value)} className={field} />
+                <input type="text" required placeholder="उदा: लखनऊ" value={form.cityHi} onChange={(e) => set("cityHi", e.target.value)} className={field} />
               </div>
             </div>
-
             <div className="sm:col-span-2 lg:col-span-3">
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                Feedback Quote (English) *
-              </label>
-              <textarea
-                required
-                rows={2}
-                value={quoteEn}
-                onChange={(e) => setQuoteEn(e.target.value)}
-                placeholder="The Kendra team identified the timing of my promotion with remarkable mathematical accuracy..."
-                className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-              />
+              <label className={label}>Feedback Quote (English) *</label>
+              <textarea required rows={2} value={form.quoteEn} onChange={(e) => set("quoteEn", e.target.value)} className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none" />
             </div>
-
             <div className="sm:col-span-2 lg:col-span-3">
-              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-                प्रशस्ति वाक्य (हिन्दी) *
-              </label>
-              <textarea
-                required
-                rows={2}
-                value={quoteHi}
-                onChange={(e) => setQuoteHi(e.target.value)}
-                placeholder="केंद्र ज्योतिषी दल ने सूर्य सिद्धान्त गणना से मेरे व्यापारिक निर्णय की अनुकूलता स्पष्ट की..."
-                className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-              />
+              <label className={label}>प्रशस्ति वाक्य (हिन्दी) *</label>
+              <textarea required rows={2} value={form.quoteHi} onChange={(e) => set("quoteHi", e.target.value)} className="w-full p-2.5 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none" />
             </div>
           </div>
 
-          <div className="flex items-center gap-4 pt-2">
+          <ImageUrlField label="Client photo (optional)" value={form.photoUrl} onChange={(v) => set("photoUrl", v)} />
+          <YouTubeUrlField value={form.youtubeUrl} onChange={(v) => set("youtubeUrl", v)} />
+          <LinksEditor links={form.additionalLinks} onChange={(v) => set("additionalLinks", v)} />
+
+          <div className="flex flex-wrap items-center gap-6 pt-2">
             <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isVerified}
-                onChange={(e) => setIsVerified(e.target.checked)}
-                className="w-4 h-4 rounded text-secondary"
-              />
-              <span>Mark as Verified Client (सत्यापित ग्राहक बैज प्रदान करें)</span>
+              <input type="checkbox" checked={form.isVerified} onChange={(e) => set("isVerified", e.target.checked)} className="w-4 h-4 rounded text-secondary" />
+              <span>Verified client (shown on the website only when verified)</span>
+            </label>
+            <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" checked={form.isActive} onChange={(e) => set("isActive", e.target.checked)} className="w-4 h-4 rounded text-secondary" />
+              <span>Active</span>
             </label>
           </div>
 
           <div className="sticky bottom-[calc(6.75rem+env(safe-area-inset-bottom,0px))] xl:bottom-12 z-30 bg-surface/95 backdrop-blur border-t border-outline-variant/40 -mx-2 px-2 py-3">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 disabled:opacity-50"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{submitting ? "Saving..." : "Add Testimonial"}</span>
-          </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{submitting ? "Saving..." : editingId ? "Save changes" : "Add Testimonial"}</span>
+            </button>
           </div>
         </form>
       </div>
 
-      {/* List */}
       <div className="space-y-4">
         <h2 className="font-serif text-lg font-bold text-secondary">
           विद्यमान अनुभव • Testimonials ({testimonials.length})
@@ -354,60 +327,51 @@ export default function AdminTestimonialsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {testimonials.map((t) => (
-              <div
-                key={t.id}
-                className="p-4 rounded-lg bg-surface border border-outline-variant/40 space-y-3"
-              >
+              <div key={t.id} className="p-4 rounded-lg bg-surface border border-outline-variant/40 space-y-3">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-secondary">{t.authorNameEn}</span>
-                      {t.isVerified && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
-                          <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                          <span>Verified</span>
-                        </span>
-                      )}
+                  <div className="flex items-start gap-3">
+                    {t.photoUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={t.photoUrl} alt="" className="w-12 h-12 rounded-full object-cover border border-outline-variant/60" />
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm text-secondary">{t.authorNameEn}</span>
+                        {t.isVerified && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
+                            <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                            <span>Verified</span>
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-outline">
+                        {t.authorTitleEn} • {t.cityEn}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-outline">
-                      {t.authorTitleEn} • {t.cityEn}
-                    </span>
                   </div>
-
-                  <button
-                    onClick={() => handleDelete(t.id)}
-                    className="p-1.5 rounded hover:bg-error-container/20 text-on-error-container transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-1">
+                    <button onClick={() => startEdit(t)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-brand text-secondary" aria-label="Edit testimonial">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(t.id)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-error-container/20 text-on-error-container" aria-label="Delete testimonial">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
-                <p className="text-xs italic text-on-surface leading-relaxed">
-                  &ldquo;{t.quoteEn}&rdquo;
-                </p>
-                <p className="text-xs italic text-on-surface-variant font-serif">
-                  &ldquo;{t.quoteHi}&rdquo;
-                </p>
+                <p className="text-xs italic text-on-surface leading-relaxed">&ldquo;{t.quoteEn}&rdquo;</p>
+                <p className="text-xs italic text-on-surface-variant font-serif">&ldquo;{t.quoteHi}&rdquo;</p>
 
                 <div className="flex items-center justify-between pt-2 border-t border-outline-variant/30 text-xs">
                   <button
-                    onClick={() => handleToggleVerified(t)}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                      t.isVerified
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-surface-container text-outline"
-                    }`}
+                    onClick={() => toggle(t, "isVerified")}
+                    className={`min-h-[36px] px-2 py-0.5 rounded text-[10px] font-bold uppercase ${t.isVerified ? "bg-emerald-100 text-emerald-800" : "bg-surface-container text-outline"}`}
                   >
-                    {t.isVerified ? "Verified Badge ON" : "Unverified (Sample)"}
+                    {t.isVerified ? "Verified Badge ON" : "Unverified"}
                   </button>
-
                   <button
-                    onClick={() => handleToggleActive(t)}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                      t.isActive
-                        ? "bg-brand/10 text-secondary"
-                        : "bg-surface-container text-outline"
-                    }`}
+                    onClick={() => toggle(t, "isActive")}
+                    className={`min-h-[36px] px-2 py-0.5 rounded text-[10px] font-bold uppercase ${t.isActive ? "bg-brand text-on-brand" : "bg-surface-container text-outline"}`}
                   >
                     {t.isActive ? "Active" : "Hidden"}
                   </button>

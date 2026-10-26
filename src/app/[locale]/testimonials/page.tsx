@@ -2,6 +2,8 @@ import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Star, ShieldCheck, MessageSquare } from "lucide-react";
+import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
+import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
 
 interface TestimonialsPageProps {
   params: Promise<{
@@ -87,14 +89,27 @@ export default async function TestimonialsPage(props: TestimonialsPageProps) {
                   <p className="text-xs sm:text-sm italic text-on-surface leading-relaxed">
                     &ldquo;{quote}&rdquo;
                   </p>
+                  <YouTubeEmbed url={t.youtubeUrl} title={author} isHindi={isHindi} />
+                  <LinkList links={normalizeLinks(t.additionalLinks)} isHindi={isHindi} />
                 </div>
 
                 <div className="pt-3 border-t border-outline-variant/30 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-bold text-xs text-secondary">{author}</h3>
-                    <p className="text-[11px] text-outline">
-                      {title} • {city}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    {isSafeImageSrc(t.photoUrl) && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={t.photoUrl}
+                        alt={author}
+                        loading="lazy"
+                        className="w-12 h-12 rounded-full object-cover border border-outline-variant/60"
+                      />
+                    )}
+                    <div>
+                      <h3 className="font-bold text-xs text-secondary">{author}</h3>
+                      <p className="text-[11px] text-outline">
+                        {title} • {city}
+                      </p>
+                    </div>
                   </div>
 
                   {t.isVerified && (

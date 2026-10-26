@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { BlocksView } from "@/components/content/MediaView";
+import { normalizeBlocks } from "@/lib/content/media";
 import { ShieldCheck, Scale, FileText, ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
 
@@ -102,6 +104,8 @@ export default async function LegalPage(props: LegalPageProps) {
       <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-outline-variant/40 shadow-sm leading-relaxed text-sm sm:text-base text-on-surface whitespace-pre-line space-y-4">
         {content}
       </div>
+
+      <BlocksView blocks={normalizeBlocks(page.blocks)} isHindi={isHindi} />
 
       {/* Ephemeris & Ethics Disclaimer Seal */}
       <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30 text-xs text-on-surface-variant flex items-center justify-between gap-3">

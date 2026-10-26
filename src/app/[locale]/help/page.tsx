@@ -1,6 +1,8 @@
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { BlocksView } from "@/components/content/MediaView";
+import { normalizeBlocks } from "@/lib/content/media";
 import { HelpCircle, Phone, Mail, Clock, MessageSquare, Search, FileText } from "lucide-react";
 import { Link } from "@/i18n/routing";
 
@@ -78,6 +80,8 @@ export default async function HelpPage(props: HelpPageProps) {
       <div className="p-6 sm:p-8 rounded-2xl bg-surface border border-outline-variant/40 shadow-sm leading-relaxed text-sm sm:text-base text-on-surface whitespace-pre-line space-y-4">
         {content}
       </div>
+
+      <BlocksView blocks={normalizeBlocks(page?.blocks)} isHindi={isHindi} />
 
       {/* Quick Action Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">

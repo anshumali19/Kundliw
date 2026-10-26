@@ -4,6 +4,9 @@ import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+import { linksInputSchema } from "@/lib/content/media";
+import { withJsonLinks } from "@/lib/content/json";
+
 const updateOtherServiceSchema = z.object({
   slug: z
     .string()
@@ -22,6 +25,7 @@ const updateOtherServiceSchema = z.object({
   actionTextEn: z.string().trim().optional().nullable(),
   actionTextHi: z.string().trim().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
   orderIndex: z.coerce.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
 });
@@ -47,7 +51,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
 
     const updated = await prisma.otherService.update({
       where: { id: params.id },
-      data: parsed.data,
+      data: withJsonLinks(parsed.data),
     });
 
     return NextResponse.json({ success: true, item: updated });
@@ -69,12 +73,10 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
   if (!csrf.isValid) return csrf.errorResponse;
 
   try {
-    await prisma.otherService.update({
-      where: { id: params.id },
-      data: { isActive: false },
-    });
+    // Other services are not tied to orders, so removing really removes it.
+    await prisma.otherService.delete({ where: { id: params.id } });
 
-    return NextResponse.json({ success: true, message: "Other service deactivated." });
+    return NextResponse.json({ success: true, message: "Other service removed." });
   } catch (error) {
     console.error("[API Admin OtherServices DELETE] Error:", error);
     return NextResponse.json(

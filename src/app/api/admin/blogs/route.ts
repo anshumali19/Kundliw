@@ -6,6 +6,9 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
+import { linksInputSchema } from "@/lib/content/media";
+import { withJsonLinks } from "@/lib/content/json";
+
 const blogSchema = z.object({
   slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
   titleEn: z.string().min(2),
@@ -15,6 +18,8 @@ const blogSchema = z.object({
   contentEn: z.string().min(10),
   contentHi: z.string().min(10),
   coverImage: z.string().optional().nullable(),
+  youtubeUrl: z.string().trim().optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
   isPublished: z.boolean().default(false),
 });
 
@@ -52,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     const post = await prisma.blogPost.create({
       data: {
-        ...parsed.data,
+        ...withJsonLinks(parsed.data),
         publishedAt: parsed.data.isPublished ? new Date() : null,
       },
     });

@@ -16,6 +16,15 @@ export async function Footer() {
     })
     .catch(() => null);
 
+  // Custom pages the admin chose to list under Quick Links
+  const footerPages = await prisma.staticPage
+    .findMany({
+      where: { isActive: true, showInFooter: true },
+      orderBy: { updatedAt: "asc" },
+      select: { slug: true, titleEn: true, titleHi: true },
+    })
+    .catch(() => []);
+
   const phone1 = settings?.phone1;
   const phone2 = settings?.phone2;
   const email = settings?.email;
@@ -160,6 +169,13 @@ export async function Footer() {
                   {tNav("vault")}
                 </Link>
               </li>
+              {footerPages.map((fp) => (
+                <li key={fp.slug}>
+                  <Link href={`/pages/${fp.slug}` as never} className="hover:text-brand-hover transition-colors block py-0.5">
+                    {locale === "hi" ? fp.titleHi : fp.titleEn}
+                  </Link>
+                </li>
+              ))}
               {settings?.appDownloadUrl && (
                 <li>
                   <Link href="/app" className="hover:text-brand-hover transition-colors block py-0.5">

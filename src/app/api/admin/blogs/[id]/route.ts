@@ -6,6 +6,9 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
+import { linksInputSchema } from "@/lib/content/media";
+import { withJsonLinks } from "@/lib/content/json";
+
 const blogUpdateSchema = z.object({
   titleEn: z.string().min(2).optional(),
   titleHi: z.string().min(2).optional(),
@@ -14,6 +17,9 @@ const blogUpdateSchema = z.object({
   contentEn: z.string().min(10).optional(),
   contentHi: z.string().min(10).optional(),
   coverImage: z.string().optional().nullable(),
+  youtubeUrl: z.string().trim().optional().nullable(),
+  additionalLinks: linksInputSchema.optional().nullable(),
+  slug: z.string().min(2).regex(/^[a-z0-9-]+$/).optional(),
   isPublished: z.boolean().optional(),
 });
 
@@ -35,11 +41,16 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
       );
     }
 
+    // Keep the original publish date when an already published article is edited.
+    const existing = await prisma.blogPost.findUnique({
+      where: { id: params.id },
+      select: { publishedAt: true },
+    });
     const post = await prisma.blogPost.update({
       where: { id: params.id },
       data: {
-        ...parsed.data,
-        publishedAt: parsed.data.isPublished ? new Date() : undefined,
+        ...withJsonLinks(parsed.data),
+        publishedAt: parsed.data.isPublished && !existing?.publishedAt ? new Date() : undefined,
       },
     });
 

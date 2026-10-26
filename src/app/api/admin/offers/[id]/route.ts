@@ -93,20 +93,22 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
   if (!csrf.isValid) return csrf.errorResponse;
 
   try {
-    await prisma.offer.update({
-      where: { id: params.id },
-      data: { isActive: false },
-    });
+    const used = await prisma.order.count({ where: { offerId: params.id } });
+    if (used > 0) {
+      await prisma.offer.update({ where: { id: params.id }, data: { isActive: false } });
+      return NextResponse.json({
+        success: true,
+        message: `This offer was used on ${used} order(s). It has been deactivated so those records stay intact.`,
+        deactivated: true,
+      });
+    }
 
-    return NextResponse.json({
-      success: true,
-      message: "Offer deactivated successfully.",
-      deactivated: true,
-    });
+    await prisma.offer.delete({ where: { id: params.id } });
+    return NextResponse.json({ success: true, message: "Offer removed.", deactivated: false });
   } catch (error) {
-    console.error("Error deactivating offer:", error);
+    console.error("Error removing offer:", error);
     return NextResponse.json(
-      { error: "Failed to deactivate offer" },
+      { error: "Failed to remove offer" },
       { status: 500 }
     );
   }

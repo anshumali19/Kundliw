@@ -1,7 +1,9 @@
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { Image as ImageIcon, Video, ExternalLink, Play } from "lucide-react";
+import { Image as ImageIcon, Play } from "lucide-react";
+import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
+import { isSafeImageSrc, isWebUrl, normalizeLinks } from "@/lib/content/media";
 
 interface GalleryPageProps {
   params: Promise<{
@@ -23,10 +25,10 @@ export async function generateMetadata(props: GalleryPageProps): Promise<Metadat
     alternates: pageAlternates(locale, "/gallery"),
     title: isHindi
       ? "चित्र एवं वीडियो दीर्घा • महर्षि कणाद ज्योतिष केंद्र"
-      : "Sanctum Gallery & Discourses • Maharshi Kanad Jyotish Kendra",
+      : "Gallery • Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "काशी दशाश्वमेध घाट ज्योतिष पीठ, पांडुलिपि संग्रह, वीडियो व्याख्यान एवं वैदिक अनुष्ठान।"
-      : "Visual archive and video discourses of our Dashashwamedh Ghat sanctum and ancient ephemerides.",
+      ? "महर्षि कणाद ज्योतिष केंद्र की तस्वीरें और वीडियो।"
+      : "Photos and videos from Maharshi Kanad Jyotish Kendra.",
   };
 }
 
@@ -39,6 +41,7 @@ export default async function GalleryPage(props: GalleryPageProps) {
 
   const isHindi = locale === "hi";
   const items = await prisma.mediaGalleryItem.findMany({
+    where: { isActive: true },
     orderBy: { orderIndex: "asc" },
   });
 
@@ -80,28 +83,18 @@ export default async function GalleryPage(props: GalleryPageProps) {
               >
                 <div>
                   {isYouTube ? (
-                    <div className="aspect-video w-full bg-black relative">
-                      <iframe
-                        src={
-                          item.videoUrl!.includes("embed")
-                            ? item.videoUrl!
-                            : item.videoUrl!.replace("watch?v=", "embed/").split("&")[0]
-                        }
-                        title={title}
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                    <div className="p-3">
+                      <YouTubeEmbed url={item.videoUrl} title={title} isHindi={isHindi} />
                     </div>
                   ) : (
                     <div className="h-60 w-full bg-surface-container overflow-hidden relative group">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={item.imageUrl}
+                        src={isSafeImageSrc(item.imageUrl) ? item.imageUrl : ""}
                         alt={title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      {item.videoUrl && (
+                      {isWebUrl(item.videoUrl) && (
                         <a
                           href={item.videoUrl}
                           target="_blank"
@@ -136,17 +129,17 @@ export default async function GalleryPage(props: GalleryPageProps) {
                   </div>
                 </div>
 
-                {item.externalLink && (
-                  <div className="px-5 pb-4 pt-1 border-t border-outline-variant/20">
-                    <a
-                      href={item.externalLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-semibold"
-                    >
-                      <span>{isHindi ? "संबद्ध विवरण देखें" : "View Details"}</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                {(item.externalLink || normalizeLinks(item.additionalLinks).length > 0) && (
+                  <div className="px-5 pb-4 pt-3 border-t border-outline-variant/20">
+                    <LinkList
+                      links={[
+                        ...(isWebUrl(item.externalLink)
+                          ? [{ labelEn: "View details", labelHi: "संबद्ध विवरण देखें", url: item.externalLink }]
+                          : []),
+                        ...normalizeLinks(item.additionalLinks),
+                      ]}
+                      isHindi={isHindi}
+                    />
                   </div>
                 )}
               </div>

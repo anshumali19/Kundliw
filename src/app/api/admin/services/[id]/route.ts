@@ -69,16 +69,13 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
       });
     }
 
-    // If no orders exist, deactivate service
-    await prisma.service.update({
-      where: { id: params.id },
-      data: { isActive: false },
-    });
+    // No orders: the service and its plans can be removed completely.
+    await prisma.service.delete({ where: { id: params.id } });
 
     return NextResponse.json({
       success: true,
-      message: "Service deactivated successfully.",
-      deactivated: true,
+      message: "Service removed.",
+      deactivated: false,
     });
   } catch (error) {
     console.error("Error deleting service:", error);

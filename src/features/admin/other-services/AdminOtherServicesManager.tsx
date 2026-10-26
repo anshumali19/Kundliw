@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { LinkItem, normalizeLinks } from "@/lib/content/media";
+import { ImageUrlField, LinksEditor, YouTubeUrlField } from "@/components/admin/MediaFields";
 import {
   Sparkles,
   Plus,
@@ -29,6 +31,7 @@ export interface OtherServiceItem {
   actionTextEn?: string | null;
   actionTextHi?: string | null;
   youtubeUrl?: string | null;
+  additionalLinks?: unknown;
   orderIndex: number;
   isActive: boolean;
 }
@@ -55,6 +58,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
   const [actionTextEn, setActionTextEn] = useState("");
   const [actionTextHi, setActionTextHi] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [links, setLinks] = useState<LinkItem[]>([]);
   const [orderIndex, setOrderIndex] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -97,6 +101,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setActionTextEn(item.actionTextEn || "Visit Portal / Learn More");
       setActionTextHi(item.actionTextHi || "पोर्टल पर जाएं / विवरण देखें");
       setYoutubeUrl(item.youtubeUrl || "");
+      setLinks(normalizeLinks(item.additionalLinks));
       setOrderIndex(item.orderIndex);
       setIsActive(item.isActive);
     } else {
@@ -113,6 +118,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setActionTextEn("Visit Portal / Learn More");
       setActionTextHi("पोर्टल पर जाएं / विवरण देखें");
       setYoutubeUrl("");
+      setLinks([]);
       setOrderIndex(items.length + 1);
       setIsActive(true);
     }
@@ -137,6 +143,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       actionTextEn: actionTextEn.trim() || null,
       actionTextHi: actionTextHi.trim() || null,
       youtubeUrl: youtubeUrl.trim() || null,
+      additionalLinks: links.filter((l) => l.url.trim()),
       orderIndex: Number(orderIndex),
       isActive,
     };
@@ -492,28 +499,9 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="font-semibold block mb-1">YouTube Video URL</label>
-                  <input
-                    type="text"
-                    value={youtubeUrl}
-                    onChange={(e) => setYoutubeUrl(e.target.value)}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-                  />
-                </div>
-                <div>
-                  <label className="font-semibold block mb-1">Image URL</label>
-                  <input
-                    type="text"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="/images/gallery-1.jpg"
-                    className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
-                  />
-                </div>
-              </div>
+              <ImageUrlField label="Image (link or upload)" value={imageUrl} onChange={setImageUrl} folder="other-services" />
+              <YouTubeUrlField label="YouTube video link" value={youtubeUrl} onChange={setYoutubeUrl} />
+              <LinksEditor links={links} onChange={setLinks} label="Additional links (besides the main button above)" />
 
               <div className="flex items-center gap-2 pt-2">
                 <input
