@@ -1,44 +1,35 @@
+import type { Metadata } from "next";
 import { pageAlternates } from "@/lib/seo";
-import { Metadata } from "next";
-import { KundliCalculatorClient } from "@/features/astro/components/KundliCalculatorClient";
-
-interface KundliPageProps {
-  params: Promise<{
-    locale: string;
-  }>;
-}
+import { getSection } from "@/lib/siteConfig/service";
+import { EmbedFrame, embedAddress } from "@/components/content/EmbedFrame";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(props: KundliPageProps): Promise<Metadata> {
-  const params = await props.params;
+type Props = { params: Promise<{ locale: string }> };
 
-  const {
-    locale
-  } = params;
-
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { locale } = await props.params;
   const isHindi = locale === "hi";
   return {
     alternates: pageAlternates(locale, "/kundli"),
-    title: isHindi
-      ? "नि:शुल्क वैदिक जन्मपत्रिका एवं ग्रह स्पष्ट | महर्षि कणाद ज्योतिष केंद्र"
-      : "Free Vedic Janampatri & Planetary Calculator | Maharshi Kanad Jyotish Kendra",
-    description: isHindi
-      ? "सूर्य सिद्धान्त एवं दृग्गणित पर आधारित शुद्ध लग्न, राशि, नक्षत्र एवं ग्रह-स्थिति विचार।"
-      : "Compute authentic Vedic natal charts, planetary degrees, ascendant, and Vimshottari Mahadasha.",
+    title: isHindi ? "निःशुल्क जन्म कुंडली • महर्षि कणाद ज्योतिष केंद्र" : "Free Kundli (Birth Chart) • Maharshi Kanad Jyotish Kendra",
+    description: isHindi ? "जन्म विवरण भरकर अपनी वास्तविक जन्म कुंडली बनाएँ।" : "Enter your birth details to create your real birth chart.",
   };
 }
 
-export default async function KundliPage(props: KundliPageProps) {
-  const params = await props.params;
-
-  const {
-    locale
-  } = params;
-
+export default async function Page(props: Props) {
+  const { locale } = await props.params;
+  const isHindi = locale === "hi";
+  const cfg = await getSection("tools");
+  const src = embedAddress(String(cfg.kundliUrl || ""), "https://www.astrosage.com/freekundli/", locale);
   return (
-    <div className="w-full min-h-screen bg-surface-container-lowest py-8">
-      <KundliCalculatorClient locale={locale} />
-    </div>
+    <EmbedFrame
+      src={src}
+      title="Free Kundli (Birth Chart)"
+      heading={isHindi ? "निःशुल्क जन्म कुंडली" : "Free Kundli (Birth Chart)"}
+      intro={isHindi ? "जन्म विवरण भरकर अपनी वास्तविक जन्म कुंडली बनाएँ।" : "Enter your birth details to create your real birth chart."}
+      openLabel={isHindi ? "पूरी स्क्रीन में खोलें" : "Open full screen"}
+      credit={isHindi ? "यह टूल AstroSage द्वारा संचालित है; सभी अधिकार उनके पास सुरक्षित हैं।" : "This tool is provided by AstroSage; all rights belong to them."}
+    />
   );
 }

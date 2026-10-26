@@ -1,42 +1,35 @@
-import { Metadata } from "next";
-import { MatchingCalculatorClient } from "@/features/astro/components/MatchingCalculatorClient";
-
-interface MatchingPageProps {
-  params: Promise<{
-    locale: string;
-  }>;
-}
+import type { Metadata } from "next";
+import { pageAlternates } from "@/lib/seo";
+import { getSection } from "@/lib/siteConfig/service";
+import { EmbedFrame, embedAddress } from "@/components/content/EmbedFrame";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata(props: MatchingPageProps): Promise<Metadata> {
-  const params = await props.params;
+type Props = { params: Promise<{ locale: string }> };
 
-  const {
-    locale
-  } = params;
-
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { locale } = await props.params;
   const isHindi = locale === "hi";
   return {
-    title: isHindi
-      ? "नि:शुल्क कुण्डली मिलान एवं अष्टकूट मेलापक | महर्षि कणाद ज्योतिष केंद्र"
-      : "Free Kundli Matching & Ashtakoot Gun Milan | Maharshi Kanad Jyotish Kendra",
-    description: isHindi
-      ? "वर-कन्या के ३६ गुणों, मांगलिक विचार एवं नाड़ी दोष की शास्त्रीय वैदिक गणना।"
-      : "Authentic 36-Guna Ashtakoot matrimonial compatibility calculation with Manglik and Nadi Dosha analysis.",
+    alternates: pageAlternates(locale, "/kundli/matching"),
+    title: isHindi ? "कुंडली मिलान • महर्षि कणाद ज्योतिष केंद्र" : "Kundli Matching • Maharshi Kanad Jyotish Kendra",
+    description: isHindi ? "वर-कन्या के अष्टकूट गुण मिलान और मांगलिक विचार।" : "Ashtakoot guna matching and Manglik check for the couple.",
   };
 }
 
-export default async function MatchingPage(props: MatchingPageProps) {
-  const params = await props.params;
-
-  const {
-    locale
-  } = params;
-
+export default async function Page(props: Props) {
+  const { locale } = await props.params;
+  const isHindi = locale === "hi";
+  const cfg = await getSection("tools");
+  const src = embedAddress(String(cfg.matchingUrl || ""), "https://www.astrosage.com/freechart/matchmaking.asp", locale);
   return (
-    <div className="w-full min-h-screen bg-surface-container-lowest py-8">
-      <MatchingCalculatorClient locale={locale} />
-    </div>
+    <EmbedFrame
+      src={src}
+      title="Kundli Matching"
+      heading={isHindi ? "कुंडली मिलान" : "Kundli Matching"}
+      intro={isHindi ? "वर-कन्या के अष्टकूट गुण मिलान और मांगलिक विचार।" : "Ashtakoot guna matching and Manglik check for the couple."}
+      openLabel={isHindi ? "पूरी स्क्रीन में खोलें" : "Open full screen"}
+      credit={isHindi ? "यह टूल AstroSage द्वारा संचालित है; सभी अधिकार उनके पास सुरक्षित हैं।" : "This tool is provided by AstroSage; all rights belong to them."}
+    />
   );
 }

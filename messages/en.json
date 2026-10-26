@@ -32,6 +32,7 @@
   "nav": {
     "home": "Home",
     "panchang": "Panchang",
+    "panchangCalendar": "Panchang Calendar",
     "services": "Services",
     "servicesShort": "Services",
     "pricingPlans": "Booking",

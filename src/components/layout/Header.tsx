@@ -150,6 +150,10 @@ export function Header({ phone }: HeaderProps = {}) {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            <Link href="/panchang" className="inline-flex items-center gap-1 rounded-full bg-secondary/90 px-2.5 py-1 text-[11px] font-bold !text-on-secondary hover:opacity-90 whitespace-nowrap">
+              <BookOpen className="w-3 h-3 shrink-0" />
+              <span className="!text-on-secondary">{tNav("panchangCalendar")}</span>
+            </Link>
             {phone && (
               <>
                 <a

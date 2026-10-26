@@ -193,6 +193,18 @@ export const SECTIONS: SectionDef[] = [
     ],
   },
   {
+    id: "tools",
+    en: "Panchang, Kundli and Matching tools",
+    hi: "पंचांग, कुंडली व मिलान टूल",
+    noteEn: "These pages show a live tool from another website inside ours. Paste a different address to change the tool, or leave empty for the standard one. Use {lang} where the page language should go (hi or en).",
+    noteHi: "ये पेज किसी दूसरी वेबसाइट का लाइव टूल हमारी साइट के अंदर दिखाते हैं। टूल बदलने के लिए नया पता डालें, खाली छोड़ने पर सामान्य टूल रहेगा। भाषा की जगह {lang} लिखें (hi या en)।",
+    fields: [
+      { key: "panchangUrl", en: "Panchang calendar address", hi: "पंचांग कैलेंडर का पता", type: "url", max: 400, def: "https://panchang.astrosage.com/?language={lang}" },
+      { key: "kundliUrl", en: "Kundli (birth chart) address", hi: "कुंडली का पता", type: "url", max: 400, def: "https://www.astrosage.com/freekundli/" },
+      { key: "matchingUrl", en: "Kundli matching address", hi: "कुंडली मिलान का पता", type: "url", max: 400, def: "https://www.astrosage.com/freechart/matchmaking.asp" },
+    ],
+  },
+  {
     id: "admin",
     en: "Admin settings",
     hi: "एडमिन सेटिंग",
