@@ -118,26 +118,22 @@ Remaining:
 - Email sending, order-status notifications, backups, Facebook login, "Ask API" (point 42).
 
 ## 5. Colour and theme
+## 5. Colour and theme
 
-The client specified four colours, used in high contrast across the whole site:
+The theme follows the client's reference site (Bharat Darshan Teerth Yatra), which the client approved ("exactly like this").
 
-| Colour | Hex | Where it is used |
-| :--- | :--- | :--- |
-| Saffron | `#F4C430` | Buttons, highlights, marquee strip, table headers |
-| Yellow | `#FFFF00` | Button hover state, soft page and card backgrounds (lighter tints) |
-| Maroon | `#800000` | Headings, text, borders, icons. As a filled background only in the footer Quick Links |
-| Red | `#FF0000` | Accent: the line under the header, card top edges, active menu underline, the AI button |
+| Role | Colour |
+| :--- | :--- |
+| Buttons, highlights, active menu | Saffron orange #F96706 (deeper #D95705 on hover), white bold text |
+| Gold accent and gradients | #FFC105, dark brown text on gold |
+| Top strip, marquee | Orange to gold gradient |
+| Page background | Warm cream #FCFAF8, peach sections #FFF2E5 |
+| Headings and body text | Dark brown #2B1A14 and #261B17 |
+| Accent text | Deep orange #B04600 |
+| Footer | Maroon #661919 with gold headings |
+| Type | Poppins (Hindi text uses Noto Sans Devanagari), rounded corners |
 
-Body text is a maroon-tinted black (`#1A0000`) on white or pale yellow.
-
-Measured contrast: maroon on white 10.9:1, maroon on yellow 10.2:1, maroon on saffron 6.7:1,
-black text on saffron 12.8:1, white or yellow text on the maroon footer 10:1 or better.
-Red is only 4.0:1 against white, so it is never used for small text. A scan of about 2,000
-text elements on 12 pages at desktop and phone width found no remaining contrast failures
-and no maroon backgrounds outside the footer.
-
-Success states (for example "Paid") keep a green tick or badge because it is a universal signal.
-This is the one deliberate exception to the four colours.
+Known trade-off: white text on the bright orange buttons has a contrast of about 3:1, which is the reference site's look but below the 4.5:1 guideline for small text. Switching button text to dark brown (5.6:1) is a one-line change in `tailwind.config.ts` (`on-brand`).
 
 ## 6. Database, security and quality
 
