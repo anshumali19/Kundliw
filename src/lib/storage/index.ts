@@ -117,7 +117,10 @@ export class LocalDiskStorageProvider implements StorageProvider {
       throw new Error(`File size (${fileBuffer.length} bytes) exceeds 10MB limit.`);
     }
 
-    const { isValid, detectedMime } = validateFileMagicBytes(fileBuffer);
+    // The vault accepts more file kinds; its routes check the content with detectDocumentType first.
+    const magic = validateFileMagicBytes(fileBuffer);
+    const isValid = magic.isValid || subfolder === "vault";
+    const detectedMime = magic.isValid ? magic.detectedMime : mimeType;
     if (!isValid) {
       throw new Error("Invalid file content: signature does not match allowed types (PDF, PNG, JPEG, WEBP).");
     }
@@ -208,7 +211,10 @@ export class VercelBlobStorageProvider implements StorageProvider {
       throw new Error(`File size (${fileBuffer.length} bytes) exceeds 10MB limit.`);
     }
 
-    const { isValid, detectedMime } = validateFileMagicBytes(fileBuffer);
+    // The vault accepts more file kinds; its routes check the content with detectDocumentType first.
+    const magic = validateFileMagicBytes(fileBuffer);
+    const isValid = magic.isValid || subfolder === "vault";
+    const detectedMime = magic.isValid ? magic.detectedMime : mimeType;
     if (!isValid) {
       throw new Error("Invalid file content: signature does not match allowed types (PDF, PNG, JPEG, WEBP).");
     }

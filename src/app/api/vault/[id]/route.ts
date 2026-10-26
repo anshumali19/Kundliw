@@ -34,7 +34,10 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     const { buffer, mimeType } = await storage.getFile(vaultFile.storageKey);
 
     // Only types a browser can show safely are opened inline; Word, Excel and the rest download.
-    const type = mimeType || vaultFile.mimeType || "application/octet-stream";
+    const type =
+      mimeType && mimeType !== "application/octet-stream"
+        ? mimeType
+        : vaultFile.mimeType || "application/octet-stream";
     const showInline =
       type === "application/pdf" ||
       (type.startsWith("image/") && type !== "image/svg+xml") ||
