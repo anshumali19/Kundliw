@@ -5,7 +5,7 @@ import FacebookProvider from "next-auth/providers/facebook";
 import * as bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { verifyOtpHash, isOtpExpired, canAttemptOtpVerification } from "./otp";
-import { verifyOtpSchema, emailPasswordLoginSchema } from "./validation";
+import { verifyOtpSchema, emailPasswordLoginSchema, emailSchema, phoneSchema } from "./validation";
 import { checkDbRateLimit, resetDbRateLimit, getClientIp } from "@/lib/rateLimit";
 import { Role } from "@prisma/client";
 
@@ -145,10 +145,27 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password format");
         }
 
-        // Password login serves Associate and Super Admin portals; defaults to Super Admin.
-        const requiredRole = credentials?.portal === "associate" ? Role.ASSOCIATE : Role.ADMIN;
+        // Password login serves every portal. The account's role must match the portal used.
+        const portalName = credentials?.portal;
+        const requiredRole =
+          portalName === "associate" ? Role.ASSOCIATE : portalName === "user" ? Role.USER : Role.ADMIN;
 
-        const { email, password } = parsed.data;
+        // The sign-in name is an email address or a mobile number.
+        const rawId = parsed.data.email;
+        let email: string;
+        let lookup: { email: string } | { phone: string };
+        if (rawId.includes("@")) {
+          const checked = emailSchema.safeParse(rawId);
+          if (!checked.success) throw new Error("Invalid email or password format");
+          email = checked.data;
+          lookup = { email };
+        } else {
+          const checked = phoneSchema.safeParse(rawId);
+          if (!checked.success) throw new Error("Invalid email or password format");
+          email = checked.data;
+          lookup = { phone: checked.data };
+        }
+        const password = parsed.data.password;
 
         // Extract client IP from req headers
         const headersObj = new Headers();
@@ -188,9 +205,7 @@ export const authOptions: NextAuthOptions = {
           );
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
+        const user = await prisma.user.findUnique({ where: lookup });
 
         if (!user || !user.passwordHash) {
           throw new Error("Invalid email or password");
@@ -223,19 +238,23 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     /**
-     * Social sign-in (Google, Facebook) is for customers only. The provider
-     * account is mapped to a database user so bookings and the vault work.
-     * Associates and administrators must use their own portals.
+     * Social sign-in (Google, Facebook). A provider account is matched to a database user by
+     * email. New people become customers. Existing associates and administrators can use
+     * Google only when Google confirms the email address; Facebook never signs in an
+     * administrator or associate because it does not guarantee a verified email.
      */
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (!account || (account.provider !== "google" && account.provider !== "facebook")) {
         return true;
       }
       const email = user.email?.trim().toLowerCase();
       if (!email) return false;
 
+      const googleVerified =
+        account.provider === "google" && (profile as { email_verified?: boolean } | undefined)?.email_verified === true;
+
       let dbUser = await prisma.user.findUnique({ where: { email } });
-      if (dbUser && dbUser.role !== Role.USER) return false;
+      if (dbUser && dbUser.role !== Role.USER && !googleVerified) return false;
       if (!dbUser) {
         dbUser = await prisma.user.create({
           data: {

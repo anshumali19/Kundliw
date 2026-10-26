@@ -15,6 +15,8 @@ const marqueeUpdateSchema = z.object({
   bgColor: z.string().optional(),
   textColor: z.string().optional(),
   position: z.nativeEnum(MarqueePosition).optional(),
+  pauseOnHover: z.boolean().optional(),
+  allowClose: z.boolean().optional(),
   isActive: z.boolean().optional(),
   orderIndex: z.number().int().optional(),
 });

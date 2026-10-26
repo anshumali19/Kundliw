@@ -32,13 +32,13 @@
   "nav": {
     "home": "मुख्य पृष्ठ",
     "panchang": "पंचांग",
-    "services": "वैदिक सेवाएँ",
+    "services": "सेवाएँ",
     "servicesShort": "सेवाएँ",
-    "pricingPlans": "मूल्य निर्धारण",
+    "pricingPlans": "बुकिंग",
     "pricingPlansShort": "योजनाएं",
-    "kundli": "कुण्डली गणना",
+    "kundli": "कुण्डली",
     "kundliShort": "कुण्डली",
-    "kundliMatching": "कुण्डली मिलान",
+    "kundliMatching": "मिलान",
     "kundliMatchingShort": "मिलान",
     "prashna": "प्रश्न कुण्डली",
     "prashnaShort": "प्रश्न",
@@ -56,7 +56,18 @@
     "profile": "प्रोफ़ाइल",
     "signIn": "लॉग इन",
     "signOut": "लॉग आउट",
-    "register": "पंजीकरण"
+    "register": "पंजीकरण",
+    "menu": "मेनू",
+    "menuSub": "सभी पृष्ठ एवं बुकिंग",
+    "booking": "बुकिंग",
+    "offers": "ऑफ़र",
+    "login": "लॉगिन",
+    "account": "मेरा खाता",
+    "credentials": "प्रमाणपत्र",
+    "contact": "संपर्क",
+    "language": "भाषा",
+    "close": "बंद करें",
+    "userGuide": "उपयोगकर्ता मार्गदर्शिका"
   },
   "header": {
     "invocation": "ॐ गं गणपतये नमः",
@@ -68,6 +79,7 @@
     "profileAria": "उपयोगकर्ता प्रोफ़ाइल"
   },
   "marquee": {
+    "close": "सूचना बंद करें",
     "badge": "विशेष घोषणा",
     "cta": "पंजीकरण करें"
   },
@@ -214,6 +226,9 @@
     "resendIn": "पुनः भेजें",
     "resendOtp": "ओटीपी पुनः भेजें",
     "facebookSignIn": "Facebook से जारी रखें",
+        "emailOrPhoneLabel": "ईमेल या मोबाइल नंबर",
+    "googleNotConfigured": "Google लॉगिन अभी चालू नहीं है। कृपया मोबाइल OTP या पासवर्ड से लॉगिन करें।",
+    "facebookNotConfigured": "Facebook लॉगिन अभी चालू नहीं है। कृपया मोबाइल OTP या पासवर्ड से लॉगिन करें।",
     "googleSignIn": "Google से जारी रखें",
     "emailLabel": "ईमेल पता",
     "passwordLabel": "पासवर्ड",

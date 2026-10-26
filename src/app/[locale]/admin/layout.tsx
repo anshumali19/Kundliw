@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Link } from "@/i18n/routing";
 import { requireAdmin } from "@/lib/auth/guards";
+import { SignOutButton } from "@/components/ui/SignOutButton";
 import {
   LayoutDashboard,
   ShieldAlert,
@@ -20,6 +21,7 @@ import {
   Sparkles,
   Handshake,
   DatabaseBackup,
+  BadgeCheck,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -72,6 +74,7 @@ export default async function AdminLayout(props: AdminLayoutProps) {
               <span>{isHindi ? "सार्वजनिक पोर्टल" : "Public Site"}</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
+            <SignOutButton label={isHindi ? "लॉग आउट" : "Log out"} className="!min-h-[36px] !px-3 !text-xs !bg-surface" />
           </div>
         </div>
       </div>
@@ -231,6 +234,14 @@ export default async function AdminLayout(props: AdminLayoutProps) {
           >
             <KeyRound className="w-3.5 h-3.5 text-primary" />
             <span>{isHindi ? "कुंजियाँ (API Keys)" : "API Keys"}</span>
+          </Link>
+
+          <Link
+            href="/admin/credentials"
+            className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+          >
+            <BadgeCheck className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "प्रमाणपत्र (Credentials)" : "Credentials"}</span>
           </Link>
 
           <Link

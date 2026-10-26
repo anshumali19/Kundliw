@@ -3,6 +3,7 @@ import { Role } from "@prisma/client";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
+import { SignOutButton } from "@/components/ui/SignOutButton";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { OrderStatusStepper } from "@/features/orders/components/OrderStatusStepper";
 import { CanonicalOrderStatus } from "@/lib/orders/status";
@@ -100,6 +101,25 @@ export default async function AccountPage(props: AccountPageProps) {
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
+      </div>
+
+      {/* Quick links: documents, credentials and logout */}
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href="/vault"
+          className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-lg border border-maroon bg-surface hover:bg-brand/20 text-sm font-bold text-secondary"
+        >
+          <FileText className="w-4 h-4 text-primary" />
+          {isHindi ? "मेरे दस्तावेज़ (वॉल्ट)" : "My documents (vault)"}
+        </Link>
+        <Link
+          href="/credentials"
+          className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded-lg border border-maroon bg-surface hover:bg-brand/20 text-sm font-bold text-secondary"
+        >
+          <ShieldCheck className="w-4 h-4 text-primary" />
+          {isHindi ? "प्रमाणपत्र एवं दस्तावेज़" : "Credentials and documents"}
+        </Link>
+        <SignOutButton label={isHindi ? "लॉग आउट" : "Log out"} className="ml-auto" />
       </div>
 
       {/* Orders Section */}

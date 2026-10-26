@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { AccountMenu } from "./AccountMenu";
 import {
   Phone,
   Calendar,
@@ -187,9 +188,14 @@ export function Header({ phone }: HeaderProps = {}) {
         <div className="h-20 w-full px-4 sm:px-6 xl:px-6 2xl:px-10 flex items-center justify-between gap-2 sm:gap-4 xl:gap-2 2xl:gap-6">
           {/* Logo & Kendra Identity */}
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0 shrink sm:shrink-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded border border-secondary flex items-center justify-center bg-surface-container-low text-secondary shrink-0">
-              <span className="font-serif text-lg sm:text-xl font-bold">ॐ</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.webp"
+              alt={tCommon("siteNameHi")}
+              width={64}
+              height={48}
+              className="h-11 sm:h-12 w-auto shrink-0 rounded-md"
+            />
             <div className="flex flex-col text-left min-w-0">
               <span className="font-serif text-sm sm:text-base lg:text-lg font-bold tracking-tight text-secondary leading-tight whitespace-nowrap truncate">
                 {tCommon("siteNameHi")}
@@ -288,13 +294,7 @@ export function Header({ phone }: HeaderProps = {}) {
               <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
             </Link>
 
-            <Link
-              href="/account"
-              aria-label={tHeader("profileAria")}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand flex items-center justify-center text-on-brand hover:opacity-90 transition-opacity min-h-[36px] min-w-[36px] shrink-0 shadow-sm"
-            >
-              <User className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Link>
+            <AccountMenu />
 
             {/* Mobile Hamburger Button */}
             <button

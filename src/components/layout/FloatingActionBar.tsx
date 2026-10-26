@@ -428,7 +428,7 @@ export function FloatingActionBar({
       {/* Floating quick actions: Call + WhatsApp on the left, AI + Chat on the right (mobile).
           They sit above the fixed marquee strip and the bottom navigation. */}
       <div
-        className="pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-auto sm:right-6 z-40 flex items-end justify-between sm:flex-col sm:items-end sm:gap-4"
+        className="pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between"
         role="region"
         aria-label="Quick contact and assistance"
       >

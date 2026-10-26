@@ -1,6 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { Megaphone, ArrowRight } from "lucide-react";
+import { Megaphone, ArrowRight, X } from "lucide-react";
 
 interface MarqueeStripProps {
   items?: Array<{
@@ -11,6 +14,8 @@ interface MarqueeStripProps {
     fontSize?: number;
     bgColor?: string;
     textColor?: string;
+    pauseOnHover?: boolean;
+    allowClose?: boolean;
   }>;
   position?: "TOP" | "BOTTOM";
 }
@@ -23,6 +28,17 @@ const safeColor = (value: string | undefined, fallback: string) =>
 export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) {
   const tMarquee = useTranslations("marquee");
   const locale = useLocale();
+
+  // Visitors can close the strip; it stays closed for the rest of the visit.
+  const storageKey = `kjk_marquee_closed_${position}`;
+  const [closed, setClosed] = useState(false);
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(storageKey) === "1") setClosed(true);
+    } catch {
+      // storage unavailable: keep the strip visible
+    }
+  }, [storageKey]);
 
   // Shown only until the admin adds an announcement under Admin > Marquee
   const defaultItems = [
@@ -37,13 +53,17 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
   const style = items && items.length > 0 ? items[0] : undefined;
 
   // Maroon is reserved for the footer Quick Links, so legacy maroon marquee settings use the brand style.
-  const LEGACY_MAROON = new Set(["var(--secondary)", "var(--primary)", "var(--maroon)", "#800000", "#6b1d1d", "#661919"]);
+  const LEGACY_MAROON = new Set(["var(--secondary)", "var(--primary)", "var(--maroon)", "#800000", "#6b1d1d"]);
   const configuredBg = style?.bgColor?.trim().toLowerCase();
   const useBrand = !configuredBg || LEGACY_MAROON.has(configuredBg);
   const background = useBrand ? "var(--brand)" : safeColor(style?.bgColor, "var(--brand)");
   const color = useBrand ? "var(--on-brand)" : safeColor(style?.textColor, "var(--on-brand)");
   const fontSize = Math.min(Math.max(style?.fontSize ?? 14, 12), 28);
   const speed = Math.min(Math.max(style?.speedSec ?? 30, 8), 120);
+  const pauseOnHover = style?.pauseOnHover ?? true;
+  const allowClose = style?.allowClose ?? true;
+
+  if (closed) return null;
 
   // BOTTOM: fixed to the screen footer, above the mobile navigation bar.
   // TOP: a normal strip at the start of the page.
@@ -54,7 +74,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
 
   return (
     <div
-      className={`${placement} py-2 overflow-hidden`}
+      className={`${placement} group py-2 overflow-hidden`}
       style={{ background, color }}
       role="region"
       aria-label="Announcements"
@@ -67,7 +87,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
 
         <div className="relative overflow-hidden w-full flex items-center min-w-0 flex-1">
           <div
-            className="whitespace-nowrap animate-marquee flex items-center gap-8 tracking-wide font-semibold"
+            className={`whitespace-nowrap animate-marquee flex items-center gap-8 tracking-wide font-semibold ${pauseOnHover ? "group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]" : ""}`}
             style={{ fontSize: `${fontSize}px`, animationDuration: `${speed}s` }}
           >
             {[0, 1].map((copy) =>
@@ -95,6 +115,24 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
           <span>{tMarquee("cta")}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
+
+        {allowClose && (
+          <button
+            type="button"
+            onClick={() => {
+              setClosed(true);
+              try {
+                sessionStorage.setItem(storageKey, "1");
+              } catch {
+                // ignore
+              }
+            }}
+            aria-label={tMarquee("close")}
+            className="shrink-0 inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-full hover:bg-black/15"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { Copy, Share2, Wallet, FileDown } from "lucide-react";
+import { SignOutButton } from "@/components/ui/SignOutButton";
 
 interface Summary {
   profile: { status: "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED"; referralCode: string; rejectionReason: string | null };
@@ -122,9 +123,12 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
             {t("Share your link, track referred bookings and request payouts.", "अपना लिंक साझा करें, रेफ़र किए गए बुकिंग देखें और भुगतान का अनुरोध करें।")}
           </p>
         </div>
-        <span className="px-3 py-1.5 rounded-full border-2 border-maroon bg-brand text-on-brand text-sm font-bold">
-          {statusLabel[profile.status]}
-        </span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="px-3 py-1.5 rounded-full border-2 border-maroon bg-brand text-on-brand text-sm font-bold">
+            {statusLabel[profile.status]}
+          </span>
+          <SignOutButton label={t("Log out", "लॉग आउट")} />
+        </div>
       </div>
 
       {message && (

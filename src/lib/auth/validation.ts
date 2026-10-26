@@ -74,7 +74,8 @@ export const verifyOtpSchema = z.object({
   otp: otpSchema,
 });
 
+/** The sign-in name can be an email address or a mobile number. */
 export const emailPasswordLoginSchema = z.object({
-  email: emailSchema,
+  email: z.string().trim().min(3, "Enter your email or mobile number").max(254),
   password: z.string().min(1, "Password is required"),
 });

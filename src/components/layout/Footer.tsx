@@ -40,9 +40,8 @@ export async function Footer() {
           {/* Col 1: Identity & Sanctum Address with Logo */}
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
-              <span className="w-9 h-9 rounded border border-brand flex items-center justify-center font-serif text-xl bg-on-maroon text-maroon font-bold shrink-0">
-                ॐ
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.webp" alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
               <div className="flex flex-col">
                 <span className="font-serif text-base font-bold text-gold leading-tight">
                   {t("title")}
@@ -167,6 +166,11 @@ export async function Footer() {
               <li>
                 <Link href="/vault" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("vault")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/credentials" className="hover:text-gold transition-colors block py-0.5">
+                  {tNav("credentials")}
                 </Link>
               </li>
               {footerPages.map((fp) => (

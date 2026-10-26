@@ -7,6 +7,7 @@ import { PageNavButtons } from "@/components/layout/PageNavButtons";
 import { Footer } from "@/components/layout/Footer";
 import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
@@ -155,8 +156,8 @@ export default async function LocaleLayout(
         name: SITE_NAME,
         alternateName: SITE_NAME_HI,
         url: SITE_URL,
-        logo: `${SITE_URL}/icon.svg`,
-        image: `${SITE_URL}/icon.svg`,
+        logo: `${SITE_URL}/logo.png`,
+        image: `${SITE_URL}/logo.png`,
         description:
           "Vedic astrology consultations, Kundli preparation, Kundli matching and Prashna Kundli with online booking.",
         ...(settings?.phone1 ? { telephone: settings.phone1 } : {}),
@@ -192,6 +193,7 @@ export default async function LocaleLayout(
         <JsonLd data={structuredData} />
         <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <AuthProvider>
           <SmoothScrollProvider>
             <Header phone={settings?.phone1 ?? undefined} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
@@ -218,6 +220,7 @@ export default async function LocaleLayout(
               }
             />
           </SmoothScrollProvider>
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -22,9 +22,35 @@ interface MarqueeItem {
   fontSize: number;
   bgColor: string;
   textColor: string;
+  pauseOnHover?: boolean;
+  allowClose?: boolean;
   position: "TOP" | "BOTTOM";
   isActive: boolean;
   orderIndex: number;
+}
+
+// Site colours the admin can pick with one click (any other colour can be chosen with the picker)
+const COLOR_PRESETS: Array<{ name: string; bg: string; text: string }> = [
+  { name: "Orange", bg: "#F96706", text: "#FFFFFF" },
+  { name: "Gold", bg: "#FFC105", text: "#261B17" },
+  { name: "Maroon", bg: "#661919", text: "#FFFFFF" },
+  { name: "Cream", bg: "#FFF2E5", text: "#261B17" },
+  { name: "Dark", bg: "#261B17", text: "#FFC105" },
+];
+
+/** The colour picker needs a #rrggbb value; older entries stored site colour names. */
+function toHex(value: string, fallback: string): string {
+  if (/^#[0-9a-fA-F]{6}$/.test(value)) return value;
+  if (/^#[0-9a-fA-F]{3}$/.test(value)) {
+    return "#" + value.slice(1).split("").map((c) => c + c).join("");
+  }
+  const named: Record<string, string> = {
+    "var(--brand)": "#F96706",
+    "var(--on-brand)": "#FFFFFF",
+    "var(--gold)": "#FFC105",
+    "var(--maroon)": "#661919",
+  };
+  return named[value] ?? fallback;
 }
 
 export default function AdminMarqueePage() {
@@ -42,6 +68,8 @@ export default function AdminMarqueePage() {
   const [textColor, setTextColor] = useState("var(--on-brand)");
   const [position, setPosition] = useState<"TOP" | "BOTTOM">("BOTTOM");
   const [orderIndex, setOrderIndex] = useState(0);
+  const [pauseOnHover, setPauseOnHover] = useState(true);
+  const [allowClose, setAllowClose] = useState(true);
 
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -77,6 +105,8 @@ export default function AdminMarqueePage() {
     setTextColor(item.textColor);
     setPosition(item.position);
     setOrderIndex(item.orderIndex);
+    setPauseOnHover(item.pauseOnHover ?? true);
+    setAllowClose(item.allowClose ?? true);
     setError(null);
     setSuccess(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -107,6 +137,8 @@ export default function AdminMarqueePage() {
           textColor,
           position,
           orderIndex,
+          pauseOnHover,
+          allowClose,
         }),
       });
 
@@ -277,6 +309,67 @@ export default function AdminMarqueePage() {
                 onChange={(e) => setOrderIndex(Number(e.target.value))}
                 className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
               />
+            </div>
+
+            <div className="sm:col-span-2 space-y-3 p-3 rounded-lg border border-outline-variant/60">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase text-secondary">
+                <Palette className="w-4 h-4 text-primary" /> Colours
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="flex items-center gap-3 text-xs font-semibold">
+                  <input
+                    type="color"
+                    value={toHex(bgColor, "#F96706")}
+                    onChange={(e) => setBgColor(e.target.value)}
+                    className="w-14 h-11 rounded border border-outline-variant bg-transparent cursor-pointer"
+                    aria-label="Background colour"
+                  />
+                  Background colour
+                </label>
+                <label className="flex items-center gap-3 text-xs font-semibold">
+                  <input
+                    type="color"
+                    value={toHex(textColor, "#FFFFFF")}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="w-14 h-11 rounded border border-outline-variant bg-transparent cursor-pointer"
+                    aria-label="Font colour"
+                  />
+                  Font colour
+                </label>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_PRESETS.map((c) => (
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => {
+                      setBgColor(c.bg);
+                      setTextColor(c.text);
+                    }}
+                    className="min-h-[40px] px-3 rounded border border-outline-variant text-xs font-bold"
+                    style={{ background: c.bg, color: c.text }}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+              <div
+                className="rounded px-3 py-2 font-semibold overflow-hidden whitespace-nowrap"
+                style={{ background: toHex(bgColor, "#F96706"), color: toHex(textColor, "#FFFFFF"), fontSize: `${fontSize}px` }}
+                aria-label="Preview"
+              >
+                {textEn || "Preview of the announcement text"}
+              </div>
+              <div className="flex flex-wrap items-center gap-6 pt-1">
+                <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" checked={pauseOnHover} onChange={(e) => setPauseOnHover(e.target.checked)} className="w-4 h-4" />
+                  Pause the scrolling when the pointer is over it
+                </label>
+                <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+                  <input type="checkbox" checked={allowClose} onChange={(e) => setAllowClose(e.target.checked)} className="w-4 h-4" />
+                  Let visitors close it
+                </label>
+              </div>
             </div>
           </div>
 

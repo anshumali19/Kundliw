@@ -333,15 +333,22 @@ model Slot {
 }
 
 model AssociateProfile {
-  id              String          @id @default(cuid())
-  userId          String          @unique
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  referralCode    String          @unique
-  status          AssociateStatus @default(PENDING)
-  rejectionReason String?         @db.Text
-  reviewedAt      DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id                    String          @id @default(cuid())
+  userId                String          @unique
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referralCode          String          @unique
+  status                AssociateStatus @default(PENDING)
+  rejectionReason       String?         @db.Text
+  reviewedAt            DateTime?
+  notes                 String?         @db.Text
+  customCommissionType  DiscountType?
+  customCommissionValue Int?
+  payoutUpi             String?
+  payoutAccountHolder   String?
+  payoutAccountNumber   String?
+  payoutIfsc            String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
 
   orders      Order[]
   commissions Commission[]
@@ -409,18 +416,19 @@ model ProcessedWebhookEvent {
 }
 
 model VaultFile {
-  id         String   @id @default(cuid())
-  orderId    String?
-  order      Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  titleEn    String
-  titleHi    String
-  fileName   String
-  storageKey String // Internal private storage path
-  fileSize   Int
-  mimeType   String   @default("application/pdf")
-  uploadedAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  orderId        String?
+  order          Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  titleEn        String
+  titleHi        String
+  fileName       String
+  storageKey     String // Internal private storage path
+  fileSize       Int
+  mimeType       String   @default("application/pdf")
+  uploadedByRole String   @default("ADMIN") // ADMIN, USER or ASSOCIATE
+  uploadedAt     DateTime @default(now())
 
   @@index([userId])
 }
@@ -488,6 +496,23 @@ model AdminSettings {
   astrosageEmbedUrl        String?  @default("https://www.astrosage.com/freekundli/")
   // Android app download section (website page and QR code)
   appDownloadUrl           String?
+  // Map shown on the Contact page and footer (admin chooses the place)
+  mapEnabled               Boolean  @default(true)
+  mapZoom                  Int      @default(15)
+  mapLabelEn               String?
+  mapLabelHi               String?
+  // Associate programme rules
+  associatesEnabled        Boolean  @default(true)
+  associateAutoApprove     Boolean  @default(false)
+  associateMinPayoutPaise  Int      @default(50000)
+  associateReferralDays    Int      @default(30)
+  associateTermsEn         String?  @db.Text
+  associateTermsHi         String?  @db.Text
+  // Backups
+  backupAutoEnabled        Boolean  @default(true)
+  backupKeepDaily          Int      @default(7)
+  backupKeepWeekly         Int      @default(4)
+  backupKeepMonthly        Int      @default(12)
   // Chatbot Settings
   chatbotEnabled           Boolean  @default(true)
   chatbotWelcomeEn         String?  @db.Text
@@ -530,17 +555,19 @@ model ContactEnquiry {
 }
 
 model MarqueeItem {
-  id         String          @id @default(cuid())
-  textEn     String
-  textHi     String
-  speedSec   Int             @default(30)
-  fontSize   Int             @default(13) // px
-  bgColor    String          @default("var(--secondary)")
-  textColor  String          @default("var(--on-secondary)")
-  position   MarqueePosition @default(BOTTOM)
-  isActive   Boolean         @default(true)
-  orderIndex Int             @default(0)
-  createdAt  DateTime        @default(now())
+  id           String          @id @default(cuid())
+  textEn       String
+  textHi       String
+  speedSec     Int             @default(30)
+  fontSize     Int             @default(13) // px
+  bgColor      String          @default("var(--secondary)")
+  textColor    String          @default("var(--on-secondary)")
+  position     MarqueePosition @default(BOTTOM)
+  isActive     Boolean         @default(true)
+  pauseOnHover Boolean         @default(true)
+  allowClose   Boolean         @default(true)
+  orderIndex   Int             @default(0)
+  createdAt    DateTime        @default(now())
 }
 
 model Banner {
@@ -702,4 +729,36 @@ model TranslationOverride {
 
   @@unique([locale, namespace, key])
   @@index([locale, namespace])
+}
+
+// Official documents shown to users (GST, MSME, trademark, ISO and so on)
+model Credential {
+  id             String   @id @default(cuid())
+  kind           String   @default("OTHER") // GST, MSME, TRADEMARK, ISO, OTHER
+  titleEn        String
+  titleHi        String
+  descriptionEn  String?  @db.Text
+  descriptionHi  String?  @db.Text
+  documentNumber String?
+  fileUrl        String
+  fileName       String
+  mimeType       String
+  isActive       Boolean  @default(true)
+  orderIndex     Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Stored copies of the site's content and records (compressed JSON)
+model BackupRecord {
+  id        String   @id @default(cuid())
+  kind      String // MANUAL, DAILY, WEEKLY, MONTHLY
+  sizeBytes Int
+  tables    Int      @default(0)
+  rows      Int      @default(0)
+  data      Bytes
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  @@index([kind, createdAt])
 }

@@ -32,13 +32,13 @@
   "nav": {
     "home": "Home",
     "panchang": "Panchang",
-    "services": "Vedic Services",
+    "services": "Services",
     "servicesShort": "Services",
-    "pricingPlans": "Pricing Plans",
+    "pricingPlans": "Booking",
     "pricingPlansShort": "Plans",
-    "kundli": "Kundli Calculator",
+    "kundli": "Kundli",
     "kundliShort": "Kundli",
-    "kundliMatching": "Kundli Matching",
+    "kundliMatching": "Matching",
     "kundliMatchingShort": "Matching",
     "prashna": "Prashna Kundli",
     "prashnaShort": "Prashna",
@@ -56,7 +56,18 @@
     "profile": "Profile",
     "signIn": "Sign In",
     "signOut": "Sign Out",
-    "register": "Register"
+    "register": "Register",
+    "menu": "Menu",
+    "menuSub": "All pages and bookings",
+    "booking": "Booking",
+    "offers": "Offers",
+    "login": "Login",
+    "account": "My Account",
+    "credentials": "Credentials",
+    "contact": "Contact",
+    "language": "Language",
+    "close": "Close",
+    "userGuide": "User Guide"
   },
   "header": {
     "invocation": "ॐ गं गणपतये नमः",
@@ -68,6 +79,7 @@
     "profileAria": "User Profile"
   },
   "marquee": {
+    "close": "Close announcement",
     "badge": "Special Notice",
     "cta": "Register Now"
   },
@@ -214,6 +226,9 @@
     "resendIn": "Resend in",
     "resendOtp": "Resend OTP",
     "facebookSignIn": "Continue with Facebook",
+        "emailOrPhoneLabel": "Email or mobile number",
+    "googleNotConfigured": "Google sign-in is not switched on yet. Please use your mobile OTP or password.",
+    "facebookNotConfigured": "Facebook sign-in is not switched on yet. Please use your mobile OTP or password.",
     "googleSignIn": "Continue with Google",
     "emailLabel": "Email Address",
     "passwordLabel": "Password",

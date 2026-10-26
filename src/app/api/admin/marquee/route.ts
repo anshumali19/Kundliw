@@ -15,6 +15,8 @@ const marqueeSchema = z.object({
   bgColor: z.string().default("var(--brand)"),
   textColor: z.string().default("var(--on-brand)"),
   position: z.nativeEnum(MarqueePosition).default(MarqueePosition.BOTTOM),
+  pauseOnHover: z.boolean().default(true),
+  allowClose: z.boolean().default(true),
   isActive: z.boolean().default(true),
   orderIndex: z.number().int().default(0),
 });

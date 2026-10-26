@@ -41,12 +41,12 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
         ? `/${locale}/associate`
         : `/${locale}/account`;
 
-  // Mode: "OTP" | "ADMIN" (email + password). Super Admin is password-only,
-  // User is OTP/Google-only, Associate may use either.
+  // Mode: "OTP" (mobile code) or "ADMIN" (email or mobile + password). Super Admin uses a password;
+  // User and Associate can use either. Google and Facebook buttons are on every login page.
   const [authMode, setAuthMode] = useState<"OTP" | "ADMIN">(
     portal === "super-admin" ? "ADMIN" : "OTP"
   );
-  const showModeSwitcher = portal === "associate";
+  const showModeSwitcher = portal !== "super-admin";
 
   // OTP Form States
   const [phone, setPhone] = useState("");
@@ -185,12 +185,18 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
       .catch(() => setSocialProviders([]));
   }, []);
 
-  const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl });
-  };
-
-  const handleFacebookSignIn = () => {
-    signIn("facebook", { callbackUrl });
+  // A provider that has no keys yet shows a clear message instead of failing silently.
+  const handleSocial = (provider: "google" | "facebook") => {
+    setErrorMsg(null);
+    if (!socialProviders.includes(provider)) {
+      setErrorMsg(
+        provider === "google"
+          ? tAuth("googleNotConfigured")
+          : tAuth("facebookNotConfigured")
+      );
+      return;
+    }
+    signIn(provider, { callbackUrl });
   };
 
   return (
@@ -377,67 +383,6 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                 </form>
               )}
 
-              {/* WebView Notice & Google Divider (customer portal only) */}
-              {portal === "user" && (socialProviders.includes("google") || socialProviders.includes("facebook")) && (
-              <div className="pt-4 border-t border-outline-variant/30 space-y-3">
-                <div className="relative text-center">
-                  <span className="bg-surface px-3 text-xs text-on-surface-variant uppercase">
-                    {tAuth("orDivider")}
-                  </span>
-                  <div className="absolute inset-0 flex items-center -z-10">
-                    <div className="w-full border-t border-outline-variant/30"></div>
-                  </div>
-                </div>
-
-                {isWebView ? (
-                  <div className="p-3 bg-surface-container-high rounded text-xs text-on-surface-variant leading-relaxed">
-                    {tAuth("appUserNote")}
-                  </div>
-                ) : (
-                  <>
-                  {socialProviders.includes("google") && (
-                  <button
-                    type="button"
-                    onClick={handleGoogleSignIn}
-                    className="w-full py-2.5 px-4 bg-surface hover:bg-surface-container text-on-surface text-xs font-bold rounded border border-outline-variant/80 transition-colors flex items-center justify-center gap-2 min-h-[44px]"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24">
-                      <path
-                        fill="#4285F4"
-                        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                      />
-                    </svg>
-                    <span>{tAuth("googleSignIn")}</span>
-                  </button>
-                  )}
-                  {socialProviders.includes("facebook") && (
-                  <button
-                    type="button"
-                    onClick={handleFacebookSignIn}
-                    className="w-full py-2.5 px-4 bg-[#1877F2] hover:opacity-90 text-white text-xs font-bold rounded border border-[#1877F2] transition-colors flex items-center justify-center gap-2 min-h-[44px]"
-                  >
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z" />
-                    </svg>
-                    <span>{tAuth("facebookSignIn")}</span>
-                  </button>
-                  )}
-                  </>
-                )}
-              </div>
-              )}
             </div>
           )}
 
@@ -446,14 +391,15 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
             <form onSubmit={handleAdminSignIn} className="space-y-4">
               <div>
                 <label className="block text-xs uppercase tracking-wider font-bold text-secondary mb-1">
-                  {tAuth("emailLabel")}
+                  {tAuth("emailOrPhoneLabel")}
                 </label>
                 <div className="relative">
                   <input
-                    type="email"
+                    type="text"
+                    autoComplete="username"
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
-                    placeholder={portal === "super-admin" ? "admin@kanad-jyotish.in" : "associate@example.com"}
+                    placeholder={portal === "super-admin" ? "admin@kanad-jyotish.in" : "name@example.com / 9876543210"}
                     className="w-full bg-surface-container-lowest text-on-surface px-3 py-2.5 rounded border border-outline-variant focus:border-secondary focus:outline-none text-sm min-h-[44px]"
                     required
                   />
@@ -486,6 +432,44 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
               </button>
             </form>
           )}
+
+          {/* Social sign-in: Google and Facebook on every login page */}
+          <div className="pt-5 mt-6 border-t border-outline-variant/30 space-y-3">
+            <div className="relative text-center">
+              <span className="bg-surface px-3 text-xs text-on-surface-variant uppercase">{tAuth("orDivider")}</span>
+            </div>
+            {isWebView ? (
+              <div className="p-3 bg-surface-container-high rounded text-xs text-on-surface-variant leading-relaxed">
+                {tAuth("appUserNote")}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSocial("google")}
+                  className="w-full py-2.5 px-4 bg-surface hover:bg-surface-container text-on-surface text-xs font-bold rounded border border-outline-variant transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z" />
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z" />
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z" />
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
+                  </svg>
+                  <span>{tAuth("googleSignIn")}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSocial("facebook")}
+                  className="w-full py-2.5 px-4 bg-[#1877F2] hover:opacity-90 text-white text-xs font-bold rounded border border-[#1877F2] transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z" />
+                  </svg>
+                  <span>{tAuth("facebookSignIn")}</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
