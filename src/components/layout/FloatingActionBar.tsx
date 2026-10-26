@@ -66,6 +66,8 @@ export function FloatingActionBar({
   const hideOnAdmin = /\/admin(\/|$)/.test(pathname || "");
 
   const [isOpen, setIsOpen] = useState(false);
+  // The four round buttons slide out of the way while the page is being scrolled, then return.
+  const [tuckedAway, setTuckedAway] = useState(false);
   // "chat": talk to the Kendra team (collects name and phone first)
   // "ai": instant answers from the Kendra knowledge base, no sign-up
   const [mode, setMode] = useState<"chat" | "ai">("chat");
@@ -103,6 +105,23 @@ export function FloatingActionBar({
   };
 
   // Load popular topics once so the Ask AI bar can show rotating suggestions
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) > 6) setTuckedAway(true);
+      lastY = y;
+      clearTimeout(timer);
+      timer = setTimeout(() => setTuckedAway(false), 900);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      clearTimeout(timer);
+    };
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     fetch(`/api/chatbot/ask?q=&locale=${locale}`)
@@ -428,7 +447,7 @@ export function FloatingActionBar({
       {/* Floating quick actions: Call + WhatsApp on the left, AI + Chat on the right (mobile).
           They sit above the fixed marquee strip and the bottom navigation. */}
       <div
-        className="pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between"
+        className={`pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between transition-all duration-300 ${tuckedAway && !isOpen ? "opacity-0 translate-y-6" : "opacity-100 translate-y-0"}`}
         role="region"
         aria-label="Quick contact and assistance"
       >
