@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { VaultFileActions } from "@/features/vault/VaultFileActions";
+import { SelectedFilePreview } from "@/components/content/FileViewer";
+import { DOCUMENT_ACCEPT } from "@/lib/storage/fileTypes";
 import {
   FileText,
   Upload,
@@ -23,6 +26,8 @@ export interface SerializedVaultFile {
   userEmail?: string | null;
   userPhone?: string | null;
   orderNumber?: string | null;
+  mimeType: string;
+  uploadedByRole?: string;
 }
 
 export interface UserOption {
@@ -124,6 +129,8 @@ export function AdminVaultManager({
         userEmail: selectedUser?.email,
         userPhone: selectedUser?.phone,
         orderNumber: selectedUser?.orders.find((o) => o.id === selectedOrderId)?.orderNumber || null,
+        mimeType: data.vaultFile.mimeType,
+        uploadedByRole: data.vaultFile.uploadedByRole,
       };
 
       setFiles([newFile, ...files]);
@@ -235,17 +242,28 @@ export function AdminVaultManager({
             </div>
           </div>
 
-          {/* PDF File Picker */}
-          <div>
-            <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
-              {isHindi ? "कुण्डली PDF फाइल (अधिकतम १० MB) *" : "Kundli PDF File (Max 10 MB) *"}
-            </label>
-            <input
-              type="file"
-              required
-              accept="application/pdf"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-surface-container-high file:text-secondary hover:file:bg-surface-container-highest cursor-pointer"
+          {/* File picker with a preview beside it */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <div>
+              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
+                {isHindi ? "फाइल (अधिकतम ४ MB) *" : "File (up to 4 MB) *"}
+              </label>
+              <input
+                type="file"
+                required
+                accept={DOCUMENT_ACCEPT}
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2.5 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-surface-container-high file:text-secondary hover:file:bg-surface-container-highest cursor-pointer"
+              />
+              <p className="text-[11px] text-on-surface-variant mt-1">
+                {isHindi
+                  ? "PDF, चित्र, वीडियो, ऑडियो, Word, Excel, PowerPoint, RTF या टेक्स्ट फाइल।"
+                  : "PDF, image, video, audio, Word, Excel, PowerPoint, RTF or text file."}
+              </p>
+            </div>
+            <SelectedFilePreview
+              file={file}
+              emptyText={isHindi ? "चुनी गई फाइल यहाँ दिखाई देगी।" : "The file you choose appears here."}
             />
           </div>
 
@@ -322,15 +340,18 @@ export function AdminVaultManager({
                   <span className="text-[11px] text-outline">
                     {new Date(doc.uploadedAt).toLocaleDateString(isHindi ? "hi-IN" : "en-IN")}
                   </span>
-                  <a
-                    href={`/api/vault/${doc.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="min-h-[44px] px-3 py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-secondary text-xs font-bold rounded flex items-center gap-1.5"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>{isHindi ? "डाउनलोड" : "Download"}</span>
-                  </a>
+                  {doc.uploadedByRole && doc.uploadedByRole !== "ADMIN" && (
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-brand/20 text-primary">
+                      {isHindi ? "ग्राहक द्वारा अपलोड" : `Uploaded by ${doc.uploadedByRole.toLowerCase()}`}
+                    </span>
+                  )}
+                  <VaultFileActions
+                    id={doc.id}
+                    title={isHindi ? doc.titleHi : doc.titleEn}
+                    fileName={doc.fileName}
+                    mimeType={doc.mimeType}
+                    isHindi={isHindi}
+                  />
                 </div>
               </div>
             ))}

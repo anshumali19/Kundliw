@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { SelectedFilePreview } from "@/components/content/FileViewer";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -430,7 +431,8 @@ export function CheckoutClient({
                     />
                   </div>
 
-                  <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                    <div>
                     <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
                       {isHindi
                         ? "भुगतान स्क्रीनशॉट / रसीद (वैकल्पिक)"
@@ -441,6 +443,11 @@ export function CheckoutClient({
                       accept="image/*,application/pdf"
                       onChange={(e) => setProofFile(e.target.files?.[0] || null)}
                       className="w-full text-xs text-on-surface-variant file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-surface-container-high file:text-on-surface hover:file:bg-surface-container-highest"
+                    />
+                    </div>
+                    <SelectedFilePreview
+                      file={proofFile}
+                      emptyText={isHindi ? "चुनी हुई रसीद यहाँ दिखेगी।" : "The receipt you choose appears here."}
                     />
                   </div>
 
@@ -553,7 +560,8 @@ export function CheckoutClient({
                     />
                   </div>
 
-                  <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                    <div>
                     <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
                       {isHindi
                         ? "बैंक अंतरण रसीद (वैकल्पिक)"
@@ -564,6 +572,11 @@ export function CheckoutClient({
                       accept="image/*,application/pdf"
                       onChange={(e) => setProofFile(e.target.files?.[0] || null)}
                       className="w-full text-xs text-on-surface-variant file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-surface-container-high file:text-on-surface hover:file:bg-surface-container-highest"
+                    />
+                    </div>
+                    <SelectedFilePreview
+                      file={proofFile}
+                      emptyText={isHindi ? "चुनी हुई रसीद यहाँ दिखेगी।" : "The receipt you choose appears here."}
                     />
                   </div>
 

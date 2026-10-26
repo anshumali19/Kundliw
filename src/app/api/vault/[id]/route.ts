@@ -33,11 +33,24 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     const storage = getStorageProvider();
     const { buffer, mimeType } = await storage.getFile(vaultFile.storageKey);
 
+    // Only types a browser can show safely are opened inline; Word, Excel and the rest download.
+    const type = mimeType || vaultFile.mimeType || "application/octet-stream";
+    const showInline =
+      type === "application/pdf" ||
+      (type.startsWith("image/") && type !== "image/svg+xml") ||
+      type.startsWith("video/") ||
+      type.startsWith("audio/") ||
+      type === "text/plain";
+    const asDownload = new URL(request.url).searchParams.get("download") === "1";
+    const safeName = vaultFile.fileName.replace(/[^\w.\- ]+/g, "_");
+
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
-        "Content-Type": mimeType || "application/pdf",
-        "Content-Disposition": `inline; filename="${vaultFile.fileName}"`,
+        "Content-Type": type,
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "sandbox",
+        "Content-Disposition": `${showInline && !asDownload ? "inline" : "attachment"}; filename="${safeName}"`,
         "Content-Length": buffer.length.toString(),
         "Cache-Control": "private, max-age=86400",
       },

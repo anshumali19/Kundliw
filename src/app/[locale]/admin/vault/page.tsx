@@ -55,6 +55,8 @@ export default async function AdminVaultPage(props: AdminVaultPageProps) {
     userEmail: f.user.email,
     userPhone: f.user.phone,
     orderNumber: f.order?.orderNumber || null,
+    mimeType: f.mimeType,
+    uploadedByRole: f.uploadedByRole,
   }));
 
   const users: UserOption[] = rawUsers.map((u) => ({

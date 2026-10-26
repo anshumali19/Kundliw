@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
+import { LocationMap } from "@/components/content/LocationMap";
 import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
 
 export async function Footer() {
@@ -318,6 +319,15 @@ export async function Footer() {
                 </li>
               )}
             </ul>
+            <div className="mt-4">
+              <LocationMap
+                settings={settings || {}}
+                title={(locale === "hi" ? settings?.mapLabelHi : settings?.mapLabelEn) || (locale === "hi" ? "हमारा स्थान" : "Find us")}
+                isHindi={locale === "hi"}
+                compact
+                onDark
+              />
+            </div>
           </div>
         </div>
 

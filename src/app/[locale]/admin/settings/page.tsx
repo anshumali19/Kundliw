@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { mapIframeSrc, parseMapInput, safeMapEmbedUrl } from "@/lib/content/map";
 import {
   Settings,
   Save,
@@ -45,6 +46,17 @@ export default function AdminSettingsPage() {
   const [qrCodeUrl, setQrCodeUrl] = useState("/images/qr-code.png");
   const [appDownloadUrl, setAppDownloadUrl] = useState("");
 
+  // Location map
+  const [mapEnabled, setMapEnabled] = useState(true);
+  const [mapZoom, setMapZoom] = useState(15);
+  const [mapLatitude, setMapLatitude] = useState<number | "">("");
+  const [mapLongitude, setMapLongitude] = useState<number | "">("");
+  const [mapLabelEn, setMapLabelEn] = useState("");
+  const [mapLabelHi, setMapLabelHi] = useState("");
+  const [mapEmbed, setMapEmbed] = useState("");
+  const [mapPaste, setMapPaste] = useState("");
+  const [mapPasteMsg, setMapPasteMsg] = useState<string | null>(null);
+
   // Tax
   const [gstin, setGstin] = useState("09AAAAA0000A1Z5");
   const [defaultGstRateBps, setDefaultGstRateBps] = useState<number>(1800);
@@ -74,6 +86,13 @@ export default function AdminSettingsPage() {
         if (s.bankName) setBankName(s.bankName);
         if (s.qrCodeUrl) setQrCodeUrl(s.qrCodeUrl);
         if (s.appDownloadUrl) setAppDownloadUrl(s.appDownloadUrl);
+        if (typeof s.mapEnabled === "boolean") setMapEnabled(s.mapEnabled);
+        if (s.mapZoom) setMapZoom(s.mapZoom);
+        if (s.mapLatitude != null) setMapLatitude(s.mapLatitude);
+        if (s.mapLongitude != null) setMapLongitude(s.mapLongitude);
+        if (s.mapLabelEn) setMapLabelEn(s.mapLabelEn);
+        if (s.mapLabelHi) setMapLabelHi(s.mapLabelHi);
+        if (s.googleMapEmbedUrl) setMapEmbed(s.googleMapEmbedUrl);
         if (s.gstin) setGstin(s.gstin);
         if (s.defaultGstRateBps !== null && s.defaultGstRateBps !== undefined)
           setDefaultGstRateBps(s.defaultGstRateBps);
@@ -148,6 +167,13 @@ export default function AdminSettingsPage() {
           bankName,
           qrCodeUrl,
           appDownloadUrl: appDownloadUrl.trim() || null,
+          mapEnabled,
+          mapZoom: Number(mapZoom) || 15,
+          mapLatitude: mapLatitude === "" ? null : Number(mapLatitude),
+          mapLongitude: mapLongitude === "" ? null : Number(mapLongitude),
+          mapLabelEn: mapLabelEn.trim() || null,
+          mapLabelHi: mapLabelHi.trim() || null,
+          googleMapEmbedUrl: mapEmbed.trim() || null,
           gstin,
           defaultGstRateBps: Number(defaultGstRateBps),
         }),
@@ -325,6 +351,108 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Section 3: Manual Payments & Banking */}
+        <div className="bg-surface rounded-lg p-6 border border-outline-variant/40 space-y-4">
+          <h2 className="font-serif text-base font-bold text-secondary pb-2 border-b border-outline-variant/30">
+            Location Map (नक्शा)
+          </h2>
+          <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+            <input type="checkbox" checked={mapEnabled} onChange={(e) => setMapEnabled(e.target.checked)} className="w-4 h-4" />
+            Show the map on the Contact page and in the footer
+          </label>
+
+          <div>
+            <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
+              Change the place: paste a Google Maps link or coordinates
+            </label>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                value={mapPaste}
+                onChange={(e) => setMapPaste(e.target.value)}
+                placeholder="https://www.google.com/maps/@25.31,82.97,17z  or  25.3176, 82.9739"
+                className="flex-1 min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const found = parseMapInput(mapPaste);
+                  if (!found) {
+                    setMapPasteMsg("Could not find a place in that text. Open the place in Google Maps, copy the full address from the browser bar (not a short link), or type latitude, longitude.");
+                    return;
+                  }
+                  setMapLatitude(found.lat);
+                  setMapLongitude(found.lng);
+                  setMapPasteMsg("Place set to " + found.lat + ", " + found.lng + ". Press Save to publish it.");
+                }}
+                className="min-h-[44px] px-4 rounded border border-maroon bg-brand text-on-brand text-xs font-bold uppercase"
+              >
+                Use this place
+              </button>
+            </div>
+            {mapPasteMsg && <p className="text-[11px] text-on-surface-variant mt-1">{mapPasteMsg}</p>}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">Latitude</label>
+              <input type="number" step="any" value={mapLatitude} onChange={(e) => setMapLatitude(e.target.value === "" ? "" : Number(e.target.value))} className="w-full min-h-[44px] px-3 py-2 font-mono bg-surface-container-low border border-outline-variant rounded text-xs" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">Longitude</label>
+              <input type="number" step="any" value={mapLongitude} onChange={(e) => setMapLongitude(e.target.value === "" ? "" : Number(e.target.value))} className="w-full min-h-[44px] px-3 py-2 font-mono bg-surface-container-low border border-outline-variant rounded text-xs" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">Zoom (3 - 19)</label>
+              <input type="number" min={3} max={19} value={mapZoom} onChange={(e) => setMapZoom(Number(e.target.value))} className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs" />
+            </div>
+            <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">Map heading (English)</label>
+                <input type="text" value={mapLabelEn} onChange={(e) => setMapLabelEn(e.target.value)} placeholder="Find us" className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">नक्शे का शीर्षक (हिन्दी)</label>
+                <input type="text" value={mapLabelHi} onChange={(e) => setMapLabelHi(e.target.value)} placeholder="हमारा स्थान" className="w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs" />
+              </div>
+            </div>
+          </div>
+
+          <details className="text-xs">
+            <summary className="cursor-pointer font-bold text-secondary min-h-[44px] flex items-center">Advanced: use a Google Maps embed instead</summary>
+            <p className="text-on-surface-variant my-2">In Google Maps choose Share, then Embed a map, and paste the whole code or only its link. When this is filled, it is shown instead of the place above.</p>
+            <textarea
+              rows={3}
+              value={mapEmbed}
+              onChange={(e) => setMapEmbed(e.target.value)}
+              placeholder="Paste the Google Maps embed code here"
+              className="w-full px-3 py-2 font-mono bg-surface-container-low border border-outline-variant rounded text-[11px]"
+            />
+            {mapEmbed.trim() && !safeMapEmbedUrl(mapEmbed) && (
+              <p className="text-on-error-container mt-1">This is not a Google Maps or OpenStreetMap embed link, so it will not be saved.</p>
+            )}
+          </details>
+
+          <div>
+            <span className="block text-xs font-bold uppercase text-on-surface-variant mb-1">Preview</span>
+            {(() => {
+              const src = mapIframeSrc({
+                mapEnabled: true,
+                mapZoom,
+                mapLatitude: mapLatitude === "" ? null : Number(mapLatitude),
+                mapLongitude: mapLongitude === "" ? null : Number(mapLongitude),
+                googleMapEmbedUrl: mapEmbed,
+              });
+              return src ? (
+                <iframe src={src} title="Map preview" loading="lazy" className="w-full h-60 rounded-lg border border-outline-variant" />
+              ) : (
+                <p className="text-xs text-on-surface-variant p-4 border border-dashed border-outline-variant rounded-lg">
+                  No place chosen yet. The map stays hidden on the website until you set one.
+                </p>
+              );
+            })()}
+          </div>
+        </div>
+
         <div className="bg-surface rounded-lg p-6 border border-outline-variant/40 space-y-4">
           <h2 className="font-serif text-base font-bold text-secondary pb-2 border-b border-outline-variant/30">
             Android App Download (ऐप डाउनलोड)

@@ -3,6 +3,7 @@ import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { safeMapEmbedUrl } from "@/lib/content/map";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,20 @@ const settingsSchema = z.object({
     .or(z.literal("")),
   gstin: z.string().optional().nullable(),
   defaultGstRateBps: z.number().int().optional().nullable(),
+  // Location map
+  mapEnabled: z.boolean().optional(),
+  mapZoom: z.number().int().min(3).max(19).optional(),
+  mapLatitude: z.number().min(-90).max(90).optional().nullable(),
+  mapLongitude: z.number().min(-180).max(180).optional().nullable(),
+  mapLabelEn: z.string().trim().max(120).optional().nullable(),
+  mapLabelHi: z.string().trim().max(120).optional().nullable(),
+  googleMapEmbedUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine((v) => v === "" || safeMapEmbedUrl(v) !== null, "Use a Google Maps or OpenStreetMap embed link")
+    .optional()
+    .nullable(),
 });
 
 export async function GET() {

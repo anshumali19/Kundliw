@@ -13,6 +13,7 @@ import {
   MessageSquare,
   ExternalLink,
 } from "lucide-react";
+import { directionsUrl, mapIframeSrc } from "@/lib/content/map";
 
 interface ContactClientProps {
   settings: {
@@ -25,6 +26,12 @@ interface ContactClientProps {
     addressHi?: string | null;
     city?: string | null;
     googleMapEmbedUrl?: string | null;
+    mapEnabled?: boolean | null;
+    mapZoom?: number | null;
+    mapLatitude?: number | null;
+    mapLongitude?: number | null;
+    mapLabelEn?: string | null;
+    mapLabelHi?: string | null;
     socialWhatsapp?: string | null;
     socialTelegram?: string | null;
     socialFacebook?: string | null;
@@ -50,7 +57,7 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
   const address = isHindi
     ? settings.addressHi || settings.addressEn || ""
     : settings.addressEn || settings.addressHi || "";
-  const mapUrl = settings.googleMapEmbedUrl || "";
+  const mapUrl = mapIframeSrc(settings) || "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,9 +101,9 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
     }
   };
 
-  const googleMapsDirectionsUrl = address
-    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`
-    : "";
+  const googleMapsDirectionsUrl =
+    directionsUrl(settings) ||
+    (address ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}` : null);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left space-y-10">

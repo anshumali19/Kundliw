@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
-import { getStorageProvider, validateFileMagicBytes, MAX_FILE_SIZE_BYTES } from "@/lib/storage";
+import { getStorageProvider } from "@/lib/storage";
+import { detectDocumentType, MAX_DOCUMENT_UPLOAD_BYTES } from "@/lib/storage/fileTypes";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { OrderStatus } from "@prisma/client";
 import {
@@ -39,27 +40,31 @@ export async function POST(request: NextRequest) {
 
     if (!userId || !titleEn || !titleHi || !file) {
       return NextResponse.json(
-        { error: "User, bilingual titles (EN & HI), and a PDF file are required." },
+        { error: "User, bilingual titles (EN & HI), and a file are required." },
         { status: 400 }
       );
     }
 
-    if (file.size > MAX_FILE_SIZE_BYTES) {
+    if (file.size > MAX_DOCUMENT_UPLOAD_BYTES) {
       return NextResponse.json(
-        { error: `File size exceeds the strict 10 MB limit (${(file.size / 1024 / 1024).toFixed(2)} MB).` },
+        { error: `File is too large (${(file.size / 1024 / 1024).toFixed(2)} MB). The limit is 4 MB.` },
         { status: 400 }
       );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const { isValid, detectedMime } = validateFileMagicBytes(buffer);
+    const detected = detectDocumentType(buffer, file.name);
 
-    if (!isValid || detectedMime !== "application/pdf") {
+    if (!detected.ok || !detected.mime) {
       return NextResponse.json(
-        { error: "Invalid file signature: only authentic PDF documents (%PDF-) are accepted." },
+        {
+          error:
+            "This file type is not accepted. Use PDF, an image, video, audio, Word, Excel, PowerPoint, RTF or a text file.",
+        },
         { status: 400 }
       );
     }
+    const detectedMime: string = detected.mime;
 
     // Verify user exists
     const targetUser = await prisma.user.findUnique({
@@ -108,7 +113,7 @@ export async function POST(request: NextRequest) {
 
     // Save to private vault storage
     const storage = getStorageProvider();
-    const stored = await storage.saveFile(buffer, file.name, "application/pdf", "vault");
+    const stored = await storage.saveFile(buffer, file.name, detectedMime, "vault");
 
     const vaultFile = await prisma.$transaction(async (tx) => {
       if (orderId) {
@@ -169,7 +174,8 @@ export async function POST(request: NextRequest) {
           fileName: file.name,
           storageKey: stored.storageKey,
           fileSize: buffer.length,
-          mimeType: "application/pdf",
+          mimeType: detectedMime,
+          uploadedByRole: "ADMIN",
         },
       });
     });

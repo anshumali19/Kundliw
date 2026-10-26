@@ -1,6 +1,8 @@
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
+import { VaultUploader } from "@/features/vault/VaultUploader";
+import { VaultFileActions } from "@/features/vault/VaultFileActions";
 import {
   FileText,
   Download,
@@ -85,6 +87,8 @@ export default async function VaultPage(props: VaultPageProps) {
         </div>
       </div>
 
+      <VaultUploader isHindi={isHindi} />
+
       {/* Vault Documents List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -152,15 +156,13 @@ export default async function VaultPage(props: VaultPageProps) {
                 </div>
 
                 <div className="shrink-0">
-                  <a
-                    href={`/api/vault/${doc.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="min-h-[44px] px-5 py-2.5 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center gap-2 text-center"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>{isHindi ? "कुण्डली PDF डाउनलोड" : "Download PDF Report"}</span>
-                  </a>
+                  <VaultFileActions
+                    id={doc.id}
+                    title={isHindi ? doc.titleHi : doc.titleEn}
+                    fileName={doc.fileName}
+                    mimeType={doc.mimeType}
+                    isHindi={isHindi}
+                  />
                 </div>
               </div>
             ))}
