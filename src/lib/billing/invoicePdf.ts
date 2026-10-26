@@ -73,7 +73,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
 
       doc.fillColor("#574237");
       doc.fontSize(8);
-      doc.text(`${data.siteAddress} | Phone: ${data.sitePhone} | Email: ${data.siteEmail}`, 40, 75);
+      doc.text([data.siteAddress, `Phone: ${data.sitePhone}`, data.siteEmail ? `Email: ${data.siteEmail}` : ""].filter(Boolean).join(" | "), 40, 75);
 
       if (data.gstin) {
         doc.text(`GSTIN: ${data.gstin} (Composite / Regulated Astrology Service)`, 40, 87);
@@ -104,7 +104,6 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       if (data.customerEmail) {
         doc.text(`Email: ${data.customerEmail}`, 330, 154);
       }
-      doc.text("Jurisdiction: Dashashwamedh Ghat Peeth, Kashi", 330, 166);
 
       // Line items table header
       const tableTop = 190;

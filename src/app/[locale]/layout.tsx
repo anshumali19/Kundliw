@@ -10,6 +10,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
 import { ToolsProvider } from "@/components/providers/ToolsProvider";
+import { IntroSplash } from "@/components/layout/IntroSplash";
 import { getActiveSocialLinks, getSection } from "@/lib/siteConfig/service";
 import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { BannerSlot } from "@/components/banners/BannerSlot";
@@ -242,13 +243,23 @@ export default async function LocaleLayout(
   };
 
   return (
-    <html lang={locale} className={`${poppins.variable} ${notoSans.variable} ${cormorant.variable} ${notoSerifDeva.variable} w-full max-w-full overflow-x-clip`}>
+    <html lang={locale} className={`${poppins.variable} ${notoSans.variable} ${cormorant.variable} ${notoSerifDeva.variable} w-full max-w-full overflow-x-clip`} suppressHydrationWarning>
+      <head>
+        {/* Opening screen: skipped at once for returning visits and for every page except the home page */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(!/^\\/(hi|en)?\\/?$/.test(location.pathname)||sessionStorage.getItem("kjk_intro_seen")==="1")document.documentElement.classList.add("intro-seen")}catch(e){}',
+          }}
+        />
+      </head>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-clip relative">
         <JsonLd data={structuredData} />
         <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
           <ToolsProvider hidden={hiddenTools}>
+            <IntroSplash isHindi={locale === "hi"} />
           <SmoothScrollProvider>
             <Header phone={settings?.phone1 ?? undefined} panchang={panchang} social={social} logoUrl={String((await getSection("logo")).logoUrl || "") || undefined} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">

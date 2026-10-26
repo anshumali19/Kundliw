@@ -3,13 +3,12 @@ import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
 import { getSection } from "@/lib/siteConfig/service";
 import { SocialLinks } from "@/components/content/SocialLinks";
-import { LocationMap } from "@/components/content/LocationMap";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { Band, SectionHead, rupees } from "@/components/home/HomeParts";
 import { KundliRequestForm } from "@/components/home/KundliRequestForm";
 import { whatsappLink } from "@/lib/content/whatsapp";
 import { pageAlternates } from "@/lib/seo";
-import { ArrowUpRight, Check, Mail, MapPin, Phone, Plus } from "lucide-react";
+import { ArrowUpRight, Check, Phone, Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -18,11 +17,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
   const isHindi = locale === "hi";
   return {
     title: isHindi
-      ? "वैदिक ज्योतिष, कुंडली, पूजा एवं वास्तु | महर्षि कणाद ज्योतिष केंद्र, भिलाई"
-      : "Vedic Astrology, Kundli, Puja and Vastu | Maharshi Kanad Jyotish Kendra, Bhilai",
+      ? "वैदिक ज्योतिष, कुंडली, पूजा एवं वास्तु | महर्षि कणाद ज्योतिष केंद्र"
+      : "Vedic Astrology, Kundli, Puja and Vastu | Maharshi Kanad Jyotish Kendra",
     description: isHindi
       ? "जन्म कुंडली, प्रश्न कुंडली, कुंडली मिलान, पूजा, पाठ, यज्ञ और वास्तु परामर्श। ऑनलाइन बुकिंग और व्हाट्सऐप पर सीधी बात।"
-      : "Janam Kundli, Prashn Kundli, Kundli matching, Puja, Paath, Yagya and Vastu guidance from Bhilai, Durg. Book online or talk on WhatsApp.",
+      : "Janam Kundli, Prashn Kundli, Kundli matching, Puja, Paath, Yagya and Vastu guidance. Book online or talk on WhatsApp.",
     alternates: pageAlternates(locale, ""),
   };
 }
@@ -46,10 +45,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     prisma.adminSettings
       .findUnique({
         where: { id: "default" },
-        select: {
-          phone1: true, email: true, addressEn: true, addressHi: true, city: true, whatsappNumber: true, socialWhatsapp: true,
-          googleMapEmbedUrl: true, mapEnabled: true, mapZoom: true, mapLatitude: true, mapLongitude: true, latitude: true, longitude: true,
-        },
+        select: { phone1: true, whatsappNumber: true, socialWhatsapp: true },
       })
       .catch(() => null),
     prisma.service
@@ -68,8 +64,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   ]);
 
   const phone = settings?.phone1 || "+91 98279 91224";
-  const email = settings?.email || "sntiwarigevra61@gmail.com";
-  const place = (isHindi ? settings?.addressHi : settings?.addressEn) || settings?.addressEn || "Bhilai, Durg, Chhattisgarh";
   const waNumber = settings?.whatsappNumber || settings?.socialWhatsapp || phone;
   const wa = (text: string) => whatsappLink(waNumber, text);
 
@@ -135,7 +129,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         {/* eslint-enable @next/next/no-img-element */}
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(30,12,7,0.82),rgba(45,17,8,0.45),rgba(42,15,7,0.35))]" aria-hidden="true" />
         <div className="relative mx-auto flex min-h-[560px] lg:min-h-[680px] w-full max-w-[1240px] items-center px-5 sm:px-8 py-16">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl hero-rise">
             <span
               className="block text-xs font-bold uppercase tracking-[0.2em] mb-4 text-gold"
               style={{ color: String(animCfg.accent || "") || undefined }}
@@ -173,31 +167,54 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         </div>
       </section>
 
-      {/* Three quick cards */}
+      {/* Three quick cards: left aligned and filled with the real offer */}
       <section className="bg-surface-container">
         <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 md:grid-cols-3">
-          <div className="flex items-start gap-4 bg-maroon text-white p-7 min-h-[138px]">
-            <span className="grid h-12 w-12 shrink-0 place-items-center border border-white/50 text-2xl" aria-hidden="true">ॐ</span>
-            <div>
-              <h3 className="font-serif text-2xl font-bold mb-1">{tr("Connect With Us", "हमसे जुड़ें")}</h3>
-              <p className="text-xs text-white/80">
-                <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="hover:underline">{phone}</a> {"•"} {place}
-              </p>
+          <div className="bg-maroon text-white p-8 lg:p-10 flex flex-col gap-4 min-h-[250px]">
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center border border-white/50 text-xl" aria-hidden="true">ॐ</span>
+              <h3 className="font-serif text-2xl lg:text-[28px] font-bold leading-tight">{tr("Connect With Us", "हमसे जुड़ें")}</h3>
+            </div>
+            <p className="text-[13px] leading-[1.8] text-white/75 max-w-xs">
+              {tr("Speak to the Kendra directly for consultations, bookings and any question.", "परामर्श, बुकिंग या किसी भी प्रश्न के लिए केंद्र से सीधे बात करें।")}
+            </p>
+            <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="font-serif text-3xl font-bold text-gold hover:underline w-fit">{phone}</a>
+            <div className="mt-auto flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold">
+              <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="text-white hover:text-gold">{tr("Call now", "अभी कॉल करें")} →</a>
+              <a href={wa(tr("Namaste, I would like to talk to the Kendra.", "नमस्ते, मैं केंद्र से बात करना चाहता हूँ।"))} target="_blank" rel="noopener noreferrer" className="text-white hover:text-gold">WhatsApp →</a>
             </div>
           </div>
-          <div className="flex items-start gap-4 bg-surface-container-lowest p-7 min-h-[138px]">
-            <span className="grid h-12 w-12 shrink-0 place-items-center border border-primary text-primary text-2xl" aria-hidden="true">✦</span>
-            <div>
-              <h3 className="font-serif text-2xl font-bold text-secondary mb-1">{tr("Consultation", "परामर्श")}</h3>
-              <p className="text-xs text-on-surface-variant">{tr("Personalized Vedic guidance for important life decisions.", "जीवन के महत्वपूर्ण निर्णयों के लिए व्यक्तिगत वैदिक मार्गदर्शन।")}</p>
+
+          <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col gap-4 min-h-[250px]">
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center border border-primary text-primary text-xl" aria-hidden="true">✦</span>
+              <h3 className="font-serif text-2xl lg:text-[28px] font-bold leading-tight text-secondary">{tr("Consultation", "परामर्श")}</h3>
             </div>
+            <p className="text-[13px] leading-[1.8] text-on-surface-variant max-w-xs">
+              {tr("Personalized Vedic guidance for important life decisions. Plans start at:", "जीवन के महत्वपूर्ण निर्णयों के लिए व्यक्तिगत वैदिक मार्गदर्शन। योजनाएँ यहाँ से शुरू:")}
+            </p>
+            <ul className="text-sm divide-y divide-outline-variant">
+              {planGroups.map((g) => (
+                <li key={g.slug} className="flex items-baseline justify-between gap-3 py-2">
+                  <span className="text-secondary font-semibold">{isHindi ? g.titleHi : g.titleEn}</span>
+                  <span className="font-serif text-xl font-bold text-primary">{rupees(g.plans[0].pricePaise)}</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/services" className="mt-auto text-xs font-bold text-primary hover:underline w-fit">{tr("Book your consultation", "परामर्श बुक करें")} →</Link>
           </div>
-          <div className="flex items-start gap-4 bg-saffron text-white p-7 min-h-[138px]">
-            <span className="grid h-12 w-12 shrink-0 place-items-center border border-white/60 text-2xl" aria-hidden="true">✧</span>
-            <div>
-              <h3 className="font-serif text-2xl font-bold mb-1">{tr("Vedic & Support Services", "वैदिक एवं सहायता सेवाएँ")}</h3>
-              <p className="text-xs text-white/90">{tr("Kundli, Vastu, Bharat Darshan, vehicle, driver and ITR help desk.", "कुंडली, वास्तु, भारत दर्शन, वाहन, ड्राइवर और आईटीआर हेल्प डेस्क।")}</p>
+
+          <div className="bg-saffron text-white p-8 lg:p-10 flex flex-col gap-4 min-h-[250px]">
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center border border-white/60 text-xl" aria-hidden="true">✧</span>
+              <h3 className="font-serif text-2xl lg:text-[28px] font-bold leading-tight">{tr("Vedic & Support Services", "वैदिक एवं सहायता सेवाएँ")}</h3>
             </div>
+            <ul className="flex flex-wrap gap-2">
+              {others.slice(0, 8).map((o) => (
+                <li key={o.slug} className="rounded-full border border-white/50 px-3 py-1 text-xs font-semibold">{isHindi ? o.titleHi : o.titleEn}</li>
+              ))}
+            </ul>
+            <a href="#services" className="mt-auto text-xs font-bold text-white hover:underline w-fit">{tr("See all services", "सभी सेवाएँ देखें")} →</a>
           </div>
         </div>
       </section>
@@ -224,8 +241,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
               label={tr("About Maharshi Kanad Jyotish Kendra", "महर्षि कणाद ज्योतिष केंद्र के बारे में")}
               title={tr("Ancient Wisdom. Personal Guidance.", "प्राचीन ज्ञान। व्यक्तिगत मार्गदर्शन।")}
               intro={tr(
-                "Maharshi Kanad Jyotish Kendra provides Vedic astrology, Janam Kundli, Prashn Kundli, Kundli Matching, Puja, Paath, Yagya, Vastu and connected support services from Bhilai, Durg, Chhattisgarh.",
-                "महर्षि कणाद ज्योतिष केंद्र भिलाई, दुर्ग, छत्तीसगढ़ से वैदिक ज्योतिष, जन्म कुंडली, प्रश्न कुंडली, कुंडली मिलान, पूजा, पाठ, यज्ञ, वास्तु और संबद्ध सहायता सेवाएँ प्रदान करता है।"
+                "Maharshi Kanad Jyotish Kendra provides Vedic astrology, Janam Kundli, Prashn Kundli, Kundli Matching, Puja, Paath, Yagya, Vastu and connected support services.",
+                "महर्षि कणाद ज्योतिष केंद्र वैदिक ज्योतिष, जन्म कुंडली, प्रश्न कुंडली, कुंडली मिलान, पूजा, पाठ, यज्ञ, वास्तु और संबद्ध सहायता सेवाएँ प्रदान करता है।"
               )}
             />
             <ul className="grid gap-4 mb-8 -mt-4">
@@ -538,31 +555,41 @@ export default async function HomePage(props: { params: Promise<{ locale: string
 
       {/* Contact */}
       <Band id="contact" tone="soft">
-        <div className="grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] shadow-[0_20px_55px_rgba(76,42,25,0.12)]">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] shadow-[0_20px_55px_rgba(76,42,25,0.12)]">
           <div className="bg-maroon text-white p-8 sm:p-12 flex flex-col gap-6">
             <div>
               <span className="block text-xs font-bold uppercase tracking-[0.2em] mb-3 text-gold">{tr("Reach Out & Connect", "संपर्क करें")}</span>
               <h2 className="font-serif text-4xl sm:text-5xl font-semibold leading-[1.05] mb-3">{tr("Begin Your Consultation", "अपना परामर्श शुरू करें")}</h2>
-              <p className="text-sm leading-[1.85] text-white/75">
+              <p className="text-sm leading-[1.85] text-white/75 max-w-md">
                 {tr("Contact Maharshi Kanad Jyotish Kendra for all astrology, ritual, travel and support enquiries.", "ज्योतिष, अनुष्ठान, यात्रा और सहायता संबंधी सभी पूछताछ के लिए महर्षि कणाद ज्योतिष केंद्र से संपर्क करें।")}
               </p>
             </div>
-            <ul className="space-y-4 text-sm">
-              <li className="flex items-start gap-3"><Phone className="h-4 w-4 mt-1 text-gold" aria-hidden="true" /><div><div className="text-[11px] font-bold uppercase tracking-wider text-gold">{tr("Phone", "फ़ोन")}</div><a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="hover:underline">{phone}</a></div></li>
-              <li className="flex items-start gap-3"><Mail className="h-4 w-4 mt-1 text-gold" aria-hidden="true" /><div><div className="text-[11px] font-bold uppercase tracking-wider text-gold">{tr("Email", "ईमेल")}</div><a href={`mailto:${email}`} className="hover:underline break-all">{email}</a></div></li>
-              <li className="flex items-start gap-3"><MapPin className="h-4 w-4 mt-1 text-gold" aria-hidden="true" /><div><div className="text-[11px] font-bold uppercase tracking-wider text-gold">{tr("Location", "स्थान")}</div>{place}</div></li>
-            </ul>
+            <div className="flex items-start gap-3 text-sm">
+              <Phone className="h-4 w-4 mt-1 text-gold" aria-hidden="true" />
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-gold">{tr("Phone", "फ़ोन")}</div>
+                <a href={`tel:${phone.replace(/[^\d+]/g, "")}`} className="font-serif text-3xl font-bold hover:underline">{phone}</a>
+              </div>
+            </div>
             <div className="mt-auto flex flex-wrap gap-3">
               <Link href="/contact" className="inline-flex items-center min-h-[48px] px-6 rounded bg-gold text-on-gold text-xs font-bold uppercase tracking-wider hover:brightness-110">{tr("Open Enquiry Form", "पूछताछ फ़ॉर्म खोलें")}</Link>
               <a href={wa(tr("Namaste, I would like to book a consultation.", "नमस्ते, मैं परामर्श बुक करना चाहता हूँ।"))} target="_blank" rel="noopener noreferrer" className={btnGhost}>WhatsApp</a>
             </div>
           </div>
-          <div className="bg-surface-container-lowest p-6 sm:p-8">
-            <LocationMap
-              settings={settings ?? {}}
-              title={tr("Find us", "हमारा स्थान")}
-              isHindi={isHindi}
-            />
+          <div className="bg-surface-container-lowest p-8 sm:p-12 flex flex-col gap-5">
+            <h3 className="font-serif text-3xl font-bold text-secondary">{tr("How we can help", "हम कैसे सहायता कर सकते हैं")}</h3>
+            <ul className="grid gap-4 text-sm">
+              {[
+                [tr("Kundli, matching and Prashn", "कुंडली, मिलान और प्रश्न"), tr("Choose a plan and book online.", "योजना चुनें और ऑनलाइन बुक करें।")],
+                [tr("Puja, Paath, Yagya and Vastu", "पूजा, पाठ, यज्ञ और वास्तु"), tr("Tell us your requirement on WhatsApp.", "अपनी आवश्यकता व्हाट्सऐप पर बताएँ।")],
+                [tr("Travel and support services", "यात्रा एवं सहायता सेवाएँ"), tr("Bharat Darshan, vehicle, driver and ITR help desk.", "भारत दर्शन, वाहन, ड्राइवर और आईटीआर हेल्प डेस्क।")],
+              ].map(([h, dd]) => (
+                <li key={h} className="flex gap-3">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center bg-primary-container text-primary" aria-hidden="true"><Check className="h-4 w-4" /></span>
+                  <span className="flex flex-col"><strong className="font-serif text-xl font-bold text-secondary">{h}</strong><small className="text-xs text-on-surface-variant">{dd}</small></span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </Band>

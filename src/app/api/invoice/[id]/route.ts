@@ -53,9 +53,9 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       orderNumber: order.orderNumber,
       date: order.createdAt,
       siteName: adminSettings?.siteNameEn || "Maharshi Kanad Jyotish Kendra",
-      siteAddress: adminSettings?.addressEn || "Dashashwamedh Ghat Marg, Varanasi, UP 221001",
+      siteAddress: adminSettings?.addressEn || "",
       sitePhone: adminSettings?.phone1 || "+91-9827991224",
-      siteEmail: adminSettings?.email || "vedic@kanad-jyotish.in",
+      siteEmail: adminSettings?.email || "",
       gstin: adminSettings?.gstin || null,
       customerName,
       customerPhone,
@@ -134,7 +134,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     <div class="header">
       <h1 class="title">${safe.siteName}</h1>
       <div class="subtitle">Vedic Astrological Heritage & Mathematical Computation Centre</div>
-      <div style="font-size: 11px; color: #574237;">${safe.siteAddress} | Phone: ${safe.sitePhone} | Email: ${safe.siteEmail}</div>
+      <div style="font-size: 11px; color: #574237;">${[safe.siteAddress, `Phone: ${safe.sitePhone}`, safe.siteEmail ? `Email: ${safe.siteEmail}` : ""].filter(Boolean).join(" | ")}</div>
       <div style="font-size: 11px; color: #574237; margin-top: 4px;">${safe.gstin ? `GSTIN: ${safe.gstin}` : "GST: Not Applicable (Unregistered Kendra)"}</div>
     </div>
 
@@ -151,7 +151,6 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
         Name: <strong>${safe.customerName}</strong><br>
         Phone: ${safe.customerPhone}<br>
         ${safe.customerEmail ? `Email: ${safe.customerEmail}<br>` : ""}
-        Jurisdiction: Varanasi, Uttar Pradesh
       </div>
     </div>
 
@@ -197,7 +196,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     <div class="footer-note">
       <strong>Terms & Declaration:</strong><br>
       1. Pure mathematical ephemeris and astrological guidance derived according to classical Surya Siddhantic & Parashari principles.<br>
-      2. Issued electronically by Maharshi Kanad Jyotish Kendra, Dashashwamedh Ghat, Varanasi.
+      2. Issued electronically by Maharshi Kanad Jyotish Kendra.
     </div>
   </div>
 </body>

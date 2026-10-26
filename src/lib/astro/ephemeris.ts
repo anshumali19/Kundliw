@@ -248,6 +248,7 @@ export function computePanchang(dateStr: string, place = DEFAULT_PLACE): Panchan
       masaEn: MASAS[masaIdx][0],
       masaHi: MASAS[masaIdx][1],
       samvat: samvatYear,
+      tithiEnd: clock(fromJD(endJd)),
     },
   };
 }

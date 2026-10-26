@@ -45,4 +45,4 @@ These Terms are governed by the laws of India. Courts at Durg, Chhattisgarh shal
 We may update these Terms from time to time. Continued use after changes are published means you accept the updated Terms.
 
 ### 13. Contact Us
-Email: sntiwarigevra61@gmail.com · Phone: +91 98279 91224 · Address: Bhilai, Durg, Chhattisgarh
+Email: [EMAIL] · Phone: +91 98279 91224 · Address: [ADDRESS]

@@ -7,9 +7,9 @@ export interface SiteLocationConfig {
 }
 
 export const FALLBACK_SITE_CONFIG: SiteLocationConfig = {
-  cityEn: "Varanasi",
-  cityHi: "वाराणसी",
-  latitude: 25.3176,
-  longitude: 82.9739,
+  cityEn: "Bhilai",
+  cityHi: "भिलाई",
+  latitude: 21.2092,
+  longitude: 81.3784,
   timezone: "Asia/Kolkata",
 };

@@ -32,7 +32,7 @@ export default function AdminSettingsPage() {
   const [addressHi, setAddressHi] = useState("");
 
   // Coordinates
-  const [city, setCity] = useState("Varanasi");
+  const [city, setCity] = useState("");
   const [latitude, setLatitude] = useState<number | "">(25.3176);
   const [longitude, setLongitude] = useState<number | "">(82.9739);
   const [timezone, setTimezone] = useState("Asia/Kolkata");

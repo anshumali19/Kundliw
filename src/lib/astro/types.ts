@@ -100,6 +100,7 @@ export interface PanchangResult {
     masaEn: string;
     masaHi: string;
     samvat: number;
+    tithiEnd: string;
   };
 }
 

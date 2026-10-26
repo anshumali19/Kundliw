@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const date = searchParams.get("date") || undefined;
-    const city = searchParams.get("city") || "Varanasi";
+    const city = searchParams.get("city") || undefined;
 
     const panchang = await getDailyPanchang(date, city);
     if (!panchang) {

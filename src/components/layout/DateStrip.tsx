@@ -11,6 +11,7 @@ export interface DateStripData {
   masaEn: string;
   masaHi: string;
   samvat: number;
+  tithiEnd?: string;
 }
 
 const DAYS_HI = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
@@ -77,7 +78,10 @@ export function DateStrip({ data, isHindi }: { data: DateStripData | null; isHin
         <>
           {sep}
           <span className="shrink-0">{isHindi ? data.pakshaHi : data.pakshaEn}</span>
-          <span className="shrink-0 text-gold">{isHindi ? data.tithiHi : data.tithiEn}</span>
+          <span className="shrink-0 text-gold">
+            {isHindi ? data.tithiHi : data.tithiEn}
+            {data.tithiEnd && <span className="hidden md:inline text-on-maroon/80 font-medium">{isHindi ? ` (${data.tithiEnd} तक)` : ` (till ${data.tithiEnd})`}</span>}
+          </span>
           <span className="shrink-0">{isHindi ? data.masaHi : data.masaEn}</span>
           {sep}
           <span className="shrink-0">

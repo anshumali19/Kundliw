@@ -24,10 +24,7 @@ export function PanchangWidget({ panchang, locale }: PanchangWidgetProps) {
             <span className="text-outline-variant">•</span>
             <span>{new Date().toLocaleDateString(isHindi ? "hi-IN" : "en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-outline">
-            <MapPin className="w-3 h-3 text-primary" />
-            <span>Bhilai, Durg, Chhattisgarh</span>
-          </div>
+          
         </div>
       </div>
     );

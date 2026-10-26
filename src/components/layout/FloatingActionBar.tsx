@@ -112,14 +112,20 @@ export function FloatingActionBar({
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
-      if (Math.abs(y - lastY) > 6) setTuckedAway(true);
+      if (Math.abs(y - lastY) > 24) setTuckedAway(true);
       lastY = y;
       clearTimeout(timer);
-      timer = setTimeout(() => setTuckedAway(false), 900);
+      timer = setTimeout(() => setTuckedAway(false), 180);
+    };
+    const onScrollEnd = () => {
+      clearTimeout(timer);
+      setTuckedAway(false);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scrollend", onScrollEnd);
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scrollend", onScrollEnd);
       clearTimeout(timer);
     };
   }, []);
@@ -421,7 +427,7 @@ export function FloatingActionBar({
       {!isOpen && (
         <form
           onSubmit={submitBar}
-          className={`fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden lg:flex items-center gap-2 w-[min(25rem,calc(100vw-18rem))] bg-white/90 backdrop-blur-md rounded-full border border-gold/60 shadow-[0_8px_24px_rgba(64,36,28,0.14)] p-1.5 transition-all duration-300 ${tuckedAway && !isOpen ? "opacity-0 translate-y-4 pointer-events-none" : "pointer-events-auto opacity-100"}`}
+          className={`fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden lg:flex items-center gap-2 w-[min(25rem,calc(100vw-18rem))] bg-white/90 backdrop-blur-md rounded-full border border-gold/60 shadow-[0_8px_24px_rgba(64,36,28,0.14)] p-1.5 transition-all duration-200 ${tuckedAway && !isOpen ? "opacity-0 translate-y-4 pointer-events-none" : "pointer-events-auto opacity-100"}`}
           aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
         >
           <span className="w-9 h-9 shrink-0 rounded-full bg-brand text-white flex items-center justify-center">
@@ -449,7 +455,7 @@ export function FloatingActionBar({
       {/* Floating quick actions: Call + WhatsApp on the left, AI + Chat on the right (mobile).
           They sit above the fixed marquee strip and the bottom navigation. */}
       <div
-        className={`pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between transition-all duration-300 ${tuckedAway && !isOpen ? "opacity-0 translate-y-6" : "opacity-100 translate-y-0"}`}
+        className={`pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between transition-all duration-200 ${tuckedAway && !isOpen ? "opacity-0 translate-y-6" : "opacity-100 translate-y-0"}`}
         role="region"
         aria-label="Quick contact and assistance"
       >
@@ -475,9 +481,7 @@ export function FloatingActionBar({
               aria-label={isHindi ? "व्हाट्सएप पर संदेश भेजें" : "Message us on WhatsApp"}
             >
               <span className={`${FAB_CIRCLE} !text-[#1F7A45] group-hover:!text-white`}>
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.97.57 3.805 1.554 5.352L2.016 22l4.773-1.523c1.5 0.922 3.266 1.453 5.242 1.453 5.536 0 10.031-4.495 10.031-10.031S17.567 2 12.031 2zm0 18.234c-1.742 0-3.359-0.5-4.734-1.375l-0.344-0.219-3.328 1.062 1.094-3.234-0.234-0.375c-0.969-1.422-1.516-3.125-1.516-4.938 0-4.523 3.68-8.203 8.203-8.203 4.523 0 8.203 3.68 8.203 8.203 0 4.523-3.68 8.203-8.203 8.203zm4.531-6.141c-0.25-0.125-1.469-0.727-1.703-0.812-0.234-0.086-0.406-0.125-0.578 0.125s-0.664 0.812-0.812 0.984c-0.156 0.172-0.305 0.187-0.555 0.062s-1.055-0.391-2.016-1.242c-0.742-0.664-1.242-1.484-1.391-1.734s-0.016-0.383 0.109-0.508c0.109-0.109 0.25-0.281 0.375-0.422s0.172-0.234 0.25-0.391c0.078-0.156 0.039-0.297-0.02-0.422s-0.578-1.391-0.797-1.906c-0.211-0.5-0.43-0.43-0.594-0.438-0.156-0.008-0.336-0.008-0.516-0.008s-0.469 0.062-0.719 0.336c-0.25 0.266-0.953 0.93-0.953 2.273s0.977 2.641 1.109 2.82c0.141 0.18 1.922 2.938 4.656 4.117 0.656 0.281 1.164 0.453 1.562 0.578 0.656 0.211 1.258 0.18 1.734 0.109 0.531-0.078 1.469-0.602 1.68-1.188s0.211-1.086 0.148-1.188c-0.062-0.109-0.234-0.172-0.484-0.297z" />
-                </svg>
+                <svg className="block h-[18px] w-[18px] shrink-0 fill-current" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
               </span>
               <FabLabel>WhatsApp</FabLabel>
             </a>

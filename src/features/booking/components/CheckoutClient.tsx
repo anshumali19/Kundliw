@@ -523,7 +523,7 @@ export function CheckoutClient({
                       {isHindi ? "बैंक व शाखा:" : "Bank & Branch:"}
                     </span>
                     <span className="font-semibold text-on-surface">
-                      {adminSettings.bankName || "State Bank of India, Main Branch Varanasi"}
+                      {adminSettings.bankName || ""}
                     </span>
                   </div>
                   <div className="flex justify-between">

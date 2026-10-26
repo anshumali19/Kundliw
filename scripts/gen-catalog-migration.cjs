@@ -1,3 +1,4 @@
+/* NOTE: migration 11 is already applied on the live database. Do not regenerate it; add a new migration instead. */
 /* eslint-disable */
 /**
  * Generates prisma/migrations/11_real_catalog/migration.sql: the Kendra's real services, plans, other

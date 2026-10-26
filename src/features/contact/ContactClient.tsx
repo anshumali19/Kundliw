@@ -203,26 +203,26 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
                         {phone1}
                       </a>
                     </div>
+                    {phone2 && (
                     <div>
                       <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="hover:underline">
                         {phone2}
                       </a>
                     </div>
+                    )}
                   </div>
                 </div>
               </div>
 
+              {emailAddr && (
               <div className="flex items-start gap-3">
                 <Mail className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-bold text-on-surface mb-0.5">
-                    {isHindi ? "ईमेल" : "Email"}
-                  </div>
-                  <a href={`mailto:${emailAddr}`} className="text-secondary font-mono hover:underline">
-                    {emailAddr}
-                  </a>
+                  <div className="font-bold text-on-surface mb-0.5">{isHindi ? "ईमेल" : "Email"}</div>
+                  <a href={`mailto:${emailAddr}`} className="text-secondary font-mono hover:underline">{emailAddr}</a>
                 </div>
               </div>
+              )}
 
               {extra?.workingHours && (
                 <div className="flex items-start gap-3">
