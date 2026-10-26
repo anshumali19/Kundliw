@@ -253,6 +253,21 @@ export default async function AdminLayout(props: AdminLayoutProps) {
           </Link>
 
           <Link
+
+                      href="/admin/website"
+
+                      className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
+
+          >
+
+            <Settings className="w-3.5 h-3.5 text-secondary" />
+
+            <span>{isHindi ? "वेबसाइट सेटिंग (Website)" : "Website"}</span>
+
+          </Link>
+
+
+          <Link
             href="/admin/settings"
             className="min-h-[40px] px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-on-surface hover:bg-surface border border-outline-variant/40 transition-colors shrink-0"
           >

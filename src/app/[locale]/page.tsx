@@ -6,6 +6,8 @@ import { PanchangWidget } from "@/features/astro/components/PanchangWidget";
 import { LiveClockEphemeris } from "@/components/home/LiveClockEphemeris";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { prisma } from "@/lib/prisma";
+import { getSection } from "@/lib/siteConfig/service";
+import { SocialLinks } from "@/components/content/SocialLinks";
 import { pageAlternates } from "@/lib/seo";
 import { ArrowRight, Calendar, Compass, HeartHandshake, HelpCircle, ScrollText, Star } from "lucide-react";
 
@@ -47,6 +49,9 @@ export default async function HomePage(
   const locale = params?.locale || "hi";
   const isHindi = locale === "hi";
   const t = await getTranslations("home");
+  const [homeCfg, heroCfg, animCfg] = await Promise.all([getSection("home"), getSection("hero"), getSection("heroAnimation")]);
+  const pick = (cfg: Record<string, string | boolean | number>, k: string, fallback: string) =>
+    String(cfg[k + (isHindi ? "Hi" : "En")] || "").trim() || fallback;
 
   const [panchang, leftBanners, rightBanners, services, testimonials] = await Promise.all([
     getDailyPanchang(),
@@ -91,22 +96,25 @@ export default async function HomePage(
 
   return (
     <div className="flex flex-col w-full text-on-surface">
-      <PanchangWidget panchang={panchang} locale={locale} />
+      {homeCfg.showPanchang !== false && <PanchangWidget panchang={panchang} locale={locale} />}
+      {pick(homeCfg, "announcement", "") && (
+        <div className="w-full bg-primary/10 text-secondary text-sm font-semibold text-center px-4 py-2">{pick(homeCfg, "announcement", "")}</div>
+      )}
 
       {/* Hero */}
       <section className="w-full bg-surface border-b border-outline-variant/40">
         <div className="w-full px-4 sm:px-8 lg:px-12 py-10 lg:py-14">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 text-left">
-              <LiveClockEphemeris tithi={panchang?.tithi} />
+              {animCfg.enabled !== false && <LiveClockEphemeris tithi={panchang?.tithi} />}
               <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">
-                {t("heroEyebrow")}
+                {pick(heroCfg, "eyebrow", t("heroEyebrow"))}
               </p>
               <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary tracking-tight leading-tight mb-4">
-                {t("heroTitle")}
+                {pick(heroCfg, "title", t("heroTitle"))}
               </h1>
               <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed mb-6">
-                {t("heroLead")}
+                {pick(heroCfg, "lead", t("heroLead"))}
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Link
@@ -123,6 +131,7 @@ export default async function HomePage(
                   {t("ctaKundli")}
                 </Link>
               </div>
+              {homeCfg.showSocialStrip !== false && <SocialLinks className="mt-5" />}
             </div>
 
             <div className="lg:col-span-5 bg-surface-container-low p-5 rounded border border-secondary/30 border-t-4 border-t-signal text-left">

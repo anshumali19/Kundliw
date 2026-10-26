@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { SocialLinks } from "@/components/content/SocialLinks";
 import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
 import { LocationMap } from "@/components/content/LocationMap";
@@ -69,53 +70,8 @@ export async function Footer() {
             </div>
             )}
 
-            {/* Social Media Links from AdminSettings */}
-            <div className="flex items-center gap-3 pt-2">
-              {settings?.socialFacebook && (
-                <a
-                  href={settings.socialFacebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gold hover:text-gold transition-colors underline"
-                  title="Facebook"
-                >
-                  Facebook
-                </a>
-              )}
-              {settings?.socialTwitter && (
-                <a
-                  href={settings.socialTwitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gold hover:text-gold transition-colors underline"
-                  title="Twitter / X"
-                >
-                  Twitter
-                </a>
-              )}
-              {settings?.socialInstagram && (
-                <a
-                  href={settings.socialInstagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gold hover:text-gold transition-colors underline"
-                  title="Instagram"
-                >
-                  Instagram
-                </a>
-              )}
-              {settings?.socialYoutube && (
-                <a
-                  href={settings.socialYoutube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gold hover:text-gold transition-colors underline"
-                  title="YouTube"
-                >
-                  YouTube
-                </a>
-              )}
-            </div>
+            {/* Social media pages managed from Admin → Website Settings */}
+            <SocialLinks tone="light" className="pt-2" />
           </div>
 
           {/* Col 2: Quick Links (Tools & Services) */}

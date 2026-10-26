@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import QRCode from "qrcode";
+import { getSection } from "@/lib/siteConfig/service";
 import { prisma } from "@/lib/prisma";
 import { pageAlternates } from "@/lib/seo";
 import { Smartphone, Download } from "lucide-react";
@@ -29,7 +30,8 @@ export default async function AppDownloadPage(props: AppPageProps) {
   const settings = await prisma.adminSettings
     .findUnique({ where: { id: "default" }, select: { appDownloadUrl: true } })
     .catch(() => null);
-  const url = settings?.appDownloadUrl?.trim() || "";
+  const appCfg = await getSection("mobileApp");
+  const url = settings?.appDownloadUrl?.trim() || String(appCfg.apkUrl || appCfg.playStoreUrl || "").trim();
 
   // The QR is generated on the server from the link the admin saved.
   const qr = url

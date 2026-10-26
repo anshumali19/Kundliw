@@ -764,3 +764,10 @@ model BackupRecord {
 
   @@index([kind, createdAt])
 }
+
+/// Website settings the super admin edits from the panel (one row per section).
+model SiteConfig {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}

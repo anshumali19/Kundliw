@@ -9,6 +9,7 @@ import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
+import { getSection } from "@/lib/siteConfig/service";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
@@ -31,7 +32,7 @@ const notoSans = Noto_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${SITE_NAME} | ${SITE_NAME_HI}`,
@@ -68,6 +69,30 @@ export const metadata: Metadata = {
       "Vedic astrology consultations, Kundli and Kundli matching with online booking.",
   },
 };
+
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await props.params;
+  const seo = await getSection("seo");
+  const g = (k: string) => String(seo[k + (locale === "hi" ? "Hi" : "En")] || seo[k + "En"] || seo[k + "Hi"] || "").trim();
+  const title = g("metaTitle");
+  const description = g("metaDescription");
+  const keywords = String(seo.keywords || "").split(",").map((k) => k.trim()).filter(Boolean);
+  const image = String(seo.shareImage || "").trim();
+  const verification = String(seo.googleVerification || "").trim();
+  return {
+    ...baseMetadata,
+    ...(title ? { title: { default: title, template: "%s" } } : {}),
+    ...(description ? { description } : {}),
+    ...(keywords.length ? { keywords } : {}),
+    ...(verification ? { verification: { google: verification } } : {}),
+    openGraph: {
+      ...baseMetadata.openGraph,
+      ...(title ? { title } : {}),
+      ...(description ? { description } : {}),
+      ...(image ? { images: [image] } : {}),
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -120,6 +145,7 @@ export default async function LocaleLayout(
       },
     })
     .catch(() => []);
+  const features = await getSection("features");
   const topMarquee = marqueeItems.filter((m) => m.position === "TOP");
   const bottomMarquee = marqueeItems.filter((m) => m.position === "BOTTOM");
 
@@ -210,6 +236,7 @@ export default async function LocaleLayout(
               <Footer />
             </div>
             <MobileNav />
+            {features.showFloatingButtons !== false && (
             <FloatingActionBar
               phone={settings?.phone1 || undefined}
               whatsappNumber={
@@ -219,6 +246,7 @@ export default async function LocaleLayout(
                 undefined
               }
             />
+            )}
           </SmoothScrollProvider>
           </AuthProvider>
         </NextIntlClientProvider>

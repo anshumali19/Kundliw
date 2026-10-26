@@ -42,6 +42,7 @@ export async function buildBackupSnapshot() {
     pages,
     translations,
     credentials,
+    siteConfig,
   ] = await Promise.all([
     prisma.adminSettings.findMany(),
     prisma.service.findMany(),
@@ -71,6 +72,7 @@ export async function buildBackupSnapshot() {
     prisma.staticPage.findMany(),
     prisma.translationOverride.findMany(),
     prisma.credential.findMany(),
+    prisma.siteConfig.findMany(),
   ]);
 
   return {
@@ -102,5 +104,6 @@ export async function buildBackupSnapshot() {
     pages,
     translations,
     credentials,
+    siteConfig,
   };
 }
