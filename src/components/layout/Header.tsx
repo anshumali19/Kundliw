@@ -69,12 +69,15 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
 
   // Primary desktop bar links
   const primaryLinks = hideTools([
+    { href: "/", label: tNav("home") },
+    { href: "/about", label: tNav("about") },
     { href: "/services", label: tNav("services") },
-    { href: "/services#plans", label: tNav("pricingPlans") },
     { href: "/kundli", label: tNav("kundli") },
-    { href: "/kundli/matching", label: tNav("kundliMatching") },
     { href: "/kundli/prashna", label: tNav("prashna") },
-    { href: "/other-services", label: tNav("otherServices") },
+    { href: "/kundli/matching", label: tNav("kundliMatching") },
+    { href: "/services#plans", label: tNav("pricingPlans") },
+    { href: "/gallery", label: tNav("gallery") },
+    { href: "/contact", label: tNav("contact") },
   ]);
 
   // Secondary/lineage items accessible in dropdown & mobile
@@ -198,14 +201,14 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
               alt={tCommon("siteNameHi")}
               width={64}
               height={48}
-              className="h-11 sm:h-12 w-auto shrink-0 rounded-md"
+              className="h-12 sm:h-[62px] w-auto shrink-0 rounded"
             />
             <div className="flex flex-col text-left min-w-0">
-              <span className="font-serif text-sm sm:text-base lg:text-lg font-bold tracking-tight text-secondary leading-tight whitespace-nowrap truncate">
-                {tCommon("siteNameHi")}
+              <span className="font-serif text-lg sm:text-[22px] font-bold tracking-tight text-secondary leading-[1.05] whitespace-nowrap truncate">
+                Maharshi Kanad Jyotish Kendra
               </span>
-              <span className="text-[8px] sm:text-[9px] xl:text-[9.5px] 2xl:text-[10.5px] font-semibold text-primary tracking-normal sm:tracking-wider uppercase mt-0.5 whitespace-nowrap truncate">
-                MAHARSHI KANAD JYOTISH KENDRA
+              <span className="text-[10px] sm:text-xs font-medium text-primary mt-1 whitespace-nowrap truncate">
+                {tCommon("siteNameHi")}
               </span>
             </div>
           </Link>
@@ -225,10 +228,10 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
                       setCurrentHash("");
                     }
                   }}
-                  className={`h-full flex items-center px-1.5 xl:px-1.5 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
+                  className={`h-full flex items-center px-1.5 2xl:px-2.5 text-[13px] font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
                     isActive
-                      ? "text-primary border-brand font-bold"
-                      : "text-on-surface-variant hover:text-primary border-transparent hover:border-brand/40"
+                      ? "text-primary border-saffron font-bold"
+                      : "text-secondary hover:text-primary border-transparent hover:border-saffron/50"
                   }`}
                 >
                   {link.label}
@@ -253,7 +256,7 @@ export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = 
                 }`}
                 aria-expanded={moreDropdownOpen}
               >
-                <span>{tNav("about")} &amp; केंद्र</span>
+                <span>{isHindi ? "और देखें" : "More"}</span>
                 <ChevronDown
                   className={`w-3.5 h-3.5 transition-transform ${
                     moreDropdownOpen ? "rotate-180 text-secondary" : ""

@@ -1,13 +1,21 @@
 import { prisma } from "@/lib/prisma";
-import { computePanchang } from "./ephemeris";
+import { computePanchang, DEFAULT_PLACE } from "./ephemeris";
 import { PanchangResult } from "./types";
 import { Prisma } from "@prisma/client";
 
 export async function getDailyPanchang(
   dateString?: string,
-  city = "Varanasi"
+  cityArg?: string
 ): Promise<PanchangResult | null> {
-  const normalizedCity = (city || "Varanasi").toLowerCase().trim();
+  // The Kendra's own place (Admin > Business settings) decides sunrise and the day's timings.
+  const place = await prisma.adminSettings
+    .findUnique({ where: { id: "default" }, select: { city: true, latitude: true, longitude: true } })
+    .catch(() => null);
+  const coords =
+    place?.latitude != null && place?.longitude != null
+      ? { lat: place.latitude, lng: place.longitude }
+      : DEFAULT_PLACE;
+  const normalizedCity = (cityArg || place?.city || "Bhilai").toLowerCase().trim();
   const effectiveDate =
     dateString ||
     new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
@@ -34,7 +42,7 @@ export async function getDailyPanchang(
     }
 
     // 2. Calculate from the Sun and Moon positions (no outside service needed)
-    const result = computePanchang(effectiveDate);
+    const result = computePanchang(effectiveDate, coords);
 
     // 3. Try saving result in database cache
     try {

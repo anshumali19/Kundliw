@@ -39,4 +39,4 @@ We may update this Privacy Policy from time to time. The updated version will be
 
 ### 12. Contact Us
 For questions, concerns or requests about this Policy or your personal information, contact Maharshi Kanad Jyotish Kendra:
-Email: [EMAIL] · Phone: [PHONE] · Address: [ADDRESS]
+Email: sntiwarigevra61@gmail.com · Phone: +91 98279 91224 · Address: Bhilai, Durg, Chhattisgarh

@@ -34,7 +34,7 @@ interface FloatingActionBarProps {
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
 
 const FAB_CIRCLE =
-  "flex items-center justify-center w-11 h-11 lg:w-14 lg:h-14 rounded-full border-2 border-maroon transition-transform active:scale-95 hover:scale-105";
+  "flex items-center justify-center w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-white/90 backdrop-blur-md border border-gold/60 text-maroon shadow-[0_6px_18px_rgba(64,36,28,0.16)] transition-all duration-200 group-hover:bg-maroon group-hover:text-white group-hover:border-maroon group-hover:-translate-y-0.5 active:scale-95";
 
 /** Renders **bold** segments from chat text without exposing the asterisks. */
 function renderBold(text: string): React.ReactNode[] {
@@ -47,9 +47,11 @@ function renderBold(text: string): React.ReactNode[] {
   );
 }
 
-function FabLabel({ children }: { children: React.ReactNode }) {
+function FabLabel({ children, side = "right" }: { children: React.ReactNode; side?: "left" | "right" }) {
   return (
-    <span className="hidden lg:block absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-brand text-xs font-bold leading-none whitespace-nowrap">
+    <span
+      className={`pointer-events-none absolute top-1/2 -translate-y-1/2 hidden lg:block whitespace-nowrap rounded bg-maroon px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 ${side === "right" ? "left-full ml-2" : "right-full mr-2"}`}
+    >
       {children}
     </span>
   );
@@ -419,7 +421,7 @@ export function FloatingActionBar({
       {!isOpen && (
         <form
           onSubmit={submitBar}
-          className="pointer-events-auto fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden lg:flex items-center gap-2 w-[min(25rem,calc(100vw-18rem))] bg-surface rounded-full border-2 border-maroon p-1.5 shadow-lg"
+          className={`fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden lg:flex items-center gap-2 w-[min(25rem,calc(100vw-18rem))] bg-white/90 backdrop-blur-md rounded-full border border-gold/60 shadow-[0_8px_24px_rgba(64,36,28,0.14)] p-1.5 transition-all duration-300 ${tuckedAway && !isOpen ? "opacity-0 translate-y-4 pointer-events-none" : "pointer-events-auto opacity-100"}`}
           aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
         >
           <span className="w-9 h-9 shrink-0 rounded-full bg-brand text-white flex items-center justify-center">
@@ -436,7 +438,7 @@ export function FloatingActionBar({
           />
           <button
             type="submit"
-            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-signal text-white text-sm font-bold"
+            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand text-on-brand text-sm font-bold"
           >
             <Send className="w-4 h-4" />
             <span>{isHindi ? "एआई से पूछें" : "Ask AI"}</span>
@@ -451,17 +453,17 @@ export function FloatingActionBar({
         role="region"
         aria-label="Quick contact and assistance"
       >
-        <div className="pointer-events-auto flex flex-col gap-4">
+        <div className="pointer-events-auto flex flex-col gap-3">
           {callHref && (
             <a
               href={callHref}
-              className="relative pb-2 flex flex-col items-center"
+              className="group relative flex items-center"
               aria-label={isHindi ? "कॉल करें" : "Call us"}
             >
-              <span className={`${FAB_CIRCLE} bg-brand text-white`}>
-                <Phone className="w-6 h-6" />
+              <span className={FAB_CIRCLE}>
+                <Phone className="w-5 h-5" />
               </span>
-              <FabLabel>{isHindi ? "कॉल" : "Call"}</FabLabel>
+              <FabLabel>{isHindi ? "कॉल करें" : "Call us"}</FabLabel>
             </a>
           )}
           {defaultWhatsappUrl && (
@@ -469,43 +471,43 @@ export function FloatingActionBar({
               href={defaultWhatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative pb-2 flex flex-col items-center"
+              className="group relative flex items-center"
               aria-label={isHindi ? "व्हाट्सएप पर संदेश भेजें" : "Message us on WhatsApp"}
             >
-              <span className={`${FAB_CIRCLE} bg-[#178a45] text-white`}>
-                <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+              <span className={`${FAB_CIRCLE} !text-[#1F7A45] group-hover:!text-white`}>
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.97.57 3.805 1.554 5.352L2.016 22l4.773-1.523c1.5 0.922 3.266 1.453 5.242 1.453 5.536 0 10.031-4.495 10.031-10.031S17.567 2 12.031 2zm0 18.234c-1.742 0-3.359-0.5-4.734-1.375l-0.344-0.219-3.328 1.062 1.094-3.234-0.234-0.375c-0.969-1.422-1.516-3.125-1.516-4.938 0-4.523 3.68-8.203 8.203-8.203 4.523 0 8.203 3.68 8.203 8.203 0 4.523-3.68 8.203-8.203 8.203zm4.531-6.141c-0.25-0.125-1.469-0.727-1.703-0.812-0.234-0.086-0.406-0.125-0.578 0.125s-0.664 0.812-0.812 0.984c-0.156 0.172-0.305 0.187-0.555 0.062s-1.055-0.391-2.016-1.242c-0.742-0.664-1.242-1.484-1.391-1.734s-0.016-0.383 0.109-0.508c0.109-0.109 0.25-0.281 0.375-0.422s0.172-0.234 0.25-0.391c0.078-0.156 0.039-0.297-0.02-0.422s-0.578-1.391-0.797-1.906c-0.211-0.5-0.43-0.43-0.594-0.438-0.156-0.008-0.336-0.008-0.516-0.008s-0.469 0.062-0.719 0.336c-0.25 0.266-0.953 0.93-0.953 2.273s0.977 2.641 1.109 2.82c0.141 0.18 1.922 2.938 4.656 4.117 0.656 0.281 1.164 0.453 1.562 0.578 0.656 0.211 1.258 0.18 1.734 0.109 0.531-0.078 1.469-0.602 1.68-1.188s0.211-1.086 0.148-1.188c-0.062-0.109-0.234-0.172-0.484-0.297z" />
                 </svg>
               </span>
-              <FabLabel>WA</FabLabel>
+              <FabLabel>WhatsApp</FabLabel>
             </a>
           )}
         </div>
 
-        <div className="pointer-events-auto flex flex-col gap-4">
+        <div className="pointer-events-auto flex flex-col gap-3">
           <button
             type="button"
             onClick={() => openAssistant("ai")}
-            className="relative pb-2 flex flex-col items-center"
+            className="group relative flex items-center"
             aria-expanded={isOpen && mode === "ai"}
             aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
           >
-            <span className={`${FAB_CIRCLE} bg-signal text-white`}>
-              <Sparkles className="w-6 h-6" />
+            <span className={FAB_CIRCLE}>
+              <Sparkles className="w-5 h-5" />
             </span>
-            <FabLabel>AI</FabLabel>
+            <FabLabel side="left">{isHindi ? "एआई से पूछें" : "Ask AI"}</FabLabel>
           </button>
           <button
             type="button"
             onClick={() => openAssistant("chat")}
-            className="relative pb-2 flex flex-col items-center"
+            className="group relative flex items-center"
             aria-expanded={isOpen && mode === "chat"}
             aria-label={isHindi ? "चैट खोलें" : "Open chat"}
           >
-            <span className={`${FAB_CIRCLE} bg-gold text-on-gold`}>
-              {isOpen && mode === "chat" ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
+            <span className={FAB_CIRCLE}>
+              {isOpen && mode === "chat" ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
             </span>
-            <FabLabel>{isHindi ? "चैट" : "Chat"}</FabLabel>
+            <FabLabel side="left">{isHindi ? "चैट करें" : "Chat with us"}</FabLabel>
           </button>
         </div>
       </div>

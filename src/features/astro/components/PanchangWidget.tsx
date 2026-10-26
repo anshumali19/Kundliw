@@ -26,7 +26,7 @@ export function PanchangWidget({ panchang, locale }: PanchangWidgetProps) {
           </div>
           <div className="flex items-center gap-1.5 text-outline">
             <MapPin className="w-3 h-3 text-primary" />
-            <span>Varanasi (25.3176° N, 82.9739° E)</span>
+            <span>Bhilai, Durg, Chhattisgarh</span>
           </div>
         </div>
       </div>

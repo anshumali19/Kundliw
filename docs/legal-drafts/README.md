@@ -14,8 +14,8 @@ Kundli services, bookings, vault uploads, associate programme). The structure an
 - The Member Agreement is renamed "User & Associate Agreement" and gains an associate section (§9).
 
 ## Items the client must fill or confirm (shown as [BRACKETS])
-1. Official contact: phone, email, postal address (the Varanasi address on the site is a sample: confirm).
-2. **Jurisdiction.** The originals name Durg, Chhattisgarh. The drafts say [Varanasi, Uttar Pradesh]: confirm.
+1. Contact details are filled from the Kendra's own website (phone, email, Bhilai, Durg): please confirm.
+2. **Jurisdiction.** Set to Durg, Chhattisgarh (the Kendra is in Bhilai, Durg): please confirm.
 3. **Refund and cancellation rules** (Terms §5): confirm the real rules and timings.
 4. Associate commission and payout wording (Agreement §9).
 5. "Last updated" date to print on approval.

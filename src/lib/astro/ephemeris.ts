@@ -11,7 +11,7 @@ const norm = (d: number) => ((d % 360) + 360) % 360;
 const sin = (d: number) => Math.sin(d * RAD);
 const cos = (d: number) => Math.cos(d * RAD);
 
-export const DEFAULT_PLACE = { lat: 25.3176, lng: 82.9739 }; // Varanasi
+export const DEFAULT_PLACE = { lat: 21.2092, lng: 81.3784 }; // Bhilai, Durg (the Kendra)
 const IST_MIN = 330;
 
 function toJD(ms: number): number {

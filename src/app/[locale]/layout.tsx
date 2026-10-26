@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Noto_Sans, Playfair_Display, Noto_Serif_Devanagari } from "next/font/google";
+import { Poppins, Noto_Sans, Cormorant_Garamond, Noto_Serif_Devanagari } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
@@ -27,11 +27,11 @@ const poppins = Poppins({
   display: "swap",
 });
 
-// Headings use an elegant serif (Playfair for English, Noto Serif for Hindi) for a classical Jyotish look.
-const playfair = Playfair_Display({
+// Headings use an elegant serif (Cormorant Garamond for English, Noto Serif for Hindi) for a classical Jyotish look.
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-playfair",
+  variable: "--font-cormorant",
   display: "swap",
 });
 
@@ -242,7 +242,7 @@ export default async function LocaleLayout(
   };
 
   return (
-    <html lang={locale} className={`${poppins.variable} ${notoSans.variable} ${playfair.variable} ${notoSerifDeva.variable} w-full max-w-full overflow-x-clip`}>
+    <html lang={locale} className={`${poppins.variable} ${notoSans.variable} ${cormorant.variable} ${notoSerifDeva.variable} w-full max-w-full overflow-x-clip`}>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-clip relative">
         <JsonLd data={structuredData} />
         <GoogleAnalytics />

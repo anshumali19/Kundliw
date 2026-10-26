@@ -43,7 +43,7 @@ The Kendra is not responsible for:
 - Loss or damage beyond the amount paid for the relevant service, to the extent permitted by law.
 
 ### 7. Governing Law
-This Agreement is governed by the laws of India. Any dispute is subject to the jurisdiction of the courts at [Varanasi, Uttar Pradesh], subject to applicable law.
+This Agreement is governed by the laws of India. Any dispute is subject to the jurisdiction of the courts at Durg, Chhattisgarh, subject to applicable law.
 
 ### 8. Acceptance
 By clicking "Register" or "I Agree", you confirm that you have read, understood and accepted this Agreement and agree to comply with it.

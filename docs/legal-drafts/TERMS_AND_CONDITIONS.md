@@ -39,10 +39,10 @@ We may suspend or terminate an account if a user violates these Terms, gives fal
 To the extent permitted by law, the Kendra is not liable for indirect or consequential loss, for decisions made on the basis of astrological guidance, for the content or availability of third-party tools, or for interruptions beyond our reasonable control. Our total liability for any service is limited to the amount paid for that service.
 
 ### 11. Dispute Resolution
-These Terms are governed by the laws of India. Courts at [Varanasi, Uttar Pradesh] shall have jurisdiction, subject to applicable law.
+These Terms are governed by the laws of India. Courts at Durg, Chhattisgarh shall have jurisdiction, subject to applicable law.
 
 ### 12. Changes to Terms
 We may update these Terms from time to time. Continued use after changes are published means you accept the updated Terms.
 
 ### 13. Contact Us
-Email: [EMAIL] · Phone: [PHONE] · Address: [ADDRESS]
+Email: sntiwarigevra61@gmail.com · Phone: +91 98279 91224 · Address: Bhilai, Durg, Chhattisgarh

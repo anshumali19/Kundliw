@@ -24,6 +24,6 @@ Fake details, harassment, threats, impersonation, spam, attempts to hack or over
 Parents and guardians are welcome to book, upload details and take part in consultations on behalf of family members, with their knowledge and consent.
 
 ### 6. Reporting & Action
-Report violations through the Contact page, by email at [EMAIL] or by phone at [PHONE]. Violations may lead to account suspension or termination.
+Report violations through the Contact page, by email at sntiwarigevra61@gmail.com or by phone at +91 98279 91224. Violations may lead to account suspension or termination.
 
 *Last Updated: [DATE OF APPROVAL]*
