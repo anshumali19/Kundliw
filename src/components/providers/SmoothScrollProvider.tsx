@@ -20,7 +20,7 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
         touchMultiplier: 1.8,
         infinite: false,
         // Menus, dialogs and any box that scrolls on its own keep the browser's native wheel scrolling.
-        prevent: (node: HTMLElement) => !!node.closest(".overflow-y-auto, .overflow-auto, [role=dialog], [data-lenis-prevent]"),
+        prevent: (node: HTMLElement) => !!node.closest("[class*=\"overflow-y-auto\"], [class*=\"overflow-auto\"], [role=dialog], [data-lenis-prevent]"),
       }}
     >
       {children}

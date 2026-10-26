@@ -181,7 +181,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
-        <nav aria-label="Sections" className="lg:max-h-[75vh] lg:overflow-y-auto overscroll-contain lg:pr-1 space-y-4">
+        <nav aria-label="Sections" data-lenis-prevent className="lg:max-h-[75vh] lg:overflow-y-auto overscroll-contain lg:pr-1 space-y-4">
           {NAV_GROUPS.map((g) => {
             const items = g.ids.map((id) => SECTIONS.find((x) => x.id === id)).filter((x): x is (typeof SECTIONS)[number] => !!x);
             if (items.length === 0) return null;
