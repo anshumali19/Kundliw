@@ -121,3 +121,31 @@ describe("Transactional Offer Claiming (claimOfferInTransaction)", () => {
     ).rejects.toThrow("usage limit exceeded");
   });
 });
+
+describe("Offer scope and per-customer limit", () => {
+  const base: OfferDefinition = {
+    code: "SCOPED",
+    discountType: "FLAT",
+    discountValuePaise: 20000,
+    minOrderValuePaise: 0,
+    isActive: true,
+    serviceSlugs: ["career"],
+    perUserLimit: 1,
+  };
+
+  it("refuses a service the code does not cover, with a clear reason", () => {
+    const r = applyOffer(base, 150000, new Date(), { serviceSlug: "matching" });
+    expect(r.isValid).toBe(false);
+    expect(r.reason).toMatch(/not valid for the selected service/);
+  });
+
+  it("accepts the covered service and any service when none are listed", () => {
+    expect(applyOffer(base, 150000, new Date(), { serviceSlug: "career" }).isValid).toBe(true);
+    expect(applyOffer({ ...base, serviceSlugs: [] }, 150000, new Date(), { serviceSlug: "anything" }).isValid).toBe(true);
+  });
+
+  it("stops a customer who used the code up to the limit; 0 means unlimited", () => {
+    expect(applyOffer(base, 150000, new Date(), { serviceSlug: "career", userUses: 1 }).reason).toMatch(/already used/);
+    expect(applyOffer({ ...base, perUserLimit: 0 }, 150000, new Date(), { serviceSlug: "career", userUses: 5 }).isValid).toBe(true);
+  });
+});

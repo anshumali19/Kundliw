@@ -39,6 +39,8 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
     maxDiscountPaise: o.maxDiscountPaise,
     minOrderValuePaise: o.minOrderValuePaise,
     usageLimit: o.usageLimit,
+    perUserLimit: o.perUserLimit,
+    serviceSlugs: o.serviceSlugs,
     usedCount: o.usedCount,
     validFrom: o.validFrom.toISOString(),
     validUntil: o.validUntil ? o.validUntil.toISOString() : null,
@@ -46,5 +48,11 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
     _count: o._count,
   }));
 
-  return <AdminOffersManager initialOffers={offersData} locale={locale} />;
+  const services = await prisma.service.findMany({
+    where: { isActive: true },
+    orderBy: { orderIndex: "asc" },
+    select: { slug: true, titleEn: true, titleHi: true },
+  });
+
+  return <AdminOffersManager initialOffers={offersData} services={services} locale={locale} />;
 }

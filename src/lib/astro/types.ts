@@ -91,6 +91,16 @@ export interface PanchangResult {
   rahuKaal: string;
   sunrise: string;
   sunset: string;
+  masa?: string;
+  parts?: {
+    tithiEn: string;
+    tithiHi: string;
+    pakshaEn: string;
+    pakshaHi: string;
+    masaEn: string;
+    masaHi: string;
+    samvat: number;
+  };
 }
 
 export interface AstroProvider {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
+import { useHiddenTools } from "@/components/providers/ToolsProvider";
 import { Link, usePathname } from "@/i18n/routing";
 import { homeForRole } from "./AccountMenu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -38,6 +39,7 @@ import {
  */
 export function MobileNav() {
   const tNav = useTranslations("nav");
+  const hideTools = useHiddenTools();
   const locale = useLocale();
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -70,7 +72,7 @@ export function MobileNav() {
     return pathname === href || pathname.startsWith(href + "/");
   };
 
-  const sheetLinks = [
+  const sheetLinks = hideTools([
     { href: "/services", label: tNav("services"), icon: Compass },
     { href: "/gallery", label: tNav("gallery"), icon: ImageIcon },
     { href: "/blogs", label: tNav("blogs"), icon: FileText },
@@ -88,7 +90,7 @@ export function MobileNav() {
     { href: "/track", label: tNav("tracker"), icon: Search },
     { href: "/vault", label: tNav("vault"), icon: Shield },
     { href: "/guides/user", label: tNav("userGuide"), icon: BookOpen },
-  ];
+  ]);
 
   const tile =
     "flex items-center gap-2.5 min-h-[48px] px-3 rounded-lg border border-outline-variant bg-surface hover:bg-brand/10 text-sm font-semibold text-on-surface";

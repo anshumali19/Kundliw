@@ -75,6 +75,25 @@ interface BookingWizardProps {
 
 const STORAGE_KEY = "mkjk_booking_draft_v1";
 
+const REASONS_HI: Array<[RegExp, (m: RegExpMatchArray) => string]> = [
+  [/^Minimum order value of ₹([d,]+) required/, (m) => `इस कोड के लिए न्यूनतम ₹${m[1]} का ऑर्डर आवश्यक है`],
+  [/^This code is not valid for the selected service/, () => "यह कोड चुनी गई सेवा पर मान्य नहीं है"],
+  [/^You have already used this code/, () => "आप यह कोड पहले ही उपयोग कर चुके हैं"],
+  [/^Offer has expired/, () => "इस ऑफर की अवधि समाप्त हो चुकी है"],
+  [/^Offer is not yet valid/, () => "यह ऑफर अभी शुरू नहीं हुआ है"],
+  [/^Offer usage limit exceeded/, () => "इस ऑफर की उपयोग सीमा पूरी हो चुकी है"],
+];
+
+/** Shows the exact reason a coupon does not apply, in the customer's language. */
+function reasonText(reason: string | undefined, isHindi: boolean): string | undefined {
+  if (!reason || !isHindi) return reason;
+  for (const [re, fn] of REASONS_HI) {
+    const m = reason.match(re);
+    if (m) return fn(m);
+  }
+  return "अमान्य अथवा अनुपलब्ध कूपन कोड।";
+}
+
 export function BookingWizard({
   services,
   initialServiceSlug,
@@ -204,7 +223,7 @@ export function BookingWizard({
       if (!res.ok || !data.isValid) {
         setAppliedOffer(null);
         setOfferError(
-          data.reason ||
+          reasonText(data.reason, isHindi) ||
             (isHindi
               ? "अमान्य अथवा अनुपलब्ध कूपन कोड।"
               : "Invalid or unavailable coupon code.")

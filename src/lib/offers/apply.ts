@@ -9,6 +9,15 @@ export interface OfferDefinition {
   validUntil?: Date | null;
   usageLimit?: number | null;
   usedCount?: number;
+  perUserLimit?: number;
+  serviceSlugs?: string[];
+}
+
+/** What we know about this particular booking, so the rules can be checked fairly. */
+export interface OfferContext {
+  serviceSlug?: string;
+  /** How many times this customer has already used the code on live orders. */
+  userUses?: number;
 }
 
 export interface OfferEvaluationResult {
@@ -23,7 +32,8 @@ export interface OfferEvaluationResult {
 export function applyOffer(
   offer: OfferDefinition,
   orderAmountPaise: number,
-  now: Date = new Date()
+  now: Date = new Date(),
+  ctx: OfferContext = {}
 ): OfferEvaluationResult {
   if (!offer.isActive) {
     return { isValid: false, discountPaise: 0, reason: "Offer is inactive" };
@@ -45,12 +55,20 @@ export function applyOffer(
     return { isValid: false, discountPaise: 0, reason: "Offer usage limit exceeded" };
   }
 
+  if (offer.serviceSlugs && offer.serviceSlugs.length > 0 && ctx.serviceSlug && !offer.serviceSlugs.includes(ctx.serviceSlug)) {
+    return { isValid: false, discountPaise: 0, reason: "This code is not valid for the selected service" };
+  }
+
+  if (offer.perUserLimit && offer.perUserLimit > 0 && (ctx.userUses ?? 0) >= offer.perUserLimit) {
+    return { isValid: false, discountPaise: 0, reason: "You have already used this code" };
+  }
+
   const minOrder = offer.minOrderValuePaise ?? 0;
   if (orderAmountPaise < minOrder) {
     return {
       isValid: false,
       discountPaise: 0,
-      reason: `Minimum order value of ₹${minOrder / 100} required`,
+      reason: `Minimum order value of ₹${(minOrder / 100).toLocaleString("en-IN")} required for this code`,
     };
   }
 
@@ -78,6 +96,7 @@ export function applyOffer(
 }
 
 export interface PrismaOfferTxLike {
+  order?: { count: (args: { where: Record<string, unknown> }) => Promise<number> };
   offer: {
     findUnique: (args: { where: { code: string } }) => Promise<OfferDefinition | null>;
     update: (args: {
@@ -100,7 +119,8 @@ export async function claimOfferInTransaction(
   tx: PrismaOfferTxLike,
   code: string,
   orderAmountPaise: number,
-  now: Date = new Date()
+  now: Date = new Date(),
+  ctx: { serviceSlug?: string; userId?: string } = {}
 ): Promise<{ offer: OfferDefinition; discountPaise: number }> {
   const offer = await tx.offer.findUnique({
     where: { code },
@@ -110,7 +130,13 @@ export async function claimOfferInTransaction(
     throw new Error("Invalid or unavailable coupon code.");
   }
 
-  const evalResult = applyOffer(offer, orderAmountPaise, now);
+  let userUses = 0;
+  if (ctx.userId && tx.order) {
+    userUses = await tx.order.count({
+      where: { userId: ctx.userId, offerCode: code, paymentStatus: { notIn: ["FAILED", "REFUNDED"] } },
+    });
+  }
+  const evalResult = applyOffer(offer, orderAmountPaise, now, { serviceSlug: ctx.serviceSlug, userUses });
   if (!evalResult.isValid) {
     throw new Error(evalResult.reason || "Invalid or unavailable coupon code.");
   }

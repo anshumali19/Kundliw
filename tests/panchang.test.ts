@@ -26,3 +26,12 @@ describe("panchang calculation", () => {
     expect(computePanchang("2026-12-21").sunrise).toMatch(/^06:/);
   });
 });
+
+describe("panchang one-line bar data", () => {
+  it("names the lunar month, paksha and samvat", () => {
+    const p = computePanchang("2026-10-26");
+    expect(p.parts?.masaEn).toBe("Ashwin");
+    expect(p.parts?.pakshaHi).toBe("शुक्ल पक्ष");
+    expect(p.parts?.samvat).toBe(2083);
+  });
+});

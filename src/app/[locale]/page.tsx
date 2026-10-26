@@ -96,7 +96,7 @@ export default async function HomePage(
 
   return (
     <div className="flex flex-col w-full text-on-surface">
-      {homeCfg.showPanchang !== false && <PanchangWidget panchang={panchang} locale={locale} />}
+      
       {pick(homeCfg, "announcement", "") && (
         <div className="w-full bg-primary/10 text-secondary text-sm font-semibold text-center px-4 py-2">{pick(homeCfg, "announcement", "")}</div>
       )}
@@ -106,7 +106,7 @@ export default async function HomePage(
         <div className="w-full px-4 sm:px-8 lg:px-12 py-10 lg:py-14">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 text-left">
-              {animCfg.enabled !== false && <LiveClockEphemeris tithi={panchang?.tithi} />}
+              
               <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">
                 {pick(heroCfg, "eyebrow", t("heroEyebrow"))}
               </p>

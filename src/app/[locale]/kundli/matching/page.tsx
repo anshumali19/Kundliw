@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { pageAlternates } from "@/lib/seo";
 import { getSection } from "@/lib/siteConfig/service";
-import { EmbedFrame, embedAddress } from "@/components/content/EmbedFrame";
+import { EmbedFrame, ToolOff, embedAddress } from "@/components/content/EmbedFrame";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +21,7 @@ export default async function Page(props: Props) {
   const { locale } = await props.params;
   const isHindi = locale === "hi";
   const cfg = await getSection("tools");
+  if (cfg.matchingEnabled === false) return <ToolOff name={isHindi ? "कुंडली मिलान" : "Kundli matching"} isHindi={isHindi} />;
   const src = embedAddress(String(cfg.matchingUrl || ""), "https://www.astrosage.com/freechart/matchmaking.asp", locale);
   return (
     <EmbedFrame

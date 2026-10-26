@@ -183,6 +183,19 @@ export function vikramSamvat(jd: number): number {
   return new Date(fromJD(jd)).getUTCFullYear() + 57;
 }
 
+const MASAS: Array<[string, string]> = [
+  ["Chaitra", "चैत्र"], ["Vaishakha", "वैशाख"], ["Jyeshtha", "ज्येष्ठ"], ["Ashadha", "आषाढ़"], ["Shravana", "श्रावण"], ["Bhadrapada", "भाद्रपद"],
+  ["Ashwin", "आश्विन"], ["Kartika", "कार्तिक"], ["Margashirsha", "मार्गशीर्ष"], ["Pausha", "पौष"], ["Magha", "माघ"], ["Phalguna", "फाल्गुन"],
+];
+
+/** Lunar month (amanta): named after the sign the Sun is in at the last new moon. */
+export function amantaMasaIndex(jd: number): number {
+  let nm = jd - elongation(jd) / 12.1907;
+  for (let k = 0; k < 4; k++) nm -= (((elongation(nm) + 180) % 360) - 180) / 12.1907;
+  const rashi = Math.floor(norm(sunLongitude(nm) - lahiri(nm)) / 30);
+  return (rashi + 1) % 12;
+}
+
 export function computePanchang(dateStr: string, place = DEFAULT_PLACE): PanchangResult {
   const [y, m, d] = dateStr.split("-").map(Number);
   const { sunriseMs, sunsetMs, noonMs } = sunTimes(dateStr, place.lat, place.lng);
@@ -207,6 +220,9 @@ export function computePanchang(dateStr: string, place = DEFAULT_PLACE): Panchan
   const rahuStart = sunriseMs + (rahuIndex - 1) * seg;
   const abhijitHalf = dayLen / 30;
 
+  // North India (Varanasi) follows the purnimanta month: the dark half belongs to the next month.
+  const masaIdx = (amantaMasaIndex(jd) + (tn.paksha === "Krishna" ? 1 : 0)) % 12;
+  const samvatYear = vikramSamvat(jd);
   const dayKey = dateStr;
   return {
     isDemo: false,
@@ -223,5 +239,15 @@ export function computePanchang(dateStr: string, place = DEFAULT_PLACE): Panchan
     rahuKaal: `${clock(rahuStart)} - ${clock(rahuStart + seg)}`,
     sunrise: clock(sunriseMs),
     sunset: clock(sunsetMs),
+    masa: `${MASAS[masaIdx][0]} (${MASAS[masaIdx][1]})`,
+    parts: {
+      tithiEn: tn.en,
+      tithiHi: tn.hi,
+      pakshaEn: tn.paksha === "Shukla" ? "Shukla Paksha" : "Krishna Paksha",
+      pakshaHi: tn.paksha === "Shukla" ? "शुक्ल पक्ष" : "कृष्ण पक्ष",
+      masaEn: MASAS[masaIdx][0],
+      masaHi: MASAS[masaIdx][1],
+      samvat: samvatYear,
+    },
   };
 }

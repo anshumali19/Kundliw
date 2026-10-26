@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useHiddenTools } from "@/components/providers/ToolsProvider";
+import { DateStrip, type DateStripData } from "./DateStrip";
 import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { AccountMenu } from "./AccountMenu";
@@ -25,13 +27,16 @@ import {
 } from "lucide-react";
 
 interface HeaderProps {
+  panchang?: { parts?: DateStripData } | null;
   phone?: string;
 }
 
-export function Header({ phone }: HeaderProps = {}) {
+export function Header({ phone, panchang }: HeaderProps = {}) {
+  const isHindi = useLocale() === "hi";
   const tNav = useTranslations("nav");
   const tHeader = useTranslations("header");
   const tCommon = useTranslations("common");
+  const hideTools = useHiddenTools();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
@@ -60,17 +65,17 @@ export function Header({ phone }: HeaderProps = {}) {
   }, []);
 
   // Primary desktop bar links
-  const primaryLinks = [
+  const primaryLinks = hideTools([
     { href: "/services", label: tNav("services") },
     { href: "/services#plans", label: tNav("pricingPlans") },
     { href: "/kundli", label: tNav("kundli") },
     { href: "/kundli/matching", label: tNav("kundliMatching") },
     { href: "/kundli/prashna", label: tNav("prashna") },
     { href: "/other-services", label: tNav("otherServices") },
-  ];
+  ]);
 
   // Secondary/lineage items accessible in dropdown & mobile
-  const kendraLinks = [
+  const kendraLinks = hideTools([
     { href: "/about", label: tNav("about"), icon: Compass },
     { href: "/founder", label: tNav("founder"), icon: Sparkles },
     { href: "/other-services", label: tNav("otherServices"), icon: Sparkles },
@@ -81,7 +86,7 @@ export function Header({ phone }: HeaderProps = {}) {
     { href: "/help", label: tNav("help"), icon: HelpCircle },
     { href: "/panchang", label: tNav("panchang"), icon: BookOpen },
     { href: "/track", label: tNav("tracker"), icon: Search },
-  ];
+  ]);
 
   // Precise route matching so siblings don't share active state
   const checkIsActive = (href: string) => {
@@ -110,7 +115,7 @@ export function Header({ phone }: HeaderProps = {}) {
   const isAnyKendraActive = kendraLinks.some((k) => pathname === k.href || pathname.startsWith(`${k.href}/`));
 
   // Complete SRS 13-item navigation list for mobile drawer
-  const srsMobileMenu = [
+  const srsMobileMenu = hideTools([
     { href: "/services", label: tNav("services") },
     { href: "/services#plans", label: tNav("pricingPlans") },
     { href: "/kundli", label: tNav("kundli") },
@@ -127,61 +132,42 @@ export function Header({ phone }: HeaderProps = {}) {
     { href: "/help", label: tNav("help") },
     { href: "/auth/register", label: tNav("register") },
     { href: "/auth/signin", label: tNav("signIn") },
-  ];
+  ]);
 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
-      {/* 1. Top Sub-Bar: Vedic Invocation, Live Ephemeris Summary & Contact */}
-      <div className="bg-brand-gradient">
-        <div className="w-full px-4 sm:px-6 xl:px-6 2xl:px-10 h-9 flex items-center justify-between gap-2 text-xs text-on-gold font-medium [&_span]:!text-on-gold [&_a]:!text-on-gold [&_svg]:!text-on-gold">
-          <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap min-w-0 flex-1">
-            <span className="font-serif text-secondary font-semibold italic tracking-wide truncate">
-              {tHeader("invocation")}
-            </span>
-            <span className="hidden lg:inline-block w-px h-3 bg-outline-variant shrink-0"></span>
-            <div className="hidden md:flex items-center gap-2 truncate">
-              <span className="text-primary font-semibold uppercase tracking-wider shrink-0">
-                {tHeader("panchangLabel")}
-              </span>
-              <span className="text-on-surface-variant italic truncate">
-                {tCommon("tagline")}
-              </span>
-            </div>
-          </div>
+      {/* 1. One-line bar: time, day, date, month, paksha, tithi and Samvat; contact and sign-in on the right */}
+      <div className="bg-maroon">
+        <div className="w-full px-3 sm:px-6 xl:px-6 2xl:px-10 h-9 flex items-center justify-between gap-3 text-xs text-on-maroon font-medium [&_a]:!text-on-maroon">
+          <DateStrip data={panchang?.parts ?? null} isHindi={isHindi} />
 
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            <Link href="/panchang" className="inline-flex items-center gap-1 rounded-full bg-secondary/90 px-2.5 py-1 text-[11px] font-bold !text-on-secondary hover:opacity-90 whitespace-nowrap">
-              <BookOpen className="w-3 h-3 shrink-0" />
-              <span className="!text-on-secondary">{tNav("panchangCalendar")}</span>
-            </Link>
-            {phone && (
-              <>
-                <a
-                  href={`tel:${phone.replace(/[^\d+]/g, "")}`}
-                  className="hidden sm:inline-flex items-center gap-1.5 hover:text-primary transition-colors text-xs"
-                >
-                  <Phone className="w-3 h-3 text-primary" />
-                  <span className="font-semibold">{phone}</span>
-                </a>
-                <span className="hidden sm:inline-block w-px h-3 bg-outline-variant shrink-0"></span>
-              </>
-            )}
+            {hideTools([{ href: "/panchang" }]).length > 0 && (
             <Link
-              href="/auth/signin"
-              className="hidden md:inline-flex items-center gap-1 hover:text-primary transition-colors text-xs font-semibold text-secondary"
+              href="/panchang"
+              className="hidden sm:inline-flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-[11px] font-bold !text-on-gold hover:opacity-90 whitespace-nowrap"
             >
-              <LogIn className="w-3 h-3 text-secondary shrink-0" />
+              <BookOpen className="w-3 h-3 shrink-0" aria-hidden="true" />
+              <span className="!text-on-gold">{tNav("panchangCalendar")}</span>
+            </Link>
+            )}
+            {phone && (
+              <a
+                href={`tel:${phone.replace(/[^d+]/g, "")}`}
+                className="hidden lg:inline-flex items-center gap-1.5 hover:underline text-xs"
+              >
+                <Phone className="w-3 h-3 text-gold" />
+                <span className="font-semibold">{phone}</span>
+              </a>
+            )}
+            <Link href="/auth/signin" className="hidden md:inline-flex items-center gap-1 hover:underline text-xs font-semibold">
+              <LogIn className="w-3 h-3 text-gold shrink-0" />
               <span>{tNav("signIn")}</span>
             </Link>
-            <span className="hidden md:inline-block w-px h-3 bg-outline-variant shrink-0"></span>
-            <Link
-              href="/auth/register"
-              className="hidden md:inline-flex items-center gap-1 hover:text-secondary transition-colors text-xs font-semibold text-primary"
-            >
-              <UserPlus className="w-3 h-3 text-primary shrink-0" />
+            <Link href="/auth/register" className="hidden md:inline-flex items-center gap-1 hover:underline text-xs font-semibold">
+              <UserPlus className="w-3 h-3 text-gold shrink-0" />
               <span>{tNav("register")}</span>
             </Link>
-            <span className="hidden md:inline-block w-px h-3 bg-outline-variant shrink-0"></span>
             <LanguageSwitcher />
           </div>
         </div>

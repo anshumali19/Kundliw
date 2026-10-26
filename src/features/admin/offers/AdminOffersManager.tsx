@@ -27,6 +27,8 @@ export interface AdminOfferItem {
   maxDiscountPaise: number | null;
   minOrderValuePaise: number;
   usageLimit: number | null;
+  perUserLimit: number;
+  serviceSlugs: string[];
   usedCount: number;
   validFrom: string;
   validUntil: string | null;
@@ -38,11 +40,13 @@ export interface AdminOfferItem {
 
 interface AdminOffersManagerProps {
   initialOffers: AdminOfferItem[];
+  services: { slug: string; titleEn: string; titleHi: string }[];
   locale: string;
 }
 
 export function AdminOffersManager({
   initialOffers,
+  services,
   locale,
 }: AdminOffersManagerProps) {
   const isHindi = locale === "hi";
@@ -58,8 +62,10 @@ export function AdminOffersManager({
     discountType: "FLAT" as "FLAT" | "PERCENTAGE",
     discountValue: 500, // In rupees for FLAT, percentage integer for PERCENTAGE
     maxDiscountRupees: "" as string | number,
-    minOrderValueRupees: 1500,
+    minOrderValueRupees: 0,
     usageLimit: "" as string | number,
+    perUserLimit: 1 as string | number,
+    serviceSlugs: [] as string[],
     validFrom: new Date().toISOString().slice(0, 10),
     validUntil: "",
     isActive: true,
@@ -88,6 +94,8 @@ export function AdminOffersManager({
           : "",
         minOrderValueRupees: paiseToRupees(offer.minOrderValuePaise),
         usageLimit: offer.usageLimit || "",
+        perUserLimit: offer.perUserLimit,
+        serviceSlugs: offer.serviceSlugs ?? [],
         validFrom: offer.validFrom.slice(0, 10),
         validUntil: offer.validUntil ? offer.validUntil.slice(0, 10) : "",
         isActive: offer.isActive,
@@ -101,8 +109,10 @@ export function AdminOffersManager({
         discountType: "FLAT",
         discountValue: 500,
         maxDiscountRupees: "",
-        minOrderValueRupees: 1500,
+        minOrderValueRupees: 0,
         usageLimit: 1000,
+        perUserLimit: 1,
+        serviceSlugs: [],
         validFrom: new Date().toISOString().slice(0, 10),
         validUntil: "",
         isActive: true,
@@ -129,6 +139,8 @@ export function AdminOffersManager({
           : null,
         minOrderValueRupees: Number(form.minOrderValueRupees || 0),
         usageLimit: form.usageLimit ? Number(form.usageLimit) : null,
+        perUserLimit: Number(form.perUserLimit || 0),
+        serviceSlugs: form.serviceSlugs,
         validFrom: new Date(form.validFrom).toISOString(),
         validUntil: form.validUntil ? new Date(form.validUntil).toISOString() : null,
         isActive: Boolean(form.isActive),
@@ -547,6 +559,49 @@ export function AdminOffersManager({
                     onChange={(e) => setForm({ ...form, validUntil: e.target.value })}
                     className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                    प्रति ग्राहक उपयोग (Uses per customer)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={form.perUserLimit}
+                    onChange={(e) => setForm({ ...form, perUserLimit: e.target.value })}
+                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                  />
+                  <p className="text-[11px] text-on-surface-variant mt-1">0 = असीमित (unlimited)</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="block text-xs font-bold uppercase text-secondary mb-1">
+                    किन सेवाओं पर मान्य (Valid for)
+                  </span>
+                  <p className="text-[11px] text-on-surface-variant mb-1">कुछ न चुनें तो सभी सेवाओं पर मान्य (none selected = all services)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {services.map((sv) => {
+                      const on = form.serviceSlugs.includes(sv.slug);
+                      return (
+                        <label key={sv.slug} className={`inline-flex items-center gap-2 min-h-[40px] px-3 rounded border text-xs cursor-pointer ${on ? "border-primary bg-primary/10 text-secondary font-semibold" : "border-outline-variant/80"}`}>
+                          <input
+                            type="checkbox"
+                            checked={on}
+                            onChange={() =>
+                              setForm({
+                                ...form,
+                                serviceSlugs: on ? form.serviceSlugs.filter((x) => x !== sv.slug) : [...form.serviceSlugs, sv.slug],
+                              })
+                            }
+                          />
+                          {isHindi ? sv.titleHi : sv.titleEn}
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 

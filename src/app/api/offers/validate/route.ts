@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { validateOfferQuerySchema } from "@/features/services/validation";
+import { getCurrentUser } from "@/lib/auth/guards";
 import { applyOffer } from "@/lib/offers/apply";
 import { calculateGst, formatPaiseToInr } from "@/lib/billing/gst";
 import { getGstSettings } from "@/lib/billing/gstSettings";
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
         titleEn: true,
         titleHi: true,
         pricePaise: true,
+        service: { select: { slug: true } },
       },
     });
 
@@ -77,12 +79,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Server-side pure evaluation of offer against plan price
-    const evalResult = applyOffer(offer, plan.pricePaise);
+    const user = await getCurrentUser().catch(() => null);
+    const userUses =
+      user && (offer.perUserLimit ?? 0) > 0
+        ? await prisma.order
+            .count({
+            where: { userId: user.id, offerCode: offer.code, paymentStatus: { notIn: ["FAILED", "REFUNDED"] } },
+          })
+            .catch(() => 0)
+        : 0;
+    const evalResult = applyOffer(offer, plan.pricePaise, new Date(), {
+      serviceSlug: plan.service?.slug,
+      userUses,
+    });
 
     if (!evalResult.isValid) {
+      // Switched-off codes stay generic; for live codes tell the customer exactly what is missing.
       return NextResponse.json({
         isValid: false,
-        reason: GENERIC_UNAVAILABLE_MESSAGE,
+        reason: offer.isActive ? evalResult.reason : GENERIC_UNAVAILABLE_MESSAGE,
       });
     }
 

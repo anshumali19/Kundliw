@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { SocialLinks } from "@/components/content/SocialLinks";
 import { Link } from "@/i18n/routing";
+import { getSection } from "@/lib/siteConfig/service";
 import { prisma } from "@/lib/prisma";
 import { LocationMap } from "@/components/content/LocationMap";
 import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
@@ -10,6 +11,7 @@ export async function Footer() {
   const t = await getTranslations("footer");
   const tCommon = await getTranslations("common");
   const tNav = await getTranslations("nav");
+  const tools = await getSection("tools");
 
   // Fetch admin settings for live contact numbers, address, and social links
   const settings = await prisma.adminSettings
@@ -90,26 +92,32 @@ export async function Footer() {
                   {tNav("pricingPlans")}
                 </Link>
               </li>
-              <li>
+              {tools.kundliEnabled !== false && (
+<li>
                 <Link href="/kundli" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("kundli")}
                 </Link>
               </li>
-              <li>
+)}
+              {tools.matchingEnabled !== false && (
+<li>
                 <Link href="/kundli/matching" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("kundliMatching")}
                 </Link>
               </li>
+)}
               <li>
                 <Link href="/kundli/prashna" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("prashna")}
                 </Link>
               </li>
-              <li>
+              {tools.panchangEnabled !== false && (
+<li>
                 <Link href="/panchang" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("panchang")}
                 </Link>
               </li>
+)}
               <li>
                 <Link href="/other-services" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("otherServices")}
@@ -236,6 +244,21 @@ export async function Footer() {
                 <li>
                   <Link href="/legal/terms" className="hover:text-gold transition-colors block py-0.5">
                     {t("termsLink")}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/platform-guidelines" className="hover:text-gold transition-colors block py-0.5">
+                    {locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines"}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/member-agreement" className="hover:text-gold transition-colors block py-0.5">
+                    {locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement"}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/rules-regulations" className="hover:text-gold transition-colors block py-0.5">
+                    {locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations"}
                   </Link>
                 </li>
                 <li>

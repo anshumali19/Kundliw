@@ -29,7 +29,7 @@ export async function getDailyPanchang(
     }
 
     // Older cached sample (demo) entries are ignored and replaced by the real calculation.
-    if (cached && cached.dataJson && (cached.dataJson as { isDemo?: boolean }).isDemo !== true) {
+    if (cached && cached.dataJson && (cached.dataJson as { isDemo?: boolean; parts?: unknown }).isDemo !== true && !!(cached.dataJson as { parts?: unknown }).parts) {
       return cached.dataJson as unknown as PanchangResult;
     }
 

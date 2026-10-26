@@ -57,3 +57,17 @@ export function EmbedFrame({
     </div>
   );
 }
+
+/** Shown when the admin has switched a tool off. */
+export function ToolOff({ name, isHindi }: { name: string; isHindi: boolean }) {
+  return (
+    <div className="w-full px-4 py-16 text-center">
+      <h1 className="font-serif text-xl font-bold text-secondary">
+        {isHindi ? `${name} अभी उपलब्ध नहीं है` : `${name} is not available right now`}
+      </h1>
+      <p className="mt-2 text-sm text-on-surface-variant">
+        {isHindi ? "कृपया बाद में पुनः प्रयास करें या हमसे संपर्क करें।" : "Please try again later or contact us."}
+      </p>
+    </div>
+  );
+}

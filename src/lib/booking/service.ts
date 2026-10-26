@@ -143,7 +143,9 @@ export async function createBookingOrder(
       const claimResult = await claimOfferInTransaction(
         tx,
         cleanCode,
-        plan.pricePaise
+        plan.pricePaise,
+        new Date(),
+        { serviceSlug: service.slug, userId }
       );
 
       discountPaise = claimResult.discountPaise;

@@ -108,10 +108,10 @@ const config: Config = {
       },
       fontFamily: {
         // Poppins for Latin text; Noto Sans supplies the Devanagari (Hindi) glyphs
-        serif: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
+        serif: ["var(--font-playfair)", "var(--font-noto-serif-deva)", "Georgia", "serif"],
         sans: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
-        display: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
-        headline: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
+        display: ["var(--font-playfair)", "var(--font-noto-serif-deva)", "Georgia", "serif"],
+        headline: ["var(--font-playfair)", "var(--font-noto-serif-deva)", "Georgia", "serif"],
         body: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
       },
       spacing: {

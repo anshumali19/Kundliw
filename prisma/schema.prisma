@@ -231,6 +231,8 @@ model Offer {
   minOrderValuePaise Int          @default(0)
   usageLimit         Int?
   usedCount          Int          @default(0)
+  perUserLimit       Int          @default(1) // 0 = unlimited uses per customer
+  serviceSlugs       String[]     @default([]) // empty = valid for every service
   validFrom          DateTime     @default(now())
   validUntil         DateTime?
   isActive           Boolean      @default(true)

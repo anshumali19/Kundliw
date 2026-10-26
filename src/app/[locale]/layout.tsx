@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Noto_Sans } from "next/font/google";
+import { Poppins, Noto_Sans, Playfair_Display, Noto_Serif_Devanagari } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
@@ -9,7 +9,9 @@ import { MarqueeStrip } from "@/components/layout/MarqueeStrip";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
+import { ToolsProvider } from "@/components/providers/ToolsProvider";
 import { getSection } from "@/lib/siteConfig/service";
+import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
@@ -22,6 +24,21 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
+  display: "swap",
+});
+
+// Headings use an elegant serif (Playfair for English, Noto Serif for Hindi) for a classical Jyotish look.
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const notoSerifDeva = Noto_Serif_Devanagari({
+  subsets: ["devanagari"],
+  weight: ["500", "600", "700"],
+  variable: "--font-noto-serif-deva",
   display: "swap",
 });
 
@@ -146,6 +163,13 @@ export default async function LocaleLayout(
     })
     .catch(() => []);
   const features = await getSection("features");
+  const panchang = await getDailyPanchang();
+  const toolsCfg = await getSection("tools");
+  const hiddenTools = [
+    ...(toolsCfg.panchangEnabled === false ? ["/panchang"] : []),
+    ...(toolsCfg.kundliEnabled === false ? ["/kundli", "/kundli/astrosage"] : []),
+    ...(toolsCfg.matchingEnabled === false ? ["/kundli/matching"] : []),
+  ];
   const topMarquee = marqueeItems.filter((m) => m.position === "TOP");
   const bottomMarquee = marqueeItems.filter((m) => m.position === "BOTTOM");
 
@@ -214,14 +238,15 @@ export default async function LocaleLayout(
   };
 
   return (
-    <html lang={locale} className={`${poppins.variable} ${notoSans.variable} w-full max-w-full overflow-x-clip`}>
+    <html lang={locale} className={`${poppins.variable} ${notoSans.variable} ${playfair.variable} ${notoSerifDeva.variable} w-full max-w-full overflow-x-clip`}>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-clip relative">
         <JsonLd data={structuredData} />
         <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
+          <ToolsProvider hidden={hiddenTools}>
           <SmoothScrollProvider>
-            <Header phone={settings?.phone1 ?? undefined} />
+            <Header phone={settings?.phone1 ?? undefined} panchang={panchang} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>
@@ -248,6 +273,7 @@ export default async function LocaleLayout(
             />
             )}
           </SmoothScrollProvider>
+          </ToolsProvider>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

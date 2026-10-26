@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Offer" ADD COLUMN "serviceSlugs" TEXT[] DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "perUserLimit" INTEGER NOT NULL DEFAULT 1;
