@@ -391,7 +391,7 @@ export function AdminOffersManager({
       {/* Modal: Offer Form */}
       {modalOpen && (
         <div className="fixed inset-0 z-[70] bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-xl w-full p-6 text-left max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto">
+          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-xl w-full p-6 text-left max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/40">
               <h2 className="font-serif text-lg font-bold text-secondary">
                 {editingOffer

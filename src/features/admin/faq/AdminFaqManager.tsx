@@ -319,7 +319,7 @@ export function AdminFaqManager({ isHindi }: { isHindi: boolean }) {
       {/* Modal Dialog */}
       {modalOpen && (
         <div className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface rounded-2xl max-w-2xl w-full max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 space-y-4 border border-outline-variant text-xs shadow-2xl">
+          <div className="bg-surface rounded-2xl max-w-2xl w-full max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain p-6 space-y-4 border border-outline-variant text-xs shadow-2xl">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <span className="font-serif font-bold text-base text-secondary">
                 {editingId ? "Edit FAQ Question" : "Add New FAQ Question"}

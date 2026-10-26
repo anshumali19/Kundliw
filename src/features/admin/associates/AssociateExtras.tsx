@@ -195,7 +195,7 @@ export function AssociateDetailsModal({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4 bg-black/60" role="dialog" aria-modal="true">
-      <form onSubmit={save} className="w-full max-w-lg max-h-[calc(100dvh-1rem)] overflow-y-auto bg-surface rounded-2xl shadow-2xl p-5 space-y-4">
+      <form onSubmit={save} className="w-full max-w-lg max-h-[calc(100dvh-1rem)] overflow-y-auto overscroll-contain bg-surface rounded-2xl shadow-2xl p-5 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="font-bold text-lg text-secondary">{associate.user.name || associate.referralCode}</h2>

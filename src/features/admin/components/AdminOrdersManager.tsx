@@ -663,7 +663,7 @@ export function AdminOrdersManager({
                   {isHindi ? "इतिहास एवं घटनाक्रम (Audit Trail)" : "Status Audit Trail"}
                 </span>
 
-                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-56 overflow-y-auto overscroll-contain pr-1">
                   {selectedOrder.statusEvents.length === 0 ? (
                     <span className="text-xs text-on-surface-variant">No events logged yet.</span>
                   ) : (

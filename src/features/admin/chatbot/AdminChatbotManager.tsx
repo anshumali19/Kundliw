@@ -426,7 +426,7 @@ export function AdminChatbotManager({ locale }: { locale: string }) {
       {/* Create / Edit Modal */}
       {isCreating && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-surface rounded-2xl border border-outline-variant p-6 shadow-2xl max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-surface rounded-2xl border border-outline-variant p-6 shadow-2xl max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/30">
               <h2 className="text-lg font-serif font-bold text-on-surface">
                 {editingItem

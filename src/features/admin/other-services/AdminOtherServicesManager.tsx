@@ -381,7 +381,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto text-xs">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto overscroll-contain text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="font-semibold block mb-1">Slug (URL Identifier) *</label>
