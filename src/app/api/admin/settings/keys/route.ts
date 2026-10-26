@@ -96,12 +96,6 @@ export async function POST(req: NextRequest) {
         case "GOOGLE_CLIENT_SECRET":
           updateData.encGoogleClientSecret = encryptSecret(trimmed);
           break;
-        case "FACEBOOK_APP_ID":
-          updateData.encFacebookAppId = trimmed;
-          break;
-        case "FACEBOOK_APP_SECRET":
-          updateData.encFacebookAppSecret = encryptSecret(trimmed);
-          break;
         case "ASTROSAGE_USER_ID":
           updateData.encAstrosageUserId = trimmed;
           break;

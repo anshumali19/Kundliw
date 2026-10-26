@@ -109,7 +109,7 @@ Open Orders to verify manual payments, move an order through its stages, approve
 Open Associates to approve or reject applications, set commission rules (global, per service or per plan) and review payout requests. Mark a payout as Paid after you have paid the associate yourself; the system records it but does not move money.
 
 5. Settings and keys
-Site Settings holds the address, phone, bank, UPI, QR, GST and the app download link. API Keys holds Razorpay, SMS, email, Google, Facebook and AstroSage details, stored encrypted.
+Site Settings holds the address, phone, bank, UPI, QR, GST and the app download link. API Keys holds Razorpay, SMS, email, Google and AstroSage details, stored encrypted.
 
 6. Backups
 Open Backup and download a copy of your content and records regularly. Keep it somewhere safe.
@@ -129,7 +129,7 @@ The User, Associate and Admin guides can be edited from Pages.`,
 एसोसिएट खोलकर आवेदन स्वीकृत या अस्वीकृत करें, कमीशन नियम (सामान्य, सेवा-वार या प्लान-वार) तय करें और भुगतान अनुरोध देखें। एसोसिएट को स्वयं भुगतान करने के बाद ही भुगतान को "भुगतान किया गया" चिह्नित करें; सिस्टम इसे दर्ज करता है, धन का लेन-देन नहीं करता।
 
 5. सेटिंग्स और कुंजियाँ
-साइट सेटिंग्स में पता, फ़ोन, बैंक, UPI, QR, GST और ऐप डाउनलोड लिंक रहते हैं। API कुंजियों में Razorpay, SMS, ईमेल, Google, Facebook और AstroSage विवरण एन्क्रिप्टेड रूप में रहते हैं।
+साइट सेटिंग्स में पता, फ़ोन, बैंक, UPI, QR, GST और ऐप डाउनलोड लिंक रहते हैं। API कुंजियों में Razorpay, SMS, ईमेल, Google और AstroSage विवरण एन्क्रिप्टेड रूप में रहते हैं।
 
 6. बैकअप
 बैकअप खोलकर अपनी सामग्री और रिकॉर्ड की प्रति नियमित रूप से डाउनलोड करें और सुरक्षित रखें।

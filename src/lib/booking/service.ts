@@ -116,6 +116,12 @@ export async function createBookingOrder(
         throw new BookingError("Selected appointment slot does not exist.");
       }
 
+      const todayUtc = new Date();
+      todayUtc.setUTCHours(0, 0, 0, 0);
+      if (slot.date < todayUtc) {
+        throw new BookingError("Selected appointment slot is in the past. Please choose another time.");
+      }
+
       // Atomic conditional reservation: increment only if bookedCount < capacity
       const reservationResult = await tx.slot.updateMany({
         where: {

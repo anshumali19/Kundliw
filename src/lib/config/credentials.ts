@@ -15,8 +15,6 @@ export type CredentialKey =
   | "SMTP_FROM"
   | "GOOGLE_CLIENT_ID"
   | "GOOGLE_CLIENT_SECRET"
-  | "FACEBOOK_APP_ID"
-  | "FACEBOOK_APP_SECRET"
   | "ASTROSAGE_USER_ID"
   | "ASTROSAGE_API_KEY"
   | "GOOGLE_ANALYTICS_ID"
@@ -136,22 +134,6 @@ export const CREDENTIALS_METADATA: Record<CredentialKey, CredentialMeta> = {
     envVar: "GOOGLE_CLIENT_SECRET",
     isSecret: true,
   },
-  FACEBOOK_APP_ID: {
-    key: "FACEBOOK_APP_ID",
-    label: "Facebook App ID",
-    category: "AUTH",
-    description: "Meta for Developers Application ID for social sign-in.",
-    envVar: "FACEBOOK_APP_ID",
-    isSecret: false,
-  },
-  FACEBOOK_APP_SECRET: {
-    key: "FACEBOOK_APP_SECRET",
-    label: "Facebook App Secret",
-    category: "AUTH",
-    description: "Meta for Developers Application Secret.",
-    envVar: "FACEBOOK_APP_SECRET",
-    isSecret: true,
-  },
   ASTROSAGE_USER_ID: {
     key: "ASTROSAGE_USER_ID",
     label: "AstroSage User ID",
@@ -238,12 +220,6 @@ export async function getCredential(key: CredentialKey): Promise<string | null> 
           break;
         case "GOOGLE_CLIENT_SECRET":
           dbValue = decryptSecret(settings.encGoogleClientSecret);
-          break;
-        case "FACEBOOK_APP_ID":
-          dbValue = settings.encFacebookAppId;
-          break;
-        case "FACEBOOK_APP_SECRET":
-          dbValue = decryptSecret(settings.encFacebookAppSecret);
           break;
         case "ASTROSAGE_USER_ID":
           dbValue = settings.encAstrosageUserId;
@@ -341,12 +317,6 @@ export async function getMaskedCredentialsSummary(): Promise<MaskedCredentialSta
           break;
         case "GOOGLE_CLIENT_SECRET":
           dbValue = decryptSecret(settings.encGoogleClientSecret);
-          break;
-        case "FACEBOOK_APP_ID":
-          dbValue = settings.encFacebookAppId;
-          break;
-        case "FACEBOOK_APP_SECRET":
-          dbValue = decryptSecret(settings.encFacebookAppSecret);
           break;
         case "ASTROSAGE_USER_ID":
           dbValue = settings.encAstrosageUserId;

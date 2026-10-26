@@ -3,6 +3,7 @@
 import { Link, usePathname } from "@/i18n/routing";
 import {
   BadgeCheck,
+  CalendarClock,
   Award,
   DatabaseBackup,
   FileText,
@@ -49,6 +50,7 @@ const GROUPS: Array<{ en: string; hi: string; items: Item[] }> = [
       { href: "/admin/orders", en: "Orders", hi: "ऑर्डर", icon: ShoppingBag },
       { href: "/admin/services", en: "Services & plans", hi: "सेवाएँ व प्लान", icon: Layers },
       { href: "/admin/other-services", en: "Other services", hi: "अन्य सेवाएँ", icon: Sparkles },
+      { href: "/admin/slots", en: "Appointment slots", hi: "अपॉइंटमेंट स्लॉट", icon: CalendarClock },
       { href: "/admin/offers", en: "Promo codes", hi: "प्रोमो कोड", icon: Tag },
       { href: "/admin/enquiries", en: "Enquiries", hi: "पूछताछ", icon: Inbox },
     ],

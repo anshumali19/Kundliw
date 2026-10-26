@@ -1,3 +1,5 @@
+> **Superseded** by the current handbook: `docs/delivery/Maharshi_Kanad_Admin_Panel_Manual.pdf` (source: `docs/handbook/02_ADMIN_PANEL_MANUAL.md`). This older page is kept for reference only.
+
 # Administrator Manual & CMS Operations Guide
 
 > **Maharshi Kanad Jyotish Kendra (महर्षि कणाद ज्योतिष केंद्र)**  

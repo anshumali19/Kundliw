@@ -1,7 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import FacebookProvider from "next-auth/providers/facebook";
 import * as bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { verifyOtpHash, isOtpExpired, canAttemptOtpVerification } from "./otp";
@@ -28,17 +27,6 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             allowDangerousEmailAccountLinking: false, // Explicitly disabled
-          }),
-        ]
-      : []),
-
-    // 1b. Facebook Login (same safety settings as Google)
-    ...(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET
-      ? [
-          FacebookProvider({
-            clientId: process.env.FACEBOOK_APP_ID,
-            clientSecret: process.env.FACEBOOK_APP_SECRET,
-            allowDangerousEmailAccountLinking: false,
           }),
         ]
       : []),
@@ -238,13 +226,12 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     /**
-     * Social sign-in (Google, Facebook). A provider account is matched to a database user by
+     * Social sign-in (Google). A provider account is matched to a database user by
      * email. New people become customers. Existing associates and administrators can use
-     * Google only when Google confirms the email address; Facebook never signs in an
-     * administrator or associate because it does not guarantee a verified email.
+     * Google only when Google confirms the email address.
      */
     async signIn({ user, account, profile }) {
-      if (!account || (account.provider !== "google" && account.provider !== "facebook")) {
+      if (!account || account.provider !== "google") {
         return true;
       }
       const email = user.email?.trim().toLowerCase();

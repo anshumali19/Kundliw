@@ -92,7 +92,7 @@ Backend work required (new, in this repo):
 
 1. **Google Play Console account** ($25 one-time) in the client's name.
 2. **Final app name, icon** (Logo.jpeg is in use) and screenshots approval.
-3. **Razorpay live keys**, **MSG91** (OTP) account/template, **Gmail SMTP**, **Google & Facebook login keys**, **Gemini/AI key** – on the client's own accounts.
+3. **Razorpay live keys**, **MSG91** (OTP) account/template, **Gmail SMTP**, **Google login keys**, **Gemini/AI key** – on the client's own accounts.
 4. **Firebase** project (we can create it under the client's Google account).
 5. **Legal documents for *this* business** (see §9).
 6. Decision on iOS (Apple Developer account $99/year) – optional, later.

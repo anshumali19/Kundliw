@@ -17,7 +17,7 @@ Prices and free limits of outside companies change. The figures below are indica
 |---|---|---|
 | **Google Analytics 4** | Visitor statistics | Free. Create a property at analytics.google.com, copy the *Measurement ID* (looks like `G-XXXXXXXXXX`), paste it in **Admin → API keys → Google Analytics ID**. Statistics appear in Google Analytics after about 24 hours. |
 | **Google Search Console** | Appearing in Google search | Free. Add the site, copy the verification code into **Admin → Website → SEO → Google Search Console code**. |
-| **Google / Facebook login** | "Sign in with Google/Facebook" buttons | Free. Needs the client's own Google Cloud / Meta developer app; paste keys in Admin → API keys. Facebook also needs a privacy-policy link. |
+| **Google login** | "Sign in with Google" button | Free. Needs the client's own Google Cloud project (Client ID and Secret); paste them in Admin > API keys. |
 | **Gmail / SMTP email** | Order emails | Free with a Gmail app password (about 500 mails a day). |
 | **AI chat assistant (Gemini)** | Website chat | Free tier has daily limits and slower answers at busy times. The key now in use is the developer's own: the client must create their own key. |
 | **Hosting (Vercel) and database (Prisma Postgres)** | The website | Free "Hobby" plans exist, but Vercel's Hobby plan is for personal, non-commercial use. A business website taking payments should use a paid plan (about US$20 per month). |
@@ -46,6 +46,6 @@ Prices and free limits of outside companies change. The figures below are indica
 - [ ] MSG91 account and DLT template (for OTP)
 - [ ] Gmail app password (order emails)
 - [ ] Google Analytics ID and Search Console code
-- [ ] Own Gemini key, Google and Facebook login keys
+- [ ] Own Gemini key, Google login keys
 - [ ] Legal texts approved (Privacy, Terms and so on)
 - [ ] Real address, phone and UPI/bank details in Admin → Settings

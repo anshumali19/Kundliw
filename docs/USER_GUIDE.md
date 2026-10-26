@@ -20,7 +20,7 @@ Site: https://kanadjyotishkendra.vercel.app  ·  Languages: Hindi (default) / En
 | Find the office on the map, call or message | **Contact** (map also in the footer) |
 | Quick help | Floating buttons: Call, WhatsApp (left) · AI Chat, Chat (right) |
 
-**Sign in / register:** Login → choose *User*. You can use mobile OTP, email + password, Google or Facebook. After signing in use the menu (your name) → **Logout** to sign out.
+**Sign in / register:** Login → choose *User*. You can use mobile OTP, email + password or Google. After signing in use the menu (your name) → **Logout** to sign out.
 
 **Upload your Kundli:** My Documents (Vault) → *Upload*. Any of PDF, image, video, audio, Word, Excel, PowerPoint, text (up to 4 MB). Your file appears in a preview window next to the upload button. PDFs, images, video, audio and text open in the page; Word/Excel files show a Download button. Only you and the Kendra can open your files.
 
@@ -30,7 +30,7 @@ Site: https://kanadjyotishkendra.vercel.app  ·  Languages: Hindi (default) / En
 
 ## 2. For associates (सहयोगी / एसोसिएट)
 
-1. Register as *Associate* (or log in at *Associate* portal with password / Google / Facebook).
+1. Register as *Associate* (or log in at *Associate* portal with password / Google).
 2. Wait for approval if the Kendra has turned auto-approval off.
 3. Copy your **referral link/code** from your dashboard and share it. A visitor who books through it is remembered for the number of days the Kendra has set.
 4. Dashboard shows referrals, commission (Pending → Earned → Paid) and payout history.
@@ -64,7 +64,7 @@ Sign in at the *Super Admin* portal (email/mobile + password, or OTP). Use **Adm
 ## 4. Good to know
 
 - Uploads are limited to **4 MB** per file.
-- Google/Facebook sign-in buttons work once the Kendra's Google/Facebook app keys are added to the hosting settings; until then they say "not switched on yet" and password/OTP login still works.
+- The Google sign-in button works once the Kendra's Google keys are added to the hosting settings; until then they say "not switched on yet" and password/OTP login still works.
 - Keep your password private; log out on shared phones.
 
 *Support: contact the developer for changes or restore requests.*
