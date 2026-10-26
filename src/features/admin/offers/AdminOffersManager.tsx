@@ -296,6 +296,9 @@ export function AdminOffersManager({
                   >
                     <td className="py-3 px-4 font-mono font-bold text-secondary text-sm">
                       {offer.code}
+                      <div className="font-sans font-normal text-[11px] text-on-surface-variant mt-1">
+                        {offer.perUserLimit > 0 ? `${offer.perUserLimit}× per customer` : "unlimited per customer"} · {offer.serviceSlugs?.length ? offer.serviceSlugs.join(", ") : "all services"}
+                      </div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="font-bold text-secondary">

@@ -312,7 +312,7 @@ export default function AdminGalleryPage() {
                   </button>
                   <span className="text-[10px] font-mono text-outline">#{item.orderIndex}</span>
                   <div className="flex">
-                    <button onClick={() => startEdit(item)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-secondary hover:bg-brand" aria-label="Edit item">
+                    <button onClick={() => startEdit(item)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-secondary hover:bg-gold" aria-label="Edit item">
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button onClick={() => handleDelete(item.id)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-on-error-container hover:bg-error-container/20" aria-label="Delete item">

@@ -21,6 +21,8 @@ export default async function Page(props: Props) {
   const { locale } = await props.params;
   const isHindi = locale === "hi";
   const cfg = await getSection("tools");
+  const tech = await getSection("technology");
+  const note = [tech[isHindi ? "calcMethodHi" : "calcMethodEn"], tech[isHindi ? "accuracyNoteHi" : "accuracyNoteEn"]].map((x) => String(x || "").trim()).filter(Boolean).join("\n\n") || undefined;
   if (cfg.panchangEnabled === false) return <ToolOff name={isHindi ? "पंचांग" : "Panchang"} isHindi={isHindi} />;
   const src = embedAddress(String(cfg.panchangUrl || ""), "https://panchang.astrosage.com/?language={lang}", locale);
   return (
@@ -29,6 +31,7 @@ export default async function Page(props: Props) {
       title="Hindi Panchang Calendar"
       heading={isHindi ? "हिंदी पंचांग कैलेंडर" : "Hindi Panchang Calendar"}
       intro={isHindi ? "आज की तिथि, नक्षत्र, योग, करण, राहु काल और शुभ मुहूर्त।" : "Today's tithi, nakshatra, yoga, karana, Rahu Kaal and auspicious times."}
+      note={note}
       openLabel={isHindi ? "पूरी स्क्रीन में खोलें" : "Open full screen"}
       credit={isHindi ? "यह टूल AstroSage द्वारा संचालित है; सभी अधिकार उनके पास सुरक्षित हैं।" : "This tool is provided by AstroSage; all rights belong to them."}
     />

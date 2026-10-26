@@ -64,7 +64,7 @@ export function DateStrip({ data, isHindi }: { data: DateStripData | null; isHin
     >
       <span className="inline-flex items-center gap-1 tabular-nums shrink-0">
         <Clock className="w-3 h-3 text-gold" aria-hidden="true" />
-        {p ? `${pad(p.h12)}:${pad(p.m)}:${pad(p.s)} ${p.ap}` : "--:--:--"}
+        <span>{p ? <>{`${pad(p.h12)}:${pad(p.m)}`}<span className="hidden sm:inline">{`:${pad(p.s)}`}</span>{` ${p.ap}`}</> : "--:--"}</span>
       </span>
       {sep}
       <span className="shrink-0">
@@ -81,7 +81,7 @@ export function DateStrip({ data, isHindi }: { data: DateStripData | null; isHin
           <span className="shrink-0">{isHindi ? data.masaHi : data.masaEn}</span>
           {sep}
           <span className="shrink-0">
-            {isHindi ? `विक्रम संवत ${data.samvat}` : `Vikram Samvat ${data.samvat}`}
+            {isHindi ? `विक्रम संवत ${data.samvat}` : <><span className="sm:hidden">{`VS ${data.samvat}`}</span><span className="hidden sm:inline">{`Vikram Samvat ${data.samvat}`}</span></>}
           </span>
         </>
       )}

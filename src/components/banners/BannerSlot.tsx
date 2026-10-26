@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useId } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { ChevronLeft, ChevronRight, Play, Pause, ExternalLink } from "lucide-react";
 
@@ -26,6 +27,10 @@ interface BannerSlotProps {
 }
 
 export function BannerSlot({ position, initialBanners, className = "" }: BannerSlotProps) {
+  const pathname = usePathname() || "";
+  // Forms (booking, sign-in, admin, account) keep the screen free for the task at hand.
+  const firstSegment = pathname.split("/").filter((x) => x && x !== "hi" && x !== "en")[0];
+  const quietPage = ["booking", "admin", "auth", "account", "vault"].includes(firstSegment ?? "");
   const [banners, setBanners] = useState<BannerData[]>(initialBanners || []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -85,7 +90,7 @@ export function BannerSlot({ position, initialBanners, className = "" }: BannerS
     return () => clearInterval(timer);
   }, [isPlaying, total, nextSlide]);
 
-  if (!loaded || total === 0) {
+  if (!loaded || total === 0 || (position === "TOP" && quietPage)) {
     return null;
   }
 

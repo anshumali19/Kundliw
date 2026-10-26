@@ -31,7 +31,7 @@ export default async function AppDownloadPage(props: AppPageProps) {
     .findUnique({ where: { id: "default" }, select: { appDownloadUrl: true } })
     .catch(() => null);
   const appCfg = await getSection("mobileApp");
-  const url = settings?.appDownloadUrl?.trim() || String(appCfg.apkUrl || appCfg.playStoreUrl || "").trim();
+  const url = settings?.appDownloadUrl?.trim() || String(appCfg.apkUrl || "").trim();
 
   // The QR is generated on the server from the link the admin saved.
   const qr = url
@@ -49,6 +49,27 @@ export default async function AppDownloadPage(props: AppPageProps) {
           {isHindi ? "एंड्रॉइड ऐप डाउनलोड करें" : "Download the Android app"}
         </h1>
       </div>
+
+      {String(appCfg[isHindi ? "appTextHi" : "appTextEn"] || "").trim() && (
+        <p className="text-base text-on-surface-variant">{String(appCfg[isHindi ? "appTextHi" : "appTextEn"])}</p>
+      )}
+
+      {(String(appCfg.playStoreUrl || "").trim() || String(appCfg.appStoreUrl || "").trim()) && (
+        <div className="flex flex-wrap gap-3">
+          {String(appCfg.playStoreUrl || "").trim() && (
+            <a href={String(appCfg.playStoreUrl)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-lg bg-brand hover:bg-brand-hover text-on-brand font-bold">
+              <Download className="w-5 h-5" />
+              Google Play
+            </a>
+          )}
+          {String(appCfg.appStoreUrl || "").trim() && (
+            <a href={String(appCfg.appStoreUrl)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-lg border-2 border-maroon text-secondary font-bold hover:bg-surface-container-high">
+              <Download className="w-5 h-5" />
+              App Store
+            </a>
+          )}
+        </div>
+      )}
 
       {url && qr ? (
         <div className="bg-surface border-2 border-maroon rounded-lg p-6 flex flex-col sm:flex-row items-center gap-6">

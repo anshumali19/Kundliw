@@ -1,4 +1,5 @@
 import { pageAlternates } from "@/lib/seo";
+import { getActiveSocialLinks, getSection } from "@/lib/siteConfig/service";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ContactClient } from "@/features/contact/ContactClient";
@@ -56,10 +57,15 @@ export default async function ContactPage(
     })
     .catch(() => null);
 
+  const contactCfg = await getSection("contact");
+  const social = (await getActiveSocialLinks()).map(({ id, name, url }) => ({ id, name, url }));
+  const pickText = (k: string) => String(contactCfg[k + (locale === "hi" ? "Hi" : "En")] || "").trim() || undefined;
+
   return (
     <ContactClient
       settings={settings || {}}
       locale={locale}
+      extra={{ workingHours: pickText("workingHours"), note: pickText("contactNote"), social }}
     />
   );
 }

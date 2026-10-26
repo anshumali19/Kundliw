@@ -44,8 +44,8 @@ export default async function AdminLayout(props: AdminLayoutProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-mono opacity-90">
-            <span>
+          <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono opacity-90">
+            <span className="hidden md:inline">
               {isHindi ? "प्रशासक:" : "Admin:"} {admin.email || admin.phone || admin.name}
             </span>
             <Link

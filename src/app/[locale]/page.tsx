@@ -105,15 +105,17 @@ export default async function HomePage(
 
       {/* Hero */}
       <section className="relative w-full overflow-hidden bg-[linear-gradient(120deg,#4B1724_0%,#792D2B_56%,#BD5B23_100%)] text-on-maroon">
-        <span aria-hidden="true" className="pointer-events-none select-none absolute -right-6 -top-10 font-serif text-[22rem] leading-none text-white/[0.05]">ॐ</span>
+        {animCfg.enabled !== false && (
+          <span aria-hidden="true" className="pointer-events-none select-none absolute -right-6 -top-10 font-serif text-[22rem] leading-none text-white/[0.05]">ॐ</span>
+        )}
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-12 lg:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 text-left">
               
-              <p className="text-xs sm:text-sm font-bold text-gold uppercase tracking-[0.25em] mb-3">
+              <p className="text-xs sm:text-sm font-bold text-gold uppercase tracking-[0.25em] mb-3" style={{ color: String(animCfg.accent || "") || undefined }}>
                 {pick(heroCfg, "eyebrow", t("heroEyebrow"))}
               </p>
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-on-maroon tracking-tight leading-[1.1] mb-5">
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-on-maroon tracking-tight leading-[1.1] mb-5" style={animCfg.glow === true ? { textShadow: "0 0 28px rgba(244,198,93,0.55)" } : undefined}>
                 {pick(heroCfg, "title", t("heroTitle"))}
               </h1>
               <p className="text-base sm:text-lg text-on-maroon/85 max-w-2xl leading-relaxed mb-8">

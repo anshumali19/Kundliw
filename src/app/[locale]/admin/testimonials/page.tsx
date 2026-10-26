@@ -350,7 +350,7 @@ export default function AdminTestimonialsPage() {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => startEdit(t)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-brand text-secondary" aria-label="Edit testimonial">
+                    <button onClick={() => startEdit(t)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-gold text-secondary" aria-label="Edit testimonial">
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button onClick={() => handleDelete(t.id)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-error-container/20 text-on-error-container" aria-label="Delete testimonial">

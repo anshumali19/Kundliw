@@ -42,7 +42,6 @@ export const SECTIONS: SectionDef[] = [
     fields: [
       { key: "logoUrl", en: "Logo image", hi: "लोगो इमेज", type: "image" },
       { key: "faviconUrl", en: "Browser tab icon", hi: "ब्राउज़र आइकन", type: "image" },
-      { key: "logoAlt", en: "Logo text (for accessibility)", hi: "लोगो का नाम", type: "text", max: 120 },
     ],
   },
   {
@@ -52,7 +51,6 @@ export const SECTIONS: SectionDef[] = [
     fields: [
       ...bi("announcement", "Highlight strip below the top banner", "ऊपर की विशेष पट्टी", "text", 200),
       { key: "showSocialStrip", en: "Show social media row on the home page", hi: "होम पेज पर सोशल मीडिया दिखाएँ", type: "toggle", def: true },
-      { key: "showPanchang", en: "Show daily Panchang", hi: "दैनिक पंचांग दिखाएँ", type: "toggle", def: true },
     ],
   },
   {
@@ -109,7 +107,6 @@ export const SECTIONS: SectionDef[] = [
       { key: "showFloatingButtons", en: "Floating Call / WhatsApp / Chat buttons", hi: "फ्लोटिंग कॉल/व्हाट्सऐप/चैट बटन", type: "toggle", def: true },
       { key: "showCredentialsLink", en: "Credentials link in footer", hi: "फुटर में प्रमाणपत्र लिंक", type: "toggle", def: true },
       { key: "showBlogLink", en: "Blog link in menus", hi: "मेनू में ब्लॉग", type: "toggle", def: true },
-      { key: "allowAssociateSignup", en: "Show 'Become an associate' links", hi: "'सहयोगी बनें' लिंक दिखाएँ", type: "toggle", def: true },
     ],
   },
   {
@@ -133,7 +130,6 @@ export const SECTIONS: SectionDef[] = [
     noteHi: "गूगल एनालिटिक्स ID 'API कीज़' में रखी जाती है। यहाँ ट्रैकिंग नियंत्रित करें।",
     fields: [
       { key: "trackingEnabled", en: "Allow visitor statistics", hi: "विज़िटर आँकड़े चालू", type: "toggle", def: true },
-      { key: "facebookPixelId", en: "Facebook Pixel ID", hi: "फेसबुक पिक्सल ID", type: "text", max: 40 },
     ],
   },
   {
@@ -152,9 +148,9 @@ export const SECTIONS: SectionDef[] = [
     en: "Hero animation",
     hi: "हीरो एनिमेशन",
     fields: [
-      { key: "enabled", en: "Show live clock and moving effects", hi: "लाइव घड़ी/एनिमेशन दिखाएँ", type: "toggle", def: true },
-      { key: "marqueeLike", en: "Soft glow behind headline", hi: "शीर्षक के पीछे हल्की चमक", type: "toggle", def: false },
-      { key: "accent", en: "Highlight colour", hi: "हाइलाइट रंग", type: "color", def: "#E77B18" },
+      { key: "enabled", en: "Show the large Om mark behind the headline", hi: "शीर्षक के पीछे बड़ा ॐ चिह्न दिखाएँ", type: "toggle", def: true },
+      { key: "glow", en: "Soft glow behind headline", hi: "शीर्षक के पीछे हल्की चमक", type: "toggle", def: false },
+      { key: "accent", en: "Small heading colour", hi: "छोटे शीर्षक का रंग", type: "color", def: "#F4C65D" },
     ],
   },
   {

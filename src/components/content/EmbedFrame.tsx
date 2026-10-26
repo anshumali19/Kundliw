@@ -17,6 +17,7 @@ export function EmbedFrame({
   openLabel,
   credit,
   tall = false,
+  note,
 }: {
   src: string;
   title: string;
@@ -25,6 +26,7 @@ export function EmbedFrame({
   openLabel: string;
   credit?: string;
   tall?: boolean;
+  note?: string;
 }) {
   return (
     <div className="w-full px-4 sm:px-8 lg:px-12 py-6 text-left">
@@ -52,6 +54,7 @@ export function EmbedFrame({
           referrerPolicy="no-referrer"
           loading="lazy"
         />
+        {note && <p className="px-4 py-3 text-xs sm:text-sm text-on-surface-variant border-t border-outline-variant/30 whitespace-pre-line">{note}</p>}
         {credit && <p className="px-4 py-2 text-[11px] text-center text-on-surface-variant border-t border-outline-variant/30">{credit}</p>}
       </div>
     </div>

@@ -250,7 +250,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
         </div>
 
         {/* Right Form Pane (6 cols) */}
-        <div className="lg:col-span-6 bg-surface p-6 sm:p-8 rounded border border-secondary/30 text-left">
+        <div className="order-first lg:order-none lg:col-span-6 bg-surface-container-lowest p-6 sm:p-8 rounded-2xl border border-gold/60 text-left">
           {/* Segmented Auth Mode Switcher */}
           <div className={`${showModeSwitcher ? "flex" : "hidden"} border-b border-outline-variant/40 mb-6`}>
             <button

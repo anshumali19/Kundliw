@@ -34,7 +34,7 @@ interface FloatingActionBarProps {
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
 
 const FAB_CIRCLE =
-  "flex items-center justify-center w-11 h-11 sm:w-14 sm:h-14 rounded-full border-2 border-maroon transition-transform active:scale-95 hover:scale-105";
+  "flex items-center justify-center w-11 h-11 lg:w-14 lg:h-14 rounded-full border-2 border-maroon transition-transform active:scale-95 hover:scale-105";
 
 /** Renders **bold** segments from chat text without exposing the asterisks. */
 function renderBold(text: string): React.ReactNode[] {
@@ -49,7 +49,7 @@ function renderBold(text: string): React.ReactNode[] {
 
 function FabLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="hidden sm:block absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-brand text-xs font-bold leading-none whitespace-nowrap">
+    <span className="hidden lg:block absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-inverse-surface text-inverse-on-surface border border-brand text-xs font-bold leading-none whitespace-nowrap">
       {children}
     </span>
   );
@@ -548,7 +548,7 @@ export function FloatingActionBar({
                     type="button"
                     onClick={() => handleSend(tp.query)}
                     disabled={loading}
-                    className="px-2.5 py-1.5 rounded-full bg-surface border border-maroon/40 hover:bg-brand text-on-surface text-xs font-medium transition-colors disabled:opacity-50"
+                    className="px-2.5 py-1.5 rounded-full bg-surface border border-maroon/40 hover:bg-gold text-on-surface text-xs font-medium transition-colors disabled:opacity-50"
                   >
                     {tp.label}
                   </button>

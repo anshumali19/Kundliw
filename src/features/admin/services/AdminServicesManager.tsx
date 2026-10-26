@@ -631,9 +631,9 @@ export function AdminServicesManager({
                 {/* Service Row Header */}
                 <div
                   onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
-                  className="p-4 bg-surface-container-low/70 hover:bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer transition-colors"
+                  className="p-4 bg-surface-container-low/70 hover:bg-surface-container-low flex flex-col lg:flex-row lg:items-center justify-between gap-3 cursor-pointer transition-colors"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <button
                       type="button"
                       className="p-1 text-secondary"
@@ -672,7 +672,7 @@ export function AdminServicesManager({
 
                   {/* Actions */}
                   <div
-                    className="flex items-center gap-2 shrink-0"
+                    className="flex flex-wrap items-center gap-2 lg:shrink-0"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button

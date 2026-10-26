@@ -1,6 +1,7 @@
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { getSection } from "@/lib/siteConfig/service";
 import { BlocksView } from "@/components/content/MediaView";
 import { normalizeBlocks } from "@/lib/content/media";
 import { ArrowRight, CalendarCheck, ScrollText, Truck } from "lucide-react";
@@ -31,6 +32,10 @@ export async function generateMetadata(props: AboutPageProps): Promise<Metadata>
 export default async function AboutPage(props: AboutPageProps) {
   const { locale } = await props.params;
   const isHindi = locale === "hi";
+
+  const contentCfg = await getSection("content");
+  const aboutShort = String(contentCfg[isHindi ? "aboutShortHi" : "aboutShortEn"] || "").trim();
+  const mission = String(contentCfg[isHindi ? "missionTextHi" : "missionTextEn"] || "").trim();
 
   const page = await prisma.staticPage
     .findUnique({ where: { slug: "about" } })
@@ -84,8 +89,15 @@ export default async function AboutPage(props: AboutPageProps) {
       </div>
 
       <div className="p-6 sm:p-8 rounded-lg bg-surface border border-outline-variant/40 leading-relaxed text-base text-on-surface whitespace-pre-line">
-        {content}
+        {aboutShort || content}
       </div>
+
+      {mission && (
+        <div className="p-6 sm:p-8 rounded-lg bg-surface-container border border-gold/60 leading-relaxed text-base text-on-surface whitespace-pre-line">
+          <div className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{isHindi ? "हमारा उद्देश्य" : "Our mission"}</div>
+          {mission}
+        </div>
+      )}
 
       <BlocksView blocks={normalizeBlocks(page?.blocks)} isHindi={isHindi} />
 

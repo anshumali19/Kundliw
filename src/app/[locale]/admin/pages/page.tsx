@@ -244,7 +244,7 @@ export default function AdminPagesPage() {
           type="button"
           onClick={startNewPage}
           className={`min-h-[44px] px-3.5 py-1.5 rounded text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border border-maroon ${
-            creating ? "bg-brand text-on-brand" : "bg-surface text-secondary hover:bg-brand"
+            creating ? "bg-brand text-on-brand" : "bg-surface text-secondary hover:bg-gold"
           }`}
         >
           <Plus className="w-4 h-4" /> New page
@@ -261,7 +261,7 @@ export default function AdminPagesPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {!creating && publicPath && (
-              <a href={publicPath} target="_blank" rel="noreferrer" className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-maroon text-xs font-bold text-secondary hover:bg-brand">
+              <a href={publicPath} target="_blank" rel="noreferrer" className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-maroon text-xs font-bold text-secondary hover:bg-gold">
                 <ExternalLink className="w-4 h-4" /> View page
               </a>
             )}

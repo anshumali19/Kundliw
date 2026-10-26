@@ -102,6 +102,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     ...(description ? { description } : {}),
     ...(keywords.length ? { keywords } : {}),
     ...(verification ? { verification: { google: verification } } : {}),
+    ...(String((await getSection("logo")).faviconUrl || "").trim() ? { icons: { icon: String((await getSection("logo")).faviconUrl), apple: "/icons/apple-touch-icon.png" } } : {}),
     openGraph: {
       ...baseMetadata.openGraph,
       ...(title ? { title } : {}),
@@ -170,6 +171,8 @@ export default async function LocaleLayout(
     ...(toolsCfg.panchangEnabled === false ? ["/panchang"] : []),
     ...(toolsCfg.kundliEnabled === false ? ["/kundli", "/kundli/astrosage"] : []),
     ...(toolsCfg.matchingEnabled === false ? ["/kundli/matching"] : []),
+    ...(features.showCredentialsLink === false ? ["/credentials"] : []),
+    ...(features.showBlogLink === false ? ["/blogs"] : []),
   ];
   const topMarquee = marqueeItems.filter((m) => m.position === "TOP");
   const bottomMarquee = marqueeItems.filter((m) => m.position === "BOTTOM");
@@ -247,7 +250,7 @@ export default async function LocaleLayout(
           <AuthProvider>
           <ToolsProvider hidden={hiddenTools}>
           <SmoothScrollProvider>
-            <Header phone={settings?.phone1 ?? undefined} panchang={panchang} social={social} />
+            <Header phone={settings?.phone1 ?? undefined} panchang={panchang} social={social} logoUrl={String((await getSection("logo")).logoUrl || "") || undefined} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>

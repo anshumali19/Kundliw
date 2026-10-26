@@ -130,7 +130,13 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
     );
   };
 
-  if (loading) return <Loader2 className="w-6 h-6 animate-spin text-primary" aria-label="Loading" />;
+  if (loading)
+    return (
+      <div className="space-y-3">
+        <h1 className="font-serif text-2xl font-bold text-secondary">{tr("Website Settings", "वेबसाइट सेटिंग्स")}</h1>
+        <Loader2 className="w-6 h-6 animate-spin text-primary" aria-label="Loading" />
+      </div>
+    );
 
   return (
     <div className="space-y-6">

@@ -108,7 +108,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
         </div>
 
         {/* Right Form Container */}
-        <div className="lg:col-span-6 bg-surface p-6 sm:p-8 rounded border border-secondary/30">
+        <div className="order-first lg:order-none lg:col-span-6 bg-surface-container-lowest p-6 sm:p-8 rounded-2xl border border-gold/60">
           {errorMsg && (
             <div className="mb-4 p-3 bg-error-container/40 border border-error/30 rounded text-on-error-container text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />

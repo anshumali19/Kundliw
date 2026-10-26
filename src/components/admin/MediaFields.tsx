@@ -8,7 +8,7 @@ const inputCls =
   "w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]";
 const labelCls = "block text-xs font-bold uppercase text-secondary mb-1";
 const smallBtn =
-  "inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 rounded border border-maroon bg-surface hover:bg-brand text-xs font-bold text-secondary disabled:opacity-40";
+  "inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 rounded border border-maroon bg-surface hover:bg-gold text-xs font-bold text-secondary disabled:opacity-40";
 
 /** Image address field: paste a link or upload a file. */
 export function ImageUrlField({

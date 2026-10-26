@@ -72,7 +72,7 @@ export function LinkList({
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between gap-2 min-h-[44px] px-3 py-2 rounded-lg bg-surface-container-low hover:bg-brand border border-outline-variant/40 text-sm font-medium text-on-surface transition-colors"
+              className="flex items-center justify-between gap-2 min-h-[44px] px-3 py-2 rounded-lg bg-surface-container-low hover:bg-gold border border-outline-variant/40 text-sm font-medium text-on-surface transition-colors"
             >
               <span>{linkLabel(link, isHindi)}</span>
               <ExternalLink className="w-4 h-4 shrink-0 text-primary" aria-hidden="true" />

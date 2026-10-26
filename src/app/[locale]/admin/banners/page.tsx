@@ -427,7 +427,7 @@ export default function AdminBannersPage() {
                   <div className="flex">
                     <button
                       onClick={() => startEdit(banner)}
-                      className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-brand text-secondary"
+                      className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-gold text-secondary"
                       aria-label="Edit banner"
                     >
                       <Pencil className="w-4 h-4" />

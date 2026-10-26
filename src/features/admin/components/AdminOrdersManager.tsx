@@ -374,7 +374,7 @@ export function AdminOrdersManager({
 
                       {/* Order Status Badge */}
                       <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-tertiary-fixed text-on-tertiary-fixed">
-                        {order.status.replace("_", " ")}
+                        {order.status.replace(/_/g, " ")}
                       </span>
                     </div>
                   </div>
@@ -401,7 +401,7 @@ export function AdminOrdersManager({
 
                   <div className="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between text-xs">
                     <span className="text-on-surface-variant">
-                      {order.paymentMode} • {formatPaiseToInr(order.netAmountPaise)}
+                      {order.paymentStatus === "PENDING" || order.paymentStatus === "FAILED" ? (isHindi ? "भुगतान बाकी" : "Not paid yet") : order.paymentMode.replace(/_/g, " ")} • {formatPaiseToInr(order.netAmountPaise)}
                     </span>
 
                     {order.paymentStatus === "AWAITING_VERIFICATION" && (
@@ -453,7 +453,7 @@ export function AdminOrdersManager({
                   <div className="text-xs text-primary space-y-1">
                     <div className="flex justify-between">
                       <span className="text-primary">{isHindi ? "मोड:" : "Mode:"}</span>
-                      <span className="font-semibold">{selectedOrder.paymentMode}</span>
+                      <span className="font-semibold">{selectedOrder.paymentMode.replace(/_/g, " ")}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-primary">{isHindi ? "संदर्भ संख्या:" : "Reference:"}</span>
@@ -579,7 +579,7 @@ export function AdminOrdersManager({
                     {isHindi ? "प्रक्रिया स्थिति अद्यतन" : "Update Canonical Status"}
                   </span>
                   <span className="text-[11px] text-primary font-bold">
-                    {selectedOrder.status.replace("_", " ")}
+                    {selectedOrder.status.replace(/_/g, " ")}
                   </span>
                 </div>
 
@@ -674,7 +674,7 @@ export function AdminOrdersManager({
                       >
                         <div className="flex items-center justify-between text-[10px] text-outline">
                           <span className="font-bold text-secondary">
-                            {evt.status.replace("_", " ")}
+                            {evt.status.replace(/_/g, " ")}
                           </span>
                           <span>
                             {new Date(evt.createdAt).toLocaleString(

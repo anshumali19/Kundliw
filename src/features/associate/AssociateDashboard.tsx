@@ -174,7 +174,7 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
               href={`https://wa.me/?text=${encodeURIComponent(referralLink)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-h-[44px] px-4 inline-flex items-center gap-2 rounded border border-maroon text-sm font-bold text-secondary hover:bg-brand"
+              className="min-h-[44px] px-4 inline-flex items-center gap-2 rounded border border-maroon text-sm font-bold text-secondary hover:bg-gold"
             >
               <Share2 className="w-4 h-4" />
               WhatsApp
@@ -300,7 +300,7 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
 
       <a
         href={`/${locale}/guides/associate`}
-        className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-maroon text-sm font-bold text-secondary hover:bg-brand"
+        className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-maroon text-sm font-bold text-secondary hover:bg-gold"
       >
         <FileDown className="w-4 h-4" />
         {t("Download the Associate guide (PDF)", "एसोसिएट मार्गदर्शिका (PDF) डाउनलोड करें")}

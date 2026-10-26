@@ -12,6 +12,12 @@ export async function Footer() {
   const tCommon = await getTranslations("common");
   const tNav = await getTranslations("nav");
   const tools = await getSection("tools");
+  const featureCfg = await getSection("features");
+  const general = await getSection("general");
+  const logoCfg = await getSection("logo");
+  const legalCfg = await getSection("legal");
+  const business = await getSection("business");
+  const pickG = (cfg: Record<string, string | boolean | number>, k: string) => String(cfg[k + (locale === "hi" ? "Hi" : "En")] || "").trim();
 
   // Fetch admin settings for live contact numbers, address, and social links
   const settings = await prisma.adminSettings
@@ -45,19 +51,24 @@ export async function Footer() {
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.webp" alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
+              <img src={String(logoCfg.logoUrl || "") || "/logo.webp"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
               <div className="flex flex-col">
                 <span className="font-serif text-base font-bold text-gold leading-tight">
                   {t("title")}
                 </span>
                 <span className="text-[10px] uppercase tracking-widest text-gold font-bold">
-                  {tCommon("tagline")}
+                  {pickG(general, "tagline") || tCommon("tagline")}
                 </span>
               </div>
             </div>
             <p className="text-xs text-on-maroon leading-relaxed">
-              {t("bio")}
+              {pickG(general, "footerNote") || t("bio")}
             </p>
+            {(business.ownerName || business.msmeNumber || Number(business.foundedYear) > 0) && (
+              <p className="text-[11px] text-on-maroon/80">
+                {[business.ownerName ? `${locale === "hi" ? "संचालक" : "Proprietor"}: ${business.ownerName}` : "", business.msmeNumber ? `MSME: ${business.msmeNumber}` : "", Number(business.foundedYear) > 0 ? `${locale === "hi" ? "स्थापना" : "Since"} ${business.foundedYear}` : ""].filter(Boolean).join(" · ")}
+              </p>
+            )}
             {addressLine1 && (
             <div className="text-xs text-on-maroon space-y-1 pt-1">
               <div className="font-semibold text-gold uppercase tracking-wider text-[11px]">
@@ -133,11 +144,13 @@ export async function Footer() {
                   {tNav("vault")}
                 </Link>
               </li>
-              <li>
+              {featureCfg.showCredentialsLink !== false && (
+<li>
                 <Link href="/credentials" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("credentials")}
                 </Link>
               </li>
+)}
               {footerPages.map((fp) => (
                 <li key={fp.slug}>
                   <Link href={`/pages/${fp.slug}` as never} className="hover:text-gold transition-colors block py-0.5">
@@ -176,11 +189,13 @@ export async function Footer() {
                   {tNav("gallery")}
                 </Link>
               </li>
-              <li>
+              {featureCfg.showBlogLink !== false && (
+<li>
                 <Link href="/blogs" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("blogs")}
                 </Link>
               </li>
+)}
               <li>
                 <Link href="/testimonials" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("testimonials")}
@@ -313,13 +328,16 @@ export async function Footer() {
         {/* Bottom Bar: Broadsheet Copyright & Lineage Seal */}
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-on-maroon">
           <div className="text-left">
-            {t("copyright")}
+            {pickG(general, "copyright") || t("copyright")}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-gold font-semibold">दृग्गणित सिद्धान्त</span>
             <span>({t("standardBadge")})</span>
           </div>
         </div>
+        {pickG(legalCfg, "disclaimer") && (
+          <p className="pt-3 text-[11px] leading-relaxed text-on-maroon/80">{pickG(legalCfg, "disclaimer")}</p>
+        )}
       </div>
     </footer>
   );

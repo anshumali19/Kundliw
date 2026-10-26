@@ -288,7 +288,7 @@ export default function AdminBlogsPage() {
                     <p className="text-xs text-on-surface-variant font-serif">{post.titleHi}</p>
                   </div>
                   <div className="flex">
-                    <button onClick={() => startEdit(post)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-brand text-secondary" aria-label="Edit article">
+                    <button onClick={() => startEdit(post)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-gold text-secondary" aria-label="Edit article">
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button onClick={() => handleDelete(post.id)} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-error-container/20 text-on-error-container" aria-label="Delete article">

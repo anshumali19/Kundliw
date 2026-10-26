@@ -12,8 +12,10 @@ import {
   AlertCircle,
   MessageSquare,
   ExternalLink,
+  Clock,
 } from "lucide-react";
 import { directionsUrl, mapIframeSrc } from "@/lib/content/map";
+import { SocialIcon } from "@/components/content/SocialIcon";
 
 interface ContactClientProps {
   settings: {
@@ -39,9 +41,14 @@ interface ContactClientProps {
     socialYoutube?: string | null;
   };
   locale: string;
+  extra?: {
+    workingHours?: string;
+    note?: string;
+    social?: Array<{ id: string; name: string; url: string }>;
+  };
 }
 
-export function ContactClient({ settings, locale }: ContactClientProps) {
+export function ContactClient({ settings, locale, extra }: ContactClientProps) {
   const isHindi = locale === "hi";
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -216,6 +223,33 @@ export function ContactClient({ settings, locale }: ContactClientProps) {
                   </a>
                 </div>
               </div>
+
+              {extra?.workingHours && (
+                <div className="flex items-start gap-3">
+                  <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold text-on-surface mb-0.5">{isHindi ? "कार्य समय" : "Working hours"}</div>
+                    <div className="text-on-surface-variant">{extra.workingHours}</div>
+                  </div>
+                </div>
+              )}
+
+              {extra?.note && <p className="text-xs text-on-surface-variant leading-relaxed">{extra.note}</p>}
+
+              {extra?.social && extra.social.length > 0 && (
+                <div>
+                  <div className="font-bold text-on-surface mb-1.5">{isHindi ? "हमें फ़ॉलो करें" : "Follow us"}</div>
+                  <ul className="flex flex-wrap gap-2">
+                    {extra.social.map((l) => (
+                      <li key={l.id}>
+                        <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} className="w-10 h-10 inline-flex items-center justify-center rounded-full border border-outline-variant text-secondary hover:bg-surface-container-high">
+                          <SocialIcon id={l.id} />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </div>

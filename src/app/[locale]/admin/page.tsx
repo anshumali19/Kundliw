@@ -150,7 +150,7 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
                       {isHindi
                         ? STATUS_LABELS[order.status]?.hi
                         : STATUS_LABELS[order.status]?.en}{" "}
-                      · {order.paymentStatus.replace("_", " ").toLowerCase()}
+                      · {order.paymentStatus.replace(/_/g, " ").toLowerCase()}
                     </div>
                   </div>
                 </li>

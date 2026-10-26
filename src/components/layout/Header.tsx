@@ -30,10 +30,11 @@ import {
 interface HeaderProps {
   panchang?: { parts?: DateStripData } | null;
   social?: Array<{ id: string; name: string; url: string }>;
+  logoUrl?: string;
   phone?: string;
 }
 
-export function Header({ phone, panchang, social = [] }: HeaderProps = {}) {
+export function Header({ phone, panchang, social = [], logoUrl }: HeaderProps = {}) {
   const isHindi = useLocale() === "hi";
   const tNav = useTranslations("nav");
   const tHeader = useTranslations("header");
@@ -181,7 +182,7 @@ export function Header({ phone, panchang, social = [] }: HeaderProps = {}) {
               <UserPlus className="w-3 h-3 text-gold shrink-0" />
               <span>{tNav("register")}</span>
             </Link>
-            <LanguageSwitcher />
+            <span className="hidden sm:inline-flex"><LanguageSwitcher tone="dark" /></span>
           </div>
         </div>
       </div>
@@ -193,7 +194,7 @@ export function Header({ phone, panchang, social = [] }: HeaderProps = {}) {
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0 shrink sm:shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo.webp"
+              src={logoUrl || "/logo.webp"}
               alt={tCommon("siteNameHi")}
               width={64}
               height={48}
@@ -296,6 +297,8 @@ export function Header({ phone, panchang, social = [] }: HeaderProps = {}) {
               <Calendar className="w-4 h-4 2xl:mr-1.5 shrink-0" />
               <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
             </Link>
+
+            <span className="sm:hidden inline-flex"><LanguageSwitcher tone="light" /></span>
 
             <AccountMenu />
 
