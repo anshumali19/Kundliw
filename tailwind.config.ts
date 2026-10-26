@@ -12,7 +12,7 @@ import plugin from "tailwindcss/plugin";
  *  - Gold (`bg-gold`, `text-gold`) is for accents on dark areas and for gradients; text on gold
  *    is dark brown (`text-on-gold`).
  *  - Headings use the dark brown `secondary`; small accent labels use `primary`, an orange
- *    deep enough to read on cream (4.8:1).
+ *    deep enough to read on cream and peach (5:1).
  *  - Maroon is the footer background (`bg-maroon`) and an accent for borders.
  *  - Body text is dark brown (#261B17) on cream (16:1).
  */
@@ -39,7 +39,7 @@ const PALETTE: Record<string, string> = {
   "surface-container-high": "#FBE6D2",
   "surface-container-highest": "#F5D9BF",
   "on-surface": "#261B17",
-  "on-surface-variant": "#6F5F59",
+  "on-surface-variant": "#5F4F49",
   "inverse-surface": "#261B17",
   "inverse-on-surface": "#FFFFFF",
   outline: "#7E6D67",
@@ -47,7 +47,7 @@ const PALETTE: Record<string, string> = {
   "surface-tint": "#F96706",
 
   // Primary: deep orange for accent text; fills use brand
-  primary: "#C24E00",
+  primary: "#B04600",
   "on-primary": "#FFFFFF",
   "primary-container": "#FFE4CC",
   "on-primary-container": "#7A2E00",

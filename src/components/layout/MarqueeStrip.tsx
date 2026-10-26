@@ -80,7 +80,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
                     aria-hidden={copy === 1 ? "true" : undefined}
                   >
                     <span>{text}</span>
-                    <span className="text-maroon font-bold">•</span>
+                    <span className="font-bold">•</span>
                   </span>
                 );
               })
@@ -90,7 +90,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
 
         <Link
           href="/services"
-          className="shrink-0 hidden md:inline-flex items-center gap-1 text-xs uppercase tracking-wider text-maroon hover:underline font-bold"
+          className="shrink-0 hidden md:inline-flex items-center gap-1 text-xs uppercase tracking-wider hover:underline font-bold"
         >
           <span>{tMarquee("cta")}</span>
           <ArrowRight className="w-3.5 h-3.5" />
