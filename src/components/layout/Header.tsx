@@ -65,6 +65,7 @@ export function Header({ phone }: HeaderProps = {}) {
     { href: "/kundli", label: tNav("kundli") },
     { href: "/kundli/matching", label: tNav("kundliMatching") },
     { href: "/kundli/prashna", label: tNav("prashna") },
+    { href: "/other-services", label: tNav("otherServices") },
   ];
 
   // Secondary/lineage items accessible in dropdown & mobile
@@ -114,6 +115,7 @@ export function Header({ phone }: HeaderProps = {}) {
     { href: "/kundli", label: tNav("kundli") },
     { href: "/kundli/matching", label: tNav("kundliMatching") },
     { href: "/kundli/prashna", label: tNav("prashna") },
+    { href: "/other-services", label: tNav("otherServices") },
     { href: "/about", label: tNav("about") },
     { href: "/founder", label: tNav("founder") },
     { href: "/other-services", label: tNav("otherServices") },
@@ -129,8 +131,8 @@ export function Header({ phone }: HeaderProps = {}) {
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
       {/* 1. Top Sub-Bar: Vedic Invocation, Live Ephemeris Summary & Contact */}
-      <div className="bg-surface-container-high border-b border-outline-variant/60">
-        <div className="w-full px-4 sm:px-6 xl:px-6 2xl:px-10 h-9 flex items-center justify-between gap-2 text-xs text-on-surface-variant font-medium">
+      <div className="bg-brand-gradient">
+        <div className="w-full px-4 sm:px-6 xl:px-6 2xl:px-10 h-9 flex items-center justify-between gap-2 text-xs text-on-gold font-medium [&_span]:!text-on-gold [&_a]:!text-on-gold [&_svg]:!text-on-gold">
           <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap min-w-0 flex-1">
             <span className="font-serif text-secondary font-semibold italic tracking-wide truncate">
               {tHeader("invocation")}
@@ -215,8 +217,8 @@ export function Header({ phone }: HeaderProps = {}) {
                   }}
                   className={`h-full flex items-center px-1.5 xl:px-1.5 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
                     isActive
-                      ? "text-secondary border-signal font-bold"
-                      : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
+                      ? "text-primary border-brand font-bold"
+                      : "text-on-surface-variant hover:text-primary border-transparent hover:border-brand/40"
                   }`}
                 >
                   {link.label}

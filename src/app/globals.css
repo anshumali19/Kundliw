@@ -32,8 +32,8 @@
   input, select, textarea { font-size: 1.0625rem; }
 }
 
-/* Red accent line under the fixed header */
-header { border-bottom: 3px solid var(--signal); }
+/* Soft divider under the fixed header */
+header { border-bottom: 1px solid var(--outline-variant); }
 
 @layer base {
   html, body {
@@ -45,7 +45,7 @@ header { border-bottom: 3px solid var(--signal); }
     position: relative;
     background-color: var(--surface);
     color: var(--on-surface);
-    font-family: var(--font-noto-sans), sans-serif;
+    font-family: var(--font-poppins), var(--font-noto-sans), sans-serif;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -73,4 +73,13 @@ header { border-bottom: 3px solid var(--signal); }
   * {
     box-shadow: none !important;
   }
+}
+
+/* Orange to gold flow used for accent words, bands and the top strip */
+.bg-brand-gradient { background-image: linear-gradient(90deg, #F96706 0%, #FF9A00 55%, #FFC105 100%); }
+.text-brand-gradient {
+  background-image: linear-gradient(90deg, #F96706, #FFB000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

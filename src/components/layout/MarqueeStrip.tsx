@@ -37,7 +37,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
   const style = items && items.length > 0 ? items[0] : undefined;
 
   // Maroon is reserved for the footer Quick Links, so legacy maroon marquee settings use the brand style.
-  const LEGACY_MAROON = new Set(["var(--secondary)", "var(--primary)", "var(--maroon)", "#800000", "#6b1d1d"]);
+  const LEGACY_MAROON = new Set(["var(--secondary)", "var(--primary)", "var(--maroon)", "#800000", "#6b1d1d", "#661919"]);
   const configuredBg = style?.bgColor?.trim().toLowerCase();
   const useBrand = !configuredBg || LEGACY_MAROON.has(configuredBg);
   const background = useBrand ? "var(--brand)" : safeColor(style?.bgColor, "var(--brand)");
@@ -60,7 +60,7 @@ export function MarqueeStrip({ items, position = "BOTTOM" }: MarqueeStripProps) 
       aria-label="Announcements"
     >
       <div className="w-full px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 shrink-0 bg-brand-hover border border-maroon px-2.5 py-1 rounded text-maroon text-xs font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-1.5 shrink-0 bg-gold border border-maroon px-2.5 py-1 rounded text-on-gold text-xs font-bold uppercase tracking-wider">
           <Megaphone className="w-3.5 h-3.5" />
           <span>{tMarquee("badge")}</span>
         </div>

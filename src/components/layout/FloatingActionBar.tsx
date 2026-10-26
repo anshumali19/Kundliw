@@ -403,7 +403,7 @@ export function FloatingActionBar({
           className="pointer-events-auto fixed left-1/2 -translate-x-1/2 bottom-[7.75rem] xl:bottom-14 z-40 hidden sm:flex items-center gap-2 w-[min(34rem,calc(100vw-16rem))] bg-surface rounded-full border-2 border-maroon p-1.5 shadow-lg"
           aria-label={isHindi ? "एआई से पूछें" : "Ask AI"}
         >
-          <span className="w-9 h-9 shrink-0 rounded-full bg-brand text-maroon flex items-center justify-center">
+          <span className="w-9 h-9 shrink-0 rounded-full bg-brand text-white flex items-center justify-center">
             <Sparkles className="w-5 h-5" />
           </span>
           <input
@@ -439,7 +439,7 @@ export function FloatingActionBar({
               className="relative pb-2 flex flex-col items-center"
               aria-label={isHindi ? "कॉल करें" : "Call us"}
             >
-              <span className={`${FAB_CIRCLE} bg-brand text-maroon`}>
+              <span className={`${FAB_CIRCLE} bg-brand text-white`}>
                 <Phone className="w-6 h-6" />
               </span>
               <FabLabel>{isHindi ? "कॉल" : "Call"}</FabLabel>
@@ -483,7 +483,7 @@ export function FloatingActionBar({
             aria-expanded={isOpen && mode === "chat"}
             aria-label={isHindi ? "चैट खोलें" : "Open chat"}
           >
-            <span className={`${FAB_CIRCLE} bg-brand-hover text-maroon`}>
+            <span className={`${FAB_CIRCLE} bg-gold text-on-gold`}>
               {isOpen && mode === "chat" ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
             </span>
             <FabLabel>{isHindi ? "चैट" : "Chat"}</FabLabel>

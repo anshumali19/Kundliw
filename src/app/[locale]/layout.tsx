@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Serif, Noto_Sans } from "next/font/google";
+import { Poppins, Noto_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
@@ -16,16 +16,16 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE_NAME, SITE_NAME_HI, SITE_URL } from "@/lib/seo";
 import "@/app/globals.css";
 
-const notoSerif = Noto_Serif({
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-noto-serif",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
 const notoSans = Noto_Sans({
   subsets: ["latin", "devanagari"],
-  weight: ["400", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-noto-sans",
   display: "swap",
 });
@@ -187,7 +187,7 @@ export default async function LocaleLayout(
   };
 
   return (
-    <html lang={locale} className={`${notoSerif.variable} ${notoSans.variable} w-full max-w-full overflow-x-clip`}>
+    <html lang={locale} className={`${poppins.variable} ${notoSans.variable} w-full max-w-full overflow-x-clip`}>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-clip relative">
         <JsonLd data={structuredData} />
         <GoogleAnalytics />

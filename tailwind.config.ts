@@ -2,78 +2,85 @@ import type { Config } from "tailwindcss";
 import plugin from "tailwindcss/plugin";
 
 /**
- * Client palette (high contrast): Saffron #F4C430, Maroon #800000, Yellow #FFFF00, Red #FF0000.
+ * Theme taken from the client's reference site (Bharat Darshan Teerth Yatra): saffron-orange
+ * #F96706 flowing into gold #FFC105, warm cream surfaces, dark brown text, maroon #661919 for
+ * the footer, Poppins type and softly rounded corners.
  *
  * Rules the whole UI follows:
- *  - Maroon is used for text and borders everywhere; as a filled background ONLY in the
- *    footer Quick Links (`bg-maroon`).
- *  - Buttons and highlights are filled saffron (`bg-brand`) with maroon text (`text-on-brand`,
- *    6.7:1), and turn yellow (`bg-brand-hover`) on hover (10.2:1).
- *  - Red (`bg-signal`) is the accent for badges, offers and alerts, with white text on large
- *    or bold labels only (4.0:1).
- *  - Body text is a maroon-tinted black (#1A0000) on white or pale yellow (20:1).
+ *  - Buttons and highlights are filled orange (`bg-brand`) with white bold text (`text-on-brand`)
+ *    and turn a deeper orange (`bg-brand-hover`) on hover.
+ *  - Gold (`bg-gold`, `text-gold`) is for accents on dark areas and for gradients; text on gold
+ *    is dark brown (`text-on-gold`).
+ *  - Headings use the dark brown `secondary`; small accent labels use `primary`, an orange
+ *    deep enough to read on cream (4.8:1).
+ *  - Maroon is the footer background (`bg-maroon`) and an accent for borders.
+ *  - Body text is dark brown (#261B17) on cream (16:1).
  */
 const PALETTE: Record<string, string> = {
   // Brand
-  brand: "#F4C430",
-  "brand-hover": "#FFFF00",
-  "on-brand": "#800000",
-  signal: "#FF0000",
+  brand: "#F96706",
+  "brand-hover": "#D95705",
+  "on-brand": "#FFFFFF",
+  gold: "#FFC105",
+  "on-gold": "#261B17",
+  signal: "#E83A3A",
   "on-signal": "#FFFFFF",
-  maroon: "#800000",
+  maroon: "#661919",
   "on-maroon": "#FFFFFF",
-  yellow: "#FFFF00",
+  yellow: "#FFC105",
 
-  // Surfaces: white and soft yellow tints
-  surface: "#FFFFFF",
-  "surface-dim": "#F9EDB5",
+  // Surfaces: warm cream with peach tints
+  surface: "#FCFAF8",
+  "surface-dim": "#F0E4D8",
   "surface-bright": "#FFFFFF",
   "surface-container-lowest": "#FFFFFF",
-  "surface-container-low": "#FFFCE6",
-  "surface-container": "#FFF7C2",
-  "surface-container-high": "#FCEFA6",
-  "surface-container-highest": "#F8E48B",
-  "on-surface": "#1A0000",
-  "on-surface-variant": "#4A1010",
-  "inverse-surface": "#1A0000",
+  "surface-container-low": "#FFF8F1",
+  "surface-container": "#FFF2E5",
+  "surface-container-high": "#FBE6D2",
+  "surface-container-highest": "#F5D9BF",
+  "on-surface": "#261B17",
+  "on-surface-variant": "#6F5F59",
+  "inverse-surface": "#261B17",
   "inverse-on-surface": "#FFFFFF",
-  outline: "#6B2C2C",
-  "outline-variant": "#DDB84A",
-  "surface-tint": "#800000",
+  outline: "#7E6D67",
+  "outline-variant": "#E8E0D9",
+  "surface-tint": "#F96706",
 
-  // Primary and secondary accents are maroon text/borders; fills use brand
-  primary: "#800000",
+  // Primary: deep orange for accent text; fills use brand
+  primary: "#C24E00",
   "on-primary": "#FFFFFF",
-  "primary-container": "#F4C430",
-  "on-primary-container": "#800000",
-  "primary-fixed": "#FFF1B0",
-  "primary-fixed-dim": "#F4C430",
-  "on-primary-fixed": "#1A0000",
-  "on-primary-fixed-variant": "#800000",
+  "primary-container": "#FFE4CC",
+  "on-primary-container": "#7A2E00",
+  "primary-fixed": "#FFE4CC",
+  "primary-fixed-dim": "#F96706",
+  "on-primary-fixed": "#261B17",
+  "on-primary-fixed-variant": "#7A2E00",
 
-  secondary: "#800000",
+  // Secondary: dark brown for headings
+  secondary: "#2B1A14",
   "on-secondary": "#FFFFFF",
-  "secondary-container": "#F4C430",
-  "on-secondary-container": "#800000",
-  "secondary-fixed": "#FFF1B0",
-  "secondary-fixed-dim": "#F4C430",
-  "on-secondary-fixed": "#1A0000",
-  "on-secondary-fixed-variant": "#800000",
+  "secondary-container": "#FFE9D0",
+  "on-secondary-container": "#2B1A14",
+  "secondary-fixed": "#FFE9D0",
+  "secondary-fixed-dim": "#F96706",
+  "on-secondary-fixed": "#261B17",
+  "on-secondary-fixed-variant": "#2B1A14",
 
-  tertiary: "#800000",
+  // Tertiary: maroon text, gold fills
+  tertiary: "#661919",
   "on-tertiary": "#FFFFFF",
-  "tertiary-container": "#FFFF00",
-  "on-tertiary-container": "#800000",
-  "tertiary-fixed": "#FFFF00",
-  "tertiary-fixed-dim": "#F4C430",
-  "on-tertiary-fixed": "#800000",
-  "on-tertiary-fixed-variant": "#800000",
+  "tertiary-container": "#FFC105",
+  "on-tertiary-container": "#261B17",
+  "tertiary-fixed": "#FFC105",
+  "tertiary-fixed-dim": "#F96706",
+  "on-tertiary-fixed": "#261B17",
+  "on-tertiary-fixed-variant": "#661919",
 
-  // Errors: red accents, maroon text on a pale red tint
-  error: "#FF0000",
+  // Errors: red accent, dark red text on a pale red tint
+  error: "#E83A3A",
   "on-error": "#FFFFFF",
-  "error-container": "#FFE3E3",
-  "on-error-container": "#800000",
+  "error-container": "#FDE3E3",
+  "on-error-container": "#7A1212",
 };
 
 const hexToRgb = (hex: string) =>
@@ -93,18 +100,19 @@ const config: Config = {
         Object.keys(PALETTE).map((name) => [name, `rgb(var(--${name}-rgb) / <alpha-value>)`])
       ),
       borderRadius: {
-        DEFAULT: "0.125rem", // 2px
-        md: "0.25rem",       // 4px
-        lg: "0.375rem",
-        xl: "0.5rem",
+        DEFAULT: "0.5rem",
+        md: "0.5rem",
+        lg: "0.75rem",
+        xl: "1rem",
         full: "9999px",
       },
       fontFamily: {
-        serif: ["var(--font-noto-serif)", "Noto Serif", "serif"],
-        sans: ["var(--font-noto-sans)", "Noto Sans", "sans-serif"],
-        display: ["var(--font-noto-serif)", "Noto Serif", "serif"],
-        headline: ["var(--font-noto-serif)", "Noto Serif", "serif"],
-        body: ["var(--font-noto-sans)", "Noto Sans", "sans-serif"],
+        // Poppins for Latin text; Noto Sans supplies the Devanagari (Hindi) glyphs
+        serif: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
+        sans: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
+        display: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
+        headline: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
+        body: ["var(--font-poppins)", "var(--font-noto-sans)", "Poppins", "sans-serif"],
       },
       spacing: {
         "space-xs": "0.25rem",
