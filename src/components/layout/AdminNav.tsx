@@ -145,7 +145,7 @@ export function AdminNav({ isHindi }: { isHindi: boolean }) {
         </summary>
         <div className="px-2 pb-4 pt-1 max-h-[70vh] overflow-y-auto overscroll-contain">{list}</div>
       </details>
-      <aside className="hidden lg:block w-64 shrink-0">
+      <aside className="hidden lg:block w-64 shrink-0 self-stretch">
         <div className="sticky top-[132px] max-h-[calc(100vh-150px)] overflow-y-auto overscroll-contain bg-surface-container-lowest border border-outline-variant rounded-xl p-3">
           {list}
         </div>
