@@ -6,6 +6,7 @@ import { RichText } from "@/components/content/RichText";
 import { safeHref } from "@/lib/content/richText";
 import { prisma } from "@/lib/prisma";
 import { kendraEmail } from "@/lib/content/contact";
+import { ownKundliHref } from "@/lib/content/ownKundli";
 import { isCorePageSlug } from "@/lib/content/pages";
 import { LocationMap } from "@/components/content/LocationMap";
 import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
@@ -109,22 +110,22 @@ export async function Footer() {
                   {tNav("pricingPlans")}
                 </Link>
               </li>
-              {tools.kundliEnabled !== false && (
+              {(
 <li>
-                <Link href="/kundli" className="hover:text-gold transition-colors block py-0.5">
+                <Link href={ownKundliHref("/kundli") as never} className="hover:text-gold transition-colors block py-0.5">
                   {tNav("kundli")}
                 </Link>
               </li>
 )}
-              {tools.matchingEnabled !== false && (
+              {(
 <li>
-                <Link href="/kundli/matching" className="hover:text-gold transition-colors block py-0.5">
+                <Link href={ownKundliHref("/kundli/matching") as never} className="hover:text-gold transition-colors block py-0.5">
                   {tNav("kundliMatching")}
                 </Link>
               </li>
 )}
               <li>
-                <Link href="/kundli/prashna" className="hover:text-gold transition-colors block py-0.5">
+                <Link href={ownKundliHref("/kundli/prashna") as never} className="hover:text-gold transition-colors block py-0.5">
                   {tNav("prashna")}
                 </Link>
               </li>

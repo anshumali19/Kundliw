@@ -1,6 +1,7 @@
 "use client";
 
 import { KENDRA_EMAIL } from "@/lib/content/contact";
+import { ownKundliHref } from "@/lib/content/ownKundli";
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
@@ -87,9 +88,9 @@ export function MobileNav() {
     { href: "/help", label: tNav("contact"), icon: Phone },
     { href: `mailto:${KENDRA_EMAIL}`, label: locale === "hi" ? "ईमेल" : "Email", icon: Mail },
     { href: "/panchang", label: tNav("panchang"), icon: CalendarDays },
-    { href: "/kundli", label: tNav("kundli"), icon: Sparkles },
-    { href: "/kundli/matching", label: tNav("kundliMatching"), icon: BookOpen },
-    { href: "/kundli/prashna", label: tNav("prashna"), icon: Search },
+    { href: ownKundliHref("/kundli"), label: tNav("kundli"), icon: Sparkles },
+    { href: ownKundliHref("/kundli/matching"), label: tNav("kundliMatching"), icon: BookOpen },
+    { href: ownKundliHref("/kundli/prashna"), label: tNav("prashna"), icon: Search },
     { href: "/other-services", label: tNav("otherServices"), icon: Award },
     { href: "/founder", label: tNav("founder"), icon: Award },
     { href: "/about", label: tNav("about"), icon: HelpCircle },

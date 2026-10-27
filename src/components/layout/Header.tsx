@@ -9,6 +9,7 @@ import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { AccountMenu } from "./AccountMenu";
 import { QuickBookingPanel } from "./QuickBookingPanel";
+import { ownKundliHref } from "@/lib/content/ownKundli";
 import {
   Phone,
   Mail,
@@ -93,14 +94,14 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
   }, []);
 
   // Primary desktop bar links
-  const customMenu = menu && menu.length > 0 ? menu.map((m) => ({ href: m.href, label: isHindi ? m.labelHi || m.labelEn : m.labelEn || m.labelHi })) : null;
+  const customMenu = menu && menu.length > 0 ? menu.map((m) => ({ href: ownKundliHref(m.href), label: isHindi ? m.labelHi || m.labelEn : m.labelEn || m.labelHi })) : null;
   const primaryLinks = customMenu ? hideTools(customMenu) : hideTools([
     { href: "/", label: tNav("home") },
     { href: "/about", label: tNav("about") },
     { href: "/services", label: tNav("services") },
-    { href: "/kundli", label: tNav("kundli") },
-    { href: "/kundli/prashna", label: tNav("prashna") },
-    { href: "/kundli/matching", label: tNav("kundliMatching") },
+    { href: ownKundliHref("/kundli"), label: tNav("kundli") },
+    { href: ownKundliHref("/kundli/prashna"), label: tNav("prashna") },
+    { href: ownKundliHref("/kundli/matching"), label: tNav("kundliMatching") },
     { href: "/services#plans", label: tNav("pricingPlans") },
     { href: "/gallery", label: tNav("gallery") },
     { href: "/contact", label: tNav("contact") },
@@ -130,8 +131,11 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
       const [base, hash] = href.split("#");
       return pathname === base && currentHash === `#${hash}`;
     }
+    if (href.startsWith("/services/")) {
+      return pathname === href;
+    }
     if (href === "/services") {
-      return (pathname === "/services" || pathname.startsWith("/services/")) && currentHash !== "#plans";
+      return (pathname === "/services" || (pathname.startsWith("/services/") && !/^\/services\/(janam-kundli|prashna-kundli|kundli-matching)$/.test(pathname))) && currentHash !== "#plans";
     }
     if (href === "/kundli") {
       return pathname === "/kundli";
@@ -151,9 +155,9 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
   const srsMobileMenu = customMenu ? hideTools(customMenu) : hideTools([
     { href: "/services", label: tNav("services") },
     { href: "/services#plans", label: tNav("pricingPlans") },
-    { href: "/kundli", label: tNav("kundli") },
-    { href: "/kundli/matching", label: tNav("kundliMatching") },
-    { href: "/kundli/prashna", label: tNav("prashna") },
+    { href: ownKundliHref("/kundli"), label: tNav("kundli") },
+    { href: ownKundliHref("/kundli/matching"), label: tNav("kundliMatching") },
+    { href: ownKundliHref("/kundli/prashna"), label: tNav("prashna") },
     { href: "/other-services", label: tNav("otherServices") },
     { href: "/about", label: tNav("about") },
     { href: "/founder", label: tNav("founder") },
@@ -270,7 +274,9 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
                     className="relative h-full flex items-center"
                     ref={navBookRef}
                     onMouseEnter={() => setNavBookOpen(true)}
-                    onMouseLeave={() => setNavBookOpen(false)}
+                    onMouseLeave={(e) => {
+                      if (!e.currentTarget.contains(document.activeElement)) setNavBookOpen(false);
+                    }}
                   >
                     <button
                       type="button"
@@ -286,8 +292,8 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
                       <ChevronDown className={`w-3.5 h-3.5 transition-transform ${navBookOpen ? "rotate-180" : ""}`} />
                     </button>
                     {navBookOpen && (
-                      <div className="absolute top-full left-0 w-80 pt-1 z-50 text-left">
-                        <div className="bg-surface border border-outline-variant/60 shadow-xl rounded p-4">
+                      <div className="absolute top-full left-0 w-[min(26rem,92vw)] pt-1 z-50 text-left">
+                        <div className="bg-surface border border-outline-variant/60 shadow-xl rounded p-4 max-h-[calc(100dvh-9rem)] overflow-y-auto">
                           <QuickBookingPanel onDone={() => setNavBookOpen(false)} />
                         </div>
                       </div>
@@ -374,7 +380,10 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
               className="relative hidden sm:block"
               ref={bookRef}
               onMouseEnter={() => setBookOpen(true)}
-              onMouseLeave={() => setBookOpen(false)}
+              onMouseLeave={(e) => {
+                // Do not close while the customer is typing in the form
+                if (!e.currentTarget.contains(document.activeElement)) setBookOpen(false);
+              }}
             >
               <button
                 type="button"
@@ -389,8 +398,8 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${bookOpen ? "rotate-180" : ""}`} />
               </button>
               {bookOpen && (
-                <div className="absolute top-full right-0 w-80 pt-1 z-50 text-left">
-                  <div className="bg-surface border border-outline-variant/60 shadow-xl rounded p-4">
+                <div className="absolute top-full right-0 w-[min(26rem,92vw)] pt-1 z-50 text-left">
+                  <div className="bg-surface border border-outline-variant/60 shadow-xl rounded p-4 max-h-[calc(100dvh-9rem)] overflow-y-auto">
                     <QuickBookingPanel onDone={() => setBookOpen(false)} />
                   </div>
                 </div>

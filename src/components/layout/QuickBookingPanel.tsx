@@ -110,6 +110,7 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         ))}
       </ol>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div>
         <label className={label} htmlFor="qb-service">{hi ? "सेवा" : "Service"}</label>
         <select
@@ -151,6 +152,9 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         </select>
       </div>
 
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div>
         <label className={label} htmlFor="qb-offer">{hi ? "ऑफर कोड" : "Offer code"}</label>
         <select id="qb-offer" className={field} value={offer} disabled={!plan} onChange={(e) => setOffer(e.target.value)}>
@@ -197,6 +201,7 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         <label className={label} htmlFor="qb-ref">{hi ? "रेफरल कोड (वैकल्पिक)" : "Referral code (optional)"}</label>
         <input id="qb-ref" className={`${field} uppercase`} value={referral} onChange={(e) => setReferral(e.target.value)} maxLength={40} />
       </div>
+      </div>
 
       <div>
         <label className={label} htmlFor="qb-pay">{hi ? "भुगतान" : "Payment"}</label>
@@ -207,14 +212,19 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         </select>
       </div>
 
-      <button
-        type="button"
-        onClick={go}
-        disabled={!plan || mobileBad}
-        className="inline-flex items-center justify-center min-h-[46px] px-6 rounded-full bg-saffron hover:brightness-110 text-white text-sm font-bold disabled:opacity-50"
-      >
-        {hi ? "बुकिंग जमा करें" : "Submit Booking"}
-      </button>
+      <div className="sticky bottom-0 -mx-1 px-1 pt-2 pb-1 bg-surface">
+        <button
+          type="button"
+          onClick={go}
+          disabled={!plan || mobileBad}
+          className="inline-flex items-center justify-center min-h-[46px] px-6 rounded-full bg-saffron hover:brightness-110 text-white text-sm font-bold disabled:opacity-50"
+        >
+          {hi ? "बुकिंग जमा करें" : "Submit Booking"}
+        </button>
+        {!plan && (
+          <p className="mt-1 text-[11px] text-on-surface-variant">{hi ? "पहले सेवा और प्लान चुनें।" : "Choose a service and a plan first."}</p>
+        )}
+      </div>
 
       <a href={`mailto:${KENDRA_EMAIL}`} className="flex items-center gap-2 text-xs text-on-surface-variant hover:text-primary">
         <Mail className="w-4 h-4 text-primary shrink-0" />
