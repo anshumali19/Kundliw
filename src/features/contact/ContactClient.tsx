@@ -1,5 +1,6 @@
 "use client";
 
+import { kendraEmail } from "@/lib/content/contact";
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -85,7 +86,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
 
   const phone1 = settings.phone1 || "";
   const phone2 = settings.phone2 || "";
-  const emailAddr = settings.email || "";
+  const emailAddr = kendraEmail(settings.email);
   const address = isHindi
     ? settings.addressHi || settings.addressEn || ""
     : settings.addressEn || settings.addressHi || "";
@@ -144,6 +145,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
   if (icons.enquiry) iconItems.push({ key: "enq", label: icons.labels.enquiry || (isHindi ? "पूछताछ" : "Enquiry"), href: "#enquiry", Icon: MessageSquare });
   if (icons.support && icons.supportLink) iconItems.push({ key: "sup", label: icons.labels.support || (isHindi ? "सहायता" : "Support"), href: icons.supportLink, Icon: LifeBuoy });
   if (icons.tickets && icons.ticketsLink) iconItems.push({ key: "tix", label: icons.labels.tickets || (isHindi ? "टिकट" : "Tickets"), href: icons.ticketsLink, Icon: Ticket });
+  if (icons.email) iconItems.push({ key: "mail", label: isHindi ? "ईमेल" : "Email", href: `mailto:${emailAddr}`, Icon: Mail });
   if (iconItems.length === 0) icons.show = false;
 
   return (

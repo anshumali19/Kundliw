@@ -1,3 +1,4 @@
+import { kendraEmail } from "@/lib/content/contact";
 import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
@@ -57,7 +58,7 @@ export default async function HelpPage(props: HelpPageProps) {
 
   const phone1 = settings?.phone1;
   const phone2 = settings?.phone2;
-  const email = settings?.email;
+  const email = kendraEmail(settings?.email);
 
   return (
     <div className="w-full max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8 text-left space-y-10">

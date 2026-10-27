@@ -1,3 +1,4 @@
+import { kendraEmail } from "@/lib/content/contact";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       siteName: adminSettings?.siteNameEn || "Maharshi Kanad Jyotish Kendra",
       siteAddress: adminSettings?.addressEn || "",
       sitePhone: adminSettings?.phone1 || "+91-9827991224",
-      siteEmail: adminSettings?.email || "",
+      siteEmail: kendraEmail(adminSettings?.email),
       gstin: adminSettings?.gstin || null,
       customerName,
       customerPhone,

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { useRouter } from "@/i18n/routing";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
+import { KENDRA_EMAIL } from "@/lib/content/contact";
 
 interface CatalogPlan { id: string; slug: string; titleEn: string; titleHi: string; pricePaise: number }
 interface CatalogService { slug: string; titleEn: string; titleHi: string; plans: CatalogPlan[] }
@@ -162,6 +163,13 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         {hi ? "आगे बढ़ें: भुगतान" : "Continue to payment"}
         <ArrowRight className="w-4 h-4" />
       </button>
+      <a
+        href={`mailto:${KENDRA_EMAIL}`}
+        className="flex items-center gap-2 text-xs text-on-surface-variant hover:text-primary"
+      >
+        <Mail className="w-4 h-4 text-primary shrink-0" />
+        <span className="break-all">{hi ? "सहायता के लिए ईमेल करें:" : "Need help? Email"} {KENDRA_EMAIL}</span>
+      </a>
       {services !== null && services.length === 0 && (
         <p className="text-xs text-on-surface-variant">{hi ? "अभी कोई सेवा उपलब्ध नहीं है।" : "No services are available right now."}</p>
       )}

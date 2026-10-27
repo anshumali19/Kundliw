@@ -12,6 +12,7 @@ import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
 import { ToolsProvider } from "@/components/providers/ToolsProvider";
 import { IntroSplash } from "@/components/layout/IntroSplash";
 import { themeCss } from "@/lib/siteConfig/theme";
+import { kendraEmail } from "@/lib/content/contact";
 import { OfferPopup } from "@/components/layout/OfferPopup";
 import { getActiveSocialLinks, getLinkList, getSection } from "@/lib/siteConfig/service";
 import { getDailyPanchang } from "@/lib/astro/panchangService";
@@ -252,7 +253,7 @@ export default async function LocaleLayout(
         description:
           "Vedic astrology consultations, Kundli preparation, Kundli matching and Prashna Kundli with online booking.",
         ...(settings?.phone1 ? { telephone: settings.phone1 } : {}),
-        ...(settings?.email ? { email: settings.email } : {}),
+        email: kendraEmail(settings?.email),
         ...(settings?.addressEn || settings?.city
           ? {
               address: {

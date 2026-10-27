@@ -114,7 +114,7 @@ export const CREDENTIALS_METADATA: Record<CredentialKey, CredentialMeta> = {
     key: "SMTP_FROM",
     label: "Default From Email",
     category: "EMAIL",
-    description: "Sender address (e.g. Maharshi Kanad Kendra <contact@kanadastro.org>).",
+    description: "Sender address (e.g. Maharshi Kanad Kendra <maharshikanadjyotishkendra@gmail.com>).",
     envVar: "SMTP_FROM",
     isSecret: false,
   },

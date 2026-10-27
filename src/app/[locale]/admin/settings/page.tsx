@@ -27,7 +27,7 @@ export default function AdminSettingsPage() {
   const [siteNameHi, setSiteNameHi] = useState("महर्षि कणाद ज्योतिष केंद्र");
   const [phone1, setPhone1] = useState("+91-9827991224");
   const [phone2, setPhone2] = useState("+91-7509124672");
-  const [email, setEmail] = useState("contact@kanadastro.org");
+  const [email, setEmail] = useState("maharshikanadjyotishkendra@gmail.com");
   const [addressEn, setAddressEn] = useState("");
   const [addressHi, setAddressHi] = useState("");
 

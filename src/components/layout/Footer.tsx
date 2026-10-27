@@ -5,6 +5,7 @@ import { getLinkList, getSection } from "@/lib/siteConfig/service";
 import { RichText } from "@/components/content/RichText";
 import { safeHref } from "@/lib/content/richText";
 import { prisma } from "@/lib/prisma";
+import { kendraEmail } from "@/lib/content/contact";
 import { isCorePageSlug } from "@/lib/content/pages";
 import { LocationMap } from "@/components/content/LocationMap";
 import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
@@ -42,7 +43,7 @@ export async function Footer() {
 
   const phone1 = settings?.phone1;
   const phone2 = settings?.phone2;
-  const email = settings?.email;
+  const email = kendraEmail(settings?.email);
   const addressLine1 =
     (locale === "hi"
       ? settings?.addressHi || settings?.addressEn
