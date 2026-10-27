@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { isKundliService } from "@/lib/content/ownKundli";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { formatPaiseToInr } from "@/lib/billing/gst";
@@ -145,6 +146,8 @@ export function BookingWizard({
     ...(activeService?.plans.some((p) => !p.packageId) ? [{ id: "", titleEn: "Standard", titleHi: "मानक", descriptionEn: null, descriptionHi: null }] : []),
   ];
   const showPackages = packageOptions.length > 1 || (packageOptions.length === 1 && packageOptions[0].id !== "");
+  // Kundli services: select Kundli > fill the form > choose a plan > pay (the plan comes after the form)
+  const kundliMode = isKundliService(activeService?.slug);
   const visiblePlans = (activeService?.plans ?? []).filter((p) => !showPackages || (p.packageId ?? "") === selectedPackageId);
 
   // Appointment Slot
@@ -352,6 +355,12 @@ export function BookingWizard({
   // Submit Order
   const handleCreateOrder = async () => {
     if (!activeService || !activePlan) return;
+    if (kundliMode && activePlan.hasCall && initialSlots.length > 0 && !selectedSlotId) {
+      setSubmissionError(
+        isHindi ? "कृपया परामर्श हेतु एक समय स्लॉट चुनें।" : "Please select an appointment slot for the consultation call."
+      );
+      return;
+    }
     setSubmitting(true);
     setSubmissionError(null);
 
@@ -423,116 +432,9 @@ export function BookingWizard({
   const gstPercentLabel = String(gstRateBasisPoints / 100);
   const netPayablePaise = taxablePaise + gstPaise;
 
-  return (
-    <div className="w-full flex flex-col text-left space-y-8">
-      {/* Broadsheet Stepper Header */}
-      <div className="w-full bg-surface-container rounded-lg p-4 border border-outline-variant/40">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
-          <div className="flex items-center gap-3">
-            <span className="text-xs uppercase font-bold tracking-widest text-primary bg-brand/20 px-2.5 py-1 rounded">
-              {isHindi ? `चरण ${currentStep} / ३` : `Step ${currentStep} of 3`}
-            </span>
-            <span className="font-serif font-bold text-sm sm:text-base text-secondary">
-              {currentStep === 1
-                ? isHindi
-                  ? "१. सेवा एवं संस्करण चयन"
-                  : "1. Service & Plan Confirmation"
-                : currentStep === 2
-                ? isHindi
-                  ? "२. जातक जन्म विवरण"
-                  : "2. Jataka Birth Details"
-                : isHindi
-                ? "३. दक्षिणा विवरण एवं पुष्टि"
-                : "3. Review & Order Confirmation"}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
-            <Lock className="w-3.5 h-3.5 text-primary" />
-            <span>{isHindi ? "सत्यापित वैदिक परामर्श" : "Verified Consultation"}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Booking path: Service > Plan > Details > Offer > Referral > Payment > Confirmation */}
-      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] font-semibold text-on-surface-variant" aria-label="Booking steps">
-        {(
-          [
-            [isHindi ? "सेवा" : "Service", 1],
-            [isHindi ? "पैकेज" : "Package", 1],
-            [isHindi ? "प्लान" : "Plan", 1],
-            [isHindi ? "विवरण" : "Details", 2],
-            [isHindi ? "ऑफर" : "Offer", 3],
-            [isHindi ? "रेफरल कोड" : "Referral code", 3],
-            [isHindi ? "भुगतान (Razorpay / UPI)" : "Payment (Razorpay / UPI)", 4],
-            [isHindi ? "पुष्टि" : "Confirmation", 4],
-          ] as Array<[string, number]>
-        ).map(([label, at], i, arr) => (
-          <li key={label} className="inline-flex items-center gap-1.5">
-            <span className={`px-2 py-0.5 rounded-full border ${currentStep >= at && at < 4 ? "bg-brand text-on-brand border-brand" : "border-outline-variant/60"}`}>{label}</span>
-            {i < arr.length - 1 && <span aria-hidden="true">&rsaquo;</span>}
-          </li>
-        ))}
-      </ol>
-
-      {submissionError && (
-        <div className="p-4 bg-surface rounded border border-error text-xs text-on-error-container font-medium flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{submissionError}</span>
-        </div>
-      )}
-
-      {/* Main Asymmetric Layout (7 Cols Left / 5 Cols Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start text-left">
-        {/* Left Column (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col space-y-6 text-left">
-          {/* STEP 1: Service & Plan Selection */}
-          {currentStep === 1 && (
-            <div className="bg-surface p-6 rounded-lg border border-outline-variant/60 shadow-sm space-y-6 text-left">
-              <div>
-                <h2 className="font-serif text-xl font-bold text-secondary">
-                  {isHindi ? "सेवा एवं संस्करण चुनें" : "Select Service & Consultation Tier"}
-                </h2>
-                <p className="text-xs text-on-surface-variant mt-1">
-                  {isHindi
-                    ? "अपनी आवश्यकतानुसार शास्त्रसम्मत सेवा और उसका प्रारूप चुनें।"
-                    : "Confirm your astrological service and consultation format."}
-                </p>
-              </div>
-
-              {/* Service Tabs */}
-              <div>
-                <label className="block text-xs font-bold uppercase text-secondary mb-2">
-                  {isHindi ? "सेवा (Service)" : "Astrological Service"}
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {services.map((s) => {
-                    const isSelected = s.slug === selectedServiceSlug;
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedServiceSlug(s.slug);
-                          if (s.plans[0]) {
-                            setSelectedPlanSlug(s.plans[0].slug);
-                            setSelectedPackageId(s.plans[0].packageId ?? "");
-                          }
-                        }}
-                        className={`min-h-[44px] p-3 rounded text-left border transition-all text-xs flex items-center justify-between ${
-                          isSelected
-                            ? "bg-surface border-2 border-primary ring-1 ring-primary/20 font-bold text-secondary"
-                            : "bg-surface-container-low border-outline-variant/60 hover:bg-surface text-on-surface"
-                        }`}
-                      >
-                        <span>{isHindi ? s.titleHi : s.titleEn}</span>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
+  // Package + plan choice and the call slot picker, shown in step 1 for other services and in step 3 for Kundli
+  const planChoiceJsx = (
+    <>
               {/* Package options (for example Sadharan, Madhyam, Uttam) */}
               {activeService && showPackages && (
                 <div>
@@ -622,6 +524,201 @@ export function BookingWizard({
                 </div>
               )}
 
+    </>
+  );
+
+  const slotPickerJsx = (
+    <>
+              {/* Appointment Slot Selection (Required if plan has live call) */}
+              {activePlan?.hasCall && (
+                <div className="pt-4 border-t border-outline-variant/30 space-y-3">
+                  <div className="font-serif font-bold text-sm text-secondary flex items-center gap-2">
+                    <PhoneCall className="w-4 h-4 text-primary" />
+                    <span>
+                      {isHindi
+                        ? "परामर्श काल खंड आरक्षित करें (Appointment Slot) *"
+                        : "Select Consultation Appointment Slot *"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant">
+                    {isHindi
+                      ? "केंद्र परामर्श दल के साथ ३० मिनट प्रत्यक्ष वार्ता हेतु उपलब्ध समय चुनें।"
+                      : "Choose a reserved timeframe for your live Kendra team consultation."}
+                  </p>
+
+                  {initialSlots.length === 0 ? (
+                    <div className="p-4 bg-surface-container-low rounded border border-outline-variant text-xs text-secondary">
+                      {isHindi
+                        ? "आगामी स्लॉट आदेश उपरांत केंद्र दल द्वारा निर्धारित किए जाएंगे।"
+                        : "Slots will be allocated directly after consultation booking."}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {initialSlots.map((slot) => {
+                        const isSelected = selectedSlotId === slot.id;
+                        return (
+                          <div
+                            key={slot.id}
+                            onClick={() => setSelectedSlotId(slot.id)}
+                            className={`p-3 rounded border cursor-pointer transition-all text-xs flex items-center justify-between ${
+                              isSelected
+                                ? "bg-surface border-2 border-primary font-bold text-secondary shadow-sm"
+                                : "bg-surface-container-low border-outline-variant/60 hover:bg-surface text-on-surface"
+                            }`}
+                          >
+                            <div>
+                              <div>{slot.date}</div>
+                              <div className="font-mono text-primary mt-0.5">
+                                {slot.startTime} - {slot.endTime}
+                              </div>
+                            </div>
+                            {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+    </>
+  );
+
+  return (
+    <div className="w-full flex flex-col text-left space-y-8">
+      {/* Broadsheet Stepper Header */}
+      <div className="w-full bg-surface-container rounded-lg p-4 border border-outline-variant/40">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
+          <div className="flex items-center gap-3">
+            <span className="text-xs uppercase font-bold tracking-widest text-primary bg-brand/20 px-2.5 py-1 rounded">
+              {isHindi ? `चरण ${currentStep} / ३` : `Step ${currentStep} of 3`}
+            </span>
+            <span className="font-serif font-bold text-sm sm:text-base text-secondary">
+              {kundliMode
+                ? currentStep === 1
+                  ? isHindi
+                    ? "१. कुण्डली चुनें"
+                    : "1. Select Kundli"
+                  : currentStep === 2
+                  ? isHindi
+                    ? "२. फ़ॉर्म भरें"
+                    : "2. Form filling"
+                  : isHindi
+                  ? "३. प्लान चुनें और भुगतान"
+                  : "3. Plan selection & payment"
+                : currentStep === 1
+                ? isHindi
+                  ? "१. सेवा एवं संस्करण चयन"
+                  : "1. Service & Plan Confirmation"
+                : currentStep === 2
+                ? isHindi
+                  ? "२. जातक जन्म विवरण"
+                  : "2. Jataka Birth Details"
+                : isHindi
+                ? "३. दक्षिणा विवरण एवं पुष्टि"
+                : "3. Review & Order Confirmation"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+            <Lock className="w-3.5 h-3.5 text-primary" />
+            <span>{isHindi ? "सत्यापित वैदिक परामर्श" : "Verified Consultation"}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Booking path: Service > Plan > Details > Offer > Referral > Payment > Confirmation */}
+      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] font-semibold text-on-surface-variant" aria-label="Booking steps">
+        {(
+          (kundliMode
+            ? [
+                [isHindi ? "कुण्डली चुनें" : "Select Kundli", 1],
+                [isHindi ? "फ़ॉर्म भरें" : "Form filling", 2],
+                [isHindi ? "प्लान चुनें" : "Plan selection", 3],
+                [isHindi ? "ऑफर" : "Offer", 3],
+                [isHindi ? "रेफरल कोड" : "Referral code", 3],
+                [isHindi ? "भुगतान (Razorpay / UPI)" : "Payment (Razorpay / UPI)", 4],
+                [isHindi ? "जमा" : "Submitted", 4],
+                [isHindi ? "पुष्टि" : "Confirmation", 4],
+              ]
+            : [
+                [isHindi ? "सेवा" : "Service", 1],
+                [isHindi ? "पैकेज" : "Package", 1],
+                [isHindi ? "प्लान" : "Plan", 1],
+                [isHindi ? "विवरण" : "Details", 2],
+                [isHindi ? "ऑफर" : "Offer", 3],
+                [isHindi ? "रेफरल कोड" : "Referral code", 3],
+                [isHindi ? "भुगतान (Razorpay / UPI)" : "Payment (Razorpay / UPI)", 4],
+                [isHindi ? "पुष्टि" : "Confirmation", 4],
+              ]) as Array<[string, number]>
+        ).map(([label, at], i, arr) => (
+          <li key={label} className="inline-flex items-center gap-1.5">
+            <span className={`px-2 py-0.5 rounded-full border ${currentStep >= at && at < 4 ? "bg-brand text-on-brand border-brand" : "border-outline-variant/60"}`}>{label}</span>
+            {i < arr.length - 1 && <span aria-hidden="true">&rsaquo;</span>}
+          </li>
+        ))}
+      </ol>
+
+      {submissionError && (
+        <div className="p-4 bg-surface rounded border border-error text-xs text-on-error-container font-medium flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{submissionError}</span>
+        </div>
+      )}
+
+      {/* Main Asymmetric Layout (7 Cols Left / 5 Cols Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start text-left">
+        {/* Left Column (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col space-y-6 text-left">
+          {/* STEP 1: Service & Plan Selection */}
+          {currentStep === 1 && (
+            <div className="bg-surface p-6 rounded-lg border border-outline-variant/60 shadow-sm space-y-6 text-left">
+              <div>
+                <h2 className="font-serif text-xl font-bold text-secondary">
+                  {isHindi ? "सेवा एवं संस्करण चुनें" : "Select Service & Consultation Tier"}
+                </h2>
+                <p className="text-xs text-on-surface-variant mt-1">
+                  {isHindi
+                    ? "अपनी आवश्यकतानुसार शास्त्रसम्मत सेवा और उसका प्रारूप चुनें।"
+                    : "Confirm your astrological service and consultation format."}
+                </p>
+              </div>
+
+              {/* Service Tabs */}
+              <div>
+                <label className="block text-xs font-bold uppercase text-secondary mb-2">
+                  {isHindi ? "सेवा (Service)" : "Astrological Service"}
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {services.map((s) => {
+                    const isSelected = s.slug === selectedServiceSlug;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedServiceSlug(s.slug);
+                          if (s.plans[0]) {
+                            setSelectedPlanSlug(s.plans[0].slug);
+                            setSelectedPackageId(s.plans[0].packageId ?? "");
+                          }
+                        }}
+                        className={`min-h-[44px] p-3 rounded text-left border transition-all text-xs flex items-center justify-between ${
+                          isSelected
+                            ? "bg-surface border-2 border-primary ring-1 ring-primary/20 font-bold text-secondary"
+                            : "bg-surface-container-low border-outline-variant/60 hover:bg-surface text-on-surface"
+                        }`}
+                      >
+                        <span>{isHindi ? s.titleHi : s.titleEn}</span>
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {!kundliMode && planChoiceJsx}
+
               {/* Action */}
               <div className="pt-4 border-t border-outline-variant/30 flex justify-end">
                 <button
@@ -629,7 +726,7 @@ export function BookingWizard({
                   onClick={() => setCurrentStep(2)}
                   className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2"
                 >
-                  <span>{isHindi ? "अगला: जन्म विवरण दर्ज करें" : "Next: Jataka Birth Details"}</span>
+                  <span>{isHindi ? (kundliMode ? "अगला: फ़ॉर्म भरें" : "अगला: जन्म विवरण दर्ज करें") : kundliMode ? "Next: Fill the form" : "Next: Jataka Birth Details"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -882,57 +979,7 @@ export function BookingWizard({
                 </div>
               )}
 
-              {/* Appointment Slot Selection (Required if plan has live call) */}
-              {activePlan?.hasCall && (
-                <div className="pt-4 border-t border-outline-variant/30 space-y-3">
-                  <div className="font-serif font-bold text-sm text-secondary flex items-center gap-2">
-                    <PhoneCall className="w-4 h-4 text-primary" />
-                    <span>
-                      {isHindi
-                        ? "परामर्श काल खंड आरक्षित करें (Appointment Slot) *"
-                        : "Select Consultation Appointment Slot *"}
-                    </span>
-                  </div>
-                  <p className="text-xs text-on-surface-variant">
-                    {isHindi
-                      ? "केंद्र परामर्श दल के साथ ३० मिनट प्रत्यक्ष वार्ता हेतु उपलब्ध समय चुनें।"
-                      : "Choose a reserved timeframe for your live Kendra team consultation."}
-                  </p>
-
-                  {initialSlots.length === 0 ? (
-                    <div className="p-4 bg-surface-container-low rounded border border-outline-variant text-xs text-secondary">
-                      {isHindi
-                        ? "आगामी स्लॉट आदेश उपरांत केंद्र दल द्वारा निर्धारित किए जाएंगे।"
-                        : "Slots will be allocated directly after consultation booking."}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {initialSlots.map((slot) => {
-                        const isSelected = selectedSlotId === slot.id;
-                        return (
-                          <div
-                            key={slot.id}
-                            onClick={() => setSelectedSlotId(slot.id)}
-                            className={`p-3 rounded border cursor-pointer transition-all text-xs flex items-center justify-between ${
-                              isSelected
-                                ? "bg-surface border-2 border-primary font-bold text-secondary shadow-sm"
-                                : "bg-surface-container-low border-outline-variant/60 hover:bg-surface text-on-surface"
-                            }`}
-                          >
-                            <div>
-                              <div>{slot.date}</div>
-                              <div className="font-mono text-primary mt-0.5">
-                                {slot.startTime} - {slot.endTime}
-                              </div>
-                            </div>
-                            {isSelected && <CheckCircle2 className="w-4 h-4 text-primary" />}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+              {!kundliMode && slotPickerJsx}
 
               {/* Actions */}
               <div className="pt-4 border-t border-outline-variant/30 flex items-center justify-between">
@@ -956,7 +1003,15 @@ export function BookingWizard({
                       );
                       return;
                     }
-                    if (activePlan?.hasCall && initialSlots.length > 0 && !selectedSlotId) {
+                    if (isMatchingService && (!formData.partnerName.trim() || !formData.partnerPob.trim())) {
+                      setSubmissionError(
+                        isHindi
+                          ? "कृपया साथी का नाम और जन्म स्थान दर्ज करें।"
+                          : "Please fill in the partner's Name and Place of Birth."
+                      );
+                      return;
+                    }
+                    if (!kundliMode && activePlan?.hasCall && initialSlots.length > 0 && !selectedSlotId) {
                       setSubmissionError(
                         isHindi
                           ? "कृपया परामर्श हेतु एक समय स्लॉट चुनें।"
@@ -969,7 +1024,7 @@ export function BookingWizard({
                   }}
                   className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2"
                 >
-                  <span>{isHindi ? "समीक्षा एवं पुष्टि करें" : "Review & Summary"}</span>
+                  <span>{isHindi ? (kundliMode ? "अगला: प्लान चुनें" : "समीक्षा एवं पुष्टि करें") : kundliMode ? "Next: Choose your plan" : "Review & Summary"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -989,6 +1044,19 @@ export function BookingWizard({
                     : "Please review your birth epoch details before creating the order."}
                 </p>
               </div>
+
+              {kundliMode && (
+                <div className="space-y-4 pb-5 border-b border-outline-variant/30">
+                  <div>
+                    <h3 className="font-serif text-lg font-bold text-secondary">{isHindi ? "प्लान चुनें" : "Plan selection"}</h3>
+                    <p className="text-xs text-on-surface-variant mt-1">
+                      {isHindi ? "अपना फ़ॉर्म भरने के बाद अब पैकेज और प्लान चुनें।" : "Your form is filled. Now choose the package and plan for your Kundli."}
+                    </p>
+                  </div>
+                  {planChoiceJsx}
+                  {slotPickerJsx}
+                </div>
+              )}
 
               {/* Jataka Summary Card */}
               <div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/40 space-y-2 text-xs">

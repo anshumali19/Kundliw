@@ -11,3 +11,10 @@ const OWN_KUNDLI_PAGES: Record<string, string> = {
 export function ownKundliHref(href: string): string {
   return OWN_KUNDLI_PAGES[href] ?? href;
 }
+
+/** The Kendra's own Kundli services. Their booking order is: select Kundli, fill the form, choose a plan, pay. */
+export const KUNDLI_SERVICE_SLUGS = ["janam-kundli", "prashna-kundli", "kundli-matching"];
+
+export function isKundliService(slug: string | undefined | null): boolean {
+  return !!slug && KUNDLI_SERVICE_SLUGS.includes(slug);
+}

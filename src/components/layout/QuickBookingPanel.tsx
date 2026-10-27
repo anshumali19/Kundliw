@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { Mail } from "lucide-react";
 import { KENDRA_EMAIL } from "@/lib/content/contact";
+import { isKundliService } from "@/lib/content/ownKundli";
 
 interface CatalogPlan { id: string; slug: string; titleEn: string; titleHi: string; pricePaise: number }
 interface CatalogPackage { id: string; titleEn: string; titleHi: string; plans: CatalogPlan[] }
@@ -48,6 +49,8 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
   }, []);
 
   const service = services?.find((s) => s.slug === serviceSlug);
+  // Kundli: select Kundli > form > plan. The plan is chosen after the form, on the booking page.
+  const kundli = isKundliService(service?.slug);
   const pkg = service?.packages.find((k) => k.id === packageId);
   const plan = pkg?.plans.find((p) => p.slug === planSlug);
   const planId = plan?.id;
@@ -71,8 +74,17 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
   const mobileBad = mobile.trim() !== "" && mobileDigits.length < 10;
 
   // Which steps of the path are done so far, shown as the pill strip
-  const stepDone = [Boolean(service), Boolean(pkg), Boolean(plan), Boolean(plan), false, false, false];
-  const steps = [
+  const stepDone = kundli ? [Boolean(service), false, false, false, false, false] : [Boolean(service), Boolean(pkg), Boolean(plan), Boolean(plan), false, false, false];
+  const steps = kundli
+    ? [
+        hi ? "कुण्डली चुनें" : "Select Kundli",
+        hi ? "फ़ॉर्म" : "Form filling",
+        hi ? "प्लान" : "Plan",
+        hi ? "भुगतान" : "Payment",
+        hi ? "जमा" : "Submitted",
+        hi ? "पुष्टि" : "Confirmed",
+      ]
+    : [
     hi ? "सेवा" : "Service",
     hi ? "पैकेज" : "Package",
     hi ? "प्लान" : "Plan",
@@ -81,11 +93,11 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
     hi ? "जमा" : "Submitted",
     hi ? "पुष्टि" : "Confirmed",
   ];
-  const current = !service ? 0 : !pkg ? 1 : !plan ? 2 : 4;
+  const current = !service ? 0 : kundli ? 1 : !pkg ? 1 : !plan ? 2 : 4;
 
   const go = () => {
-    if (!service || !plan || mobileBad) return;
-    const q = new URLSearchParams({ service: service.slug, plan: plan.slug, pay });
+    if (!service || (!kundli && !plan) || mobileBad) return;
+    const q = new URLSearchParams(kundli ? { service: service.slug, pay } : { service: service.slug, plan: plan!.slug, pay });
     if (code) q.set("offer", code);
     if (referral.trim()) q.set("ref", referral.trim().toUpperCase());
     if (name.trim()) q.set("name", name.trim());
@@ -139,6 +151,15 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         </select>
       </div>
 
+      {kundli && (
+        <p className="sm:col-span-2 text-xs text-on-surface-variant">
+          {hi
+            ? "कुण्डली के लिए पहले आप फ़ॉर्म भरेंगे, फिर प्लान चुनेंगे, फिर भुगतान करेंगे।"
+            : "For a Kundli you fill the form first, then choose your plan, then pay."}
+        </p>
+      )}
+      {!kundli && (
+      <>
       <div>
         <label className={label} htmlFor="qb-package">{hi ? "पैकेज" : "Package"}</label>
         <select
@@ -179,10 +200,14 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
           ))}
         </select>
       </div>
+      </>
+      )}
 
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {!kundli && (
+      <>
       <div>
         <label className={label} htmlFor="qb-offer">{hi ? "ऑफर कोड" : "Offer code"}</label>
         <select id="qb-offer" className={field} value={offer} disabled={!plan} onChange={(e) => setOffer(e.target.value)}>
@@ -203,6 +228,8 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
           />
         )}
       </div>
+      </>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
@@ -244,12 +271,12 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         <button
           type="button"
           onClick={go}
-          disabled={!plan || mobileBad}
+          disabled={(!kundli && !plan) || mobileBad}
           className="inline-flex items-center justify-center min-h-[46px] px-6 rounded-full bg-saffron hover:brightness-110 text-white text-sm font-bold disabled:opacity-50"
         >
           {hi ? "बुकिंग जमा करें" : "Submit Booking"}
         </button>
-        {!plan && (
+        {!kundli && !plan && (
           <p className="mt-1 text-[11px] text-on-surface-variant">{hi ? "पहले सेवा, पैकेज और प्लान चुनें।" : "Choose a service, a package and a plan first."}</p>
         )}
       </div>
