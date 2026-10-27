@@ -1,3 +1,4 @@
+import { kendraEmail } from "@/lib/content/contact";
 import { prisma } from "@/lib/prisma";
 
 const DEFAULT_MODEL = "gemini-flash-lite-latest";
@@ -19,14 +20,15 @@ export async function askLlm(query: string, locale: "hi" | "en"): Promise<string
   const [qa, settings] = await Promise.all([
     prisma.chatbotQA.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, take: 60 }).catch(() => []),
     prisma.adminSettings
-      .findUnique({ where: { id: "default" }, select: { phone1: true, whatsappNumber: true } })
+      .findUnique({ where: { id: "default" }, select: { phone1: true, whatsappNumber: true, email: true } })
       .catch(() => null),
   ]);
 
   const knowledge = qa
     .map((q) => `Q: ${locale === "hi" ? q.questionHi : q.questionEn}\nA: ${locale === "hi" ? q.answerHi : q.answerEn}`)
     .join("\n\n");
-  const contact = settings?.whatsappNumber || settings?.phone1 || "";
+  const phoneContact = settings?.whatsappNumber || settings?.phone1 || "";
+  const contact = [phoneContact, kendraEmail(settings?.email)].filter(Boolean).join(", ");
 
   const system = [
     "You are the website assistant of Maharshi Kanad Jyotish Kendra, a Vedic astrology centre.",

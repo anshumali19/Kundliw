@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { BlocksView } from "@/components/content/MediaView";
 import { normalizeBlocks } from "@/lib/content/media";
-import { ShieldCheck, Scale, FileText, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Scale, FileText, ArrowLeft, Mail } from "lucide-react";
+import { kendraEmail } from "@/lib/content/contact";
 import { Link } from "@/i18n/routing";
 
 interface LegalPageProps {
@@ -53,6 +54,9 @@ export default async function LegalPage(props: LegalPageProps) {
 
   const isHindi = locale === "hi";
   const fullSlug = `legal/${slug}`;
+  const supportEmail = kendraEmail(
+    (await prisma.adminSettings.findUnique({ where: { id: "default" }, select: { email: true } }).catch(() => null))?.email
+  );
 
   const page = await prisma.staticPage
     .findFirst({
@@ -107,6 +111,12 @@ export default async function LegalPage(props: LegalPageProps) {
       </div>
 
       <BlocksView blocks={normalizeBlocks(page.blocks)} isHindi={isHindi} />
+
+      <div className="p-4 rounded-xl bg-surface border border-outline-variant/40 text-sm text-on-surface flex flex-wrap items-center gap-x-3 gap-y-1">
+        <Mail className="w-4 h-4 text-primary shrink-0" />
+        <span>{isHindi ? "इस दस्तावेज़ के बारे में प्रश्न हों तो ईमेल करें:" : "Questions about this document? Email us:"}</span>
+        <a href={`mailto:${supportEmail}`} className="font-semibold text-secondary hover:underline break-all">{supportEmail}</a>
+      </div>
 
       {/* Ephemeris & Ethics Disclaimer Seal */}
       <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30 text-xs text-on-surface-variant flex items-center justify-between gap-3">

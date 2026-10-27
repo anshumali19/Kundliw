@@ -1,3 +1,4 @@
+import { KENDRA_EMAIL } from "@/lib/content/contact";
 import nodemailer from "nodemailer";
 import { getCredential } from "@/lib/config/credentials";
 
@@ -58,9 +59,10 @@ export async function sendNotification(input: NotificationInput): Promise<Notifi
     await transport.sendMail({
       from: from || user,
       to: input.email,
+      replyTo: KENDRA_EMAIL,
       subject: input.subject,
-      text: input.message,
-      html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1a0000">${safe}<br><br><strong>Maharshi Kanad Jyotish Kendra</strong></div>`,
+      text: `${input.message}\n\nMaharshi Kanad Jyotish Kendra\n${KENDRA_EMAIL}`,
+      html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1a0000">${safe}<br><br><strong>Maharshi Kanad Jyotish Kendra</strong><br><a href="mailto:${KENDRA_EMAIL}" style="color:#800000">${KENDRA_EMAIL}</a></div>`,
     });
     return { emailSent: true };
   } catch (error) {

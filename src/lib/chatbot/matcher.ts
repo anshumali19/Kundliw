@@ -1,3 +1,4 @@
+import { kendraEmail } from "@/lib/content/contact";
 import { prisma } from "@/lib/prisma";
 import { getCredential } from "@/lib/config/credentials";
 
@@ -42,7 +43,7 @@ export async function matchChatbotQuery(
   const settings = await prisma.adminSettings
     .findUnique({
       where: { id: "default" },
-      select: { whatsappNumber: true, phone1: true, chatbotWelcomeEn: true, chatbotWelcomeHi: true },
+      select: { whatsappNumber: true, phone1: true, email: true, chatbotWelcomeEn: true, chatbotWelcomeHi: true },
     })
     .catch(() => null);
 
@@ -143,10 +144,11 @@ export async function matchChatbotQuery(
   }
 
   // Fallback for queries with no match
+  const mailTo = kendraEmail(settings?.email);
   const fallbackAnswer =
     locale === "hi"
-      ? "आपके प्रश्न का सीधा उत्तर केंद्र की सामान्य मार्गदर्शिका में उपलब्ध नहीं है। आप हमारे मुख्य आचार्य से सीधे WhatsApp पर परामर्श ले सकते हैं अथवा नीचे 'पूछताछ संदेश' छोड़ सकते हैं, हमारी टीम २४ घंटे में संपर्क करेगी।"
-      : "We could not find an exact automated match for your query. You can connect directly with our Daivajna team on WhatsApp or submit a formal enquiry message below for personal assistance.";
+      ? `आपके प्रश्न का सीधा उत्तर केंद्र की सामान्य मार्गदर्शिका में उपलब्ध नहीं है। आप हमारे मुख्य आचार्य से सीधे WhatsApp पर परामर्श ले सकते हैं, हमें ${mailTo} पर ईमेल कर सकते हैं अथवा नीचे 'पूछताछ संदेश' छोड़ सकते हैं, हमारी टीम २४ घंटे में संपर्क करेगी।`
+      : `We could not find an exact automated match for your query. You can connect directly with our Daivajna team on WhatsApp, email us at ${mailTo}, or submit a formal enquiry message below for personal assistance.`;
 
   return {
     matched: false,
