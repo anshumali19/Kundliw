@@ -84,6 +84,8 @@ export const baseOfferInputSchema = z.object({
   serviceSlugs: z.array(z.string().trim().min(1).max(120)).max(50).default([]),
   planIds: z.array(z.string().trim().min(1).max(120)).max(200).default([]),
   showOnPlan: z.boolean().default(false),
+  autoApply: z.boolean().default(false),
+  showInPopup: z.boolean().default(true),
   validFrom: z.coerce.date().default(() => new Date()),
   validUntil: z.coerce.date().optional().nullable(),
   isActive: z.boolean().default(true),

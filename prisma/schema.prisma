@@ -235,6 +235,8 @@ model Offer {
   serviceSlugs       String[]     @default([]) // empty = valid for every service
   planIds            String[]     @default([]) // empty = valid for every plan of the chosen services
   showOnPlan         Boolean      @default(false) // list this offer next to its plans so customers can tap to apply
+  autoApply          Boolean      @default(false) // applied automatically at booking, no code needed
+  showInPopup        Boolean      @default(true) // listed in the offers pop-up shown to visitors
   validFrom          DateTime     @default(now())
   validUntil         DateTime?
   isActive           Boolean      @default(true)

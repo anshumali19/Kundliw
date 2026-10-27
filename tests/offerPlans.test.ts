@@ -33,3 +33,32 @@ describe("theme extras", () => {
     expect(themeCss({ bodyFont: "x;}body{display:none" })).toBe("");
   });
 });
+
+import { pickBestAutoOffer } from "@/lib/offers/apply";
+
+describe("automatic offers", () => {
+  const base = { isActive: true, discountType: "FLAT" as const, planIds: [] as string[], serviceSlugs: [] as string[] };
+  it("picks the offer that saves the most", () => {
+    const best = pickBestAutoOffer(
+      [
+        { ...base, code: "SMALL", discountValuePaise: 10000 },
+        { ...base, code: "BIG", discountValuePaise: 30000 },
+      ],
+      100000
+    );
+    expect(best?.offer.code).toBe("BIG");
+    expect(best?.discountPaise).toBe(30000);
+  });
+  it("ignores offers that do not fit the plan or the amount", () => {
+    const best = pickBestAutoOffer(
+      [
+        { ...base, code: "OTHERPLAN", discountValuePaise: 50000, planIds: ["p2"] },
+        { ...base, code: "MIN", discountValuePaise: 20000, minOrderValuePaise: 500000 },
+      ],
+      100000,
+      new Date(),
+      { planId: "p1" }
+    );
+    expect(best).toBeNull();
+  });
+});

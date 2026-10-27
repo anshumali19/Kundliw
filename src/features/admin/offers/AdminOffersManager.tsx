@@ -31,6 +31,8 @@ export interface AdminOfferItem {
   serviceSlugs: string[];
   planIds: string[];
   showOnPlan: boolean;
+  autoApply: boolean;
+  showInPopup: boolean;
   usedCount: number;
   validFrom: string;
   validUntil: string | null;
@@ -70,6 +72,8 @@ export function AdminOffersManager({
     serviceSlugs: [] as string[],
     planIds: [] as string[],
     showOnPlan: false,
+    autoApply: false,
+    showInPopup: true,
     validFrom: new Date().toISOString().slice(0, 10),
     validUntil: "",
     isActive: true,
@@ -102,6 +106,8 @@ export function AdminOffersManager({
         serviceSlugs: offer.serviceSlugs ?? [],
         planIds: offer.planIds ?? [],
         showOnPlan: offer.showOnPlan ?? false,
+        autoApply: offer.autoApply ?? false,
+        showInPopup: offer.showInPopup ?? true,
         validFrom: offer.validFrom.slice(0, 10),
         validUntil: offer.validUntil ? offer.validUntil.slice(0, 10) : "",
         isActive: offer.isActive,
@@ -121,6 +127,8 @@ export function AdminOffersManager({
         serviceSlugs: [],
         planIds: [],
         showOnPlan: false,
+        autoApply: false,
+        showInPopup: true,
         validFrom: new Date().toISOString().slice(0, 10),
         validUntil: "",
         isActive: true,
@@ -151,6 +159,8 @@ export function AdminOffersManager({
         serviceSlugs: form.serviceSlugs,
         planIds: form.planIds,
         showOnPlan: form.showOnPlan,
+        autoApply: form.autoApply,
+        showInPopup: form.showInPopup,
         validFrom: new Date(form.validFrom).toISOString(),
         validUntil: form.validUntil ? new Date(form.validUntil).toISOString() : null,
         isActive: Boolean(form.isActive),
@@ -307,7 +317,7 @@ export function AdminOffersManager({
                     <td className="py-3 px-4 font-mono font-bold text-secondary text-sm">
                       {offer.code}
                       <div className="font-sans font-normal text-[11px] text-on-surface-variant mt-1">
-                        {offer.perUserLimit > 0 ? `${offer.perUserLimit}× per customer` : "unlimited per customer"} · {offer.serviceSlugs?.length ? offer.serviceSlugs.join(", ") : "all services"}{offer.planIds?.length ? ` · ${offer.planIds.length} plan(s)` : ""}{offer.showOnPlan ? " · shown on plans" : ""}
+                        {offer.perUserLimit > 0 ? `${offer.perUserLimit}× per customer` : "unlimited per customer"} · {offer.serviceSlugs?.length ? offer.serviceSlugs.join(", ") : "all services"}{offer.planIds?.length ? ` · ${offer.planIds.length} plan(s)` : ""}{offer.showOnPlan ? " · shown on plans" : ""}{offer.autoApply ? " · applies automatically" : ""}{offer.showInPopup ? " · in pop-up" : ""}
                       </div>
                     </td>
                     <td className="py-3 px-4">
@@ -663,6 +673,32 @@ export function AdminOffersManager({
                 />
                 <label htmlFor="offerShow" className="text-xs font-medium text-secondary">
                   {isHindi ? "बुकिंग में प्लान के साथ यह ऑफर दिखाएँ (ग्राहक एक टैप से लगा सकें)" : "Show this offer next to its plans in booking (customer can tap to apply)"}
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="offerAuto"
+                  checked={form.autoApply}
+                  onChange={(e) => setForm({ ...form, autoApply: e.target.checked })}
+                  className="w-4 h-4 text-primary rounded"
+                />
+                <label htmlFor="offerAuto" className="text-xs font-medium text-secondary">
+                  {isHindi ? "बिना कोड डाले अपने आप लागू हो (ग्राहक को कोड टाइप नहीं करना पड़ेगा)" : "Apply automatically, no code needed (the customer does not have to type it)"}
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="offerPopup"
+                  checked={form.showInPopup}
+                  onChange={(e) => setForm({ ...form, showInPopup: e.target.checked })}
+                  className="w-4 h-4 text-primary rounded"
+                />
+                <label htmlFor="offerPopup" className="text-xs font-medium text-secondary">
+                  {isHindi ? "साइट खुलने पर ऑफर पॉप-अप में दिखाएँ" : "Show this offer in the pop-up visitors see when the site opens"}
                 </label>
               </div>
 

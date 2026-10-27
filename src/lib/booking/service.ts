@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { CreateBookingOrderInput } from "@/features/booking/validation";
 import { calculateGst } from "@/lib/billing/gst";
 import { getGstSettings } from "@/lib/billing/gstSettings";
-import { claimOfferInTransaction } from "@/lib/offers/apply";
+import { claimOfferInTransaction, pickBestAutoOffer } from "@/lib/offers/apply";
 import {
   attachReferralToOrder,
   cancelCommission,
@@ -144,8 +144,26 @@ export async function createBookingOrder(
     let claimedOfferId: string | null = null;
     let claimedOfferCode: string | null = null;
 
-    if (input.offerCode && input.offerCode.trim()) {
-      const cleanCode = input.offerCode.trim().toUpperCase();
+    // No code typed: an offer that applies by itself (admin: "Apply automatically") is used if there is one
+    let offerCodeToClaim = input.offerCode?.trim() ? input.offerCode.trim().toUpperCase() : "";
+    if (!offerCodeToClaim) {
+      const autoOffers = await tx.offer.findMany({ where: { isActive: true, autoApply: true } });
+      let userUsesByCode: Record<string, number> = {};
+      if (autoOffers.length > 0) {
+        const used = await tx.order.groupBy({
+          by: ["offerCode"],
+          where: { userId, offerCode: { in: autoOffers.map((o) => o.code) }, paymentStatus: { notIn: ["FAILED", "REFUNDED"] } },
+          _count: { _all: true },
+        });
+        userUsesByCode = Object.fromEntries(used.map((u) => [u.offerCode ?? "", u._count._all]));
+      }
+      const eligible = autoOffers.filter((o) => !(o.perUserLimit > 0 && (userUsesByCode[o.code] ?? 0) >= o.perUserLimit));
+      const best = pickBestAutoOffer(eligible, plan.pricePaise, new Date(), { serviceSlug: service.slug, planId: plan.id });
+      if (best) offerCodeToClaim = best.offer.code;
+    }
+
+    if (offerCodeToClaim) {
+      const cleanCode = offerCodeToClaim;
       const claimResult = await claimOfferInTransaction(
         tx,
         cleanCode,

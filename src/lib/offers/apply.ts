@@ -101,6 +101,26 @@ export function applyOffer(
   };
 }
 
+/**
+ * Of the offers that apply by themselves (no code typed), picks the one that saves the customer the most.
+ * Returns null when none is valid for this service, plan and amount.
+ */
+export function pickBestAutoOffer<T extends OfferDefinition>(
+  offers: T[],
+  orderAmountPaise: number,
+  now: Date = new Date(),
+  ctx: OfferContext = {}
+): { offer: T; discountPaise: number } | null {
+  let best: { offer: T; discountPaise: number } | null = null;
+  for (const o of offers) {
+    const r = applyOffer(o, orderAmountPaise, now, ctx);
+    if (r.isValid && r.discountPaise > 0 && (!best || r.discountPaise > best.discountPaise)) {
+      best = { offer: o, discountPaise: r.discountPaise };
+    }
+  }
+  return best;
+}
+
 export interface PrismaOfferTxLike {
   order?: { count: (args: { where: Record<string, unknown> }) => Promise<number> };
   offer: {

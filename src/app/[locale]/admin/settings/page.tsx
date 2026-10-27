@@ -417,8 +417,16 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <details className="text-xs">
-            <summary className="cursor-pointer font-bold text-secondary min-h-[44px] flex items-center">Advanced: use a Google Maps embed instead</summary>
+          <details className="text-xs group rounded border border-outline-variant bg-surface-container-low open:bg-surface">
+            <summary className="cursor-pointer select-none list-none flex items-center justify-between gap-3 px-3 min-h-[48px] font-bold text-secondary rounded hover:bg-surface-container [&::-webkit-details-marker]:hidden">
+              <span>Advanced: use a Google Maps embed instead</span>
+              <span className="inline-flex items-center gap-1 text-primary shrink-0">
+                <span className="group-open:hidden">Show</span>
+                <span className="hidden group-open:inline">Hide</span>
+                <span aria-hidden="true" className="inline-block text-sm transition-transform group-open:rotate-180">▼</span>
+              </span>
+            </summary>
+            <div className="px-3 pb-3 border-t border-outline-variant/60">
             <p className="text-on-surface-variant my-2">In Google Maps choose Share, then Embed a map, and paste the whole code or only its link. When this is filled, it is shown instead of the place above.</p>
             <textarea
               rows={3}
@@ -430,6 +438,7 @@ export default function AdminSettingsPage() {
             {mapEmbed.trim() && !safeMapEmbedUrl(mapEmbed) && (
               <p className="text-on-error-container mt-1">This is not a Google Maps or OpenStreetMap embed link, so it will not be saved.</p>
             )}
+            </div>
           </details>
 
           <div>

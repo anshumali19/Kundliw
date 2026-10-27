@@ -37,7 +37,7 @@ interface FloatingActionBarProps {
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
 
 const FAB_BASE =
-  "flex items-center justify-center w-11 h-11 lg:w-12 lg:h-12 rounded-full border border-white/70 text-white shadow-[0_6px_18px_rgba(64,36,28,0.22)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:brightness-110 active:scale-95";
+  "flex flex-col items-center justify-center gap-0.5 w-[3.75rem] h-[3.75rem] lg:w-16 lg:h-16 rounded-2xl border border-white/70 text-white shadow-[0_6px_18px_rgba(64,36,28,0.22)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:brightness-110 active:scale-95";
 /** Each button keeps its own colour: call blue, WhatsApp green, AI purple, chat orange. */
 const FAB_CALL = `${FAB_BASE} bg-[#2563EB]`;
 const FAB_WHATSAPP = `${FAB_BASE} bg-[#25A244]`;
@@ -55,14 +55,9 @@ function renderBold(text: string): React.ReactNode[] {
   );
 }
 
-function FabLabel({ children, side = "right" }: { children: React.ReactNode; side?: "left" | "right" }) {
-  return (
-    <span
-      className={`pointer-events-none absolute top-1/2 -translate-y-1/2 hidden lg:block whitespace-nowrap rounded bg-maroon px-2.5 py-1 text-[11px] font-semibold text-white opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 ${side === "right" ? "left-full ml-2" : "right-full mr-2"}`}
-    >
-      {children}
-    </span>
-  );
+/** The name sits inside the button, so it is readable without hovering. */
+function FabText({ children }: { children: React.ReactNode }) {
+  return <span className="text-[10px] font-bold leading-none tracking-tight">{children}</span>;
 }
 
 export function FloatingActionBar({
@@ -127,20 +122,14 @@ export function FloatingActionBar({
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
-      if (Math.abs(y - lastY) > 24) setTuckedAway(true);
+      if (Math.abs(y - lastY) >= 1) setTuckedAway(true);
       lastY = y;
       clearTimeout(timer);
-      timer = setTimeout(() => setTuckedAway(false), 180);
-    };
-    const onScrollEnd = () => {
-      clearTimeout(timer);
-      setTuckedAway(false);
+      timer = setTimeout(() => setTuckedAway(false), 450);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("scrollend", onScrollEnd);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("scrollend", onScrollEnd);
       clearTimeout(timer);
     };
   }, []);
@@ -470,7 +459,9 @@ export function FloatingActionBar({
       {/* Floating quick actions: Call + WhatsApp on the left, AI + Chat on the right (mobile).
           They sit above the fixed marquee strip and the bottom navigation. */}
       <div
-        className="pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between transition-all duration-200 opacity-100 translate-y-0"
+        className={`pointer-events-none fixed inset-x-3 bottom-[7.75rem] xl:bottom-14 sm:inset-x-6 z-40 flex items-end justify-between transition-all duration-300 ${
+          tuckedAway && !isOpen ? "opacity-0 translate-y-6 [&_*]:!pointer-events-none" : "opacity-100 translate-y-0"
+        }`}
         role="region"
         aria-label="Quick contact and assistance"
       >
@@ -483,8 +474,8 @@ export function FloatingActionBar({
             >
               <span className={FAB_CALL}>
                 <Phone className="w-5 h-5" />
+                <FabText>{isHindi ? "कॉल" : "Call"}</FabText>
               </span>
-              <FabLabel>{isHindi ? "कॉल करें" : "Call us"}</FabLabel>
             </a>
           )}
           {showWhatsapp && defaultWhatsappUrl && (
@@ -497,8 +488,8 @@ export function FloatingActionBar({
             >
               <span className={FAB_WHATSAPP}>
                 <svg className="block h-[18px] w-[18px] shrink-0 fill-current" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
+                <FabText>WhatsApp</FabText>
               </span>
-              <FabLabel>WhatsApp</FabLabel>
             </a>
           )}
         </div>
@@ -514,8 +505,8 @@ export function FloatingActionBar({
           >
             <span className={FAB_AI}>
               <Sparkles className="w-5 h-5" />
+              <FabText>{isHindi ? "AI पूछें" : "Ask AI"}</FabText>
             </span>
-            <FabLabel side="left">{isHindi ? "एआई से पूछें" : "Ask AI"}</FabLabel>
           </button>
           )}
           {showChat && (
@@ -528,8 +519,8 @@ export function FloatingActionBar({
           >
             <span className={FAB_CHAT}>
               {isOpen && mode === "chat" ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
+              <FabText>{isHindi ? "चैट" : "Chat"}</FabText>
             </span>
-            <FabLabel side="left">{isHindi ? "चैट करें" : "Chat with us"}</FabLabel>
           </button>
           )}
         </div>

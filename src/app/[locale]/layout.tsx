@@ -12,6 +12,7 @@ import { FloatingActionBar } from "@/components/layout/FloatingActionBar";
 import { ToolsProvider } from "@/components/providers/ToolsProvider";
 import { IntroSplash } from "@/components/layout/IntroSplash";
 import { themeCss } from "@/lib/siteConfig/theme";
+import { OfferPopup } from "@/components/layout/OfferPopup";
 import { getActiveSocialLinks, getLinkList, getSection } from "@/lib/siteConfig/service";
 import { getDailyPanchang } from "@/lib/astro/panchangService";
 import { BannerSlot } from "@/components/banners/BannerSlot";
@@ -346,6 +347,7 @@ export default async function LocaleLayout(
               <Footer />
             </div>
             <MobileNav />
+            <OfferPopup />
             {features.showFloatingButtons !== false && (
             <FloatingActionBar
               phone={String(floatCfg.callNumber || "").trim() || settings?.phone1 || undefined}

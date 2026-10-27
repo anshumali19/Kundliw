@@ -43,6 +43,8 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
     serviceSlugs: o.serviceSlugs,
     planIds: o.planIds,
     showOnPlan: o.showOnPlan,
+    autoApply: o.autoApply,
+    showInPopup: o.showInPopup,
     usedCount: o.usedCount,
     validFrom: o.validFrom.toISOString(),
     validUntil: o.validUntil ? o.validUntil.toISOString() : null,

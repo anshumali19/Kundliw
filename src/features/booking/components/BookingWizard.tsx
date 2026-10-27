@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { formatPaiseToInr } from "@/lib/billing/gst";
@@ -146,6 +146,8 @@ export function BookingWizard({
     netAmountPaise: number;
     netAmountFormatted: string;
   } | null>(null);
+  // true while the applied offer is the one the Kendra applies by itself (no code typed)
+  const [offerIsAuto, setOfferIsAuto] = useState(false);
   const [offerLoading, setOfferLoading] = useState(false);
   const [offerError, setOfferError] = useState<string | null>(null);
 
@@ -155,6 +157,9 @@ export function BookingWizard({
   const [referralError, setReferralError] = useState<string | null>(null);
   const [referralLoading, setReferralLoading] = useState(false);
 
+  const appliedOfferRef = useRef<unknown>(null);
+  const offerCodeRef = useRef("");
+  const handleValidateOfferRef = useRef<((code?: string, auto?: boolean) => Promise<void>) | null>(null);
   // Offers the admin chose to show next to this plan
   const [planOffers, setPlanOffers] = useState<Array<{ code: string; titleEn: string; titleHi: string; discountFormatted: string }>>([]);
   useEffect(() => {
@@ -163,7 +168,12 @@ export function BookingWizard({
     fetch(`/api/offers/available?planId=${encodeURIComponent(activePlan.id)}`)
       .then((r) => r.json())
       .then((d) => {
-        if (!cancelled) setPlanOffers(Array.isArray(d.offers) ? d.offers : []);
+        if (cancelled) return;
+        setPlanOffers(Array.isArray(d.offers) ? d.offers : []);
+        // Offers that apply by themselves are put on straight away when the customer has typed nothing
+        if (d.auto?.code && !appliedOfferRef.current && !offerCodeRef.current.trim()) {
+          void handleValidateOfferRef.current?.(d.auto.code, true);
+        }
       })
       .catch(() => {
         if (!cancelled) setPlanOffers([]);
@@ -261,7 +271,7 @@ export function BookingWizard({
   }, [formData, selectedSlotId, selectedServiceSlug, selectedPlanSlug, currentStep]);
 
   // Apply offer validation
-  const handleValidateOffer = async (codeToTry?: string) => {
+  const handleValidateOffer = async (codeToTry?: string, auto = false) => {
     const code = (codeToTry ?? offerCodeInput).trim();
     if (!code || !activePlan) return;
 
@@ -288,6 +298,7 @@ export function BookingWizard({
               : "Invalid or unavailable coupon code.")
         );
       } else {
+        setOfferIsAuto(auto);
         setAppliedOffer({
           code: data.code,
           discountPaise: data.discountPaise,
@@ -309,10 +320,16 @@ export function BookingWizard({
     }
   };
 
+  useEffect(() => {
+    appliedOfferRef.current = appliedOffer;
+    offerCodeRef.current = offerCodeInput;
+    handleValidateOfferRef.current = handleValidateOffer;
+  });
+
   // Re-validate coupon if user changes plan
   useEffect(() => {
     if (appliedOffer && activePlan) {
-      handleValidateOffer(appliedOffer.code);
+      handleValidateOffer(appliedOffer.code, offerIsAuto);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePlan?.id]);
@@ -1037,10 +1054,10 @@ export function BookingWizard({
                 value={offerCodeInput}
                 onChange={(e) => setOfferCodeInput(e.target.value.toUpperCase())}
                 placeholder="e.g. VEDIC2025"
-                disabled={offerLoading || appliedOffer !== null}
+                disabled={offerLoading || (appliedOffer !== null && !offerIsAuto)}
                 className="w-full bg-surface border border-outline-variant rounded px-3 py-2 text-xs font-mono font-bold uppercase min-h-[44px] focus:outline-none focus:ring-1 focus:ring-primary"
               />
-              {appliedOffer ? (
+              {appliedOffer && !offerIsAuto ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -1074,16 +1091,20 @@ export function BookingWizard({
               <div className="text-[11px] text-secondary font-medium flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-tertiary" />
                 <span>
-                  {isHindi
-                    ? `'${appliedOffer.code}' लागू (-${appliedOffer.discountFormatted})`
-                    : `'${appliedOffer.code}' applied (-${appliedOffer.discountFormatted})`}
+                  {offerIsAuto
+                    ? isHindi
+                      ? `ऑफर '${appliedOffer.code}' अपने आप लागू हुआ (-${appliedOffer.discountFormatted})`
+                      : `Offer '${appliedOffer.code}' applied automatically (-${appliedOffer.discountFormatted})`
+                    : isHindi
+                      ? `'${appliedOffer.code}' लागू (-${appliedOffer.discountFormatted})`
+                      : `'${appliedOffer.code}' applied (-${appliedOffer.discountFormatted})`}
                 </span>
               </div>
             )}
           </div>
 
           {/* Offers for this plan */}
-          {planOffers.length > 0 && !appliedOffer && (
+          {planOffers.length > 0 && (!appliedOffer || offerIsAuto) && (
             <div className="space-y-2">
               <div className="text-xs font-bold uppercase text-secondary">{isHindi ? "इस प्लान के ऑफर" : "Offers on this plan"}</div>
               <ul className="space-y-1.5">
@@ -1097,7 +1118,7 @@ export function BookingWizard({
                       type="button"
                       onClick={() => {
                         setOfferCodeInput(o.code);
-                        handleValidateOffer(o.code);
+                        handleValidateOffer(o.code, false);
                       }}
                       className="shrink-0 min-h-[36px] px-3 bg-brand text-on-brand rounded text-[11px] font-bold uppercase hover:bg-brand-hover"
                     >

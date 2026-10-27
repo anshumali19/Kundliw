@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Offer" ADD COLUMN "autoApply" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN "showInPopup" BOOLEAN NOT NULL DEFAULT true;
