@@ -112,6 +112,7 @@ async function main() {
     update: {
       phone1: "+91-9827991224",
       phone2: "+91-7509124672",
+      email: "sntiwarigevra61@gmail.com",
       addressEn: "Kachru Nagar, Dundera, Risali, Bhilai, District Durg, Chhattisgarh - 491107",
       addressHi: "कचरू नगर, दुंदेरा, रिसाली, भिलाई, जिला दुर्ग, छत्तीसगढ़ - ४९११०७",
       city: "Bhilai",
@@ -126,6 +127,7 @@ async function main() {
       siteNameHi: "महर्षि कणाद ज्योतिष केंद्र",
       phone1: "+91-9827991224", // SRS Real Phone 1
       phone2: "+91-7509124672", // SRS Real Phone 2
+      email: "sntiwarigevra61@gmail.com",
       addressEn: "Kachru Nagar, Dundera, Risali, Bhilai, District Durg, Chhattisgarh - 491107",
       addressHi: "कचरू नगर, दुंदेरा, रिसाली, भिलाई, जिला दुर्ग, छत्तीसगढ़ - ४९११०७",
       city: "Bhilai",
