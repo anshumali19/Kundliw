@@ -112,6 +112,7 @@ async function main() {
     update: {
       phone1: "+91-9827991224",
       phone2: "+91-7509124672",
+      gstin: "22APBPT4784J1ZK",
       email: "maharshikanadjyotishkendra@gmail.com",
       addressEn: "Kachru Nagar, Dundera, Risali, Bhilai, District Durg, Chhattisgarh - 491107",
       addressHi: "कचरू नगर, दुंदेरा, रिसाली, भिलाई, जिला दुर्ग, छत्तीसगढ़ - ४९११०७",
@@ -142,7 +143,7 @@ async function main() {
       bankIfsc: "SBIN0000201",
       bankName: "State Bank of India, Main Branch Varanasi",
       qrCodeUrl: "https://placehold.co/300x300/333333/ffffff?text=QR+Code",
-      gstin: "09AAATM1234F1Z5", // Demo GSTIN
+      gstin: "22APBPT4784J1ZK", // From the GST registration certificate (legal name Krishna Tiwari)
       defaultGstRateBps: 1800, // 18.00%
     },
   });

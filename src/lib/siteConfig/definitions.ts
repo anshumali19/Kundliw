@@ -412,7 +412,8 @@ export const SECTIONS: SectionDef[] = [
       ...bi("title", "Name shown", "दिखने वाला नाम", "text", 80),
       ...bi("tagline", "Line under the name", "नाम के नीचे की पंक्ति", "text", 120),
       ...bi("sub", "Small capital line", "छोटी पंक्ति", "text", 80),
-      { key: "symbol", en: "Symbol in the circle", hi: "सर्कल का चिह्न", type: "text", max: 4, def: "ॐ" },
+      { key: "logoImage", en: "Logo shown on the opening screen (clear it to show the symbol instead)", hi: "ओपनिंग स्क्रीन का लोगो (खाली करने पर चिह्न दिखेगा)", type: "image", def: "/logo-intro.jpg" },
+      { key: "symbol", en: "Symbol in the circle (used when no logo)", hi: "सर्कल का चिह्न (लोगो न हो तब)", type: "text", max: 4, def: "ॐ" },
     ],
   },
   {

@@ -326,6 +326,7 @@ export default async function LocaleLayout(
               tagline={String(introCfg[locale === "hi" ? "taglineHi" : "taglineEn"] || "")}
               sub={String(introCfg[locale === "hi" ? "subHi" : "subEn"] || "")}
               symbol={String(introCfg.symbol || "")}
+              logo={String(introCfg.logoImage ?? "")}
             />
           <SmoothScrollProvider>
             <Header

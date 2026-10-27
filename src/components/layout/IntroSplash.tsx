@@ -19,6 +19,7 @@ export function IntroSplash({
   tagline = "",
   sub = "",
   symbol = "",
+  logo = "",
 }: {
   isHindi: boolean;
   enabled?: boolean;
@@ -28,6 +29,8 @@ export function IntroSplash({
   tagline?: string;
   sub?: string;
   symbol?: string;
+  /** Logo image shown in place of the symbol (admin can change or clear it) */
+  logo?: string;
 }) {
   const pathname = usePathname() || "/";
   const onHome = /^\/(hi|en)?\/?$/.test(pathname);
@@ -73,8 +76,13 @@ export function IntroSplash({
       <div className="intro-glow" />
       <div className="intro-ring" />
       <div className="intro-ring-inner" />
-      <div className="intro-symbol" aria-hidden="true">{symbol || "ॐ"}</div>
-      <div className="intro-copy">
+      {logo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="intro-logo" src={logo} alt="Maharshi Kanad Jyotish Kendra" />
+      ) : (
+        <div className="intro-symbol" aria-hidden="true">{symbol || "ॐ"}</div>
+      )}
+      <div className={`intro-copy${logo ? " has-logo" : ""}`}>
         <div className="intro-title">{(isHindi && titleHi) || title || "Maharshi Kanad Jyotish Kendra"}</div>
         <div className="intro-hindi">{tagline || (isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "ज्योतिष • ज्ञान • मार्गदर्शन")}</div>
         <div className="intro-sub">{sub || "VEDIC ASTROLOGY & GUIDANCE"}</div>
