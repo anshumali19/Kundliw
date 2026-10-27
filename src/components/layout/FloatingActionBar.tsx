@@ -526,7 +526,7 @@ export function FloatingActionBar({
               <Sparkles className="w-5 h-5" />
               <FabText>{isHindi ? "AI पूछें" : "Ask AI"}</FabText>
             </span>
-            <FabNumber side="left">प्रश्न जानिये</FabNumber>
+            <FabNumber side="left">{isHindi ? "प्रश्न जानिये" : "Ask a question"}</FabNumber>
           </button>
           )}
           {showChat && (
@@ -541,7 +541,7 @@ export function FloatingActionBar({
               {isOpen && mode === "chat" ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
               <FabText>{isHindi ? "चैट" : "Chat"}</FabText>
             </span>
-            <FabNumber side="left">बातचीत कीजिए</FabNumber>
+            <FabNumber side="left">{isHindi ? "बातचीत कीजिए" : "Chat with us"}</FabNumber>
           </button>
           )}
         </div>
