@@ -1,3 +1,4 @@
+import { kendraEmail } from "@/lib/content/contact";
 import type { Metadata } from "next";
 import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
@@ -61,7 +62,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     prisma.adminSettings
       .findUnique({
         where: { id: "default" },
-        select: { phone1: true, whatsappNumber: true, socialWhatsapp: true },
+        select: { phone1: true, email: true, whatsappNumber: true, socialWhatsapp: true },
       })
       .catch(() => null),
     prisma.service
@@ -225,6 +226,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
               <div className="mt-auto flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold">
                 <a href={telHref} className="text-white hover:text-gold">{tr("Call now", "अभी कॉल करें")} →</a>
                 <a href={wa(tr("Namaste, I would like to talk to the Kendra.", "नमस्ते, मैं केंद्र से बात करना चाहता हूँ।"))} target="_blank" rel="noopener noreferrer" className="text-white hover:text-gold">WhatsApp →</a>
+                <a href={`mailto:${kendraEmail(settings?.email)}`} className="text-white hover:text-gold">{tr("Email", "ईमेल")} →</a>
               </div>
             </div>
 

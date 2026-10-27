@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpEmail } from "@/components/content/HelpEmail";
 import React, { useState } from "react";
 import { SelectedFilePreview } from "@/components/content/FileViewer";
 import { useRouter } from "next/navigation";
@@ -704,6 +705,7 @@ export function CheckoutClient({
           </div>
         </div>
       </div>
+      <HelpEmail isHindi={isHindi} className="mt-4" />
     </div>
   );
 }

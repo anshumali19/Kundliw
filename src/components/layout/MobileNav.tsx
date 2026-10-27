@@ -1,5 +1,6 @@
 "use client";
 
+import { KENDRA_EMAIL } from "@/lib/content/contact";
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
@@ -20,6 +21,7 @@ import {
   FileText,
   MessageSquare,
   Phone,
+  Mail,
   CalendarDays,
   Sparkles,
   Award,
@@ -83,6 +85,7 @@ export function MobileNav() {
     { href: "/offers", label: tNav("offers"), icon: Percent },
     { href: "/testimonials", label: tNav("testimonials"), icon: MessageSquare },
     { href: "/help", label: tNav("contact"), icon: Phone },
+    { href: `mailto:${KENDRA_EMAIL}`, label: locale === "hi" ? "ईमेल" : "Email", icon: Mail },
     { href: "/panchang", label: tNav("panchang"), icon: CalendarDays },
     { href: "/kundli", label: tNav("kundli"), icon: Sparkles },
     { href: "/kundli/matching", label: tNav("kundliMatching"), icon: BookOpen },
@@ -183,12 +186,19 @@ export function MobileNav() {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              {sheetLinks.map(({ href, label, icon: Icon }) => (
-                <Link key={href} href={href as never} className={tile}>
-                  <Icon className="w-4 h-4 text-primary shrink-0" />
-                  <span className="truncate">{label}</span>
-                </Link>
-              ))}
+              {sheetLinks.map(({ href, label, icon: Icon }) =>
+                href.startsWith("mailto:") ? (
+                  <a key={href} href={href} className={tile}>
+                    <Icon className="w-4 h-4 text-primary shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </a>
+                ) : (
+                  <Link key={href} href={href as never} className={tile}>
+                    <Icon className="w-4 h-4 text-primary shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </Link>
+                )
+              )}
               {signedIn ? (
                 <>
                   <Link href={accountHref} className={tile}>

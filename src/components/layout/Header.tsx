@@ -11,6 +11,7 @@ import { AccountMenu } from "./AccountMenu";
 import { QuickBookingPanel } from "./QuickBookingPanel";
 import {
   Phone,
+  Mail,
   Calendar,
   User,
   Menu,
@@ -33,6 +34,7 @@ interface HeaderProps {
   social?: Array<{ id: string; name: string; url: string }>;
   logoUrl?: string;
   phone?: string;
+  email?: string;
   /** Admin > Website settings > Top bar */
   topbar?: Record<string, boolean | string | number>;
   /** Admin menu (when the admin has changed it) */
@@ -41,7 +43,7 @@ interface HeaderProps {
   pages?: Array<{ href: string; labelEn: string; labelHi: string }>;
 }
 
-export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, menu, pages = [] }: HeaderProps = {}) {
+export function Header({ phone, email, panchang, social = [], logoUrl, topbar = {}, menu, pages = [] }: HeaderProps = {}) {
   const activePhone = phone || "+91 98279 91224";
   const cleanPhone = activePhone.replace(/[^\d+]/g, "");
   const cleanWa = activePhone.replace(/[^\d]/g, "");
@@ -200,6 +202,15 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
               >
                 <Phone className="w-3 h-3 text-gold" />
                 <span className="font-semibold">{phone}</span>
+              </a>
+            )}
+            {tb("showEmail") && email && (
+              <a
+                href={`mailto:${email}`}
+                className="hidden xl:inline-flex items-center gap-1.5 hover:underline text-xs"
+              >
+                <Mail className="w-3 h-3 text-gold" />
+                <span className="font-semibold">{email}</span>
               </a>
             )}
             {tb("showAuthLinks") && (

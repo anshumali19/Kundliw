@@ -1,3 +1,4 @@
+import { HelpEmail } from "@/components/content/HelpEmail";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
@@ -340,6 +341,8 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
               <span>{isHindi ? "मुख्य पृष्ठ पर लौटें" : "Return to Home"}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
+
+            <HelpEmail isHindi={isHindi} className="pt-1" />
           </div>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { kendraEmail } from "@/lib/content/contact";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
@@ -83,6 +84,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
 
     const contact: string[] = [];
     if (cfg.showPhone !== false && settings?.phone1) contact.push(`${hi ? "फ़ोन" : "Phone"}: ${settings.phone1}`);
+    contact.push(`${hi ? "ईमेल" : "Email"}: ${kendraEmail(settings?.email)}`);
     if (cfg.showAddress !== false) {
       const a = hi ? settings?.addressHi || settings?.addressEn : settings?.addressEn || settings?.addressHi;
       if (a) contact.push(a);

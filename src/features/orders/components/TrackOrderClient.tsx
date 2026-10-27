@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpEmail } from "@/components/content/HelpEmail";
 import React, { useState } from "react";
 import { OrderStatusStepper } from "./OrderStatusStepper";
 import { CanonicalOrderStatus } from "@/lib/orders/status";
@@ -232,6 +233,7 @@ export function TrackOrderClient({
           </div>
         </div>
       )}
+      <HelpEmail isHindi={isHindi} className="mt-4" />
     </div>
   );
 }
