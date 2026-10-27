@@ -112,10 +112,13 @@ async function main() {
     update: {
       phone1: "+91-9827991224",
       phone2: "+91-7509124672",
-      city: null,
-      latitude: null,
-      longitude: null,
-      timezone: null,
+      addressEn: "Kachru Nagar, Dundera, Risali, Bhilai, District Durg, Chhattisgarh - 491107",
+      addressHi: "कचरू नगर, दुंदेरा, रिसाली, भिलाई, जिला दुर्ग, छत्तीसगढ़ - ४९११०७",
+      city: "Bhilai",
+      latitude: 21.14997,
+      longitude: 81.39878,
+      timezone: "Asia/Kolkata",
+      googleMapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m21!1m12!1m3!1d2507.850553630668!2d81.39877503238948!3d21.149970590993906!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m6!3e6!4m0!4m3!3m2!1d21.14914630407819!2d81.40102440967371!5e1!3m2!1sen!2sin!4v1790355598598!5m2!1sen!2sin",
     },
     create: {
       id: "default",
@@ -123,13 +126,13 @@ async function main() {
       siteNameHi: "महर्षि कणाद ज्योतिष केंद्र",
       phone1: "+91-9827991224", // SRS Real Phone 1
       phone2: "+91-7509124672", // SRS Real Phone 2
-      email: "contact@kanadastro.org",
-      addressEn: "Kanad Bhavan, Dashashwamedh Ghat Marg, Varanasi, Uttar Pradesh 221001",
-      addressHi: "कणाद भवन, दशाश्वमेध घाट मार्ग, वाराणसी, उत्तर प्रदेश २२१००१",
-      city: null,
-      latitude: null,
-      longitude: null,
-      timezone: null,
+      addressEn: "Kachru Nagar, Dundera, Risali, Bhilai, District Durg, Chhattisgarh - 491107",
+      addressHi: "कचरू नगर, दुंदेरा, रिसाली, भिलाई, जिला दुर्ग, छत्तीसगढ़ - ४९११०७",
+      city: "Bhilai",
+      latitude: 21.14997,
+      longitude: 81.39878,
+      timezone: "Asia/Kolkata",
+      googleMapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m21!1m12!1m3!1d2507.850553630668!2d81.39877503238948!3d21.149970590993906!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m6!3e6!4m0!4m3!3m2!1d21.14914630407819!2d81.40102440967371!5e1!3m2!1sen!2sin!4v1790355598598!5m2!1sen!2sin",
       // --- DEMO BANK & GST DETAILS ---
       upiVpa: "kanadjyotish@sbi",
       bankAccountName: "Maharshi Kanad Jyotish Kendra [Demo Account]",
