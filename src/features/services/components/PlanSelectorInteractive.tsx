@@ -35,10 +35,20 @@ export interface PlanDTO {
   featuresHi: string[];
   isPopular: boolean;
   orderIndex: number;
+  packageId?: string | null;
+}
+
+export interface PackageDTO {
+  id: string;
+  titleEn: string;
+  titleHi: string;
+  descriptionEn?: string | null;
+  descriptionHi?: string | null;
 }
 
 interface PlanSelectorInteractiveProps {
   plans: PlanDTO[];
+  packages?: PackageDTO[];
   serviceSlug: string;
   serviceTitle: string;
   locale: string;
@@ -53,15 +63,27 @@ interface AppliedCoupon {
 }
 
 export function PlanSelectorInteractive({
-  plans,
+  plans: allPlans,
+  packages = [],
   serviceSlug,
   serviceTitle,
   locale,
 }: PlanSelectorInteractiveProps) {
   const isHindi = locale === "hi";
 
-  // Select default plan: popular plan first, or the first plan
-  const defaultPlan = plans.find((p) => p.isPopular) || plans[0];
+  // Service > Package > Plan: the customer picks a package first, then one of its plans.
+  // Plans that belong to no package are shown under a package of their own.
+  const packageList: PackageDTO[] = [...packages];
+  if (allPlans.some((p) => !p.packageId || !packages.some((k) => k.id === p.packageId))) {
+    packageList.push({ id: "__none", titleEn: "Standard", titleHi: "मानक" });
+  }
+  const planPackage = (p: PlanDTO) => (p.packageId && packages.some((k) => k.id === p.packageId) ? p.packageId : "__none");
+  const pickDefault = (list: PlanDTO[]) => list.find((p) => p.isPopular) || list[0];
+  const firstPackage = packageList.find((k) => allPlans.some((p) => planPackage(p) === k.id)) ?? packageList[0];
+  const startPlan = pickDefault(allPlans.filter((p) => !firstPackage || planPackage(p) === firstPackage.id));
+  const [selectedPackageId, setSelectedPackageId] = useState<string>(firstPackage ? firstPackage.id : "");
+  const plans = allPlans.filter((p) => packageList.length === 0 || planPackage(p) === selectedPackageId);
+  const defaultPlan = startPlan;
   const [selectedPlanId, setSelectedPlanId] = useState<string>(
     defaultPlan ? defaultPlan.id : ""
   );
@@ -148,7 +170,7 @@ export function PlanSelectorInteractive({
       )}${appliedCoupon ? `&offer=${encodeURIComponent(appliedCoupon.code)}` : ""}`
     : `/${locale}/booking`;
 
-  if (plans.length === 0) {
+  if (allPlans.length === 0) {
     return (
       <div className="p-8 text-left bg-surface rounded border border-outline-variant/60">
         <AlertCircle className="w-8 h-8 text-outline mb-2" />
@@ -166,7 +188,46 @@ export function PlanSelectorInteractive({
 
   return (
     <div className="w-full flex flex-col text-left space-y-12">
-      {/* 1. Dynamic Plan Cards (Supports any number of plans) */}
+      {/* 1. Packages, then the plans inside the chosen package */}
+      {packageList.length > 1 || (packageList.length === 1 && packageList[0].id !== "__none") ? (
+        <div>
+          <div className="text-xs uppercase tracking-widest text-primary font-bold mb-3">
+            {isHindi ? "चरण 1: पैकेज चुनें" : "Step 1: Choose a package"}
+          </div>
+          <div className="flex flex-wrap gap-3" role="tablist" aria-label={isHindi ? "पैकेज" : "Packages"}>
+            {packageList
+              .filter((k) => allPlans.some((p) => planPackage(p) === k.id))
+              .map((k) => {
+                const on = selectedPackageId === k.id;
+                const desc = isHindi ? k.descriptionHi || k.descriptionEn : k.descriptionEn || k.descriptionHi;
+                return (
+                  <button
+                    key={k.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={on}
+                    onClick={() => {
+                      setSelectedPackageId(k.id);
+                      const pick = pickDefault(allPlans.filter((p) => planPackage(p) === k.id));
+                      if (pick) setSelectedPlanId(pick.id);
+                    }}
+                    className={`text-left min-w-[10rem] max-w-xs px-4 py-3 rounded-lg border transition-colors ${
+                      on ? "bg-maroon text-on-maroon border-maroon" : "bg-surface border-outline-variant hover:border-secondary"
+                    }`}
+                  >
+                    <span className="block font-serif font-bold text-base">{isHindi ? k.titleHi : k.titleEn}</span>
+                    {desc && <span className={`block text-xs mt-0.5 ${on ? "text-on-maroon/90" : "text-on-surface-variant"}`}>{desc}</span>}
+                  </button>
+                );
+              })}
+          </div>
+          <div className="mt-6 text-xs uppercase tracking-widest text-primary font-bold">
+            {isHindi ? "चरण 2: प्लान चुनें" : "Step 2: Choose a plan"}
+          </div>
+        </div>
+      ) : null}
+
+      {/* 1b. Dynamic Plan Cards (Supports any number of plans) */}
       <div>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 text-left">
           <div>

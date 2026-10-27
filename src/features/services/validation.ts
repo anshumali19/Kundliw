@@ -38,6 +38,7 @@ export const planInputSchema = z.object({
     .trim()
     .min(2, "Slug must be at least 2 characters")
     .regex(/^[a-z0-9-]+$/, "Slug must only contain lowercase letters, numbers, and hyphens"),
+  packageId: z.string().trim().min(1).optional().nullable(),
   titleEn: z.string().trim().min(2, "English plan title is required"),
   titleHi: z.string().trim().min(2, "Hindi plan title is required"),
   descriptionEn: z.string().trim().min(10, "English description must be at least 10 characters"),
@@ -147,4 +148,19 @@ export const updateOfferInputSchema = baseOfferInputSchema
 export const validateOfferQuerySchema = z.object({
   code: z.string().trim().toUpperCase(),
   planId: z.string().min(1),
+});
+
+export const packageInputSchema = z.object({
+  serviceId: z.string().min(1, "Service ID is required"),
+  slug: z
+    .string()
+    .trim()
+    .min(2, "Slug must be at least 2 characters")
+    .regex(/^[a-z0-9-]+$/, "Slug must only contain lowercase letters, numbers, and hyphens"),
+  titleEn: z.string().trim().min(2, "English package name is required"),
+  titleHi: z.string().trim().min(2, "Hindi package name is required"),
+  descriptionEn: z.string().trim().max(2000).optional().nullable(),
+  descriptionHi: z.string().trim().max(2000).optional().nullable(),
+  orderIndex: z.coerce.number().int().min(0).default(0),
+  isActive: z.boolean().default(true),
 });

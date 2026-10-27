@@ -1,3 +1,4 @@
+import { activePlanWhere } from "@/lib/content/packages";
 import { kendraEmail } from "@/lib/content/contact";
 import type { Metadata } from "next";
 import { Link } from "@/i18n/routing";
@@ -69,7 +70,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       .findMany({
         where: { isActive: true, slug: { in: ["janam-kundli", "prashna-kundli", "kundli-matching"] } },
         orderBy: { orderIndex: "asc" },
-        include: { plans: { where: { isActive: true }, orderBy: { pricePaise: "asc" } } },
+        include: { plans: { where: activePlanWhere, orderBy: { pricePaise: "asc" } } },
       })
       .catch(() => []),
     prisma.otherService.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" } }).catch(() => []),

@@ -1,3 +1,4 @@
+import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
@@ -47,7 +48,7 @@ export default async function ServicesListingPage(
     where: { isActive: true },
     include: {
       plans: {
-        where: { isActive: true },
+        where: activePlanWhere,
         orderBy: { orderIndex: "asc" },
       },
     },

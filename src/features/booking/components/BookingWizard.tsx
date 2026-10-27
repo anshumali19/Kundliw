@@ -28,8 +28,10 @@ export interface BookingServiceSummary {
   slug: string;
   titleEn: string;
   titleHi: string;
+  packages?: { id: string; titleEn: string; titleHi: string; descriptionEn?: string | null; descriptionHi?: string | null }[];
   plans: {
     id: string;
+    packageId?: string | null;
     slug: string;
     titleEn: string;
     titleHi: string;
@@ -135,6 +137,15 @@ export function BookingWizard({
   const activePlan =
     activeService?.plans.find((p) => p.slug === selectedPlanSlug) ||
     activeService?.plans[0];
+
+  // Service > Package > Plan: the plans shown are those of the chosen package
+  const [selectedPackageId, setSelectedPackageId] = useState<string>(activePlan?.packageId ?? "");
+  const packageOptions = [
+    ...(activeService?.packages ?? []).filter((k) => activeService?.plans.some((p) => p.packageId === k.id)),
+    ...(activeService?.plans.some((p) => !p.packageId) ? [{ id: "", titleEn: "Standard", titleHi: "मानक", descriptionEn: null, descriptionHi: null }] : []),
+  ];
+  const showPackages = packageOptions.length > 1 || (packageOptions.length === 1 && packageOptions[0].id !== "");
+  const visiblePlans = (activeService?.plans ?? []).filter((p) => !showPackages || (p.packageId ?? "") === selectedPackageId);
 
   // Appointment Slot
   const [selectedSlotId, setSelectedSlotId] = useState<string>("");
@@ -448,6 +459,7 @@ export function BookingWizard({
         {(
           [
             [isHindi ? "सेवा" : "Service", 1],
+            [isHindi ? "पैकेज" : "Package", 1],
             [isHindi ? "प्लान" : "Plan", 1],
             [isHindi ? "विवरण" : "Details", 2],
             [isHindi ? "ऑफर" : "Offer", 3],
@@ -502,7 +514,10 @@ export function BookingWizard({
                         type="button"
                         onClick={() => {
                           setSelectedServiceSlug(s.slug);
-                          if (s.plans[0]) setSelectedPlanSlug(s.plans[0].slug);
+                          if (s.plans[0]) {
+                            setSelectedPlanSlug(s.plans[0].slug);
+                            setSelectedPackageId(s.plans[0].packageId ?? "");
+                          }
                         }}
                         className={`min-h-[44px] p-3 rounded text-left border transition-all text-xs flex items-center justify-between ${
                           isSelected
@@ -518,6 +533,40 @@ export function BookingWizard({
                 </div>
               </div>
 
+              {/* Package options (for example Sadharan, Madhyam, Uttam) */}
+              {activeService && showPackages && (
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-2">
+                    {isHindi ? "पैकेज (Package)" : "Package"}
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {packageOptions.map((k) => {
+                      const on = k.id === selectedPackageId;
+                      const desc = isHindi ? k.descriptionHi || k.descriptionEn : k.descriptionEn || k.descriptionHi;
+                      return (
+                        <button
+                          key={k.id || "standard"}
+                          type="button"
+                          onClick={() => {
+                            setSelectedPackageId(k.id);
+                            const first = activeService.plans.find((p) => (p.packageId ?? "") === k.id);
+                            if (first) setSelectedPlanSlug(first.slug);
+                          }}
+                          className={`min-h-[44px] p-3 rounded text-left border transition-all text-xs ${
+                            on
+                              ? "bg-surface border-2 border-primary ring-1 ring-primary/20 font-bold text-secondary"
+                              : "bg-surface-container-low border-outline-variant/60 hover:bg-surface text-on-surface"
+                          }`}
+                        >
+                          <span className="block font-semibold">{isHindi ? k.titleHi : k.titleEn}</span>
+                          {desc && <span className="block text-[11px] font-normal text-on-surface-variant mt-0.5">{desc}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Plan Options */}
               {activeService && (
                 <div>
@@ -525,7 +574,7 @@ export function BookingWizard({
                     {isHindi ? "परामर्श संस्करण (Consultation Tier)" : "Available Tiers"}
                   </label>
                   <div className="space-y-3">
-                    {activeService.plans.map((p) => {
+                    {visiblePlans.map((p) => {
                       const isSelected = p.slug === selectedPlanSlug;
                       return (
                         <div

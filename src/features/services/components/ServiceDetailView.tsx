@@ -4,7 +4,7 @@ import { RichText } from "@/components/content/RichText";
 import React, { useState } from "react";
 import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
-import { PlanSelectorInteractive, PlanDTO } from "./PlanSelectorInteractive";
+import { PlanSelectorInteractive, PlanDTO, PackageDTO } from "./PlanSelectorInteractive";
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
 import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
@@ -46,8 +46,10 @@ export interface ServiceDetailDTO {
   samagriHi?: string | null;
   youtubeUrl?: string | null;
   additionalLinks?: unknown;
+  packages?: PackageDTO[];
   plans: Array<{
     id: string;
+    packageId?: string | null;
     slug: string;
     titleEn: string;
     titleHi: string;
@@ -116,6 +118,7 @@ export function ServiceDetailView({
     featuresHi: p.featuresHi,
     isPopular: p.isPopular,
     orderIndex: p.orderIndex,
+    packageId: p.packageId ?? null,
   }));
 
   const lowestPrice =
@@ -362,6 +365,7 @@ export function ServiceDetailView({
         <div className="w-full px-4 sm:px-8 lg:px-12">
           <PlanSelectorInteractive
             plans={plansDto}
+            packages={service.packages ?? []}
             serviceSlug={service.slug}
             serviceTitle={title}
             locale={locale}

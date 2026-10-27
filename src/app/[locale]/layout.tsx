@@ -1,3 +1,4 @@
+import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
 import { Poppins, Noto_Sans, Cormorant_Garamond, Noto_Serif_Devanagari } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
@@ -235,7 +236,7 @@ export default async function LocaleLayout(
     .findMany({
       where: { isActive: true },
       orderBy: { orderIndex: "asc" },
-      select: { slug: true, titleEn: true, plans: { where: { isActive: true }, select: { titleEn: true, pricePaise: true } } },
+      select: { slug: true, titleEn: true, plans: { where: activePlanWhere, select: { titleEn: true, pricePaise: true } } },
     })
     .catch(() => []);
 

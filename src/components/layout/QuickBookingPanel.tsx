@@ -7,7 +7,8 @@ import { Mail } from "lucide-react";
 import { KENDRA_EMAIL } from "@/lib/content/contact";
 
 interface CatalogPlan { id: string; slug: string; titleEn: string; titleHi: string; pricePaise: number }
-interface CatalogService { slug: string; titleEn: string; titleHi: string; plans: CatalogPlan[] }
+interface CatalogPackage { id: string; titleEn: string; titleHi: string; plans: CatalogPlan[] }
+interface CatalogService { slug: string; titleEn: string; titleHi: string; packages: CatalogPackage[]; plans: CatalogPlan[] }
 interface OfferChoice { code: string; titleEn: string; titleHi: string; discountFormatted: string }
 
 const OTHER = "__other";
@@ -25,6 +26,7 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
   const router = useRouter();
   const [services, setServices] = useState<CatalogService[] | null>(null);
   const [serviceSlug, setServiceSlug] = useState("");
+  const [packageId, setPackageId] = useState<string | null>(null);
   const [planSlug, setPlanSlug] = useState("");
   const [offers, setOffers] = useState<OfferChoice[]>([]);
   const [offer, setOffer] = useState("");
@@ -46,7 +48,8 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
   }, []);
 
   const service = services?.find((s) => s.slug === serviceSlug);
-  const plan = service?.plans.find((p) => p.slug === planSlug);
+  const pkg = service?.packages.find((k) => k.id === packageId);
+  const plan = pkg?.plans.find((p) => p.slug === planSlug);
   const planId = plan?.id;
 
   useEffect(() => {
@@ -68,16 +71,17 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
   const mobileBad = mobile.trim() !== "" && mobileDigits.length < 10;
 
   // Which steps of the path are done so far, shown as the pill strip
-  const stepDone = [Boolean(service), Boolean(plan), Boolean(plan), false, false, false];
+  const stepDone = [Boolean(service), Boolean(pkg), Boolean(plan), Boolean(plan), false, false, false];
   const steps = [
     hi ? "सेवा" : "Service",
+    hi ? "पैकेज" : "Package",
     hi ? "प्लान" : "Plan",
     hi ? "ऑफर" : "Offer",
     hi ? "भुगतान" : "Payment",
     hi ? "जमा" : "Submitted",
     hi ? "पुष्टि" : "Confirmed",
   ];
-  const current = !service ? 0 : !plan ? 1 : 3;
+  const current = !service ? 0 : !pkg ? 1 : !plan ? 2 : 4;
 
   const go = () => {
     if (!service || !plan || mobileBad) return;
@@ -119,7 +123,10 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
           value={serviceSlug}
           disabled={services === null}
           onChange={(e) => {
+            const next = services?.find((s) => s.slug === e.target.value);
             setServiceSlug(e.target.value);
+            // A service with a single package skips that choice
+            setPackageId(next && next.packages.length === 1 ? next.packages[0].id : null);
             setPlanSlug("");
             setOffer("");
             setOffers([]);
@@ -133,12 +140,33 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
       </div>
 
       <div>
+        <label className={label} htmlFor="qb-package">{hi ? "पैकेज" : "Package"}</label>
+        <select
+          id="qb-package"
+          className={field}
+          value={packageId === null ? "__none" : packageId}
+          disabled={!service}
+          onChange={(e) => {
+            setPackageId(e.target.value === "__none" ? "" : e.target.value);
+            setPlanSlug("");
+            setOffer("");
+            setOffers([]);
+          }}
+        >
+          <option value="__none">{hi ? "पैकेज चुनें" : "Choose a package"}</option>
+          {(service?.packages ?? []).map((k) => (
+            <option key={k.id || "standard"} value={k.id}>{pick(k.titleEn, k.titleHi)}</option>
+          ))}
+        </select>
+      </div>
+
+      <div>
         <label className={label} htmlFor="qb-plan">{hi ? "प्लान" : "Plan"}</label>
         <select
           id="qb-plan"
           className={field}
           value={planSlug}
-          disabled={!service}
+          disabled={!pkg}
           onChange={(e) => {
             setPlanSlug(e.target.value);
             setOffer("");
@@ -146,7 +174,7 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
           }}
         >
           <option value="">{hi ? "प्लान चुनें" : "Choose a plan"}</option>
-          {(service?.plans ?? []).map((p) => (
+          {(pkg?.plans ?? []).map((p) => (
             <option key={p.slug} value={p.slug}>{pick(p.titleEn, p.titleHi)} {rupees(p.pricePaise)}</option>
           ))}
         </select>
@@ -222,7 +250,7 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
           {hi ? "बुकिंग जमा करें" : "Submit Booking"}
         </button>
         {!plan && (
-          <p className="mt-1 text-[11px] text-on-surface-variant">{hi ? "पहले सेवा और प्लान चुनें।" : "Choose a service and a plan first."}</p>
+          <p className="mt-1 text-[11px] text-on-surface-variant">{hi ? "पहले सेवा, पैकेज और प्लान चुनें।" : "Choose a service, a package and a plan first."}</p>
         )}
       </div>
 

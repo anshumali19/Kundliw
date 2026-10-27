@@ -18,6 +18,7 @@ export async function buildBackupSnapshot() {
   const [
     settings,
     services,
+    packages,
     plans,
     offers,
     slots,
@@ -47,6 +48,7 @@ export async function buildBackupSnapshot() {
   ] = await Promise.all([
     prisma.adminSettings.findMany(),
     prisma.service.findMany(),
+    prisma.servicePackage.findMany(),
     prisma.plan.findMany(),
     prisma.offer.findMany(),
     prisma.slot.findMany(),
@@ -82,6 +84,7 @@ export async function buildBackupSnapshot() {
     note: "Secrets, password hashes and file contents are not included.",
     settings: settings.map(stripSecrets),
     services,
+    packages,
     plans,
     offers,
     slots,

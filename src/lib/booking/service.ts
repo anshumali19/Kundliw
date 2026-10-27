@@ -95,9 +95,10 @@ export async function createBookingOrder(
           slug: input.planSlug,
         },
       },
+      include: { package: { select: { isActive: true } } },
     });
 
-    if (!plan || !plan.isActive) {
+    if (!plan || !plan.isActive || (plan.package && !plan.package.isActive)) {
       throw new BookingError("Requested consultation tier is unavailable or inactive.");
     }
 

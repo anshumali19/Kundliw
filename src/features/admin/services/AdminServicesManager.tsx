@@ -22,8 +22,20 @@ import {
   FileText,
 } from "lucide-react";
 
+export interface AdminPackageItem {
+  id: string;
+  slug: string;
+  titleEn: string;
+  titleHi: string;
+  descriptionEn?: string | null;
+  descriptionHi?: string | null;
+  orderIndex: number;
+  isActive: boolean;
+}
+
 export interface AdminPlanItem {
   id: string;
+  packageId?: string | null;
   slug: string;
   titleEn: string;
   titleHi: string;
@@ -77,6 +89,7 @@ export interface AdminServiceItem {
   orderIndex: number;
   isActive: boolean;
   plans: AdminPlanItem[];
+  packages: AdminPackageItem[];
   _count?: {
     orders: number;
   };
@@ -129,6 +142,7 @@ export function AdminServicesManager({
   const [selectedServiceForPlan, setSelectedServiceForPlan] = useState<string | null>(null);
   const [editingPlan, setEditingPlan] = useState<AdminPlanItem | null>(null);
   const [planForm, setPlanForm] = useState({
+    packageId: "",
     slug: "",
     titleEn: "",
     titleHi: "",
@@ -302,7 +316,7 @@ export function AdminServicesManager({
         );
         setSuccessMsg("Service updated successfully.");
       } else {
-        setServices((prev) => [...prev, { ...data.service, plans: [] }]);
+        setServices((prev) => [...prev, { ...data.service, plans: [], packages: [] }]);
         setSuccessMsg("Service created successfully.");
       }
       setServiceModalOpen(false);
@@ -341,6 +355,7 @@ export function AdminServicesManager({
     if (plan) {
       setEditingPlan(plan);
       setPlanForm({
+        packageId: plan.packageId || "",
         slug: plan.slug,
         titleEn: plan.titleEn,
         titleHi: plan.titleHi,
@@ -373,6 +388,7 @@ export function AdminServicesManager({
       setEditingPlan(null);
       const parent = services.find((s) => s.id === serviceId);
       setPlanForm({
+        packageId: parent?.packages[0]?.id || "",
         slug: "",
         titleEn: "",
         titleHi: "",
@@ -417,6 +433,7 @@ export function AdminServicesManager({
     try {
       const payload = {
         serviceId: selectedServiceForPlan,
+        packageId: planForm.packageId || null,
         slug: planForm.slug,
         titleEn: planForm.titleEn,
         titleHi: planForm.titleHi,
@@ -542,6 +559,99 @@ export function AdminServicesManager({
       setSuccessMsg(data.message || "Service removed.");
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to remove service");
+    }
+  };
+
+  // ---- Packages (the level between a service and its plans)
+  const slugify = (v: string) =>
+    v
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60);
+  const [packageModal, setPackageModal] = useState<{ serviceId: string; editing: AdminPackageItem | null } | null>(null);
+  const [packageForm, setPackageForm] = useState({
+    slug: "",
+    titleEn: "",
+    titleHi: "",
+    descriptionEn: "",
+    descriptionHi: "",
+    orderIndex: 0,
+    isActive: true,
+  });
+
+  const handleOpenPackageModal = (serviceId: string, pkg?: AdminPackageItem) => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    const parent = services.find((s) => s.id === serviceId);
+    setPackageForm({
+      slug: pkg?.slug || "",
+      titleEn: pkg?.titleEn || "",
+      titleHi: pkg?.titleHi || "",
+      descriptionEn: pkg?.descriptionEn || "",
+      descriptionHi: pkg?.descriptionHi || "",
+      orderIndex: pkg ? pkg.orderIndex : (parent?.packages.length || 0) + 1,
+      isActive: pkg ? pkg.isActive : true,
+    });
+    setPackageModal({ serviceId, editing: pkg || null });
+  };
+
+  const handleSavePackage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!packageModal) return;
+    setLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const payload = {
+        serviceId: packageModal.serviceId,
+        slug: packageForm.slug.trim() || slugify(packageForm.titleEn),
+        titleEn: packageForm.titleEn,
+        titleHi: packageForm.titleHi,
+        descriptionEn: packageForm.descriptionEn.trim() || null,
+        descriptionHi: packageForm.descriptionHi.trim() || null,
+        orderIndex: Number(packageForm.orderIndex),
+        isActive: packageForm.isActive,
+      };
+      const editing = packageModal.editing;
+      const res = await fetch(editing ? `/api/admin/packages/${editing.id}` : "/api/admin/packages", {
+        method: editing ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const detail = data.details ? Object.values(data.details).flat().join(" ") : "";
+        throw new Error(data.error ? `${data.error} ${detail}`.trim() : "Failed to save package");
+      }
+      setServices((prev) =>
+        prev.map((s) => {
+          if (s.id !== packageModal.serviceId) return s;
+          const list = editing ? s.packages.map((p) => (p.id === editing.id ? data.package : p)) : [...s.packages, data.package];
+          return { ...s, packages: list.sort((a, b) => a.orderIndex - b.orderIndex) };
+        })
+      );
+      setSuccessMsg(editing ? "Package updated." : "Package added. Now add plans under it.");
+      setPackageModal(null);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Error saving package");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePackage = async (serviceId: string, pkg: AdminPackageItem) => {
+    if (!window.confirm(isHindi ? `"${pkg.titleHi}" पैकेज हटाएँ?` : `Remove the package "${pkg.titleEn}"?`)) return;
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const res = await fetch(`/api/admin/packages/${pkg.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to remove package");
+      setServices((prev) => prev.map((s) => (s.id === serviceId ? { ...s, packages: s.packages.filter((p) => p.id !== pkg.id) } : s)));
+      setSuccessMsg("Package removed.");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to remove package");
     }
   };
 
@@ -716,8 +826,54 @@ export function AdminServicesManager({
                 {/* Service Plans Details (Nested) */}
                 {isExpanded && (
                   <div className="p-4 border-t border-outline-variant/30 space-y-4 bg-surface">
+                    {/* Packages: Service > Package > Plan */}
+                    <div className="rounded-lg border border-outline-variant/50 bg-surface-container-low p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs font-bold uppercase tracking-wider text-primary">
+                          {isHindi ? "पैकेज (जैसे साधारण, मध्यम, उत्तम)" : "Packages (for example Sadharan, Madhyam, Uttam)"}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenPackageModal(service.id)}
+                          className="min-h-[36px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded flex items-center gap-1"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>{isHindi ? "पैकेज जोड़ें" : "Add Package"}</span>
+                        </button>
+                      </div>
+                      {service.packages.length === 0 ? (
+                        <p className="text-xs text-on-surface-variant">
+                          {isHindi
+                            ? "अभी कोई पैकेज नहीं है। पैकेज बनाइए, फिर हर पैकेज में प्लान जोड़िए। ग्राहक पहले पैकेज, फिर प्लान चुनेगा।"
+                            : "No packages yet. Create a package, then add plans under it. Customers choose the package first, then the plan."}
+                        </p>
+                      ) : (
+                        <ul className="divide-y divide-outline-variant/40">
+                          {service.packages.map((pkg) => (
+                            <li key={pkg.id} className={`py-2 flex items-center justify-between gap-2 ${pkg.isActive ? "" : "opacity-60"}`}>
+                              <div className="min-w-0">
+                                <div className="text-sm font-semibold text-secondary truncate">{isHindi ? pkg.titleHi : pkg.titleEn}</div>
+                                <div className="text-[11px] text-on-surface-variant">
+                                  {service.plans.filter((p) => p.packageId === pkg.id).length} {isHindi ? "प्लान" : "plan(s)"}
+                                  {!pkg.isActive ? (isHindi ? " · बंद" : " · switched off") : ""}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button type="button" onClick={() => handleOpenPackageModal(service.id, pkg)} className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand">
+                                  {isHindi ? "संपादित करें" : "Edit"}
+                                </button>
+                                <button type="button" onClick={() => handleDeletePackage(service.id, pkg)} className="min-h-[36px] text-xs px-2 py-1 border border-error text-on-error-container rounded hover:bg-error-container">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+
                     <div className="text-xs font-bold uppercase tracking-wider text-primary">
-                      {isHindi ? "इस सेवा के अंतर्गत उपलब्ध संस्करण (Plans)" : "Available Consultation Tiers"}
+                      {isHindi ? "इस सेवा के अंतर्गत उपलब्ध संस्करण (Plans)" : "Plans (each belongs to a package)"}
                     </div>
 
                     {service.plans.length === 0 ? (
@@ -728,7 +884,13 @@ export function AdminServicesManager({
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {service.plans.map((plan) => (
+                        {[...service.plans]
+                          .sort((a, b) => {
+                            const oa = service.packages.find((p) => p.id === a.packageId)?.orderIndex ?? 9999;
+                            const ob = service.packages.find((p) => p.id === b.packageId)?.orderIndex ?? 9999;
+                            return oa - ob || a.orderIndex - b.orderIndex;
+                          })
+                          .map((plan) => (
                           <div
                             key={plan.id}
                             className={`p-4 rounded-lg border flex flex-col justify-between ${
@@ -741,6 +903,12 @@ export function AdminServicesManager({
                               <div className="flex items-center justify-between pb-2 border-b border-outline-variant/30">
                                 <span className="text-xs font-serif font-bold text-secondary">
                                   {isHindi ? plan.titleHi : plan.titleEn}
+                                  <span className="block text-[10px] font-sans font-semibold text-primary">
+                                    {(() => {
+                                      const pk = service.packages.find((p) => p.id === plan.packageId);
+                                      return pk ? (isHindi ? pk.titleHi : pk.titleEn) : isHindi ? "पैकेज नहीं चुना" : "No package chosen";
+                                    })()}
+                                  </span>
                                 </span>
                                 {plan.isPopular && (
                                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand text-on-brand">
@@ -1098,6 +1266,66 @@ export function AdminServicesManager({
         </div>
       )}
 
+      {/* Modal: Package Form */}
+      {packageModal && (
+        <div className="fixed inset-0 z-[70] bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-lg w-full p-6 text-left max-h-[calc(100dvh-1rem)] overflow-y-auto overscroll-contain">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/40">
+              <h2 className="font-serif text-lg font-bold text-secondary">
+                {packageModal.editing ? (isHindi ? "पैकेज संपादित करें" : "Edit Package") : isHindi ? "नया पैकेज" : "Add Package"}
+              </h2>
+              <button type="button" onClick={() => setPackageModal(null)} className="p-1 text-on-surface-variant hover:text-secondary">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSavePackage} className="mt-4 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">Package name (English) *</label>
+                  <input type="text" required value={packageForm.titleEn} onChange={(e) => setPackageForm({ ...packageForm, titleEn: e.target.value })} placeholder="e.g. Sadharan" className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">पैकेज का नाम (हिन्दी) *</label>
+                  <input type="text" required value={packageForm.titleHi} onChange={(e) => setPackageForm({ ...packageForm, titleHi: e.target.value })} placeholder="जैसे साधारण" className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">Short description (English)</label>
+                  <textarea rows={2} value={packageForm.descriptionEn} onChange={(e) => setPackageForm({ ...packageForm, descriptionEn: e.target.value })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">संक्षिप्त विवरण (हिन्दी)</label>
+                  <textarea rows={2} value={packageForm.descriptionHi} onChange={(e) => setPackageForm({ ...packageForm, descriptionHi: e.target.value })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">Slug (URL key, auto if empty)</label>
+                  <input type="text" value={packageForm.slug} onChange={(e) => setPackageForm({ ...packageForm, slug: e.target.value })} placeholder="auto from the English name" className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">Order</label>
+                  <input type="number" min={0} value={packageForm.orderIndex} onChange={(e) => setPackageForm({ ...packageForm, orderIndex: Number(e.target.value) })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                </div>
+              </div>
+              <label className="flex items-center gap-2 text-xs font-medium text-secondary">
+                <input type="checkbox" checked={packageForm.isActive} onChange={(e) => setPackageForm({ ...packageForm, isActive: e.target.checked })} className="w-4 h-4 rounded" />
+                {isHindi ? "पैकेज सक्रिय रखें" : "Package is active (visible to customers)"}
+              </label>
+              <div className="flex items-center gap-2 pt-2">
+                <button type="submit" disabled={loading} className="min-h-[44px] px-5 bg-brand hover:bg-brand-hover text-on-brand text-xs font-bold uppercase tracking-wider rounded disabled:opacity-60">
+                  {loading ? "…" : isHindi ? "सहेजें" : "Save package"}
+                </button>
+                <button type="button" onClick={() => setPackageModal(null)} className="min-h-[44px] px-4 border border-outline-variant text-xs font-bold uppercase tracking-wider rounded text-on-surface-variant">
+                  {isHindi ? "रद्द करें" : "Cancel"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Modal: Plan Form */}
       {planModalOpen && (
         <div className="fixed inset-0 z-[70] bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
@@ -1122,6 +1350,24 @@ export function AdminServicesManager({
             </div>
 
             <form onSubmit={handleSavePlan} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                  {isHindi ? "पैकेज *" : "Package *"}
+                </label>
+                <select
+                  value={planForm.packageId}
+                  onChange={(e) => setPlanForm({ ...planForm, packageId: e.target.value })}
+                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]"
+                >
+                  <option value="">{isHindi ? "— पैकेज चुनें —" : "— Choose a package —"}</option>
+                  {(services.find((sv) => sv.id === selectedServiceForPlan)?.packages ?? []).map((pk) => (
+                    <option key={pk.id} value={pk.id}>{isHindi ? pk.titleHi : pk.titleEn}</option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[11px] text-on-surface-variant">
+                  {isHindi ? "पैकेज न दिखे तो पहले सेवा में 'पैकेज जोड़ें' दबाएँ।" : "If no package is listed, first use 'Add Package' on the service."}
+                </p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">

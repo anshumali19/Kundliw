@@ -1,3 +1,4 @@
+import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -51,11 +52,21 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     where: { slug },
     include: {
       plans: {
+        where: activePlanWhere,
+        orderBy: { orderIndex: "asc" },
+      },
+      packages: {
         where: { isActive: true },
         orderBy: { orderIndex: "asc" },
       },
     },
   });
+
+  if (service) {
+    // Plans of a package that is switched off are not offered
+    const activePackageIds = new Set(service.packages.map((k) => k.id));
+    service.plans = service.plans.filter((p) => !p.packageId || activePackageIds.has(p.packageId));
+  }
 
   if (!service || !service.isActive) {
     notFound();
@@ -94,8 +105,16 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     samagriHi: service.samagriHi,
     youtubeUrl: service.youtubeUrl,
     additionalLinks: service.additionalLinks,
+    packages: service.packages.map((k) => ({
+      id: k.id,
+      titleEn: k.titleEn,
+      titleHi: k.titleHi,
+      descriptionEn: k.descriptionEn,
+      descriptionHi: k.descriptionHi,
+    })),
     plans: service.plans.map((p) => ({
       id: p.id,
+      packageId: p.packageId,
       slug: p.slug,
       titleEn: p.titleEn,
       titleHi: p.titleHi,

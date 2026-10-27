@@ -1,3 +1,4 @@
+import { activePlanWhere } from "@/lib/content/packages";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
@@ -57,9 +58,10 @@ export default async function BookingPage(props: BookingPageProps) {
     where: { isActive: true },
     include: {
       plans: {
-        where: { isActive: true },
+        where: activePlanWhere,
         orderBy: { orderIndex: "asc" },
       },
+      packages: { where: { isActive: true }, orderBy: { orderIndex: "asc" } },
     },
     orderBy: { orderIndex: "asc" },
   });
@@ -69,8 +71,19 @@ export default async function BookingPage(props: BookingPageProps) {
     slug: s.slug,
     titleEn: s.titleEn,
     titleHi: s.titleHi,
-    plans: s.plans.map((p) => ({
+    packages: s.packages.map((k) => ({
+      id: k.id,
+      titleEn: k.titleEn,
+      titleHi: k.titleHi,
+      descriptionEn: k.descriptionEn,
+      descriptionHi: k.descriptionHi,
+    })),
+    // Plans of a package that is switched off are not offered
+    plans: s.plans
+      .filter((p) => !p.packageId || s.packages.some((k) => k.id === p.packageId))
+      .map((p) => ({
       id: p.id,
+      packageId: p.packageId,
       slug: p.slug,
       titleEn: p.titleEn,
       titleHi: p.titleHi,

@@ -26,6 +26,9 @@ export default async function AdminServicesPage(props: AdminServicesPageProps) {
       plans: {
         orderBy: { orderIndex: "asc" },
       },
+      packages: {
+        orderBy: { orderIndex: "asc" },
+      },
       _count: {
         select: { orders: true },
       },
@@ -49,8 +52,19 @@ export default async function AdminServicesPage(props: AdminServicesPageProps) {
     icon: s.icon,
     orderIndex: s.orderIndex,
     isActive: s.isActive,
+    packages: s.packages.map((k) => ({
+      id: k.id,
+      slug: k.slug,
+      titleEn: k.titleEn,
+      titleHi: k.titleHi,
+      descriptionEn: k.descriptionEn,
+      descriptionHi: k.descriptionHi,
+      orderIndex: k.orderIndex,
+      isActive: k.isActive,
+    })),
     plans: s.plans.map((p) => ({
       id: p.id,
+      packageId: p.packageId,
       slug: p.slug,
       titleEn: p.titleEn,
       titleHi: p.titleHi,
