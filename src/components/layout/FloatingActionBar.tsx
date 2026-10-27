@@ -56,11 +56,11 @@ function renderBold(text: string): React.ReactNode[] {
 }
 
 /** The number shows beside the button when the pointer is over it (large screens) */
-function FabNumber({ children }: { children: React.ReactNode }) {
+function FabNumber({ children, side = "right" }: { children: React.ReactNode; side?: "left" | "right" }) {
   return (
     <span
       role="tooltip"
-      className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 hidden lg:block whitespace-nowrap rounded-md bg-maroon px-3 py-1.5 text-sm font-bold tracking-wide text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+      className={`pointer-events-none absolute top-1/2 -translate-y-1/2 hidden lg:block ${side === "right" ? "left-full ml-2" : "right-full mr-2"} whitespace-nowrap rounded-md bg-maroon px-3 py-1.5 text-sm font-bold tracking-wide text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100`}
     >
       {children}
     </span>
@@ -526,6 +526,7 @@ export function FloatingActionBar({
               <Sparkles className="w-5 h-5" />
               <FabText>{isHindi ? "AI पूछें" : "Ask AI"}</FabText>
             </span>
+            <FabNumber side="left">प्रश्न जानिये</FabNumber>
           </button>
           )}
           {showChat && (
@@ -540,6 +541,7 @@ export function FloatingActionBar({
               {isOpen && mode === "chat" ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
               <FabText>{isHindi ? "चैट" : "Chat"}</FabText>
             </span>
+            <FabNumber side="left">बातचीत कीजिए</FabNumber>
           </button>
           )}
         </div>
