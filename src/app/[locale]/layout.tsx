@@ -320,13 +320,14 @@ export default async function LocaleLayout(
             <IntroSplash
               isHindi={locale === "hi"}
               enabled={introOn}
-              seconds={Number(introCfg.seconds) || 3}
+              seconds={Number(introCfg.stayTime) || 7}
               title={String(introCfg.titleEn || "")}
               titleHi={String(introCfg.titleHi || "")}
               tagline={String(introCfg[locale === "hi" ? "taglineHi" : "taglineEn"] || "")}
               sub={String(introCfg[locale === "hi" ? "subHi" : "subEn"] || "")}
               symbol={String(introCfg.symbol || "")}
               logo={String(introCfg.logoImage ?? "")}
+              welcome={String(introCfg[locale === "hi" ? "welcomeHi" : "welcomeEn"] || "")}
             />
           <SmoothScrollProvider>
             <Header

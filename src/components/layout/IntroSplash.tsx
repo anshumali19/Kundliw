@@ -13,13 +13,14 @@ const KEY = "kjk_intro_seen";
 export function IntroSplash({
   isHindi,
   enabled = true,
-  seconds = 3,
+  seconds = 7,
   title = "",
   titleHi = "",
   tagline = "",
   sub = "",
   symbol = "",
   logo = "",
+  welcome = "",
 }: {
   isHindi: boolean;
   enabled?: boolean;
@@ -31,6 +32,8 @@ export function IntroSplash({
   symbol?: string;
   /** Logo image shown in place of the symbol (admin can change or clear it) */
   logo?: string;
+  /** Welcome line at the bottom of the screen */
+  welcome?: string;
 }) {
   const pathname = usePathname() || "/";
   const onHome = /^\/(hi|en)?\/?$/.test(pathname);
@@ -51,7 +54,7 @@ export function IntroSplash({
     }
     document.body.style.overflow = "hidden";
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timer = setTimeout(() => finish(), reduce ? 700 : Math.min(8, Math.max(1, seconds)) * 1000 - 100);
+    const timer = setTimeout(() => finish(), reduce ? 700 : Math.min(12, Math.max(1, seconds)) * 1000 - 100);
     function finish() {
       setDone(true);
       document.body.style.overflow = "";
@@ -76,17 +79,20 @@ export function IntroSplash({
       <div className="intro-glow" />
       <div className="intro-ring" />
       <div className="intro-ring-inner" />
-      {logo ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img className="intro-logo" src={logo} alt="Maharshi Kanad Jyotish Kendra" />
-      ) : (
+      <div className="intro-stack">
         <div className="intro-symbol" aria-hidden="true">{symbol || "ॐ"}</div>
-      )}
-      <div className={`intro-copy${logo ? " has-logo" : ""}`}>
-        <div className="intro-title">{(isHindi && titleHi) || title || "Maharshi Kanad Jyotish Kendra"}</div>
-        <div className="intro-hindi">{tagline || (isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "ज्योतिष • ज्ञान • मार्गदर्शन")}</div>
-        <div className="intro-sub">{sub || "VEDIC ASTROLOGY & GUIDANCE"}</div>
-        <div className="intro-loader" />
+        {logo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="intro-logo" src={logo} alt="Maharshi Kanad" />
+        )}
+        <div className="intro-copy">
+          <div className="intro-title">
+            {welcome || (isHindi ? "महर्षि कणाद ज्योतिष केंद्र में आपका स्वागत है" : "Welcome to Maharshi Kanad Jyotish Kendra")}
+          </div>
+          <div className="intro-hindi">{tagline || (isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "ज्योतिष • ज्ञान • मार्गदर्शन")}</div>
+          <div className="intro-sub">{sub || "VEDIC ASTROLOGY & GUIDANCE"}</div>
+          <div className="intro-loader" />
+        </div>
       </div>
       <button type="button" className="intro-skip" onClick={() => (window as unknown as { __introFinish?: () => void }).__introFinish?.()}>
         {isHindi ? "वेबसाइट खोलें" : "ENTER WEBSITE"}&nbsp; ↗

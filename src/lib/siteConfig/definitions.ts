@@ -408,12 +408,14 @@ export const SECTIONS: SectionDef[] = [
     hi: "ओपनिंग स्क्रीन",
     fields: [
       { key: "enabled", en: "Show the opening screen on the first visit", hi: "पहली बार खुलने पर ओपनिंग स्क्रीन दिखाएँ", type: "toggle", def: true },
-      { key: "seconds", en: "How long it stays (seconds, 1 to 8)", hi: "कितनी देर दिखे (सेकंड, 1 से 8)", type: "number", def: 3 },
+      { key: "stayTime", en: "How long it stays (seconds, 1 to 12)", hi: "कितनी देर दिखे (सेकंड, 1 से 12)", type: "number", def: 7 },
+      { key: "welcomeEn", en: "Welcome line at the bottom (English)", hi: "नीचे का स्वागत वाक्य (अंग्रेज़ी)", type: "text", max: 120, def: "Welcome to Maharshi Kanad Jyotish Kendra" },
+      { key: "welcomeHi", en: "Welcome line at the bottom (Hindi)", hi: "नीचे का स्वागत वाक्य (हिंदी)", type: "text", max: 120, def: "महर्षि कणाद ज्योतिष केंद्र में आपका स्वागत है" },
       ...bi("title", "Name shown", "दिखने वाला नाम", "text", 80),
       ...bi("tagline", "Line under the name", "नाम के नीचे की पंक्ति", "text", 120),
       ...bi("sub", "Small capital line", "छोटी पंक्ति", "text", 80),
-      { key: "logoImage", en: "Logo shown on the opening screen (clear it to show the symbol instead)", hi: "ओपनिंग स्क्रीन का लोगो (खाली करने पर चिह्न दिखेगा)", type: "image", def: "/logo-intro.jpg" },
-      { key: "symbol", en: "Symbol in the circle (used when no logo)", hi: "सर्कल का चिह्न (लोगो न हो तब)", type: "text", max: 4, def: "ॐ" },
+      { key: "logoImage", en: "Photo of Maharshi Kanad shown under the Om (clear it to hide)", hi: "ओम के नीचे महर्षि कणाद की फोटो (हटाने के लिए खाली करें)", type: "image", def: "/logo-intro.jpg" },
+      { key: "symbol", en: "Symbol in the circle", hi: "सर्कल का चिह्न", type: "text", max: 4, def: "ॐ" },
     ],
   },
   {

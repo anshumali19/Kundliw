@@ -107,19 +107,18 @@ header { border-bottom: 1px solid var(--outline-variant); }
 .intro-ring::before { content: ""; position: absolute; inset: 19px; border: 1px dashed rgba(216, 163, 65, 0.42); border-radius: 50%; }
 .intro-ring-inner { position: absolute; width: min(53vw, 310px); aspect-ratio: 1; border: 1px solid rgba(216, 163, 65, 0.3); border-radius: 50%; transform: rotate(22deg); animation: introSpinBack 18s linear infinite; }
 .intro-symbol {
-  position: relative; width: clamp(104px, 18vw, 132px); height: clamp(104px, 18vw, 132px); border-radius: 50%; display: grid; place-items: center;
+  position: relative; width: clamp(84px, 12vw, 104px); height: clamp(84px, 12vw, 104px); border-radius: 50%; display: grid; place-items: center;
   background: radial-gradient(circle at 35% 22%, #fff3c9 0, #e9bb58 40%, #d95a24 70%, #8a2a1c 100%);
   border: 1px solid #f7dc9a; box-shadow: 0 0 32px rgba(216, 163, 65, 0.45), 0 0 0 9px rgba(216, 163, 65, 0.08);
-  color: #40241c; font: 600 clamp(58px, 9vw, 76px) "Cormorant Garamond", Georgia, serif; animation: introRise 1.05s cubic-bezier(0.2, 0.8, 0.2, 1) both; z-index: 2;
+  color: #40241c; font: 600 clamp(46px, 7vw, 60px) "Cormorant Garamond", Georgia, serif; animation: introRise 1.05s cubic-bezier(0.2, 0.8, 0.2, 1) both; z-index: 2;
 }
+.intro-stack { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: -44px; padding: 0 18px; }
 .intro-logo {
-  position: relative; width: clamp(230px, 36vw, 360px); height: auto; border-radius: 22px; z-index: 2; margin-top: -80px;
-  background: #fbf8f2; box-shadow: 0 0 40px rgba(216, 163, 65, 0.4), 0 0 0 8px rgba(216, 163, 65, 0.12); animation: introRise 1.05s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  width: clamp(190px, 26vw, 280px); height: auto; border-radius: 20px; background: #fbf8f2;
+  box-shadow: 0 0 36px rgba(216, 163, 65, 0.4), 0 0 0 7px rgba(216, 163, 65, 0.12); animation: introRise 1.05s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-.intro-copy.has-logo { top: calc(50% + clamp(120px, 14vw, 150px)); }
-.intro-copy.has-logo .intro-title { display: none; }
-.intro-copy { position: absolute; top: calc(50% + clamp(100px, 17vw, 119px)); left: 18px; right: 18px; text-align: center; animation: introText 0.9s 0.25s both; }
-.intro-title { font: 600 clamp(24px, 4.4vw, 40px) "Cormorant Garamond", Georgia, serif; letter-spacing: 0.02em; color: #fff5df; margin: 0 0 8px; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35); }
+.intro-copy { position: relative; text-align: center; animation: introText 0.9s 0.25s both; }
+.intro-title { font: 600 clamp(20px, 3.4vw, 32px) "Cormorant Garamond", Georgia, serif; letter-spacing: 0.02em; color: #fff5df; margin: 0 0 8px; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35); }
 .intro-hindi { font-size: clamp(13px, 2vw, 16px); color: #ffe2a8; margin-bottom: 8px; }
 .intro-sub { font-size: 10px; letter-spacing: clamp(2px, 0.6vw, 4px); font-weight: 700; color: #d8a341; }
 .intro-loader { width: 132px; height: 2px; background: rgba(255, 255, 255, 0.15); margin: 22px auto 0; overflow: hidden; border-radius: 9px; }
@@ -133,9 +132,9 @@ header { border-bottom: 1px solid var(--outline-variant); }
 @keyframes introText { from { opacity: 0; transform: translateY(13px); } }
 @keyframes introLoad { from { transform: translateX(-120%); } to { transform: translateX(320%); } }
 @media (max-width: 600px) {
-  .intro-symbol { width: 88px; height: 88px; font-size: 50px; }
-  .intro-logo { width: min(74vw, 290px); margin-top: -60px; }
-  .intro-copy.has-logo { top: calc(50% + 110px); }
+  .intro-symbol { width: 72px; height: 72px; font-size: 40px; }
+  .intro-stack { margin-top: -30px; gap: 12px; }
+  .intro-logo { width: min(62vw, 230px); }
   .intro-ring { width: 250px; }
   .intro-ring-inner { width: 190px; }
   .intro-copy { top: calc(50% + 78px); }
