@@ -711,6 +711,9 @@ model StaticPage {
   blocks       Json?
   isActive     Boolean  @default(true)
   showInFooter Boolean  @default(false)
+  showInMenu   Boolean  @default(false)
+  metaDescEn   String?  @db.Text
+  metaDescHi   String?  @db.Text
   updatedAt    DateTime @updatedAt
 }
 

@@ -23,7 +23,11 @@ export async function generateMetadata(props: CustomPageProps): Promise<Metadata
   const { locale, slug } = await props.params;
   const page = await loadPage(slug);
   if (!page) return { title: "Page not found" };
-  return { title: `${locale === "hi" ? page.titleHi : page.titleEn} • Maharshi Kanad Jyotish Kendra` };
+  const desc = (locale === "hi" ? page.metaDescHi || page.metaDescEn : page.metaDescEn || page.metaDescHi) || undefined;
+  return {
+    title: `${locale === "hi" ? page.titleHi : page.titleEn} • Maharshi Kanad Jyotish Kendra`,
+    ...(desc ? { description: desc } : {}),
+  };
 }
 
 export default async function CustomPage(props: CustomPageProps) {

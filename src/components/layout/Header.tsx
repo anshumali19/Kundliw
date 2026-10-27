@@ -36,9 +36,11 @@ interface HeaderProps {
   topbar?: Record<string, boolean | string | number>;
   /** Admin menu (when the admin has changed it) */
   menu?: Array<{ href: string; labelEn: string; labelHi: string }>;
+  /** Pages the admin created with "Show in the top menu" */
+  pages?: Array<{ href: string; labelEn: string; labelHi: string }>;
 }
 
-export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, menu }: HeaderProps = {}) {
+export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, menu, pages = [] }: HeaderProps = {}) {
   const activePhone = phone || "+91 98279 91224";
   const cleanPhone = activePhone.replace(/[^\d+]/g, "");
   const cleanWa = activePhone.replace(/[^\d]/g, "");
@@ -102,6 +104,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
     { href: "/help", label: tNav("help"), icon: HelpCircle },
     { href: "/panchang", label: tNav("panchang"), icon: BookOpen },
     { href: "/track", label: tNav("tracker"), icon: Search },
+    ...pages.map((p) => ({ href: p.href, label: isHindi ? p.labelHi || p.labelEn : p.labelEn || p.labelHi, icon: FileText })),
   ]);
 
   // Precise route matching so siblings don't share active state
@@ -149,6 +152,8 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
     { href: "/auth/register", label: tNav("register") },
     { href: "/auth/signin", label: tNav("signIn") },
   ]);
+  const mobileExtra = pages.map((p) => ({ href: p.href, label: isHindi ? p.labelHi || p.labelEn : p.labelEn || p.labelHi }));
+  const mobileLinks = [...srsMobileMenu, ...mobileExtra.filter((x) => !srsMobileMenu.some((m) => m.href === x.href))];
 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
@@ -341,7 +346,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
             <div className="text-[10px] uppercase font-bold tracking-wider text-on-surface-variant px-3 py-1">
               वेबसाइट मेनू • Website Navigation
             </div>
-            {srsMobileMenu.map((link) => {
+            {mobileLinks.map((link) => {
               const isActive = checkIsActive(link.href);
               return (
                 <Link

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { isCorePageSlug } from "@/lib/content/pages";
 import { LOCALES, absoluteUrl, localizedPath } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +38,7 @@ function entriesFor(path: string, lastModified: Date | undefined, priority: numb
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [services, posts, legal] = await Promise.all([
+  const [services, posts, legal, custom] = await Promise.all([
     prisma.service
       .findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } })
       .catch(() => []),
@@ -47,12 +48,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.staticPage
       .findMany({ where: { isActive: true, slug: { startsWith: "legal/" } }, select: { slug: true, updatedAt: true } })
       .catch(() => []),
+    prisma.staticPage
+      .findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } })
+      .then((rows) => rows.filter((r) => !isCorePageSlug(r.slug) && !r.slug.startsWith("legal/")))
+      .catch(() => []),
   ]);
 
   return [
     ...STATIC_ROUTES.flatMap((r) => entriesFor(r.path, undefined, r.priority, r.changeFrequency)),
     ...services.flatMap((s) => entriesFor(`/services/${s.slug}`, s.updatedAt, 0.8, "weekly")),
     ...posts.flatMap((p) => entriesFor(`/blogs/${p.slug}`, p.updatedAt, 0.6, "monthly")),
+    ...custom.flatMap((p) => entriesFor(`/pages/${p.slug}`, p.updatedAt, 0.5, "monthly")),
     ...legal.flatMap((p) => entriesFor(`/${p.slug}`, p.updatedAt, 0.3, "yearly")),
   ];
 }

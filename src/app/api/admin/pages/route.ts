@@ -18,6 +18,9 @@ const pageSchema = z.object({
   blocks: blocksInputSchema.optional(),
   isActive: z.boolean().optional(),
   showInFooter: z.boolean().optional(),
+  showInMenu: z.boolean().optional(),
+  metaDescEn: z.string().max(300).optional().nullable(),
+  metaDescHi: z.string().max(300).optional().nullable(),
 });
 
 export async function GET() {
@@ -56,7 +59,7 @@ export async function POST(request: NextRequest) {
     const core = isCorePageSlug(parsed.data.slug);
     const data = {
       ...parsed.data,
-      ...(core ? { isActive: true, showInFooter: false } : {}),
+      ...(core ? { isActive: true, showInFooter: false, showInMenu: false } : {}),
     };
     const page = await prisma.staticPage.upsert({
       where: { slug: parsed.data.slug },

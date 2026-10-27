@@ -1,7 +1,7 @@
 "use client";
 
 import { LinkTextarea } from "@/components/admin/LinkTextarea";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Save, CheckCircle2, AlertCircle, Plus, Trash2, ExternalLink } from "lucide-react";
 import { DEFAULT_GUIDES, GUIDE_SLUGS, guidePageSlug } from "@/lib/guides/defaults";
 import { ContentBlock, normalizeBlocks } from "@/lib/content/media";
@@ -18,6 +18,9 @@ interface StaticPageItem {
   blocks?: unknown;
   isActive: boolean;
   showInFooter: boolean;
+  showInMenu?: boolean;
+  metaDescEn?: string | null;
+  metaDescHi?: string | null;
   updatedAt: string;
 }
 
@@ -38,6 +41,7 @@ const field =
 const label = "block text-xs font-bold uppercase text-on-surface-variant mb-1";
 
 export default function AdminPagesPage() {
+  const startedFromLink = useRef(false);
   const [pages, setPages] = useState<StaticPageItem[]>([]);
   const [selectedSlug, setSelectedSlug] = useState("about");
   const [creating, setCreating] = useState(false);
@@ -53,6 +57,10 @@ export default function AdminPagesPage() {
   const [blocks, setBlocks] = useState<ContentBlock[]>([]);
   const [isActive, setIsActive] = useState(true);
   const [showInFooter, setShowInFooter] = useState(false);
+  const [showInMenu, setShowInMenu] = useState(false);
+  const [metaDescEn, setMetaDescEn] = useState("");
+  const [metaDescHi, setMetaDescHi] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
 
   const customPages = pages.filter((p) => !isCorePageSlug(p.slug));
   const isCore = isCorePageSlug(selectedSlug);
@@ -68,6 +76,9 @@ export default function AdminPagesPage() {
       setBlocks(normalizeBlocks(existing.blocks));
       setIsActive(existing.isActive);
       setShowInFooter(existing.showInFooter);
+      setShowInMenu(!!existing.showInMenu);
+      setMetaDescEn(existing.metaDescEn || "");
+      setMetaDescHi(existing.metaDescHi || "");
     } else if (GUIDE_SLUGS.some((g) => guidePageSlug(g) === slug)) {
       const guide = DEFAULT_GUIDES[slug.replace("guide-", "") as keyof typeof DEFAULT_GUIDES];
       setTitleEn(guide.titleEn);
@@ -128,9 +139,21 @@ export default function AdminPagesPage() {
     setBlocks([]);
     setIsActive(true);
     setShowInFooter(true);
+    setShowInMenu(true);
+    setMetaDescEn("");
+    setMetaDescHi("");
+    setSlugTouched(false);
     setError(null);
     setSuccess(null);
   };
+
+  // Arrived from "Add a new page" elsewhere in the admin (address ends with ?new=1)
+  useEffect(() => {
+    if (startedFromLink.current) return;
+    startedFromLink.current = true;
+    if (new URLSearchParams(window.location.search).get("new") === "1") startNewPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,6 +184,9 @@ export default function AdminPagesPage() {
           blocks,
           isActive,
           showInFooter,
+          showInMenu,
+          metaDescEn: metaDescEn.trim() || null,
+          metaDescHi: metaDescHi.trim() || null,
         }),
       });
       const data = await res.json();
@@ -284,10 +310,10 @@ export default function AdminPagesPage() {
 
         {creating && (
           <div>
-            <label className={label}>Page address * (letters, numbers and hyphens)</label>
+            <label className={label}>Page address * (made from the title; you may change it)</label>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono text-on-surface-variant">/pages/</span>
-              <input type="text" required value={newSlug} onChange={(e) => setNewSlug(e.target.value.toLowerCase())} placeholder="our-process" className={field + " font-mono max-w-xs"} />
+              <input type="text" required value={newSlug} onChange={(e) => { setSlugTouched(true); setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-")); }} placeholder="our-process" className={field + " font-mono max-w-xs"} />
             </div>
           </div>
         )}
@@ -296,7 +322,7 @@ export default function AdminPagesPage() {
           <div className="space-y-3">
             <div>
               <label className={label}>Title (English) *</label>
-              <input type="text" required value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className={field} />
+              <input type="text" required value={titleEn} onChange={(e) => { setTitleEn(e.target.value); if (creating && !slugTouched) setNewSlug(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60)); }} className={field} />
             </div>
             <div>
               <label className={label}>Page text (English) *</label>
@@ -318,10 +344,27 @@ export default function AdminPagesPage() {
         <BlocksEditor blocks={blocks} onChange={setBlocks} />
 
         {!isCore && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className={label}>Search engine description (English, optional)</label>
+              <textarea rows={2} maxLength={300} value={metaDescEn} onChange={(e) => setMetaDescEn(e.target.value)} className={field} />
+            </div>
+            <div>
+              <label className={label}>सर्च इंजन विवरण (हिन्दी, वैकल्पिक)</label>
+              <textarea rows={2} maxLength={300} value={metaDescHi} onChange={(e) => setMetaDescHi(e.target.value)} className={field} />
+            </div>
+          </div>
+        )}
+
+        {!isCore && (
           <div className="flex flex-wrap items-center gap-6 pt-1">
             <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
               <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="w-4 h-4" />
               Active (page is visible)
+            </label>
+            <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+              <input type="checkbox" checked={showInMenu} onChange={(e) => setShowInMenu(e.target.checked)} className="w-4 h-4" />
+              Show in the top menu (More list and phone menu)
             </label>
             <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer">
               <input type="checkbox" checked={showInFooter} onChange={(e) => setShowInFooter(e.target.checked)} className="w-4 h-4" />

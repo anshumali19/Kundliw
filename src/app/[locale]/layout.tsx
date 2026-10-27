@@ -18,6 +18,7 @@ import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { prisma } from "@/lib/prisma";
+import { isCorePageSlug } from "@/lib/content/pages";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE_NAME, SITE_NAME_HI, SITE_URL } from "@/lib/seo";
 import "@/app/globals.css";
@@ -194,6 +195,10 @@ export default async function LocaleLayout(
     getSection("intro"),
     getLinkList("menu"),
   ]);
+  const menuPages = await prisma.staticPage
+    .findMany({ where: { isActive: true, showInMenu: true }, orderBy: { updatedAt: "asc" }, select: { slug: true, titleEn: true, titleHi: true }, take: 12 })
+    .then((rows) => rows.filter((r) => !isCorePageSlug(r.slug)))
+    .catch(() => []);
   const themeStyles = themeCss(themeCfg);
   const introOn = introCfg.enabled !== false;
   const hiddenTools = [
@@ -325,6 +330,7 @@ export default async function LocaleLayout(
               topbar={topbarCfg as Record<string, boolean | string | number>}
               menu={menuRows.map((m) => ({ href: m.href, labelEn: m.labelEn, labelHi: m.labelHi }))}
               phone={settings?.phone1 ?? undefined}
+              pages={menuPages.map((p) => ({ href: `/pages/${p.slug}`, labelEn: p.titleEn, labelHi: p.titleHi }))}
               panchang={panchang} social={social} logoUrl={String((await getSection("logo")).logoUrl || "") || undefined} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />

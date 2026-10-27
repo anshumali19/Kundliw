@@ -200,6 +200,12 @@ export function AdminFounderManager({ isHindi }: { isHindi: boolean }) {
         <p className="text-xs text-on-surface-variant">
           Upload photo, edit designation, scholarly role, video links, sister portal links, and ethical footer notes.
         </p>
+        <a
+          href="/admin/pages?new=1"
+          className="mt-3 inline-flex min-h-[44px] items-center gap-2 px-4 rounded bg-brand hover:bg-brand-hover text-on-brand text-xs font-bold uppercase tracking-wider"
+        >
+          + Add a new page (gets its own address, menu link and search description)
+        </a>
       </div>
 
       {status && (
