@@ -158,7 +158,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
       {/* 1. One-line bar: time, day, date, month, paksha, tithi and Samvat; contact and sign-in on the right */}
-      <div className={tb("showBar") ? "bg-[rgb(var(--topbar-bg-rgb,var(--maroon-rgb)))]" : "hidden"}>
+      <div className={tb("showBar") ? "bg-[rgb(var(--topbar-bg-rgb,138_42_58))]" : "hidden"}>
         <div className="w-full px-3 sm:px-6 xl:px-6 2xl:px-10 h-9 flex items-center justify-between gap-3 text-xs text-on-maroon font-medium [&_a]:!text-on-maroon">
           <DateStrip
             data={panchang?.parts ?? null}
