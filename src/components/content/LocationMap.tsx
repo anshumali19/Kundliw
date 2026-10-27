@@ -24,7 +24,7 @@ export function LocationMap({
   return (
     <section aria-label={isHindi ? "हमारा स्थान" : "Our location"} className="space-y-2">
       {(title || !compact) && (
-        <div className={`flex items-center gap-2 font-bold ${compact ? "text-xs uppercase tracking-wider" : "text-base"} ${onDark ? "text-gold" : "text-secondary"}`}>
+        <div className={`flex items-center gap-2 font-bold ${compact ? "text-xs uppercase tracking-wider" : "text-base"} ${onDark ? "text-white" : "text-secondary"}`}>
           <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>{title || (isHindi ? "हमारा स्थान" : "Our location")}</span>
         </div>
@@ -44,7 +44,7 @@ export function LocationMap({
           href={directions}
           target="_blank"
           rel="noopener noreferrer"
-          className={`inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold hover:underline ${onDark ? "text-gold" : "text-primary"}`}
+          className={`inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold hover:underline ${onDark ? "text-white" : "text-primary"}`}
         >
           <Navigation className="w-4 h-4" aria-hidden="true" />
           {isHindi ? "रास्ता देखें" : "Get directions"}

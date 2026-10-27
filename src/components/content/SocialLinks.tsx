@@ -8,7 +8,7 @@ export async function SocialLinks({ className = "", tone = "dark" }: { className
   if (links.length === 0) return null;
   const color =
     tone === "light"
-      ? "border-gold/50 text-gold hover:bg-gold/10"
+      ? "border-white/60 text-white hover:bg-white/15"
       : "border-outline-variant text-secondary hover:bg-surface-container-high";
   return (
     <ul className={`flex flex-wrap items-center gap-2 ${className}`} aria-label="Social media">

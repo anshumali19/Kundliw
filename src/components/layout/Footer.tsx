@@ -60,15 +60,15 @@ export async function Footer() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={String(logoCfg.logoUrl || "") || "/Logo.jpeg"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
               <div className="flex flex-col">
-                <span className="font-serif text-base font-bold text-gold leading-tight">
+                <span className="font-serif text-base font-bold text-white leading-tight">
                   {t("title")}
                 </span>
-                <span className="text-[10px] uppercase tracking-widest text-gold font-bold">
+                <span className="text-[10px] uppercase tracking-widest text-white font-bold">
                   {pickG(general, "tagline") || tCommon("tagline")}
                 </span>
               </div>
             </div>
-            <div className="text-xs text-on-maroon leading-relaxed space-y-2 [&_a]:!text-gold">
+            <div className="text-xs text-on-maroon leading-relaxed space-y-2 [&_a]:!text-white [&_a]:underline">
               <RichText text={pickG(general, "footerNote") || t("bio")} />
             </div>
             {(business.ownerName || business.msmeNumber || Number(business.foundedYear) > 0) && (
@@ -78,7 +78,7 @@ export async function Footer() {
             )}
             {addressLine1 && (
             <div className="text-xs text-on-maroon space-y-1 pt-1">
-              <div className="font-semibold text-gold uppercase tracking-wider text-[11px]">
+              <div className="font-semibold text-white uppercase tracking-wider text-[11px]">
                 {t("campusLabel")}
               </div>
               <div>{addressLine1}</div>
@@ -96,71 +96,71 @@ export async function Footer() {
 
           {/* Col 2: Quick Links (Tools & Services) */}
           <div>
-            <div className="font-serif text-xs font-bold text-gold mb-3 uppercase tracking-wider">
+            <div className="font-serif text-base lg:text-lg font-bold text-white mb-3 uppercase tracking-wider">
               {t("servicesTitle")}
             </div>
             <ul className="space-y-1.5 text-xs text-on-maroon">
               <li>
-                <Link href="/services" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/services" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("services")}
                 </Link>
               </li>
               <li>
-                <Link href="/services#plans" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/services#plans" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("pricingPlans")}
                 </Link>
               </li>
               {(
 <li>
-                <Link href={ownKundliHref("/kundli") as never} className="hover:text-gold transition-colors block py-0.5">
+                <Link href={ownKundliHref("/kundli") as never} className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("kundli")}
                 </Link>
               </li>
 )}
               {(
 <li>
-                <Link href={ownKundliHref("/kundli/matching") as never} className="hover:text-gold transition-colors block py-0.5">
+                <Link href={ownKundliHref("/kundli/matching") as never} className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("kundliMatching")}
                 </Link>
               </li>
 )}
               <li>
-                <Link href={ownKundliHref("/kundli/prashna") as never} className="hover:text-gold transition-colors block py-0.5">
+                <Link href={ownKundliHref("/kundli/prashna") as never} className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("prashna")}
                 </Link>
               </li>
               {tools.panchangEnabled !== false && (
 <li>
-                <Link href="/panchang" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/panchang" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("panchang")}
                 </Link>
               </li>
 )}
               <li>
-                <Link href="/other-services" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/other-services" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("otherServices")}
                 </Link>
               </li>
               <li>
-                <Link href="/kundli/astrosage" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/kundli/astrosage" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("astrosageTool")}
                 </Link>
               </li>
               <li>
-                <Link href="/vault" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/vault" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("vault")}
                 </Link>
               </li>
               {footerPages.map((fp) => (
                 <li key={fp.slug}>
-                  <Link href={`/pages/${fp.slug}` as never} className="hover:text-gold transition-colors block py-0.5">
+                  <Link href={`/pages/${fp.slug}` as never} className="hover:text-white hover:underline transition-colors block py-0.5">
                     {locale === "hi" ? fp.titleHi : fp.titleEn}
                   </Link>
                 </li>
               ))}
               {settings?.appDownloadUrl && (
                 <li>
-                  <Link href="/app" className="hover:text-gold transition-colors block py-0.5">
+                  <Link href="/app" className="hover:text-white hover:underline transition-colors block py-0.5">
                     {locale === "hi" ? "एंड्रॉइड ऐप" : "Android App"}
                   </Link>
                 </li>
@@ -170,44 +170,44 @@ export async function Footer() {
 
           {/* Col 2b: Legal Pages, beside Quick Links, every legal page listed */}
           <div>
-            <div className="font-serif text-xs font-bold text-gold mb-3 uppercase tracking-wider">
+            <div className="font-serif text-base lg:text-lg font-bold text-white mb-3 uppercase tracking-wider">
               {locale === "hi" ? "लीगल पेजेस" : "Legal Pages"}
             </div>
             <ul className="space-y-1.5 text-xs text-on-maroon">
             {featureCfg.showCredentialsLink !== false && (
               <li>
-                <Link href="/credentials" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/credentials" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("credentials")}
                 </Link>
               </li>
             )}
             <li>
-              <Link href="/legal/privacy" className="hover:text-gold transition-colors block py-0.5">
+              <Link href="/legal/privacy" className="hover:text-white hover:underline transition-colors block py-0.5">
                 {t("privacyLink")}
               </Link>
             </li>
             <li>
-              <Link href="/legal/terms" className="hover:text-gold transition-colors block py-0.5">
+              <Link href="/legal/terms" className="hover:text-white hover:underline transition-colors block py-0.5">
                 {t("termsLink")}
               </Link>
             </li>
             <li>
-              <Link href="/legal/platform-guidelines" className="hover:text-gold transition-colors block py-0.5">
+              <Link href="/legal/platform-guidelines" className="hover:text-white hover:underline transition-colors block py-0.5">
                 {locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines"}
               </Link>
             </li>
             <li>
-              <Link href="/legal/member-agreement" className="hover:text-gold transition-colors block py-0.5">
+              <Link href="/legal/member-agreement" className="hover:text-white hover:underline transition-colors block py-0.5">
                 {locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement"}
               </Link>
             </li>
             <li>
-              <Link href="/legal/rules-regulations" className="hover:text-gold transition-colors block py-0.5">
+              <Link href="/legal/rules-regulations" className="hover:text-white hover:underline transition-colors block py-0.5">
                 {locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations"}
               </Link>
             </li>
             <li>
-              <Link href="/legal/ephemeris-sources" className="hover:text-gold transition-colors block py-0.5">
+              <Link href="/legal/ephemeris-sources" className="hover:text-white hover:underline transition-colors block py-0.5">
                 {t("ephemerisLink")}
               </Link>
             </li>
@@ -216,44 +216,44 @@ export async function Footer() {
 
           {/* Col 3: Lineage & Kendra */}
           <div>
-            <div className="font-serif text-xs font-bold text-gold mb-3 uppercase tracking-wider">
+            <div className="font-serif text-base lg:text-lg font-bold text-white mb-3 uppercase tracking-wider">
               {tNav("about")} &amp; केंद्र
             </div>
             <ul className="space-y-1.5 text-xs text-on-maroon">
               <li>
-                <Link href="/about" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/about" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("about")}
                 </Link>
               </li>
               <li>
-                <Link href="/founder" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/founder" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("founder")}
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/gallery" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("gallery")}
                 </Link>
               </li>
               {featureCfg.showBlogLink !== false && (
 <li>
-                <Link href="/blogs" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/blogs" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("blogs")}
                 </Link>
               </li>
 )}
               <li>
-                <Link href="/testimonials" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/testimonials" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("testimonials")}
                 </Link>
               </li>
               <li>
-                <Link href="/help" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/help" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("help")}
                 </Link>
               </li>
               <li>
-                <Link href="/track" className="hover:text-gold transition-colors block py-0.5">
+                <Link href="/track" className="hover:text-white hover:underline transition-colors block py-0.5">
                   {tNav("tracker")}
                 </Link>
               </li>
@@ -263,7 +263,7 @@ export async function Footer() {
           {/* Col 4: Sister Portals & Legal Pages */}
           <div className="space-y-4">
             <div>
-              <div className="font-serif text-xs font-bold text-gold mb-3 uppercase tracking-wider">
+              <div className="font-serif text-base lg:text-lg font-bold text-white mb-3 uppercase tracking-wider">
                 सहयोगी सेवाएँ • Sister Portals
               </div>
               <ul className="space-y-1.5 text-xs">
@@ -272,7 +272,7 @@ export async function Footer() {
                     href="https://bharatdarshanmpcg.org"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-gold hover:underline font-medium"
+                    className="inline-flex items-center gap-1 text-white hover:underline font-medium"
                   >
                     <span>Bharat Darshan MPCG</span>
                     <ExternalLink className="w-3 h-3 shrink-0" />
@@ -283,7 +283,7 @@ export async function Footer() {
                     href="https://vindhyavivahsanskar.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-gold hover:underline font-medium"
+                    className="inline-flex items-center gap-1 text-white hover:underline font-medium"
                   >
                     <span>Vindhya Vivah Sanskar</span>
                     <ExternalLink className="w-3 h-3 shrink-0" />
@@ -296,27 +296,27 @@ export async function Footer() {
 
           {/* Col 5: Helpline & Support Contact */}
           <div>
-            <div className="font-serif text-xs font-bold text-gold mb-3 uppercase tracking-wider">
+            <div className="font-serif text-base lg:text-lg font-bold text-white mb-3 uppercase tracking-wider">
               {t("contactTitle")}
             </div>
             <ul className="space-y-1.5 text-xs text-on-maroon">
               {phone1 && (
                 <li>
-                  <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="hover:text-gold font-semibold text-on-maroon block">
+                  <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="hover:text-white hover:underline font-semibold text-on-maroon block">
                     {phone1}
                   </a>
                 </li>
               )}
               {phone2 && (
                 <li>
-                  <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="hover:text-gold text-on-maroon block">
+                  <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="hover:text-white hover:underline text-on-maroon block">
                     {phone2}
                   </a>
                 </li>
               )}
               {email && (
                 <li>
-                  <a href={`mailto:${email}`} className="hover:text-gold block">
+                  <a href={`mailto:${email}`} className="hover:text-white hover:underline block">
                     {email}
                   </a>
                 </li>
@@ -336,13 +336,13 @@ export async function Footer() {
 
         {extraLinks.length > 0 && (
           <nav aria-label={locale === "hi" ? "और लिंक" : "More links"} className="py-4 border-b border-gold/30 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
-            <span className="font-semibold text-gold uppercase tracking-wider text-[11px]">{locale === "hi" ? "और लिंक" : "More links"}</span>
+            <span className="font-semibold text-white uppercase tracking-wider text-[11px]">{locale === "hi" ? "और लिंक" : "More links"}</span>
             {extraLinks.map((l, i) => {
               const ok = safeHref(l.href);
               if (!ok) return null;
               const label = (locale === "hi" ? l.labelHi || l.labelEn : l.labelEn || l.labelHi) || l.href;
               return (
-                <a key={i} href={ok.href} {...(ok.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="text-on-maroon hover:text-gold underline-offset-2 hover:underline">
+                <a key={i} href={ok.href} {...(ok.external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="text-on-maroon hover:text-white hover:underline underline-offset-2 hover:underline">
                   {label}
                 </a>
               );
@@ -356,7 +356,7 @@ export async function Footer() {
             {pickG(general, "copyright") || t("copyright")}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-gold font-semibold">दृग्गणित सिद्धान्त</span>
+            <span className="text-white font-semibold">दृग्गणित सिद्धान्त</span>
             <span>({t("standardBadge")})</span>
           </div>
         </div>
