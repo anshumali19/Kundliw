@@ -100,6 +100,54 @@ export async function Footer() {
             </div>
             <ul className="space-y-1.5 text-xs text-on-maroon">
               <li>
+                {/* One folder for every legal page */}
+                <details className="group" open>
+                  <summary className="cursor-pointer list-none flex items-center gap-1 font-semibold text-gold py-0.5 [&::-webkit-details-marker]:hidden">
+                    <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">▸</span>
+                    {locale === "hi" ? "लीगल पेजेस" : "Legal Pages"}
+                  </summary>
+                  <ul className="mt-1 ml-3 pl-3 border-l border-gold/40 space-y-1">
+                    {featureCfg.showCredentialsLink !== false && (
+                      <li>
+                        <Link href="/credentials" className="hover:text-gold transition-colors block py-0.5">
+                          {tNav("credentials")}
+                        </Link>
+                      </li>
+                    )}
+                    <li>
+                      <Link href="/legal/privacy" className="hover:text-gold transition-colors block py-0.5">
+                        {t("privacyLink")}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/legal/terms" className="hover:text-gold transition-colors block py-0.5">
+                        {t("termsLink")}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/legal/platform-guidelines" className="hover:text-gold transition-colors block py-0.5">
+                        {locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines"}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/legal/member-agreement" className="hover:text-gold transition-colors block py-0.5">
+                        {locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement"}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/legal/rules-regulations" className="hover:text-gold transition-colors block py-0.5">
+                        {locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations"}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/legal/ephemeris-sources" className="hover:text-gold transition-colors block py-0.5">
+                        {t("ephemerisLink")}
+                      </Link>
+                    </li>
+                  </ul>
+                </details>
+              </li>
+              <li>
                 <Link href="/services" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("services")}
                 </Link>
@@ -149,54 +197,6 @@ export async function Footer() {
                 <Link href="/vault" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("vault")}
                 </Link>
-              </li>
-              <li>
-                {/* One folder for every legal page */}
-                <details className="group">
-                  <summary className="cursor-pointer list-none flex items-center gap-1 font-semibold text-gold py-0.5 [&::-webkit-details-marker]:hidden">
-                    <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">▸</span>
-                    {locale === "hi" ? "लीगल पेजेस" : "Legal Pages"}
-                  </summary>
-                  <ul className="mt-1 ml-3 pl-3 border-l border-gold/40 space-y-1">
-                    {featureCfg.showCredentialsLink !== false && (
-                      <li>
-                        <Link href="/credentials" className="hover:text-gold transition-colors block py-0.5">
-                          {tNav("credentials")}
-                        </Link>
-                      </li>
-                    )}
-                    <li>
-                      <Link href="/legal/privacy" className="hover:text-gold transition-colors block py-0.5">
-                        {t("privacyLink")}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/terms" className="hover:text-gold transition-colors block py-0.5">
-                        {t("termsLink")}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/platform-guidelines" className="hover:text-gold transition-colors block py-0.5">
-                        {locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines"}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/member-agreement" className="hover:text-gold transition-colors block py-0.5">
-                        {locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement"}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/rules-regulations" className="hover:text-gold transition-colors block py-0.5">
-                        {locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations"}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/ephemeris-sources" className="hover:text-gold transition-colors block py-0.5">
-                        {t("ephemerisLink")}
-                      </Link>
-                    </li>
-                  </ul>
-                </details>
               </li>
               {footerPages.map((fp) => (
                 <li key={fp.slug}>
