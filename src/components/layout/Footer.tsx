@@ -5,6 +5,7 @@ import { getLinkList, getSection } from "@/lib/siteConfig/service";
 import { RichText } from "@/components/content/RichText";
 import { safeHref } from "@/lib/content/richText";
 import { prisma } from "@/lib/prisma";
+import { isCorePageSlug } from "@/lib/content/pages";
 import { LocationMap } from "@/components/content/LocationMap";
 import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
 
@@ -36,6 +37,7 @@ export async function Footer() {
       orderBy: { updatedAt: "asc" },
       select: { slug: true, titleEn: true, titleHi: true },
     })
+    .then((rows) => rows.filter((r) => !isCorePageSlug(r.slug)))
     .catch(() => []);
 
   const phone1 = settings?.phone1;
@@ -152,7 +154,7 @@ export async function Footer() {
                 <details className="group">
                   <summary className="cursor-pointer list-none flex items-center gap-1 font-semibold text-gold py-0.5 [&::-webkit-details-marker]:hidden">
                     <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">▸</span>
-                    {locale === "hi" ? "लीगल पेज" : "Legal Page"}
+                    {locale === "hi" ? "लीगल पेजेस" : "Legal Pages"}
                   </summary>
                   <ul className="mt-1 ml-3 pl-3 border-l border-gold/40 space-y-1">
                     {featureCfg.showCredentialsLink !== false && (
