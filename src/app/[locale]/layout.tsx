@@ -336,7 +336,6 @@ export default async function LocaleLayout(
               topbar={topbarCfg as Record<string, boolean | string | number>}
               menu={menuRows.map((m) => ({ href: m.href, labelEn: m.labelEn, labelHi: m.labelHi }))}
               phone={settings?.phone1 ?? undefined}
-              email={kendraEmail(settings?.email)}
               pages={menuPages.map((p) => ({ href: `/pages/${p.slug}`, labelEn: p.titleEn, labelHi: p.titleHi }))}
               panchang={panchang} social={social} logoUrl={String((await getSection("logo")).logoUrl || "") || undefined} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">

@@ -381,7 +381,6 @@ export const SECTIONS: SectionDef[] = [
       { key: "showSamvat", en: "Vikram Samvat", hi: "विक्रम संवत", type: "toggle", def: true },
       { key: "showPanchangButton", en: "Panchang Calendar button", hi: "पंचांग कैलेंडर बटन", type: "toggle", def: true },
       { key: "showPhone", en: "Phone number", hi: "फ़ोन नंबर", type: "toggle", def: true },
-      { key: "showEmail", en: "Email address", hi: "ईमेल पता", type: "toggle", def: true },
       { key: "showSocial", en: "Social media icons", hi: "सोशल मीडिया आइकन", type: "toggle", def: true },
       { key: "showAuthLinks", en: "Sign in and Register links", hi: "साइन इन और रजिस्टर लिंक", type: "toggle", def: true },
       { key: "showBar", en: "Show the whole top bar", hi: "पूरी ऊपरी पट्टी दिखाएँ", type: "toggle", def: true },
