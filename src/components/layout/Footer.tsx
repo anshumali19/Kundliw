@@ -52,7 +52,7 @@ export async function Footer() {
   return (
     <footer className="w-full bg-[rgb(var(--footer-bg-rgb,128_0_0))] text-on-maroon border-t-4 border-gold pt-8 pb-6 text-left">
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 xl:gap-8 pb-8 border-b border-gold/40 text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 xl:gap-8 pb-8 border-b border-gold/40 text-left">
           {/* Col 1: Identity & Sanctum Address with Logo */}
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
@@ -99,54 +99,6 @@ export async function Footer() {
               {t("servicesTitle")}
             </div>
             <ul className="space-y-1.5 text-xs text-on-maroon">
-              <li>
-                {/* One folder for every legal page */}
-                <details className="group" open>
-                  <summary className="cursor-pointer list-none flex items-center gap-1 font-semibold text-gold py-0.5 [&::-webkit-details-marker]:hidden">
-                    <span className="inline-block transition-transform group-open:rotate-90" aria-hidden="true">▸</span>
-                    {locale === "hi" ? "लीगल पेजेस" : "Legal Pages"}
-                  </summary>
-                  <ul className="mt-1 ml-3 pl-3 border-l border-gold/40 space-y-1">
-                    {featureCfg.showCredentialsLink !== false && (
-                      <li>
-                        <Link href="/credentials" className="hover:text-gold transition-colors block py-0.5">
-                          {tNav("credentials")}
-                        </Link>
-                      </li>
-                    )}
-                    <li>
-                      <Link href="/legal/privacy" className="hover:text-gold transition-colors block py-0.5">
-                        {t("privacyLink")}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/terms" className="hover:text-gold transition-colors block py-0.5">
-                        {t("termsLink")}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/platform-guidelines" className="hover:text-gold transition-colors block py-0.5">
-                        {locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines"}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/member-agreement" className="hover:text-gold transition-colors block py-0.5">
-                        {locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement"}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/rules-regulations" className="hover:text-gold transition-colors block py-0.5">
-                        {locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations"}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/legal/ephemeris-sources" className="hover:text-gold transition-colors block py-0.5">
-                        {t("ephemerisLink")}
-                      </Link>
-                    </li>
-                  </ul>
-                </details>
-              </li>
               <li>
                 <Link href="/services" className="hover:text-gold transition-colors block py-0.5">
                   {tNav("services")}
@@ -213,6 +165,52 @@ export async function Footer() {
                 </li>
               )}
             </ul>
+          </div>
+
+          {/* Col 2b: Legal Pages, beside Quick Links, every legal page listed */}
+          <div>
+            <div className="font-serif text-xs font-bold text-gold mb-3 uppercase tracking-wider">
+              {locale === "hi" ? "लीगल पेजेस" : "Legal Pages"}
+            </div>
+            <ul className="space-y-1.5 text-xs text-on-maroon">
+            {featureCfg.showCredentialsLink !== false && (
+              <li>
+                <Link href="/credentials" className="hover:text-gold transition-colors block py-0.5">
+                  {tNav("credentials")}
+                </Link>
+              </li>
+            )}
+            <li>
+              <Link href="/legal/privacy" className="hover:text-gold transition-colors block py-0.5">
+                {t("privacyLink")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/legal/terms" className="hover:text-gold transition-colors block py-0.5">
+                {t("termsLink")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/legal/platform-guidelines" className="hover:text-gold transition-colors block py-0.5">
+                {locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/legal/member-agreement" className="hover:text-gold transition-colors block py-0.5">
+                {locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/legal/rules-regulations" className="hover:text-gold transition-colors block py-0.5">
+                {locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/legal/ephemeris-sources" className="hover:text-gold transition-colors block py-0.5">
+                {t("ephemerisLink")}
+              </Link>
+            </li>
+          </ul>
           </div>
 
           {/* Col 3: Lineage & Kendra */}
