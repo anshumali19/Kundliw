@@ -417,6 +417,11 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                   />
                 </div>
               </div>
+              <div className="-mt-2 text-right">
+                <Link href="/auth/forgot-password" className="text-xs font-semibold text-primary hover:underline">
+                  {locale === "hi" ? "पासवर्ड भूल गए?" : "Forgot password?"}
+                </Link>
+              </div>
 
               <button
                 type="submit"
