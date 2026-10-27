@@ -14,6 +14,8 @@ interface BookingPageProps {
     plan?: string;
     offer?: string;
     ref?: string;
+    phone?: string;
+    pay?: string;
     name?: string;
     gender?: "MALE" | "FEMALE" | "OTHER";
     dob?: string;
@@ -117,6 +119,7 @@ export default async function BookingPage(props: BookingPageProps) {
         initialPlanSlug={searchParams?.plan || (servicesData[0]?.plans[0]?.slug ?? "")}
         initialOfferCode={searchParams?.offer || ""}
         initialReferralCode={referralCookie}
+        initialPay={searchParams?.pay}
         gstRateBasisPoints={gst.rateBasisPoints}
         initialSlots={availableSlots}
         userPhone={user.phone}
@@ -125,6 +128,7 @@ export default async function BookingPage(props: BookingPageProps) {
         locale={locale}
         initialJataka={{
           name: searchParams?.name,
+          phone: searchParams?.phone,
           gender: searchParams?.gender,
           dob: searchParams?.dob,
           tob: searchParams?.tob,

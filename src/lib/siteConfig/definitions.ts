@@ -137,9 +137,9 @@ export const SECTIONS: SectionDef[] = [
     noteHi: "GST, बैंक और UPI 'सेटिंग्स' में हैं। यहाँ अन्य व्यवसाय जानकारी है:",
     fields: [
       ...bi("businessName", "Registered business name", "पंजीकृत व्यवसाय नाम", "text", 160),
-      { key: "ownerName", en: "Owner / proprietor", hi: "स्वामी / प्रोपराइटर", type: "text", max: 120 },
-      { key: "msmeNumber", en: "MSME / Udyam number", hi: "MSME / उद्यम संख्या", type: "text", max: 60 },
-      { key: "foundedYear", en: "Year started", hi: "स्थापना वर्ष", type: "number", def: 0 },
+      { key: "ownerName", en: "Owner / proprietor", hi: "स्वामी / प्रोपराइटर", type: "text", max: 120, def: "Krishna Tiwari" },
+      { key: "msmeNumber", en: "MSME / Udyam number", hi: "MSME / उद्यम संख्या", type: "text", max: 60, def: "UDYAM-CG-05-0069748" },
+      { key: "foundedYear", en: "Year started", hi: "स्थापना वर्ष", type: "number", def: 2026 },
     ],
   },
   {

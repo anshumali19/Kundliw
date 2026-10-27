@@ -47,6 +47,8 @@ interface CheckoutClientProps {
   locale: string;
   /** "demo" only on a developer machine; a live site shows manual UPI / bank payment until a real gateway is connected. */
   gatewayMode?: "demo" | "razorpay" | "off";
+  /** Payment picked in the Booking menu, used when that option is available */
+  initialMethod?: "GATEWAY" | "UPI" | "BANK";
 }
 
 export function CheckoutClient({
@@ -54,14 +56,22 @@ export function CheckoutClient({
   adminSettings,
   locale,
   gatewayMode = "off",
+  initialMethod,
 }: CheckoutClientProps) {
   const router = useRouter();
   const tCheckout = useTranslations("checkout");
   const tBooking = useTranslations("booking");
   const isHindi = locale === "hi";
 
+  const gatewayOn = gatewayMode === "demo" || gatewayMode === "razorpay";
   const [paymentMethod, setPaymentMethod] = useState<"GATEWAY" | "UPI" | "BANK">(
-    gatewayMode === "demo" || gatewayMode === "razorpay" ? "GATEWAY" : adminSettings.upiVpa || adminSettings.qrCodeUrl ? "UPI" : "BANK"
+    initialMethod && (initialMethod !== "GATEWAY" || gatewayOn)
+      ? initialMethod
+      : gatewayOn
+        ? "GATEWAY"
+        : adminSettings.upiVpa || adminSettings.qrCodeUrl
+          ? "UPI"
+          : "BANK"
   );
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

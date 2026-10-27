@@ -62,8 +62,11 @@ interface BookingWizardProps {
   userName?: string | null;
   userEmail?: string | null;
   locale: string;
+  /** Payment the customer chose in the Booking menu: GATEWAY, UPI or BANK */
+  initialPay?: string;
   initialJataka?: {
     name?: string;
+    phone?: string;
     gender?: "MALE" | "FEMALE" | "OTHER";
     dob?: string;
     tob?: string;
@@ -109,6 +112,7 @@ export function BookingWizard({
   userEmail = "",
   locale,
   initialJataka,
+  initialPay,
 }: BookingWizardProps) {
   const router = useRouter();
   const tBooking = useTranslations("booking");
@@ -222,7 +226,7 @@ export function BookingWizard({
     tob: initialJataka?.tob || "10:30",
     isTimeUnknown: false,
     pob: initialJataka?.pob || "",
-    phone: userPhone || "",
+    phone: (initialJataka?.phone || "").replace(/\D/g, "").slice(-10) || userPhone || "",
     email: userEmail || "",
     language: (locale === "en" ? "en" : "hi") as "hi" | "en",
     queries: "",
@@ -390,7 +394,7 @@ export function BookingWizard({
       }
 
       // Navigate to checkout payment page
-      router.push(`/${locale}/booking/checkout/${data.orderId}`);
+      router.push(`/${locale}/booking/checkout/${data.orderId}${initialPay ? `?pay=${encodeURIComponent(initialPay)}` : ""}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Order creation failed.";
       setSubmissionError(msg);

@@ -11,12 +11,14 @@ interface CheckoutPageProps {
     locale: string;
     id: string;
   }>;
+  searchParams?: Promise<{ pay?: string }>;
 }
 
 export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage(props: CheckoutPageProps) {
   const params = await props.params;
+  const query = (await props.searchParams) ?? {};
 
   const {
     locale,
@@ -90,6 +92,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
       order={orderData}
       adminSettings={adminSettings}
       locale={locale}
+      initialMethod={query.pay === "GATEWAY" || query.pay === "UPI" || query.pay === "BANK" ? query.pay : undefined}
       gatewayMode={razorpayConfigured() ? "razorpay" : isDemoMode() && process.env.NODE_ENV !== "production" ? "demo" : "off"}
     />
   );
