@@ -55,6 +55,8 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [bookOpen, setBookOpen] = useState(false);
+  const bookRef = useRef<HTMLDivElement>(null);
   const [currentHash, setCurrentHash] = useState("");
 
   // Sync hash for hash-based navigation (e.g. /services#plans)
@@ -72,6 +74,9 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setMoreDropdownOpen(false);
+      }
+      if (bookRef.current && !bookRef.current.contains(event.target as Node)) {
+        setBookOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -314,15 +319,48 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
 
           {/* Action CTAs */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 ml-auto">
-            <Link
-              href="/services"
-              aria-label={tCommon("bookConsultation")}
-              title={tCommon("bookConsultation")}
-              className="hidden sm:inline-flex items-center justify-center px-3 xl:px-3 py-2 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
+            {/* Booking dropdown: the booking path Service, Plan, Offers, then Track and My Account */}
+            <div
+              className="relative hidden sm:block"
+              ref={bookRef}
+              onMouseEnter={() => setBookOpen(true)}
+              onMouseLeave={() => setBookOpen(false)}
             >
-              <Calendar className="w-4 h-4 2xl:mr-1.5 shrink-0" />
-              <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
-            </Link>
+              <button
+                type="button"
+                onClick={() => setBookOpen(!bookOpen)}
+                aria-expanded={bookOpen}
+                aria-label={tCommon("bookConsultation")}
+                title={tCommon("bookConsultation")}
+                className="inline-flex items-center justify-center gap-1 px-3 py-2 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
+              >
+                <Calendar className="w-4 h-4 shrink-0" />
+                <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${bookOpen ? "rotate-180" : ""}`} />
+              </button>
+              {bookOpen && (
+                <div className="absolute top-full right-0 w-60 pt-1 z-50 text-left">
+                  <div className="bg-surface border border-outline-variant/60 shadow-xl rounded py-2">
+                    {[
+                      { href: "/services", label: tNav("services") },
+                      { href: "/services#plans", label: tNav("pricingPlans") },
+                      { href: "/offers", label: tNav("offers") },
+                      { href: "/track", label: tNav("tracker") },
+                      { href: "/account", label: tNav("account") },
+                    ].map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setBookOpen(false)}
+                        className="flex items-center px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-surface-container-high transition-colors min-h-[40px]"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <span className="sm:hidden inline-flex"><LanguageSwitcher tone="light" /></span>
 
