@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import {
   ShieldCheck,
   CreditCard,
+  Lock,
   QrCode,
   Building,
   CheckCircle2,
@@ -25,6 +26,7 @@ interface CheckoutClientProps {
     baseAmountPaise: number;
     discountAmountPaise: number;
     gstAmountPaise: number;
+    gstRateBasisPoints?: number;
     netAmountPaise: number;
     offerCode?: string | null;
     serviceTitle: string;
@@ -43,7 +45,7 @@ interface CheckoutClientProps {
   };
   locale: string;
   /** "demo" only on a developer machine; a live site shows manual UPI / bank payment until a real gateway is connected. */
-  gatewayMode?: "demo" | "off";
+  gatewayMode?: "demo" | "razorpay" | "off";
 }
 
 export function CheckoutClient({
@@ -58,7 +60,7 @@ export function CheckoutClient({
   const isHindi = locale === "hi";
 
   const [paymentMethod, setPaymentMethod] = useState<"GATEWAY" | "UPI" | "BANK">(
-    gatewayMode === "demo" ? "GATEWAY" : adminSettings.upiVpa || adminSettings.qrCodeUrl ? "UPI" : "BANK"
+    gatewayMode === "demo" || gatewayMode === "razorpay" ? "GATEWAY" : adminSettings.upiVpa || adminSettings.qrCodeUrl ? "UPI" : "BANK"
   );
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -73,6 +75,65 @@ export function CheckoutClient({
       navigator.clipboard.writeText(adminSettings.upiVpa);
       setCopiedVpa(true);
       setTimeout(() => setCopiedVpa(false), 2500);
+    }
+  };
+
+  const handleRazorpay = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      await new Promise<void>((resolve, reject) => {
+        if ((window as unknown as { Razorpay?: unknown }).Razorpay) return resolve();
+        const s = document.createElement("script");
+        s.src = "https://checkout.razorpay.com/v1/checkout.js";
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Could not load the payment window. Check your internet and try again."));
+        document.body.appendChild(s);
+      });
+      const res = await fetch("/api/payments/razorpay/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not start the online payment.");
+
+      type RzpCtor = new (o: Record<string, unknown>) => { open: () => void; on: (e: string, cb: () => void) => void };
+      const Rzp = (window as unknown as { Razorpay: RzpCtor }).Razorpay;
+      const box = new Rzp({
+        key: data.keyId,
+        amount: data.amountPaise,
+        currency: data.currency,
+        order_id: data.providerOrderId,
+        name: "Maharshi Kanad Jyotish Kendra",
+        description: order.serviceTitle + " - " + order.orderNumber,
+        prefill: { name: order.jatakaName },
+        theme: { color: "#C0481B" },
+        modal: { ondismiss: () => setLoading(false) },
+        handler: async (r: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+          try {
+            const v = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId: order.id, ...r }),
+            });
+            const vd = await v.json();
+            if (!v.ok) throw new Error(vd.error || "Could not confirm the payment.");
+            router.push(`/${locale}/booking/success/${order.id}`);
+          } catch (e) {
+            setErrorMessage((e instanceof Error ? e.message : "Could not confirm the payment.") + (isHindi ? " यदि पैसे कटे हैं तो हमसे संपर्क करें।" : " If money was deducted, please contact us."));
+            setLoading(false);
+          }
+        },
+      });
+      box.on("payment.failed", () => {
+        setErrorMessage(isHindi ? "भुगतान विफल रहा। दोबारा प्रयास करें या UPI / बैंक ट्रांसफर चुनें।" : "The payment failed. Please try again, or pay by UPI / bank transfer.");
+        setLoading(false);
+      });
+      box.open();
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Network error");
+      setLoading(false);
     }
   };
 
@@ -241,7 +302,7 @@ export function CheckoutClient({
               )}
 
               <div className="flex justify-between text-on-surface-variant">
-                <span>{isHindi ? "जीएसटी (GST @ 18%):" : "GST (18%):"}</span>
+                <span>{isHindi ? `जीएसटी (GST @ ${(order.gstRateBasisPoints ?? 1800) / 100}%):` : `GST (${(order.gstRateBasisPoints ?? 1800) / 100}%):`}</span>
                 <span>{formatPaiseToInr(order.gstAmountPaise)}</span>
               </div>
 
@@ -350,6 +411,51 @@ export function CheckoutClient({
             )}
           </div>
           </>
+          )}
+
+          {gatewayMode === "razorpay" && (
+          <div
+            onClick={() => setPaymentMethod("GATEWAY")}
+            className={`p-5 rounded-lg border-2 transition-all cursor-pointer ${
+              paymentMethod === "GATEWAY"
+                ? "border-primary bg-surface-container-lowest shadow-sm"
+                : "border-outline-variant/60 bg-surface-container-low hover:border-outline"
+            }`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <input
+                  type="radio"
+                  name="paymentMode"
+                  checked={paymentMethod === "GATEWAY"}
+                  onChange={() => setPaymentMethod("GATEWAY")}
+                  className="mt-1 h-4 w-4 accent-primary"
+                />
+                <div>
+                  <span className="font-serif font-bold text-sm sm:text-base text-on-surface">
+                    {isHindi ? "ऑनलाइन भुगतान (Razorpay: UPI / कार्ड / नेटबैंकिंग)" : "Pay online (Razorpay: UPI / Card / Netbanking)"}
+                  </span>
+                  <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                    {isHindi ? "भुगतान होते ही बुकिंग तुरंत पक्की हो जाती है।" : "Your booking is confirmed the moment the payment goes through."}
+                  </p>
+                </div>
+              </div>
+              <CreditCard className="w-6 h-6 text-primary shrink-0" />
+            </div>
+            {paymentMethod === "GATEWAY" && (
+              <div className="mt-5 pt-4 border-t border-outline-variant/40">
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={handleRazorpay}
+                  className="w-full min-h-[44px] px-5 py-3 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>{isHindi ? `अभी भुगतान करें (${formatPaiseToInr(order.netAmountPaise)})` : `Pay now (${formatPaiseToInr(order.netAmountPaise)})`}</span>
+                </button>
+              </div>
+            )}
+          </div>
           )}
 
           {/* Mode 2: Direct UPI */}

@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { isDemoMode } from "@/lib/config/demo";
+import { razorpayConfigured } from "@/lib/payments/gateway";
 import { prisma } from "@/lib/prisma";
 import { PaymentStatus, Role } from "@prisma/client";
 import { CheckoutClient } from "@/features/booking/components/CheckoutClient";
@@ -74,6 +75,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
     baseAmountPaise: order.baseAmountPaise,
     discountAmountPaise: order.discountAmountPaise,
     gstAmountPaise: order.gstAmountPaise,
+    gstRateBasisPoints: order.gstRateBasisPoints,
     netAmountPaise: order.netAmountPaise,
     offerCode: order.offerCode,
     serviceTitle: isHindi ? order.service?.titleHi || "" : order.service?.titleEn || "",
@@ -88,7 +90,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
       order={orderData}
       adminSettings={adminSettings}
       locale={locale}
-      gatewayMode={isDemoMode() && process.env.NODE_ENV !== "production" ? "demo" : "off"}
+      gatewayMode={razorpayConfigured() ? "razorpay" : isDemoMode() && process.env.NODE_ENV !== "production" ? "demo" : "off"}
     />
   );
 }

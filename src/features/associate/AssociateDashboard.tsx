@@ -183,8 +183,8 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
           <p className="text-xs text-on-surface-variant mt-2">
             {t("Code:", "कोड:")} <strong>{profile.referralCode}</strong>.{" "}
             {t(
-              "A booking made within 30 days of someone opening your link is credited to you.",
-              "आपका लिंक खोलने के 30 दिनों के भीतर किया गया बुकिंग आपके नाम दर्ज होगा।"
+              "A booking is credited to you when someone opens your link (valid for 30 days) or types your code in the Referral Code box while booking.",
+              "बुकिंग आपके नाम दर्ज होगी जब कोई आपका लिंक खोले (30 दिन मान्य) या बुकिंग के समय 'रेफरल कोड' में आपका कोड डाले।"
             )}
           </p>
         </div>
