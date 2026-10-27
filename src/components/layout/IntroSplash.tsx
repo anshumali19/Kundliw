@@ -20,7 +20,9 @@ export function IntroSplash({
   sub = "",
   symbol = "",
   logo = "",
-  welcome = "",
+  welcomeHi = "",
+  welcomeEn = "",
+  mantra = "",
 }: {
   isHindi: boolean;
   enabled?: boolean;
@@ -32,8 +34,11 @@ export function IntroSplash({
   symbol?: string;
   /** Logo image shown in place of the symbol (admin can change or clear it) */
   logo?: string;
-  /** Welcome line at the bottom of the screen */
-  welcome?: string;
+  /** Welcome lines at the bottom: Hindi first, English below it */
+  welcomeHi?: string;
+  welcomeEn?: string;
+  /** Mantra between the Om and the photo, one line per row */
+  mantra?: string;
 }) {
   const pathname = usePathname() || "/";
   const onHome = /^\/(hi|en)?\/?$/.test(pathname);
@@ -81,15 +86,21 @@ export function IntroSplash({
       <div className="intro-ring-inner" />
       <div className="intro-stack">
         <div className="intro-symbol" aria-hidden="true">{symbol || "ॐ"}</div>
+        {mantra.trim() && (
+          <p className="intro-mantra" lang="sa">
+            {mantra.split("\n").filter((l) => l.trim()).map((line, i) => (
+              <span key={i} className="block">{line}</span>
+            ))}
+          </p>
+        )}
         {logo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img className="intro-logo" src={logo} alt="Maharshi Kanad" />
         )}
         <div className="intro-copy">
-          <div className="intro-title">
-            {welcome || (isHindi ? "महर्षि कणाद ज्योतिष केंद्र में आपका स्वागत है" : "Welcome to Maharshi Kanad Jyotish Kendra")}
-          </div>
-          <div className="intro-hindi">{tagline || (isHindi ? "महर्षि कणाद ज्योतिष केंद्र" : "ज्योतिष • ज्ञान • मार्गदर्शन")}</div>
+          <div className="intro-welcome-hi" lang="hi">{welcomeHi || "महर्षि कणाद ज्योतिष केंद्र में आपका स्वागत है"}</div>
+          <div className="intro-title">{welcomeEn || "Welcome to Maharshi Kanad Jyotish Kendra"}</div>
+          <div className="intro-hindi">{tagline || "ज्योतिष • ज्ञान • मार्गदर्शन"}</div>
           <div className="intro-sub">{sub || "VEDIC ASTROLOGY & GUIDANCE"}</div>
           <div className="intro-loader" />
         </div>

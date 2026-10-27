@@ -327,7 +327,9 @@ export default async function LocaleLayout(
               sub={String(introCfg[locale === "hi" ? "subHi" : "subEn"] || "")}
               symbol={String(introCfg.symbol || "")}
               logo={String(introCfg.logoImage ?? "")}
-              welcome={String(introCfg[locale === "hi" ? "welcomeHi" : "welcomeEn"] || "")}
+              welcomeHi={String(introCfg.welcomeHi || "")}
+              welcomeEn={String(introCfg.welcomeEn || "")}
+              mantra={String(introCfg.mantra || "")}
             />
           <SmoothScrollProvider>
             <Header

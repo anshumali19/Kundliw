@@ -107,21 +107,27 @@ header { border-bottom: 1px solid var(--outline-variant); }
 .intro-ring::before { content: ""; position: absolute; inset: 19px; border: 1px dashed rgba(216, 163, 65, 0.42); border-radius: 50%; }
 .intro-ring-inner { position: absolute; width: min(53vw, 310px); aspect-ratio: 1; border: 1px solid rgba(216, 163, 65, 0.3); border-radius: 50%; transform: rotate(22deg); animation: introSpinBack 18s linear infinite; }
 .intro-symbol {
-  position: relative; width: clamp(84px, 12vw, 104px); height: clamp(84px, 12vw, 104px); border-radius: 50%; display: grid; place-items: center;
+  position: relative; width: clamp(60px, 10vh, 96px); height: clamp(60px, 10vh, 96px); border-radius: 50%; display: grid; place-items: center;
   background: radial-gradient(circle at 35% 22%, #fff3c9 0, #e9bb58 40%, #d95a24 70%, #8a2a1c 100%);
   border: 1px solid #f7dc9a; box-shadow: 0 0 32px rgba(216, 163, 65, 0.45), 0 0 0 9px rgba(216, 163, 65, 0.08);
-  color: #40241c; font: 600 clamp(46px, 7vw, 60px) "Cormorant Garamond", Georgia, serif; animation: introRise 1.05s cubic-bezier(0.2, 0.8, 0.2, 1) both; z-index: 2;
+  color: #40241c; font: 600 clamp(34px, 5.8vh, 56px) "Cormorant Garamond", Georgia, serif; animation: introRise 1.05s cubic-bezier(0.2, 0.8, 0.2, 1) both; z-index: 2;
 }
-.intro-stack { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: -44px; padding: 0 18px; }
+.intro-stack { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.6vh, 16px); margin-top: -3vh; padding: 0 18px 56px; max-width: 100%; }
+.intro-mantra {
+  margin: 0; text-align: center; color: #ffe2a8; font-weight: 600; line-height: 1.7; letter-spacing: 0.01em;
+  font-size: clamp(14px, 2.1vh, 19px); max-width: min(92vw, 640px); text-wrap: balance; animation: introText 0.9s 0.1s both;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
 .intro-logo {
-  width: clamp(190px, 26vw, 280px); height: auto; border-radius: 20px; background: #fbf8f2;
-  box-shadow: 0 0 36px rgba(216, 163, 65, 0.4), 0 0 0 7px rgba(216, 163, 65, 0.12); animation: introRise 1.05s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  width: min(380px, 78vw, 36vh * 1.333); height: auto; border-radius: 22px; background: #fbf8f2;
+  box-shadow: 0 0 44px rgba(216, 163, 65, 0.42), 0 0 0 8px rgba(216, 163, 65, 0.12); animation: introRise 1.05s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .intro-copy { position: relative; text-align: center; animation: introText 0.9s 0.25s both; }
-.intro-title { font: 600 clamp(20px, 3.4vw, 32px) "Cormorant Garamond", Georgia, serif; letter-spacing: 0.02em; color: #fff5df; margin: 0 0 8px; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35); }
+.intro-welcome-hi { font-weight: 700; font-size: clamp(17px, 2.9vh, 26px); color: #ffe9bd; margin: 0 0 4px; line-height: 1.5; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35); }
+.intro-title { font: 600 clamp(17px, 2.6vh, 27px) "Cormorant Garamond", Georgia, serif; letter-spacing: 0.02em; color: #fff5df; margin: 0 0 8px; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35); }
 .intro-hindi { font-size: clamp(13px, 2vw, 16px); color: #ffe2a8; margin-bottom: 8px; }
 .intro-sub { font-size: 10px; letter-spacing: clamp(2px, 0.6vw, 4px); font-weight: 700; color: #d8a341; }
-.intro-loader { width: 132px; height: 2px; background: rgba(255, 255, 255, 0.15); margin: 22px auto 0; overflow: hidden; border-radius: 9px; }
+.intro-loader { width: 132px; height: 2px; background: rgba(255, 255, 255, 0.15); margin: clamp(8px, 1.6vh, 16px) auto 0; overflow: hidden; border-radius: 9px; }
 .intro-loader::after { content: ""; display: block; width: 36%; height: 100%; background: linear-gradient(90deg, #d95a24, #ffe7a3, #d95a24); animation: introLoad 1.45s ease-in-out infinite; }
 .intro-skip { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); border: 1px solid rgba(216, 163, 65, 0.45); background: rgba(255, 255, 255, 0.05); color: #ffe9bd; border-radius: 30px; padding: 9px 20px; font-size: 11px; letter-spacing: 1px; transition: background 0.2s ease; z-index: 5; }
 .intro-skip:hover { background: rgba(255, 255, 255, 0.14); }
@@ -131,10 +137,13 @@ header { border-bottom: 1px solid var(--outline-variant); }
 @keyframes introRise { from { opacity: 0; transform: translateY(20px) scale(0.78); } }
 @keyframes introText { from { opacity: 0; transform: translateY(13px); } }
 @keyframes introLoad { from { transform: translateX(-120%); } to { transform: translateX(320%); } }
+@media (max-height: 720px) {
+  .intro-hindi, .intro-sub { display: none; }
+}
 @media (max-width: 600px) {
-  .intro-symbol { width: 72px; height: 72px; font-size: 40px; }
-  .intro-stack { margin-top: -30px; gap: 12px; }
-  .intro-logo { width: min(62vw, 230px); }
+  .intro-symbol { width: clamp(56px, 9vh, 72px); height: clamp(56px, 9vh, 72px); font-size: clamp(32px, 5.2vh, 40px); }
+  .intro-stack { gap: 10px; }
+  .intro-mantra { font-size: clamp(13px, 1.9vh, 16px); }
   .intro-ring { width: 250px; }
   .intro-ring-inner { width: 190px; }
   .intro-copy { top: calc(50% + 78px); }

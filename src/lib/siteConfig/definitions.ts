@@ -409,6 +409,7 @@ export const SECTIONS: SectionDef[] = [
     fields: [
       { key: "enabled", en: "Show the opening screen on the first visit", hi: "पहली बार खुलने पर ओपनिंग स्क्रीन दिखाएँ", type: "toggle", def: true },
       { key: "stayTime", en: "How long it stays (seconds, 1 to 12)", hi: "कितनी देर दिखे (सेकंड, 1 से 12)", type: "number", def: 7 },
+      { key: "mantra", en: "Mantra between the Om and the photo (one line per row)", hi: "ओम और फोटो के बीच का मंत्र (हर पंक्ति अलग)", type: "textarea", max: 300, def: "ॐ असतो मा सद्गमय। तमसो मा ज्योतिर्गमय। मृत्योर्मा अमृतं गमय॥\nॐ शान्तिः शान्तिः शान्तिः" },
       { key: "welcomeEn", en: "Welcome line at the bottom (English)", hi: "नीचे का स्वागत वाक्य (अंग्रेज़ी)", type: "text", max: 120, def: "Welcome to Maharshi Kanad Jyotish Kendra" },
       { key: "welcomeHi", en: "Welcome line at the bottom (Hindi)", hi: "नीचे का स्वागत वाक्य (हिंदी)", type: "text", max: 120, def: "महर्षि कणाद ज्योतिष केंद्र में आपका स्वागत है" },
       ...bi("title", "Name shown", "दिखने वाला नाम", "text", 80),
