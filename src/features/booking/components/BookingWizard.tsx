@@ -55,6 +55,8 @@ interface BookingWizardProps {
   initialServiceSlug: string;
   initialPlanSlug: string;
   initialOfferCode?: string;
+  initialReferralCode?: string;
+  gstRateBasisPoints?: number;
   initialSlots: AvailableSlot[];
   userPhone?: string | null;
   userName?: string | null;
@@ -99,6 +101,8 @@ export function BookingWizard({
   initialServiceSlug,
   initialPlanSlug,
   initialOfferCode = "",
+  initialReferralCode = "",
+  gstRateBasisPoints = 1800,
   initialSlots,
   userPhone = "",
   userName = "",
@@ -144,6 +148,61 @@ export function BookingWizard({
   } | null>(null);
   const [offerLoading, setOfferLoading] = useState(false);
   const [offerError, setOfferError] = useState<string | null>(null);
+
+  // Referral code (associate) - entered here or remembered from a referral link
+  const [referralInput, setReferralInput] = useState<string>(initialReferralCode || "");
+  const [referralApplied, setReferralApplied] = useState<string | null>(null);
+  const [referralError, setReferralError] = useState<string | null>(null);
+  const [referralLoading, setReferralLoading] = useState(false);
+
+  // Offers the admin chose to show next to this plan
+  const [planOffers, setPlanOffers] = useState<Array<{ code: string; titleEn: string; titleHi: string; discountFormatted: string }>>([]);
+  useEffect(() => {
+    if (!activePlan?.id) return;
+    let cancelled = false;
+    fetch(`/api/offers/available?planId=${encodeURIComponent(activePlan.id)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled) setPlanOffers(Array.isArray(d.offers) ? d.offers : []);
+      })
+      .catch(() => {
+        if (!cancelled) setPlanOffers([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activePlan?.id]);
+
+  const handleCheckReferral = async () => {
+    const code = referralInput.trim().toUpperCase();
+    if (!code) return;
+    setReferralLoading(true);
+    setReferralError(null);
+    try {
+      const res = await fetch("/api/associate/referral-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setReferralApplied(code);
+      } else {
+        setReferralApplied(null);
+        setReferralError(data.error || (isHindi ? "यह रेफरल कोड सही नहीं है।" : "This referral code is not valid."));
+      }
+    } catch {
+      setReferralError(isHindi ? "जाँच नहीं हो सकी, दोबारा प्रयास करें।" : "Could not check the code. Please try again.");
+    } finally {
+      setReferralLoading(false);
+    }
+  };
+
+  // A code remembered from a referral link is checked once on arrival
+  useEffect(() => {
+    if (initialReferralCode) handleCheckReferral();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Jataka Details Form
   const [formData, setFormData] = useState({
@@ -269,6 +328,7 @@ export function BookingWizard({
         serviceSlug: activeService.slug,
         planSlug: activePlan.slug,
         offerCode: appliedOffer ? appliedOffer.code : undefined,
+        referralCode: referralApplied || undefined,
         slotId: activePlan.hasCall ? selectedSlotId : undefined,
         jatakaDetails: {
           name: formData.name.trim(),
@@ -327,7 +387,8 @@ export function BookingWizard({
   const basePricePaise = activePlan ? activePlan.pricePaise : 0;
   const discountPaise = appliedOffer ? appliedOffer.discountPaise : 0;
   const taxablePaise = Math.max(0, basePricePaise - discountPaise);
-  const gstPaise = Math.round((taxablePaise * 1800) / 10000); // 18% GST
+  const gstPaise = Math.round((taxablePaise * gstRateBasisPoints) / 10000);
+  const gstPercentLabel = String(gstRateBasisPoints / 100);
   const netPayablePaise = taxablePaise + gstPaise;
 
   return (
@@ -360,6 +421,26 @@ export function BookingWizard({
           </div>
         </div>
       </div>
+
+      {/* Booking path: Service > Plan > Details > Offer > Referral > Payment > Confirmation */}
+      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] font-semibold text-on-surface-variant" aria-label="Booking steps">
+        {(
+          [
+            [isHindi ? "सेवा" : "Service", 1],
+            [isHindi ? "प्लान" : "Plan", 1],
+            [isHindi ? "विवरण" : "Details", 2],
+            [isHindi ? "ऑफर" : "Offer", 3],
+            [isHindi ? "रेफरल कोड" : "Referral code", 3],
+            [isHindi ? "भुगतान (Razorpay / UPI)" : "Payment (Razorpay / UPI)", 4],
+            [isHindi ? "पुष्टि" : "Confirmation", 4],
+          ] as Array<[string, number]>
+        ).map(([label, at], i, arr) => (
+          <li key={label} className="inline-flex items-center gap-1.5">
+            <span className={`px-2 py-0.5 rounded-full border ${currentStep >= at && at < 4 ? "bg-brand text-on-brand border-brand" : "border-outline-variant/60"}`}>{label}</span>
+            {i < arr.length - 1 && <span aria-hidden="true">&rsaquo;</span>}
+          </li>
+        ))}
+      </ol>
 
       {submissionError && (
         <div className="p-4 bg-surface rounded border border-error text-xs text-on-error-container font-medium flex items-center gap-2">
@@ -1001,6 +1082,88 @@ export function BookingWizard({
             )}
           </div>
 
+          {/* Offers for this plan */}
+          {planOffers.length > 0 && !appliedOffer && (
+            <div className="space-y-2">
+              <div className="text-xs font-bold uppercase text-secondary">{isHindi ? "इस प्लान के ऑफर" : "Offers on this plan"}</div>
+              <ul className="space-y-1.5">
+                {planOffers.map((o) => (
+                  <li key={o.code} className="flex items-center justify-between gap-2 rounded border border-outline-variant/60 bg-surface px-3 py-2">
+                    <div className="min-w-0 text-[11px]">
+                      <div className="font-semibold text-secondary truncate">{isHindi ? o.titleHi : o.titleEn}</div>
+                      <div className="font-mono text-on-surface-variant">{o.code} · -{o.discountFormatted}</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOfferCodeInput(o.code);
+                        handleValidateOffer(o.code);
+                      }}
+                      className="shrink-0 min-h-[36px] px-3 bg-brand text-on-brand rounded text-[11px] font-bold uppercase hover:bg-brand-hover"
+                    >
+                      {isHindi ? "लगाएँ" : "Apply"}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Referral code */}
+          <div className="space-y-2 text-left">
+            <label className="block text-xs font-bold uppercase text-secondary">
+              {isHindi ? "रेफरल कोड (Referral Code)" : "Referral Code"}
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={referralInput}
+                onChange={(e) => {
+                  setReferralInput(e.target.value.toUpperCase());
+                  setReferralApplied(null);
+                  setReferralError(null);
+                }}
+                placeholder={isHindi ? "सहयोगी का कोड (वैकल्पिक)" : "Associate code (optional)"}
+                disabled={referralLoading}
+                className="w-full bg-surface border border-outline-variant rounded px-3 py-2 text-xs font-mono font-bold uppercase min-h-[44px] focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              {referralApplied ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReferralApplied(null);
+                    setReferralInput("");
+                  }}
+                  aria-label={isHindi ? "रेफरल कोड हटाएँ" : "Remove referral code"}
+                  className="min-h-[44px] px-3 bg-surface border border-outline-variant text-on-error-container rounded hover:bg-surface-container"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleCheckReferral}
+                  disabled={referralLoading || !referralInput.trim()}
+                  className="min-h-[44px] px-4 bg-brand text-on-brand rounded text-xs uppercase font-bold hover:bg-brand-hover disabled:opacity-50"
+                >
+                  {referralLoading ? "..." : isHindi ? "जाँचें" : "Check"}
+                </button>
+              )}
+            </div>
+            {referralError && (
+              <div className="text-[11px] text-on-error-container font-medium flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>{referralError}</span>
+              </div>
+            )}
+            {referralApplied && (
+              <div className="text-[11px] text-secondary font-medium flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-tertiary" />
+                <span>{isHindi ? `रेफरल कोड '${referralApplied}' जुड़ गया` : `Referral code '${referralApplied}' added`}</span>
+              </div>
+            )}
+          </div>
+
           {/* Financial Breakdown Table */}
           <div className="space-y-2 text-xs border-t border-outline-variant/40 pt-4 text-on-surface">
             <div className="flex justify-between">
@@ -1025,7 +1188,7 @@ export function BookingWizard({
             </div>
 
             <div className="flex justify-between text-on-surface-variant">
-              <span>{isHindi ? "वस्तु एवं सेवा कर (GST @ 18%):" : "GST @ 18%:"}</span>
+              <span>{isHindi ? `वस्तु एवं सेवा कर (GST @ ${gstPercentLabel}%):` : `GST @ ${gstPercentLabel}%:`}</span>
               <span>{formatPaiseToInr(gstPaise)}</span>
             </div>
 

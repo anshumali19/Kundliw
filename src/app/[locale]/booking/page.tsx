@@ -1,5 +1,8 @@
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { REFERRAL_COOKIE, normalizeReferralCode } from "@/lib/associates/service";
+import { getGstSettings } from "@/lib/billing/gstSettings";
 import { BookingWizard, BookingServiceSummary, AvailableSlot } from "@/features/booking/components/BookingWizard";
 
 interface BookingPageProps {
@@ -99,6 +102,9 @@ export default async function BookingPage(props: BookingPageProps) {
       available: s.capacity - s.bookedCount,
     }));
 
+  const gst = await getGstSettings();
+  const referralCookie = normalizeReferralCode((await cookies()).get(REFERRAL_COOKIE)?.value) || "";
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left">
       <BookingWizard
@@ -106,6 +112,8 @@ export default async function BookingPage(props: BookingPageProps) {
         initialServiceSlug={searchParams?.service || (servicesData[0]?.slug ?? "")}
         initialPlanSlug={searchParams?.plan || (servicesData[0]?.plans[0]?.slug ?? "")}
         initialOfferCode={searchParams?.offer || ""}
+        initialReferralCode={referralCookie}
+        gstRateBasisPoints={gst.rateBasisPoints}
         initialSlots={availableSlots}
         userPhone={user.phone}
         userName={user.name}

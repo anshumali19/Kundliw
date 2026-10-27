@@ -10,8 +10,8 @@ const NAV_GROUPS: Array<{ en: string; hi: string; ids: string[] }> = [
   { en: "Home page", hi: "होम पेज", ids: ["homeHero", "homeSections", "homeCards", "homeServices", "homeProcess", "homeContact", "home", "hero", "heroAnimation"] },
   { en: "Menus, links and buttons", hi: "मेन्यू, लिंक और बटन", ids: ["menu", "footerLinks", "social", "topbar", "floating"] },
   { en: "Look of the site", hi: "साइट का रूप", ids: ["theme", "logo", "intro", "general"] },
-  { en: "Pages and content", hi: "पेज और कंटेंट", ids: ["contact", "content", "features", "tools", "technology", "mobileApp", "legal"] },
-  { en: "Business, Google and notes", hi: "व्यवसाय, गूगल और नोट", ids: ["business", "seo", "analytics", "admin"] },
+  { en: "Pages and content", hi: "पेज और कंटेंट", ids: ["contact", "mapPage", "content", "features", "tools", "technology", "mobileApp", "legal"] },
+  { en: "Business, Google and notes", hi: "व्यवसाय, गूगल और नोट", ids: ["business", "invoice", "ticket", "seo", "analytics", "admin"] },
 ];
 
 const field = "w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-sm";

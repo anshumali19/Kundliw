@@ -6,6 +6,8 @@ import { generateInvoicePdf } from "@/lib/billing/invoicePdf";
 import { formatPaiseToInr, formatGstRateBasisPoints } from "@/lib/billing/gst";
 import { escapeHtml } from "@/lib/billing/html";
 import { isDemoMode } from "@/lib/config/demo";
+import { getSection } from "@/lib/siteConfig/service";
+import { DEFAULT_INVOICE_TERMS, type InvoiceOptions } from "@/lib/billing/invoicePdf";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +38,27 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: "Forbidden: Access denied to this invoice" }, { status: 403 });
     }
+
+    const cfg = await getSection("invoice");
+    if (!isAdmin && cfg.userCanDownload === false) {
+      return NextResponse.json({ error: "Invoices are not available to download right now. Please contact us." }, { status: 403 });
+    }
+    const text = (k: string) => String(cfg[k] || "").trim();
+    const opts: InvoiceOptions = {
+      title: text("title") || undefined,
+      tagline: text("tagline") || undefined,
+      numberLabel: text("numberLabel") || undefined,
+      showAddress: cfg.showAddress !== false,
+      showPhone: cfg.showPhone !== false,
+      showEmail: cfg.showEmail !== false,
+      showGstin: cfg.showGstin !== false,
+      showCustomerEmail: cfg.showCustomerEmail !== false,
+      showOfferCode: cfg.showOfferCode !== false,
+      terms: text("terms").split(/\r?\n/).map((x) => x.trim()).filter(Boolean).slice(0, 10),
+      footerLine: text("footerLine") || undefined,
+      signatureName: text("signatureName") || undefined,
+      signatureTitle: text("signatureTitle") || undefined,
+    };
 
     const adminSettings = await prisma.adminSettings.findUnique({
       where: { id: "default" },
@@ -71,6 +94,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       paymentMode: order.paymentMode,
       paymentStatus: order.paymentStatus,
       offerCode: order.offerCode,
+      opts,
     };
 
     const { searchParams } = new URL(request.url);
@@ -85,6 +109,12 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
         siteAddress: escapeHtml(invoiceData.siteAddress),
         sitePhone: escapeHtml(invoiceData.sitePhone),
         siteEmail: escapeHtml(invoiceData.siteEmail),
+        title: escapeHtml(opts.title || "TAX INVOICE / DAKSHINA RECEIPT"),
+        tagline: escapeHtml(opts.tagline || "Vedic Astrological Heritage & Mathematical Computation Centre"),
+        numberLabel: escapeHtml(opts.numberLabel || "Invoice Number"),
+        footerLine: escapeHtml(opts.footerLine || ""),
+        signature: escapeHtml([opts.signatureName, opts.signatureTitle].filter(Boolean).join(" - ")),
+        terms: (opts.terms && opts.terms.length > 0 ? opts.terms : DEFAULT_INVOICE_TERMS).map((t, i) => `${i + 1}. ${escapeHtml(t)}`).join("<br>"),
         gstin: invoiceData.gstin ? escapeHtml(invoiceData.gstin) : null,
         invoiceNumber: escapeHtml(invoiceData.invoiceNumber),
         date: escapeHtml(invoiceData.date.toLocaleDateString("en-IN")),
@@ -133,15 +163,15 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     ${isDemoMode() && process.env.NODE_ENV !== "production" ? '<div class="demo-watermark">DEMO INVOICE (नमूना)</div>' : ""}
     <div class="header">
       <h1 class="title">${safe.siteName}</h1>
-      <div class="subtitle">Vedic Astrological Heritage & Mathematical Computation Centre</div>
-      <div style="font-size: 11px; color: #574237;">${[safe.siteAddress, `Phone: ${safe.sitePhone}`, safe.siteEmail ? `Email: ${safe.siteEmail}` : ""].filter(Boolean).join(" | ")}</div>
-      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${safe.gstin ? `GSTIN: ${safe.gstin}` : "GST: Not Applicable (Unregistered Kendra)"}</div>
+      <div class="subtitle">${safe.tagline}</div>
+      <div style="font-size: 11px; color: #574237;">${[opts.showAddress === false ? "" : safe.siteAddress, opts.showPhone === false || !safe.sitePhone ? "" : `Phone: ${safe.sitePhone}`, opts.showEmail === false || !safe.siteEmail ? "" : `Email: ${safe.siteEmail}`].filter(Boolean).join(" | ")}</div>
+      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${opts.showGstin === false ? "" : safe.gstin ? `GSTIN: ${safe.gstin}` : "GST: Not Applicable (Unregistered Kendra)"}</div>
     </div>
 
     <div class="meta-grid">
       <div class="meta-col">
-        <strong>INVOICE DETAILS:</strong><br>
-        Invoice Number: <strong>${safe.invoiceNumber}</strong><br>
+        <strong>${safe.title}</strong><br>
+        ${safe.numberLabel}: <strong>${safe.invoiceNumber}</strong><br>
         Date: ${safe.date}<br>
         Order Ref: ${safe.orderNumber}<br>
         Payment Mode: ${safe.paymentMode} (${safe.paymentStatus})
@@ -150,7 +180,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
         <strong>BILLED TO (CUSTOMER):</strong><br>
         Name: <strong>${safe.customerName}</strong><br>
         Phone: ${safe.customerPhone}<br>
-        ${safe.customerEmail ? `Email: ${safe.customerEmail}<br>` : ""}
+        ${safe.customerEmail && opts.showCustomerEmail !== false ? `Email: ${safe.customerEmail}<br>` : ""}
       </div>
     </div>
 
@@ -169,7 +199,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
           <td>1</td>
           <td>
             <strong>${safe.serviceTitle}</strong><br>
-            <span style="font-size: 11px; color: #574237;">Tier: ${safe.planTitle}${safe.offerCode ? ` (Offer: ${safe.offerCode})` : ""}</span>
+            <span style="font-size: 11px; color: #574237;">Tier: ${safe.planTitle}${safe.offerCode && opts.showOfferCode !== false ? ` (Offer: ${safe.offerCode})` : ""}</span>
           </td>
           <td class="text-right">${escapeHtml(formatPaiseToInr(invoiceData.baseAmountPaise))}</td>
           <td class="text-right">${invoiceData.discountAmountPaise > 0 ? `-${escapeHtml(formatPaiseToInr(invoiceData.discountAmountPaise))}` : "₹0"}</td>
@@ -195,9 +225,10 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
 
     <div class="footer-note">
       <strong>Terms & Declaration:</strong><br>
-      1. Pure mathematical ephemeris and astrological guidance derived according to classical Surya Siddhantic & Parashari principles.<br>
-      2. Issued electronically by Maharshi Kanad Jyotish Kendra.
+      ${safe.terms}
     </div>
+    ${safe.signature ? `<div style="margin-top:28px;text-align:right;font-size:12px;"><strong>${safe.signature}</strong></div>` : ""}
+    ${safe.footerLine ? `<div style="margin-top:20px;text-align:center;font-size:12px;color:#984700;font-weight:bold;">${safe.footerLine}</div>` : ""}
   </div>
 </body>
 </html>`;

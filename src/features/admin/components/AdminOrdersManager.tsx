@@ -440,6 +440,24 @@ export function AdminOrdersManager({
                   {selectedOrder.serviceTitle}
                 </h3>
                 <p className="text-xs text-on-surface-variant">{selectedOrder.planTitle}</p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <a
+                    href={`/api/invoice/${selectedOrder.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="min-h-[40px] px-3 inline-flex items-center rounded border border-outline-variant text-xs font-semibold text-secondary hover:bg-surface-container"
+                  >
+                    {isHindi ? "इनवॉइस खोलें (PDF)" : "Open invoice (PDF)"}
+                  </a>
+                  <a
+                    href={`/api/ticket/${selectedOrder.id}?lang=${isHindi ? "hi" : "en"}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="min-h-[40px] px-3 inline-flex items-center rounded border border-outline-variant text-xs font-semibold text-secondary hover:bg-surface-container"
+                  >
+                    {isHindi ? "कन्फर्मेशन टिकट खोलें" : "Open confirmation ticket"}
+                  </a>
+                </div>
               </div>
 
               {/* Payment Verification Section if Awaiting */}

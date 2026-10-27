@@ -61,11 +61,37 @@ export default async function ContactPage(
   const social = (await getActiveSocialLinks()).map(({ id, name, url }) => ({ id, name, url }));
   const pickText = (k: string) => String(contactCfg[k + (locale === "hi" ? "Hi" : "En")] || "").trim() || undefined;
 
+  const mp = await getSection("mapPage");
+  const on = (k: string) => mp[k] !== false;
+  const lbl = (k: string) => String(mp[k + (locale === "hi" ? "Hi" : "En")] || "").trim() || undefined;
+  const link = (k: string, def: string) => {
+    const v = String(mp[k] ?? def).trim();
+    return /^(\/|#|https?:\/\/|tel:|mailto:)/i.test(v) ? v : "";
+  };
+
   return (
     <ContactClient
       settings={settings || {}}
       locale={locale}
-      extra={{ workingHours: pickText("workingHours"), note: pickText("contactNote"), social }}
+      extra={{
+        workingHours: pickText("workingHours"),
+        note: pickText("contactNote"),
+        social,
+        icons: {
+          show: on("showIcons"),
+          map: on("showMap"),
+          navigation: on("showNavigation"),
+          enquiry: on("showEnquiry"),
+          support: on("showSupport"),
+          tickets: on("showTickets"),
+          address: on("showAddress"),
+          phone: on("showPhone"),
+          email: on("showEmail"),
+          labels: { navigation: lbl("navigationLabel"), enquiry: lbl("enquiryLabel"), support: lbl("supportLabel"), tickets: lbl("ticketsLabel") },
+          supportLink: link("supportLink", "/help"),
+          ticketsLink: link("ticketsLink", "/account"),
+        },
+      }}
     />
   );
 }

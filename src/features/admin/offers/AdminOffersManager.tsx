@@ -29,6 +29,8 @@ export interface AdminOfferItem {
   usageLimit: number | null;
   perUserLimit: number;
   serviceSlugs: string[];
+  planIds: string[];
+  showOnPlan: boolean;
   usedCount: number;
   validFrom: string;
   validUntil: string | null;
@@ -40,7 +42,7 @@ export interface AdminOfferItem {
 
 interface AdminOffersManagerProps {
   initialOffers: AdminOfferItem[];
-  services: { slug: string; titleEn: string; titleHi: string }[];
+  services: { slug: string; titleEn: string; titleHi: string; plans?: { id: string; titleEn: string; titleHi: string }[] }[];
   locale: string;
 }
 
@@ -66,6 +68,8 @@ export function AdminOffersManager({
     usageLimit: "" as string | number,
     perUserLimit: 1 as string | number,
     serviceSlugs: [] as string[],
+    planIds: [] as string[],
+    showOnPlan: false,
     validFrom: new Date().toISOString().slice(0, 10),
     validUntil: "",
     isActive: true,
@@ -96,6 +100,8 @@ export function AdminOffersManager({
         usageLimit: offer.usageLimit || "",
         perUserLimit: offer.perUserLimit,
         serviceSlugs: offer.serviceSlugs ?? [],
+        planIds: offer.planIds ?? [],
+        showOnPlan: offer.showOnPlan ?? false,
         validFrom: offer.validFrom.slice(0, 10),
         validUntil: offer.validUntil ? offer.validUntil.slice(0, 10) : "",
         isActive: offer.isActive,
@@ -113,6 +119,8 @@ export function AdminOffersManager({
         usageLimit: 1000,
         perUserLimit: 1,
         serviceSlugs: [],
+        planIds: [],
+        showOnPlan: false,
         validFrom: new Date().toISOString().slice(0, 10),
         validUntil: "",
         isActive: true,
@@ -141,6 +149,8 @@ export function AdminOffersManager({
         usageLimit: form.usageLimit ? Number(form.usageLimit) : null,
         perUserLimit: Number(form.perUserLimit || 0),
         serviceSlugs: form.serviceSlugs,
+        planIds: form.planIds,
+        showOnPlan: form.showOnPlan,
         validFrom: new Date(form.validFrom).toISOString(),
         validUntil: form.validUntil ? new Date(form.validUntil).toISOString() : null,
         isActive: Boolean(form.isActive),
@@ -297,7 +307,7 @@ export function AdminOffersManager({
                     <td className="py-3 px-4 font-mono font-bold text-secondary text-sm">
                       {offer.code}
                       <div className="font-sans font-normal text-[11px] text-on-surface-variant mt-1">
-                        {offer.perUserLimit > 0 ? `${offer.perUserLimit}× per customer` : "unlimited per customer"} · {offer.serviceSlugs?.length ? offer.serviceSlugs.join(", ") : "all services"}
+                        {offer.perUserLimit > 0 ? `${offer.perUserLimit}× per customer` : "unlimited per customer"} · {offer.serviceSlugs?.length ? offer.serviceSlugs.join(", ") : "all services"}{offer.planIds?.length ? ` · ${offer.planIds.length} plan(s)` : ""}{offer.showOnPlan ? " · shown on plans" : ""}
                       </div>
                     </td>
                     <td className="py-3 px-4">
@@ -606,6 +616,54 @@ export function AdminOffersManager({
                     })}
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <span className="block text-xs font-bold uppercase text-secondary mb-1">
+                  किन प्लान पर मान्य (Valid for these plans)
+                </span>
+                <p className="text-[11px] text-on-surface-variant mb-2">
+                  कुछ न चुनें तो चुनी हुई सेवाओं के सभी प्लान पर मान्य (none selected = every plan)
+                </p>
+                <div className="space-y-2 max-h-56 overflow-y-auto overscroll-contain border border-outline-variant/60 rounded p-3">
+                  {services
+                    .filter((sv) => form.serviceSlugs.length === 0 || form.serviceSlugs.includes(sv.slug))
+                    .map((sv) => (
+                      <div key={sv.slug}>
+                        <div className="text-[11px] font-bold text-secondary mb-1">{isHindi ? sv.titleHi : sv.titleEn}</div>
+                        <div className="flex flex-wrap gap-2">
+                          {(sv.plans ?? []).map((pl) => {
+                            const on = form.planIds.includes(pl.id);
+                            return (
+                              <label key={pl.id} className={`inline-flex items-center gap-2 min-h-[36px] px-3 rounded border text-xs cursor-pointer ${on ? "border-primary bg-primary/10 text-secondary font-semibold" : "border-outline-variant/80"}`}>
+                                <input
+                                  type="checkbox"
+                                  checked={on}
+                                  onChange={() =>
+                                    setForm({ ...form, planIds: on ? form.planIds.filter((x) => x !== pl.id) : [...form.planIds, pl.id] })
+                                  }
+                                />
+                                {isHindi ? pl.titleHi : pl.titleEn}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="offerShow"
+                  checked={form.showOnPlan}
+                  onChange={(e) => setForm({ ...form, showOnPlan: e.target.checked })}
+                  className="w-4 h-4 text-primary rounded"
+                />
+                <label htmlFor="offerShow" className="text-xs font-medium text-secondary">
+                  {isHindi ? "बुकिंग में प्लान के साथ यह ऑफर दिखाएँ (ग्राहक एक टैप से लगा सकें)" : "Show this offer next to its plans in booking (customer can tap to apply)"}
+                </label>
               </div>
 
               <div className="flex items-center gap-2">

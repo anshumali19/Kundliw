@@ -25,7 +25,31 @@ export interface InvoicePdfData {
   paymentMode: string;
   paymentStatus?: string | null;
   offerCode?: string | null;
+  /** Admin > Website settings > Invoice. Missing values fall back to the standard wording. */
+  opts?: InvoiceOptions;
 }
+
+export interface InvoiceOptions {
+  title?: string;
+  tagline?: string;
+  numberLabel?: string;
+  showAddress?: boolean;
+  showPhone?: boolean;
+  showEmail?: boolean;
+  showGstin?: boolean;
+  showCustomerEmail?: boolean;
+  showOfferCode?: boolean;
+  terms?: string[];
+  footerLine?: string;
+  signatureName?: string;
+  signatureTitle?: string;
+}
+
+export const DEFAULT_INVOICE_TERMS = [
+  "All calculations strictly adhere to Surya Siddhanta, Parashara Hora Shastra, and Drik mathematical systems.",
+  "Astrological Dakshina is utilized for Kendra preservation, Vedic pandits, and scholarly research.",
+  "This is a computer-generated invoice issued by Maharshi Kanad Jyotish Kendra.",
+];
 
 /**
  * Generates a formal PDF invoice document using PDFKit.
@@ -69,13 +93,26 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
 
       doc.fillColor("#984700"); // Saffron
       doc.fontSize(9);
-      doc.font("Helvetica").text("Vedic Astrological Heritage & Mathematical Computation Centre", 40, 62);
+      const o = data.opts || {};
+      doc.font("Helvetica").text(o.tagline || "Vedic Astrological Heritage & Mathematical Computation Centre", 40, 62);
 
       doc.fillColor("#574237");
       doc.fontSize(8);
-      doc.text([data.siteAddress, `Phone: ${data.sitePhone}`, data.siteEmail ? `Email: ${data.siteEmail}` : ""].filter(Boolean).join(" | "), 40, 75);
+      doc.text(
+        [
+          o.showAddress === false ? "" : data.siteAddress,
+          o.showPhone === false || !data.sitePhone ? "" : `Phone: ${data.sitePhone}`,
+          o.showEmail === false || !data.siteEmail ? "" : `Email: ${data.siteEmail}`,
+        ]
+          .filter(Boolean)
+          .join(" | "),
+        40,
+        75
+      );
 
-      if (data.gstin) {
+      if (o.showGstin === false) {
+        // GSTIN switched off by the admin
+      } else if (data.gstin) {
         doc.text(`GSTIN: ${data.gstin} (Composite / Regulated Astrology Service)`, 40, 87);
       } else {
         doc.text("GST: Not Applicable (Unregistered / Direct Kendra Consultation)", 40, 87);
@@ -87,11 +124,11 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       // Invoice & Customer Meta Box (Split 2-Column)
       doc.fillColor("#241915");
       doc.fontSize(10);
-      doc.font("Helvetica-Bold").text("TAX INVOICE / DAKSHINA RECEIPT", 40, 115);
+      doc.font("Helvetica-Bold").text(o.title || "TAX INVOICE / DAKSHINA RECEIPT", 40, 115);
 
       doc.fontSize(8.5);
       doc.font("Helvetica");
-      doc.text(`Invoice No: ${data.invoiceNumber}`, 40, 130);
+      doc.text(`${o.numberLabel || "Invoice No"}: ${data.invoiceNumber}`, 40, 130);
       doc.text(`Date of Issue: ${data.date.toLocaleDateString("en-IN")}`, 40, 142);
       doc.text(`Booking Reference: ${data.orderNumber}`, 40, 154);
       doc.text(`Payment Mode: ${data.paymentMode} (Status: ${String(data.paymentStatus || "PENDING").replace(/_/g, " ")})`, 40, 166);
@@ -101,7 +138,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.font("Helvetica");
       doc.text(`Name: ${data.customerName}`, 330, 130);
       doc.text(`Phone: ${data.customerPhone}`, 330, 142);
-      if (data.customerEmail) {
+      if (data.customerEmail && o.showCustomerEmail !== false) {
         doc.text(`Email: ${data.customerEmail}`, 330, 154);
       }
 
@@ -123,7 +160,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
 
       doc.font("Helvetica").fontSize(8).fillColor("#574237");
       doc.text(`Tier: ${data.planTitle} | Includes astrological calculation and personal consultation.`, 80, rowY + 13);
-      if (data.offerCode) {
+      if (data.offerCode && o.showOfferCode !== false) {
         doc.text(`Special Offer Applied: ${data.offerCode}`, 80, rowY + 24);
       }
 
@@ -160,42 +197,39 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
 
       // Notes and declaration
       const notesY = calcY + 70;
-      doc.rect(40, notesY, 515, 65).fill("#FFF8F6");
-      doc.rect(40, notesY, 515, 65).strokeColor("#DEC1B1").lineWidth(0.5).stroke();
+      const terms = o.terms && o.terms.length > 0 ? o.terms : DEFAULT_INVOICE_TERMS;
+      const boxH = 24 + terms.length * 10;
+      doc.rect(40, notesY, 515, boxH).fill("#FFF8F6");
+      doc.rect(40, notesY, 515, boxH).strokeColor("#DEC1B1").lineWidth(0.5).stroke();
 
       doc.fillColor("#6B1D1D").font("Helvetica-Bold").fontSize(8);
       doc.text("DECLARATION & TERMS:", 48, notesY + 8);
 
       doc.fillColor("#574237").font("Helvetica").fontSize(7.5);
-      doc.text(
-        "1. All calculations strictly adhere to Surya Siddhanta, Parashara Hora Shastra, and Drik mathematical systems.",
-        48,
-        notesY + 20
-      );
-      doc.text(
-        "2. Astrological Dakshina is utilized for Kendra preservation, Vedic pandits, and scholarly research.",
-        48,
-        notesY + 30
-      );
-      doc.text(
-        "3. This is a computer-generated invoice issued by Maharshi Kanad Jyotish Kendra.",
-        48,
-        notesY + 40
-      );
+      terms.forEach((t, i) => doc.text(`${i + 1}. ${t}`, 48, notesY + 20 + i * 10, { width: 500, lineBreak: false }));
+
+      let afterY = notesY + boxH + 30;
+      if (o.signatureName || o.signatureTitle) {
+        doc.fillColor("#241915").font("Helvetica-Bold").fontSize(9);
+        if (o.signatureName) doc.text(o.signatureName, 340, afterY, { width: 215, align: "right" });
+        doc.font("Helvetica").fontSize(8).fillColor("#574237");
+        if (o.signatureTitle) doc.text(o.signatureTitle, 340, afterY + 12, { width: 215, align: "right" });
+        afterY += 34;
+      }
 
       // Auspicious Footer Shloka
       doc.fillColor("#984700").font("Helvetica-Bold").fontSize(9);
       doc.text(
-        "Om Sarve Bhavantu Sukhinah Sarve Santu Niramayah",
+        o.footerLine || "Om Sarve Bhavantu Sukhinah Sarve Santu Niramayah",
         40,
-        notesY + 95,
+        afterY,
         { align: "center", width: 515 }
       );
       doc.fillColor("#574237").font("Helvetica").fontSize(7.5);
       doc.text(
         "Maharshi Kanad Jyotish Kendra • Digital Ephemeris Records",
         40,
-        notesY + 110,
+        afterY + 15,
         { align: "center", width: 515 }
       );
 

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Offer" ADD COLUMN "planIds" TEXT[] DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "showOnPlan" BOOLEAN NOT NULL DEFAULT false;

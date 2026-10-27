@@ -17,6 +17,8 @@ import {
 import { directionsUrl, mapIframeSrc } from "@/lib/content/map";
 import { RichText } from "@/components/content/RichText";
 import { SocialIcon } from "@/components/content/SocialIcon";
+import { Link } from "@/i18n/routing";
+import { LifeBuoy, Ticket, Map as MapIcon } from "lucide-react";
 
 interface ContactClientProps {
   settings: {
@@ -46,8 +48,30 @@ interface ContactClientProps {
     workingHours?: string;
     note?: string;
     social?: Array<{ id: string; name: string; url: string }>;
+    /** Admin > Website settings > Map and contact icons */
+    icons?: {
+      show: boolean;
+      map: boolean;
+      navigation: boolean;
+      enquiry: boolean;
+      support: boolean;
+      tickets: boolean;
+      address: boolean;
+      phone: boolean;
+      email: boolean;
+      labels: { navigation?: string; enquiry?: string; support?: string; tickets?: string };
+      supportLink: string;
+      ticketsLink: string;
+    };
   };
 }
+
+const DEFAULT_ICONS = {
+  show: true, map: true, navigation: true, enquiry: true, support: true, tickets: true,
+  address: true, phone: true, email: true,
+  labels: {} as { navigation?: string; enquiry?: string; support?: string; tickets?: string },
+  supportLink: "/help", ticketsLink: "/account",
+};
 
 export function ContactClient({ settings, locale, extra }: ContactClientProps) {
   const isHindi = locale === "hi";
@@ -113,6 +137,15 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
     directionsUrl(settings) ||
     (address ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}` : null);
 
+  const icons = { ...DEFAULT_ICONS, ...(extra?.icons || {}) };
+  const iconItems: Array<{ key: string; label: string; href: string; Icon: typeof MapIcon }> = [];
+  if (icons.map && mapUrl) iconItems.push({ key: "map", label: isHindi ? "गूगल मैप" : "Google Map", href: "#contact-map", Icon: MapIcon });
+  if (icons.navigation && googleMapsDirectionsUrl) iconItems.push({ key: "nav", label: icons.labels.navigation || (isHindi ? "नेविगेशन" : "Navigation"), href: googleMapsDirectionsUrl, Icon: Navigation });
+  if (icons.enquiry) iconItems.push({ key: "enq", label: icons.labels.enquiry || (isHindi ? "पूछताछ" : "Enquiry"), href: "#enquiry", Icon: MessageSquare });
+  if (icons.support && icons.supportLink) iconItems.push({ key: "sup", label: icons.labels.support || (isHindi ? "सहायता" : "Support"), href: icons.supportLink, Icon: LifeBuoy });
+  if (icons.tickets && icons.ticketsLink) iconItems.push({ key: "tix", label: icons.labels.tickets || (isHindi ? "टिकट" : "Tickets"), href: icons.ticketsLink, Icon: Ticket });
+  if (iconItems.length === 0) icons.show = false;
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left space-y-10">
       {/* Editorial Header */}
@@ -131,9 +164,36 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
         </p>
       </div>
 
+      {/* Icon row: Map, Navigation, Enquiry, Support, Tickets (Admin > Website settings > Map and contact icons) */}
+      {icons.show && (
+        <ul className="grid grid-cols-2 sm:grid-cols-5 gap-3" aria-label={isHindi ? "त्वरित विकल्प" : "Quick options"}>
+          {iconItems.map((it) => {
+            const cls =
+              "flex flex-col items-center justify-center gap-2 min-h-[88px] px-3 py-4 rounded-xl border border-outline-variant/60 bg-surface text-secondary text-xs font-bold text-center hover:bg-surface-container-high transition-colors";
+            const body = (
+              <>
+                <it.Icon className="w-6 h-6 text-primary" aria-hidden="true" />
+                <span>{it.label}</span>
+              </>
+            );
+            return (
+              <li key={it.key}>
+                {it.href.startsWith("#") ? (
+                  <a href={it.href} className={cls}>{body}</a>
+                ) : it.href.startsWith("/") ? (
+                  <Link href={it.href} className={cls}>{body}</Link>
+                ) : (
+                  <a href={it.href} target={it.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className={cls}>{body}</a>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
       {/* Embedded Google Map Section */}
-      {mapUrl && (
-      <div className="bg-surface-container-low border border-outline-variant/60 rounded-xl overflow-hidden shadow-sm">
+      {mapUrl && icons.map && (
+      <div id="contact-map" className="scroll-mt-40 bg-surface-container-low border border-outline-variant/60 rounded-xl overflow-hidden shadow-sm">
         <div className="p-4 bg-surface border-b border-outline-variant/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Navigation className="w-4 h-4 text-primary" />
@@ -180,7 +240,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
             </h2>
 
             <div className="space-y-4 text-xs">
-              {address && (
+              {address && icons.address && (
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
@@ -192,6 +252,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
               </div>
               )}
 
+              {icons.phone && phone1 && (
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
@@ -214,8 +275,9 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
                   </div>
                 </div>
               </div>
+              )}
 
-              {emailAddr && (
+              {emailAddr && icons.email && (
               <div className="flex items-start gap-3">
                 <Mail className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
@@ -256,7 +318,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
         </div>
 
         {/* Right Column: Quick Enquiry Form (7 cols) */}
-        <div className="lg:col-span-7 bg-surface border border-outline-variant/60 rounded-xl p-6 sm:p-8 space-y-6">
+        <div id="enquiry" className="scroll-mt-40 lg:col-span-7 bg-surface border border-outline-variant/60 rounded-xl p-6 sm:p-8 space-y-6">
           <div>
             <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest mb-1">
               <MessageSquare className="w-4 h-4" />

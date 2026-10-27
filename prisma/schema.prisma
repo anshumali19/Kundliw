@@ -233,6 +233,8 @@ model Offer {
   usedCount          Int          @default(0)
   perUserLimit       Int          @default(1) // 0 = unlimited uses per customer
   serviceSlugs       String[]     @default([]) // empty = valid for every service
+  planIds            String[]     @default([]) // empty = valid for every plan of the chosen services
+  showOnPlan         Boolean      @default(false) // list this offer next to its plans so customers can tap to apply
   validFrom          DateTime     @default(now())
   validUntil         DateTime?
   isActive           Boolean      @default(true)

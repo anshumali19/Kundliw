@@ -151,7 +151,7 @@ export async function createBookingOrder(
         cleanCode,
         plan.pricePaise,
         new Date(),
-        { serviceSlug: service.slug, userId }
+        { serviceSlug: service.slug, planId: plan.id, userId }
       );
 
       discountPaise = claimResult.discountPaise;

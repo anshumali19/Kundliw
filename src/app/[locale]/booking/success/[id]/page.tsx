@@ -321,6 +321,18 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
               </a>
             )}
 
+            {isPaid && (
+              <a
+                href={`/api/ticket/${order.id}?lang=${isHindi ? "hi" : "en"}`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full min-h-[44px] px-4 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 text-center"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{isHindi ? "कन्फर्मेशन टिकट" : "Confirmation Ticket"}</span>
+              </a>
+            )}
+
             <Link
               href="/"
               className="w-full min-h-[44px] px-4 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center justify-center gap-1.5 text-center"

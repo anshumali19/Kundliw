@@ -278,6 +278,15 @@ export default async function AccountPage(props: AccountPageProps) {
                             <span>{isHindi ? "बीजक (PDF)" : "Invoice (PDF)"}</span>
                           </a>
                           <a
+                            href={`/api/ticket/${order.id}?lang=${isHindi ? "hi" : "en"}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-1.5 transition-colors"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-primary" />
+                            <span>{isHindi ? "कन्फर्मेशन टिकट" : "Confirmation Ticket"}</span>
+                          </a>
+                          <a
                             href={`/api/invoice/${order.id}?format=html`}
                             target="_blank"
                             rel="noreferrer"

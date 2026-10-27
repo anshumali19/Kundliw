@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Create order transactionally with server-side pricing
-    const referralCode = request.cookies.get(REFERRAL_COOKIE)?.value ?? null;
+    const referralCode = parsed.data.referralCode || request.cookies.get(REFERRAL_COOKIE)?.value || null;
     const result = await createBookingOrder(user.id, parsed.data, referralCode);
 
     return NextResponse.json(

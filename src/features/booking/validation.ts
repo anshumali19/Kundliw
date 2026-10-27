@@ -30,6 +30,7 @@ export const createBookingOrderSchema = z.object({
   serviceSlug: z.string().min(1, "Service is required"),
   planSlug: z.string().min(1, "Plan tier is required"),
   offerCode: z.string().trim().toUpperCase().optional().or(z.literal("")),
+  referralCode: z.string().trim().toUpperCase().optional().or(z.literal("")),
   slotId: z.string().optional().or(z.literal("")),
   idempotencyKey: z.string().trim().optional(),
   jatakaDetails: jatakaDetailsSchema,

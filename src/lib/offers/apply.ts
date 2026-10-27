@@ -11,11 +11,13 @@ export interface OfferDefinition {
   usedCount?: number;
   perUserLimit?: number;
   serviceSlugs?: string[];
+  planIds?: string[];
 }
 
 /** What we know about this particular booking, so the rules can be checked fairly. */
 export interface OfferContext {
   serviceSlug?: string;
+  planId?: string;
   /** How many times this customer has already used the code on live orders. */
   userUses?: number;
 }
@@ -57,6 +59,10 @@ export function applyOffer(
 
   if (offer.serviceSlugs && offer.serviceSlugs.length > 0 && ctx.serviceSlug && !offer.serviceSlugs.includes(ctx.serviceSlug)) {
     return { isValid: false, discountPaise: 0, reason: "This code is not valid for the selected service" };
+  }
+
+  if (offer.planIds && offer.planIds.length > 0 && ctx.planId && !offer.planIds.includes(ctx.planId)) {
+    return { isValid: false, discountPaise: 0, reason: "This code is not valid for the selected plan" };
   }
 
   if (offer.perUserLimit && offer.perUserLimit > 0 && (ctx.userUses ?? 0) >= offer.perUserLimit) {
@@ -120,7 +126,7 @@ export async function claimOfferInTransaction(
   code: string,
   orderAmountPaise: number,
   now: Date = new Date(),
-  ctx: { serviceSlug?: string; userId?: string } = {}
+  ctx: { serviceSlug?: string; planId?: string; userId?: string } = {}
 ): Promise<{ offer: OfferDefinition; discountPaise: number }> {
   const offer = await tx.offer.findUnique({
     where: { code },
@@ -136,7 +142,7 @@ export async function claimOfferInTransaction(
       where: { userId: ctx.userId, offerCode: code, paymentStatus: { notIn: ["FAILED", "REFUNDED"] } },
     });
   }
-  const evalResult = applyOffer(offer, orderAmountPaise, now, { serviceSlug: ctx.serviceSlug, userUses });
+  const evalResult = applyOffer(offer, orderAmountPaise, now, { serviceSlug: ctx.serviceSlug, planId: ctx.planId, userUses });
   if (!evalResult.isValid) {
     throw new Error(evalResult.reason || "Invalid or unavailable coupon code.");
   }

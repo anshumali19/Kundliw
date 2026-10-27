@@ -90,6 +90,7 @@ export async function POST(request: NextRequest) {
         : 0;
     const evalResult = applyOffer(offer, plan.pricePaise, new Date(), {
       serviceSlug: plan.service?.slug,
+      planId: plan.id,
       userUses,
     });
 
