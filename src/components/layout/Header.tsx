@@ -60,6 +60,9 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [bookOpen, setBookOpen] = useState(false);
   const bookRef = useRef<HTMLDivElement>(null);
+  // The "Booking" item of the main menu opens the same booking list as the calendar button
+  const [navBookOpen, setNavBookOpen] = useState(false);
+  const navBookRef = useRef<HTMLDivElement>(null);
   const [currentHash, setCurrentHash] = useState("");
 
   // Sync hash for hash-based navigation (e.g. /services#plans)
@@ -80,6 +83,9 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
       }
       if (bookRef.current && !bookRef.current.contains(event.target as Node)) {
         setBookOpen(false);
+      }
+      if (navBookRef.current && !navBookRef.current.contains(event.target as Node)) {
+        setNavBookOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -257,6 +263,38 @@ export function Header({ phone, email, panchang, social = [], logoUrl, topbar = 
           <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 2xl:gap-3 h-20 ml-2 xl:ml-3">
             {primaryLinks.map((link) => {
               const isActive = checkIsActive(link.href);
+              if (link.href === "/services#plans" || link.href === "/booking") {
+                return (
+                  <div
+                    key={link.href}
+                    className="relative h-full flex items-center"
+                    ref={navBookRef}
+                    onMouseEnter={() => setNavBookOpen(true)}
+                    onMouseLeave={() => setNavBookOpen(false)}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setNavBookOpen(!navBookOpen)}
+                      aria-expanded={navBookOpen}
+                      className={`h-full flex items-center gap-1 px-1.5 2xl:px-2.5 text-[13px] font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
+                        isActive || navBookOpen
+                          ? "text-primary border-saffron font-bold"
+                          : "text-secondary hover:text-primary border-transparent hover:border-saffron/50"
+                      }`}
+                    >
+                      {link.label}
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${navBookOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {navBookOpen && (
+                      <div className="absolute top-full left-0 w-80 pt-1 z-50 text-left">
+                        <div className="bg-surface border border-outline-variant/60 shadow-xl rounded p-4">
+                          <QuickBookingPanel onDone={() => setNavBookOpen(false)} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
               return (
                 <Link
                   key={link.href}
