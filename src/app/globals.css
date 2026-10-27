@@ -97,7 +97,7 @@ header { border-bottom: 1px solid var(--outline-variant); }
 .intro-seen .intro-screen { display: none; }
 .intro-screen {
   position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; overflow: hidden; isolation: isolate;
-  background: radial-gradient(ellipse at 50% 42%, #7d3b22 0, #40241c 48%, #1a0f0b 100%);
+  background: radial-gradient(ellipse at 50% 42%, #A31515 0, #800000 48%, #5C0000 100%);
   color: #fff7e8; transition: opacity 0.75s ease, visibility 0.75s ease, transform 0.9s cubic-bezier(0.7, 0, 0.2, 1);
 }
 .intro-screen::before { content: ""; position: absolute; inset: 18px; border: 1px solid rgba(216, 163, 65, 0.25); border-radius: 4px; pointer-events: none; }

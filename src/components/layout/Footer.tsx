@@ -47,7 +47,7 @@ export async function Footer() {
       : settings?.addressEn || settings?.addressHi) || "";
 
   return (
-    <footer className="w-full bg-[rgb(var(--footer-bg-rgb,138_42_58))] text-on-maroon border-t-4 border-gold pt-8 pb-6 text-left">
+    <footer className="w-full bg-[rgb(var(--footer-bg-rgb,128_0_0))] text-on-maroon border-t-4 border-gold pt-8 pb-6 text-left">
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 xl:gap-8 pb-8 border-b border-gold/40 text-left">
           {/* Col 1: Identity & Sanctum Address with Logo */}
