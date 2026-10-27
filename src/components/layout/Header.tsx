@@ -8,6 +8,7 @@ import { DateStrip, type DateStripData } from "./DateStrip";
 import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { AccountMenu } from "./AccountMenu";
+import { QuickBookingPanel } from "./QuickBookingPanel";
 import {
   Phone,
   Calendar,
@@ -319,7 +320,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
 
           {/* Action CTAs */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 ml-auto">
-            {/* Booking dropdown: the booking path Service, Plan, Offers, then Track and My Account */}
+            {/* Booking drop-down list: Service, Plan, Offer, Referral code, then Payment */}
             <div
               className="relative hidden sm:block"
               ref={bookRef}
@@ -339,24 +340,9 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${bookOpen ? "rotate-180" : ""}`} />
               </button>
               {bookOpen && (
-                <div className="absolute top-full right-0 w-60 pt-1 z-50 text-left">
-                  <div className="bg-surface border border-outline-variant/60 shadow-xl rounded py-2">
-                    {[
-                      { href: "/services", label: tNav("services") },
-                      { href: "/services#plans", label: tNav("pricingPlans") },
-                      { href: "/offers", label: tNav("offers") },
-                      { href: "/track", label: tNav("tracker") },
-                      { href: "/account", label: tNav("account") },
-                    ].map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setBookOpen(false)}
-                        className="flex items-center px-4 py-2.5 text-xs font-semibold text-on-surface hover:bg-surface-container-high transition-colors min-h-[40px]"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
+                <div className="absolute top-full right-0 w-80 pt-1 z-50 text-left">
+                  <div className="bg-surface border border-outline-variant/60 shadow-xl rounded p-4">
+                    <QuickBookingPanel onDone={() => setBookOpen(false)} />
                   </div>
                 </div>
               )}

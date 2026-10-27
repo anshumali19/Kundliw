@@ -7,6 +7,7 @@ import { useHiddenTools } from "@/components/providers/ToolsProvider";
 import { Link, usePathname } from "@/i18n/routing";
 import { homeForRole } from "./AccountMenu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { QuickBookingPanel } from "./QuickBookingPanel";
 import {
   Home,
   Menu,
@@ -44,10 +45,14 @@ export function MobileNav() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
   const signedIn = status === "authenticated";
 
   // Close the sheet when the page changes
-  useEffect(() => setMenuOpen(false), [pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+    setBookOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -61,7 +66,6 @@ export function MobileNav() {
   const tabs = [
     { key: "home", href: "/", label: tNav("home"), icon: Home },
     { key: "services", href: "/services", label: tNav("services"), icon: Compass },
-    { key: "booking", href: "/services#plans", label: tNav("booking"), icon: CalendarCheck },
     { key: "offers", href: "/offers", label: tNav("offers"), icon: Percent },
     { key: "login", href: accountHref, label: signedIn ? tNav("account") : tNav("login"), icon: UserCircle },
   ];
@@ -116,11 +120,40 @@ export function MobileNav() {
             <Menu className="w-5 h-5" />
             <span className="text-[11px] mt-1 leading-tight max-w-full truncate">{tNav("menu")}</span>
           </button>
-          {tabs.slice(1).map((tab) => (
+          <TabLink key={tabs[1].key} tab={tabs[1]} active={isActive(tabs[1].href)} />
+          <button
+            type="button"
+            onClick={() => setBookOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={bookOpen}
+            className="flex flex-col items-center justify-center min-h-[44px] text-on-surface-variant hover:text-on-surface"
+          >
+            <CalendarCheck className="w-5 h-5" />
+            <span className="text-[11px] mt-1 leading-tight max-w-full truncate">{tNav("booking")}</span>
+          </button>
+          {tabs.slice(2).map((tab) => (
             <TabLink key={tab.key} tab={tab} active={isActive(tab.href)} />
           ))}
         </div>
       </nav>
+
+      {bookOpen && (
+        <div className="xl:hidden fixed inset-0 z-[70] flex items-end" role="dialog" aria-modal="true" aria-label={tNav("booking")}>
+          <button type="button" className="absolute inset-0 bg-black/50" aria-label={tNav("close")} onClick={() => setBookOpen(false)} />
+          <div className="relative w-full max-h-[88dvh] overflow-y-auto bg-surface rounded-t-2xl border-t-4 border-brand p-4 pb-8 shadow-2xl">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h2 className="font-bold text-lg text-secondary flex items-center gap-2">
+                <CalendarCheck className="w-5 h-5 text-primary" />
+                {tNav("booking")}
+              </h2>
+              <button type="button" onClick={() => setBookOpen(false)} aria-label={tNav("close")} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-full hover:bg-surface-container">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <QuickBookingPanel onDone={() => setBookOpen(false)} />
+          </div>
+        </div>
+      )}
 
       {menuOpen && (
         <div className="xl:hidden fixed inset-0 z-[70] flex items-end" role="dialog" aria-modal="true" aria-label={tNav("menu")}>

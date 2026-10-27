@@ -13,6 +13,7 @@ interface BookingPageProps {
     service?: string;
     plan?: string;
     offer?: string;
+    ref?: string;
     name?: string;
     gender?: "MALE" | "FEMALE" | "OTHER";
     dob?: string;
@@ -41,7 +42,9 @@ export default async function BookingPage(props: BookingPageProps) {
       searchParams?.service
         ? `?service=${encodeURIComponent(searchParams.service)}&plan=${encodeURIComponent(
             searchParams.plan || ""
-          )}`
+          )}${searchParams.offer ? `&offer=${encodeURIComponent(searchParams.offer)}` : ""}${
+            searchParams.ref ? `&ref=${encodeURIComponent(searchParams.ref)}` : ""
+          }`
         : ""
     }`,
     locale
@@ -103,7 +106,8 @@ export default async function BookingPage(props: BookingPageProps) {
     }));
 
   const gst = await getGstSettings();
-  const referralCookie = normalizeReferralCode((await cookies()).get(REFERRAL_COOKIE)?.value) || "";
+  const referralCookie =
+    normalizeReferralCode(searchParams?.ref) || normalizeReferralCode((await cookies()).get(REFERRAL_COOKIE)?.value) || "";
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left">
