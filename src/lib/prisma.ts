@@ -12,7 +12,7 @@ declare global {
 function databaseUrl(): string | undefined {
   const url = process.env.DATABASE_URL;
   if (!url || process.env.NODE_ENV !== "production" || /[?&]connection_limit=/.test(url)) return url;
-  return url + (url.includes("?") ? "&" : "?") + "connection_limit=1&pool_timeout=20";
+  return url + (url.includes("?") ? "&" : "?") + "connection_limit=1&pool_timeout=20&connect_timeout=15";
 }
 
 export const prisma =

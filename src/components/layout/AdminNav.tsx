@@ -77,6 +77,7 @@ const GROUPS: Array<{ en: string; hi: string; items: Item[] }> = [
       { href: "/admin/testimonials", en: "Reviews", hi: "समीक्षाएँ", icon: Star },
       { href: "/admin/faq", en: "FAQ", hi: "प्रश्नोत्तर", icon: HelpCircle },
       { href: "/admin/founder", en: "Founder", hi: "संस्थापक", icon: Award },
+      { href: "/admin/team", en: "Team & assistants", hi: "सहायक व टीम", icon: Users },
       { href: "/admin/credentials", en: "Certificates", hi: "प्रमाणपत्र", icon: BadgeCheck },
       { href: "/admin/translations", en: "Translations", hi: "अनुवाद", icon: Languages },
       { href: "/admin/chatbot", en: "Chatbot", hi: "चैटबॉट", icon: MessageSquare },

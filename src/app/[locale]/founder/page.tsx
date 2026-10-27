@@ -78,6 +78,9 @@ export default async function FounderPage(props: FounderPageProps) {
 
   const additionalLinks = normalizeLinks(founder.additionalLinks);
   const blocks = normalizeBlocks(founder.blocks);
+  const team = await prisma.teamMember
+    .findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }] })
+    .catch(() => []);
 
   return (
     <div className="w-full min-h-[75vh] py-10 px-4 sm:px-6 lg:px-12 text-left space-y-10 max-w-7xl mx-auto">
@@ -151,6 +154,33 @@ export default async function FounderPage(props: FounderPageProps) {
           )}
         </div>
       </div>
+
+      {team.length > 0 && (
+        <section className="space-y-5 border-t border-outline-variant/40 pt-8" aria-labelledby="team-heading">
+          <h2 id="team-heading" className="font-serif text-2xl font-bold text-secondary">
+            {isHindi ? "हमारी टीम एवं सहायक" : "Our team and assistants"}
+          </h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {team.map((m) => {
+              const mName = isHindi ? m.nameHi || m.nameEn : m.nameEn;
+              const mBio = isHindi ? m.bioHi || m.bioEn : m.bioEn || m.bioHi;
+              return (
+                <li key={m.id} className="rounded-lg bg-surface border border-outline-variant/40 overflow-hidden">
+                  {isSafeImageSrc(m.photoUrl) && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={m.photoUrl as string} alt={mName} className="w-full h-56 object-cover object-top" />
+                  )}
+                  <div className="p-5 space-y-1.5">
+                    <h3 className="font-serif text-lg font-bold text-secondary">{mName}</h3>
+                    <p className="text-sm font-semibold text-primary">{isHindi ? m.roleHi : m.roleEn}</p>
+                    {mBio && <div className="text-sm leading-relaxed text-on-surface-variant pt-1"><RichText text={mBio} /></div>}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

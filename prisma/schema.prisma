@@ -778,3 +778,18 @@ model SiteConfig {
   value     Json
   updatedAt DateTime @updatedAt
 }
+
+model TeamMember {
+  id         String   @id @default(cuid())
+  nameEn     String
+  nameHi     String
+  roleEn     String
+  roleHi     String
+  bioEn      String?  @db.Text
+  bioHi      String?  @db.Text
+  photoUrl   String?
+  orderIndex Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
