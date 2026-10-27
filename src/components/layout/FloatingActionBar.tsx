@@ -465,10 +465,16 @@ export function FloatingActionBar({
           />
           <button
             type="submit"
-            className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand text-on-brand text-sm font-bold"
+            className="group relative shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand text-on-brand text-sm font-bold"
           >
             <Send className="w-4 h-4" />
             <span>{isHindi ? "एआई से पूछें" : "Ask AI"}</span>
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute bottom-full right-0 mb-2 whitespace-nowrap rounded-md bg-maroon px-3 py-1.5 text-sm font-bold text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+            >
+              {isHindi ? "उत्तर जानिये" : "Get your answer"}
+            </span>
           </button>
         </form>
       )}
