@@ -4,7 +4,6 @@ import { requireAdmin } from "@/lib/auth/guards";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 import { ShieldAlert, ExternalLink } from "lucide-react";
 import { AdminNav } from "@/components/layout/AdminNav";
-import { AdminReloadGuard } from "@/components/layout/AdminReloadGuard";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -63,7 +62,6 @@ export default async function AdminLayout(props: AdminLayoutProps) {
 
       {/* Menu + content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6 items-start">
-        <AdminReloadGuard />
         <AdminNav isHindi={isHindi} />
         <main className="flex-1 min-w-0 w-full text-left">{children}</main>
       </div>
