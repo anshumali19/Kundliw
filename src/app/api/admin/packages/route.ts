@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { packageInputSchema } from "@/features/services/validation";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
+import { jsonOrNull } from "@/lib/content/json";
 
 export async function POST(request: NextRequest) {
   const guard = await guardApiAdmin();
@@ -29,7 +30,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `A package with slug "${slug}" already exists for this service.` }, { status: 409 });
     }
 
-    const pkg = await prisma.servicePackage.create({ data: parsed.data });
+    const { itineraryDays, additionalLinks, ...rest } = parsed.data;
+    const pkg = await prisma.servicePackage.create({
+      data: { ...rest, itineraryDays: jsonOrNull(itineraryDays), additionalLinks: jsonOrNull(additionalLinks) },
+    });
     return NextResponse.json({ success: true, package: pkg }, { status: 201 });
   } catch (error) {
     console.error("Error creating package:", error);

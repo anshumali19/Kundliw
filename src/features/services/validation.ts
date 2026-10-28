@@ -150,17 +150,45 @@ export const validateOfferQuerySchema = z.object({
   planId: z.string().min(1),
 });
 
-export const packageInputSchema = z.object({
-  serviceId: z.string().min(1, "Service ID is required"),
-  slug: z
-    .string()
-    .trim()
-    .min(2, "Slug must be at least 2 characters")
-    .regex(/^[a-z0-9-]+$/, "Slug must only contain lowercase letters, numbers, and hyphens"),
-  titleEn: z.string().trim().min(2, "English package name is required"),
-  titleHi: z.string().trim().min(2, "Hindi package name is required"),
-  descriptionEn: z.string().trim().max(2000).optional().nullable(),
-  descriptionHi: z.string().trim().max(2000).optional().nullable(),
-  orderIndex: z.coerce.number().int().min(0).default(0),
-  isActive: z.boolean().default(true),
+const dayInputSchema = z.object({
+  titleEn: z.string().trim().max(200).default(""),
+  titleHi: z.string().trim().max(200).default(""),
+  detailsEn: z.string().trim().max(4000).default(""),
+  detailsHi: z.string().trim().max(4000).default(""),
 });
+
+const listInputSchema = z.array(z.string().trim().min(1).max(300)).max(100).default([]);
+
+export const packageInputSchema = z
+  .object({
+    serviceId: z.string().min(1, "Service ID is required"),
+    slug: z
+      .string()
+      .trim()
+      .min(2, "Slug must be at least 2 characters")
+      .regex(/^[a-z0-9-]+$/, "Slug must only contain lowercase letters, numbers, and hyphens"),
+    titleEn: z.string().trim().min(2, "English package name is required"),
+    titleHi: z.string().trim().min(2, "Hindi package name is required"),
+    descriptionEn: z.string().trim().max(8000).optional().nullable(),
+    descriptionHi: z.string().trim().max(8000).optional().nullable(),
+    numberOfDays: z.coerce.number().int().min(1).max(365).optional().nullable(),
+    startDate: z.coerce.date().optional().nullable(),
+    endDate: z.coerce.date().optional().nullable(),
+    seats: z.coerce.number().int().min(1).max(100000).optional().nullable(),
+    itineraryDays: z.array(dayInputSchema).max(60).optional().nullable(),
+    inclusionsEn: listInputSchema,
+    inclusionsHi: listInputSchema,
+    exclusionsEn: listInputSchema,
+    exclusionsHi: listInputSchema,
+    materialsEn: listInputSchema,
+    materialsHi: listInputSchema,
+    youtubeUrl: z.string().trim().max(500).optional().nullable(),
+    imageUrl: z.string().trim().max(500).optional().nullable(),
+    additionalLinks: linksInputSchema.optional().nullable(),
+    orderIndex: z.coerce.number().int().min(0).default(0),
+    isActive: z.boolean().default(true),
+  })
+  .refine((v) => !v.startDate || !v.endDate || v.endDate >= v.startDate, {
+    message: "End date cannot be before the start date",
+    path: ["endDate"],
+  });

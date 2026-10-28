@@ -8,7 +8,7 @@ import { KENDRA_EMAIL } from "@/lib/content/contact";
 import { isKundliService } from "@/lib/content/ownKundli";
 
 interface CatalogPlan { id: string; slug: string; titleEn: string; titleHi: string; pricePaise: number }
-interface CatalogPackage { id: string; titleEn: string; titleHi: string; plans: CatalogPlan[] }
+interface CatalogPackage { id: string; titleEn: string; titleHi: string; plans: CatalogPlan[]; availability?: { status: "open" | "full" | "closed"; seatsLeft: number | null; reason?: string } }
 interface CatalogService { slug: string; titleEn: string; titleHi: string; packages: CatalogPackage[]; plans: CatalogPlan[] }
 interface OfferChoice { code: string; titleEn: string; titleHi: string; discountFormatted: string }
 
@@ -176,7 +176,10 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         >
           <option value="__none">{hi ? "पैकेज चुनें" : "Choose a package"}</option>
           {(service?.packages ?? []).map((k) => (
-            <option key={k.id || "standard"} value={k.id}>{pick(k.titleEn, k.titleHi)}</option>
+            <option key={k.id || "standard"} value={k.id} disabled={k.availability?.status === "full" || k.availability?.status === "closed"}>
+              {pick(k.titleEn, k.titleHi)}
+              {k.availability?.status === "full" ? (hi ? " (भर चुका)" : " (fully booked)") : k.availability?.status === "closed" ? (hi ? " (बंद)" : " (closed)") : k.availability?.seatsLeft != null ? (hi ? ` (${k.availability.seatsLeft} स्थान शेष)` : ` (${k.availability.seatsLeft} left)`) : ""}
+            </option>
           ))}
         </select>
       </div>

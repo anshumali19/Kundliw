@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
+import { bookedSeatsByPackage } from "@/lib/booking/packageAvailability";
 import { AdminServicesManager, AdminServiceItem } from "@/features/admin/services/AdminServicesManager";
 
 interface AdminServicesPageProps {
@@ -36,6 +37,8 @@ export default async function AdminServicesPage(props: AdminServicesPageProps) {
     orderBy: { orderIndex: "asc" },
   });
 
+  const booked = await bookedSeatsByPackage(services.flatMap((s) => s.packages.map((k) => k.id)));
+
   const servicesData: AdminServiceItem[] = services.map((s) => ({
     id: s.id,
     slug: s.slug,
@@ -59,6 +62,21 @@ export default async function AdminServicesPage(props: AdminServicesPageProps) {
       titleHi: k.titleHi,
       descriptionEn: k.descriptionEn,
       descriptionHi: k.descriptionHi,
+      numberOfDays: k.numberOfDays,
+      startDate: k.startDate ? k.startDate.toISOString() : null,
+      endDate: k.endDate ? k.endDate.toISOString() : null,
+      seats: k.seats,
+      booked: booked[k.id] ?? 0,
+      itineraryDays: k.itineraryDays,
+      inclusionsEn: k.inclusionsEn,
+      inclusionsHi: k.inclusionsHi,
+      exclusionsEn: k.exclusionsEn,
+      exclusionsHi: k.exclusionsHi,
+      materialsEn: k.materialsEn,
+      materialsHi: k.materialsHi,
+      youtubeUrl: k.youtubeUrl,
+      imageUrl: k.imageUrl,
+      additionalLinks: k.additionalLinks,
       orderIndex: k.orderIndex,
       isActive: k.isActive,
     })),

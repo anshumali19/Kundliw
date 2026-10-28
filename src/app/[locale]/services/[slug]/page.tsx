@@ -1,3 +1,4 @@
+import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -72,6 +73,8 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     notFound();
   }
 
+  const booked = await bookedSeatsByPackage(service.packages.map((k) => k.id));
+
   // Find next active service for universal Next button (#45)
   const nextService = await prisma.service.findFirst({
     where: {
@@ -111,6 +114,20 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
       titleHi: k.titleHi,
       descriptionEn: k.descriptionEn,
       descriptionHi: k.descriptionHi,
+      numberOfDays: k.numberOfDays,
+      startDate: k.startDate ? k.startDate.toISOString() : null,
+      endDate: k.endDate ? k.endDate.toISOString() : null,
+      itineraryDays: k.itineraryDays,
+      inclusionsEn: k.inclusionsEn,
+      inclusionsHi: k.inclusionsHi,
+      exclusionsEn: k.exclusionsEn,
+      exclusionsHi: k.exclusionsHi,
+      materialsEn: k.materialsEn,
+      materialsHi: k.materialsHi,
+      youtubeUrl: k.youtubeUrl,
+      imageUrl: k.imageUrl,
+      additionalLinks: k.additionalLinks,
+      availability: computeAvailability(k, booked[k.id] ?? 0),
     })),
     plans: service.plans.map((p) => ({
       id: p.id,

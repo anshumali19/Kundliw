@@ -4,7 +4,8 @@ import { RichText } from "@/components/content/RichText";
 import React, { useState } from "react";
 import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
-import { PlanSelectorInteractive, PlanDTO, PackageDTO } from "./PlanSelectorInteractive";
+import { PlanSelectorInteractive, PlanDTO } from "./PlanSelectorInteractive";
+import type { PackageDetailDTO } from "./PackageDetails";
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
 import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
@@ -46,7 +47,7 @@ export interface ServiceDetailDTO {
   samagriHi?: string | null;
   youtubeUrl?: string | null;
   additionalLinks?: unknown;
-  packages?: PackageDTO[];
+  packages?: PackageDetailDTO[];
   plans: Array<{
     id: string;
     packageId?: string | null;

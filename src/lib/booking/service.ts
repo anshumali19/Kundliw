@@ -3,6 +3,7 @@ import { CreateBookingOrderInput } from "@/features/booking/validation";
 import { calculateGst } from "@/lib/billing/gst";
 import { getGstSettings } from "@/lib/billing/gstSettings";
 import { claimOfferInTransaction, pickBestAutoOffer } from "@/lib/offers/apply";
+import { computeAvailability } from "@/lib/booking/packageAvailability";
 import {
   attachReferralToOrder,
   cancelCommission,
@@ -95,11 +96,27 @@ export async function createBookingOrder(
           slug: input.planSlug,
         },
       },
-      include: { package: { select: { isActive: true } } },
+      include: { package: { select: { id: true, isActive: true, seats: true, startDate: true, endDate: true } } },
     });
 
     if (!plan || !plan.isActive || (plan.package && !plan.package.isActive)) {
       throw new BookingError("Requested consultation tier is unavailable or inactive.");
+    }
+
+    // Package availability: dates and seats. The package row is locked so two customers cannot take the last seat together.
+    if (plan.package) {
+      await tx.$queryRaw`SELECT "id" FROM "ServicePackage" WHERE "id" = ${plan.package.id} FOR UPDATE`;
+      const held = await tx.order.count({
+        where: { plan: { packageId: plan.package.id }, paymentStatus: { notIn: [PaymentStatus.FAILED, PaymentStatus.REFUNDED] } },
+      });
+      const availability = computeAvailability(plan.package, held);
+      if (availability.status !== "open") {
+        throw new BookingError(
+          availability.reason === "full"
+            ? "Sorry, all seats in this package are booked."
+            : "Sorry, booking for this package is closed."
+        );
+      }
     }
 
     // 3. If plan includes live call, validate and reserve appointment slot

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { packageInputSchema } from "@/features/services/validation";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
+import { jsonOrNull } from "@/lib/content/json";
 
 export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -23,13 +24,16 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
     const current = await prisma.servicePackage.findUnique({ where: { id: params.id } });
     if (!current) return NextResponse.json({ error: "Package not found." }, { status: 404 });
 
-    const { serviceId, slug, ...rest } = parsed.data;
+    const { serviceId, slug, itineraryDays, additionalLinks, ...rest } = parsed.data;
     if (slug !== current.slug) {
       const clash = await prisma.servicePackage.findUnique({ where: { serviceId_slug: { serviceId: current.serviceId, slug } } });
       if (clash) return NextResponse.json({ error: `A package with slug "${slug}" already exists for this service.` }, { status: 409 });
     }
 
-    const pkg = await prisma.servicePackage.update({ where: { id: params.id }, data: { slug, ...rest } });
+    const pkg = await prisma.servicePackage.update({
+      where: { id: params.id },
+      data: { slug, ...rest, itineraryDays: jsonOrNull(itineraryDays), additionalLinks: jsonOrNull(additionalLinks) },
+    });
     return NextResponse.json({ success: true, package: pkg });
   } catch (error) {
     console.error("Error updating package:", error);

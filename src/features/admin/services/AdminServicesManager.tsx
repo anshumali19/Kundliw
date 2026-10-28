@@ -29,9 +29,45 @@ export interface AdminPackageItem {
   titleHi: string;
   descriptionEn?: string | null;
   descriptionHi?: string | null;
+  numberOfDays?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  seats?: number | null;
+  booked?: number;
+  itineraryDays?: unknown;
+  inclusionsEn?: string[];
+  inclusionsHi?: string[];
+  exclusionsEn?: string[];
+  exclusionsHi?: string[];
+  materialsEn?: string[];
+  materialsHi?: string[];
+  youtubeUrl?: string | null;
+  imageUrl?: string | null;
+  additionalLinks?: unknown;
   orderIndex: number;
   isActive: boolean;
 }
+
+interface PackageDay { titleEn: string; titleHi: string; detailsEn: string; detailsHi: string }
+const emptyDay = (): PackageDay => ({ titleEn: "", titleHi: "", detailsEn: "", detailsHi: "" });
+const toDays = (raw: unknown): PackageDay[] =>
+  Array.isArray(raw)
+    ? raw.map((d) => {
+        const r = (d ?? {}) as Record<string, unknown>;
+        return {
+          titleEn: String(r.titleEn ?? ""),
+          titleHi: String(r.titleHi ?? ""),
+          detailsEn: String(r.detailsEn ?? ""),
+          detailsHi: String(r.detailsHi ?? ""),
+        };
+      })
+    : [];
+const linesOf = (list?: string[]) => (list ?? []).join("\n");
+const toLines = (text: string) =>
+  text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
 
 export interface AdminPlanItem {
   id: string;
@@ -576,6 +612,20 @@ export function AdminServicesManager({
     titleHi: "",
     descriptionEn: "",
     descriptionHi: "",
+    numberOfDays: "" as string | number,
+    startDate: "",
+    endDate: "",
+    seats: "" as string | number,
+    itineraryDays: [] as PackageDay[],
+    inclusionsEn: "",
+    inclusionsHi: "",
+    exclusionsEn: "",
+    exclusionsHi: "",
+    materialsEn: "",
+    materialsHi: "",
+    youtubeUrl: "",
+    imageUrl: "",
+    additionalLinks: [] as LinkItem[],
     orderIndex: 0,
     isActive: true,
   });
@@ -590,6 +640,20 @@ export function AdminServicesManager({
       titleHi: pkg?.titleHi || "",
       descriptionEn: pkg?.descriptionEn || "",
       descriptionHi: pkg?.descriptionHi || "",
+      numberOfDays: pkg?.numberOfDays ?? "",
+      startDate: pkg?.startDate ? pkg.startDate.slice(0, 10) : "",
+      endDate: pkg?.endDate ? pkg.endDate.slice(0, 10) : "",
+      seats: pkg?.seats ?? "",
+      itineraryDays: toDays(pkg?.itineraryDays),
+      inclusionsEn: linesOf(pkg?.inclusionsEn),
+      inclusionsHi: linesOf(pkg?.inclusionsHi),
+      exclusionsEn: linesOf(pkg?.exclusionsEn),
+      exclusionsHi: linesOf(pkg?.exclusionsHi),
+      materialsEn: linesOf(pkg?.materialsEn),
+      materialsHi: linesOf(pkg?.materialsHi),
+      youtubeUrl: pkg?.youtubeUrl || "",
+      imageUrl: pkg?.imageUrl || "",
+      additionalLinks: normalizeLinks(pkg?.additionalLinks),
       orderIndex: pkg ? pkg.orderIndex : (parent?.packages.length || 0) + 1,
       isActive: pkg ? pkg.isActive : true,
     });
@@ -610,6 +674,20 @@ export function AdminServicesManager({
         titleHi: packageForm.titleHi,
         descriptionEn: packageForm.descriptionEn.trim() || null,
         descriptionHi: packageForm.descriptionHi.trim() || null,
+        numberOfDays: packageForm.numberOfDays === "" ? null : Number(packageForm.numberOfDays),
+        startDate: packageForm.startDate || null,
+        endDate: packageForm.endDate || null,
+        seats: packageForm.seats === "" ? null : Number(packageForm.seats),
+        itineraryDays: packageForm.itineraryDays.filter((d) => d.titleEn.trim() || d.titleHi.trim() || d.detailsEn.trim() || d.detailsHi.trim()),
+        inclusionsEn: toLines(packageForm.inclusionsEn),
+        inclusionsHi: toLines(packageForm.inclusionsHi),
+        exclusionsEn: toLines(packageForm.exclusionsEn),
+        exclusionsHi: toLines(packageForm.exclusionsHi),
+        materialsEn: toLines(packageForm.materialsEn),
+        materialsHi: toLines(packageForm.materialsHi),
+        youtubeUrl: packageForm.youtubeUrl.trim() || null,
+        imageUrl: packageForm.imageUrl.trim() || null,
+        additionalLinks: packageForm.additionalLinks.filter((l) => l.url.trim()),
         orderIndex: Number(packageForm.orderIndex),
         isActive: packageForm.isActive,
       };
@@ -627,7 +705,8 @@ export function AdminServicesManager({
       setServices((prev) =>
         prev.map((s) => {
           if (s.id !== packageModal.serviceId) return s;
-          const list = editing ? s.packages.map((p) => (p.id === editing.id ? data.package : p)) : [...s.packages, data.package];
+          const saved = { ...data.package, booked: editing?.booked ?? 0 };
+          const list = editing ? s.packages.map((p) => (p.id === editing.id ? saved : p)) : [...s.packages, saved];
           return { ...s, packages: list.sort((a, b) => a.orderIndex - b.orderIndex) };
         })
       );
@@ -855,6 +934,9 @@ export function AdminServicesManager({
                                 <div className="text-sm font-semibold text-secondary truncate">{isHindi ? pkg.titleHi : pkg.titleEn}</div>
                                 <div className="text-[11px] text-on-surface-variant">
                                   {service.plans.filter((p) => p.packageId === pkg.id).length} {isHindi ? "प्लान" : "plan(s)"}
+                                  {pkg.numberOfDays ? ` · ${pkg.numberOfDays} ${isHindi ? "दिन" : "days"}` : ""}
+                                  {pkg.startDate ? ` · ${pkg.startDate.slice(0, 10)}${pkg.endDate ? " → " + pkg.endDate.slice(0, 10) : ""}` : ""}
+                                  {pkg.seats ? ` · ${pkg.booked ?? 0}/${pkg.seats} ${isHindi ? "सीट भरीं" : "seats taken"}` : pkg.booked ? ` · ${pkg.booked} ${isHindi ? "बुकिंग" : "booked"}` : ""}
                                   {!pkg.isActive ? (isHindi ? " · बंद" : " · switched off") : ""}
                                 </div>
                               </div>
@@ -1269,7 +1351,7 @@ export function AdminServicesManager({
       {/* Modal: Package Form */}
       {packageModal && (
         <div className="fixed inset-0 z-[70] bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-lg w-full p-6 text-left max-h-[calc(100dvh-1rem)] overflow-y-auto overscroll-contain">
+          <div className="bg-surface rounded-lg border border-secondary/30 shadow-xl max-w-3xl w-full p-6 text-left max-h-[calc(100dvh-1rem)] overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/40">
               <h2 className="font-serif text-lg font-bold text-secondary">
                 {packageModal.editing ? (isHindi ? "पैकेज संपादित करें" : "Edit Package") : isHindi ? "नया पैकेज" : "Add Package"}
@@ -1291,14 +1373,114 @@ export function AdminServicesManager({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-secondary mb-1">Short description (English)</label>
-                  <textarea rows={2} value={packageForm.descriptionEn} onChange={(e) => setPackageForm({ ...packageForm, descriptionEn: e.target.value })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">Details / Description (English)</label>
+                  <textarea rows={4} value={packageForm.descriptionEn} onChange={(e) => setPackageForm({ ...packageForm, descriptionEn: e.target.value })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase text-secondary mb-1">संक्षिप्त विवरण (हिन्दी)</label>
-                  <textarea rows={2} value={packageForm.descriptionHi} onChange={(e) => setPackageForm({ ...packageForm, descriptionHi: e.target.value })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
+                  <label className="block text-xs font-bold uppercase text-secondary mb-1">विवरण (हिन्दी)</label>
+                  <textarea rows={4} value={packageForm.descriptionHi} onChange={(e) => setPackageForm({ ...packageForm, descriptionHi: e.target.value })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
                 </div>
               </div>
+              {/* Days, dates and seats */}
+              <div className="rounded-lg border border-outline-variant/50 bg-surface-container-low p-3 space-y-3">
+                <div className="text-xs font-bold uppercase tracking-wider text-primary">
+                  {isHindi ? "दिन, तारीख और उपलब्धता" : "Days, dates and availability"}
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-secondary mb-1">Number of days</label>
+                    <input type="number" min={1} value={packageForm.numberOfDays} onChange={(e) => setPackageForm({ ...packageForm, numberOfDays: e.target.value })} className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-secondary mb-1">Start date</label>
+                    <input type="date" value={packageForm.startDate} onChange={(e) => setPackageForm({ ...packageForm, startDate: e.target.value })} className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-secondary mb-1">End date</label>
+                    <input type="date" value={packageForm.endDate} onChange={(e) => setPackageForm({ ...packageForm, endDate: e.target.value })} className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-secondary mb-1">Seats (empty = no limit)</label>
+                    <input type="number" min={1} value={packageForm.seats} onChange={(e) => setPackageForm({ ...packageForm, seats: e.target.value })} className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                  </div>
+                </div>
+                <p className="text-[11px] text-on-surface-variant">
+                  {isHindi
+                    ? "बुकिंग तब तक खुली रहती है जब तक आरंभ तिथि नहीं आती और सीटें बची हैं। समाप्ति तिथि के बाद पैकेज बंद हो जाता है। असफल या समाप्त ऑर्डर सीट नहीं रोकते।"
+                    : "Booking stays open until the start date passes and while seats remain. The package closes after its end date. Failed, expired or refunded orders do not hold a seat."}
+                </p>
+              </div>
+
+              {/* Day by day itinerary */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs font-bold uppercase tracking-wider text-primary">
+                    {isHindi ? "दिन-वार कार्यक्रम (Itinerary)" : "Day by day itinerary"}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPackageForm({ ...packageForm, itineraryDays: [...packageForm.itineraryDays, emptyDay()] })}
+                    className="min-h-[36px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    {isHindi ? "दिन जोड़ें" : "Add day"}
+                  </button>
+                </div>
+                {packageForm.itineraryDays.map((d, i) => (
+                  <div key={i} className="rounded border border-outline-variant/60 p-3 space-y-2 bg-surface">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-secondary">{isHindi ? `दिन ${i + 1}` : `Day ${i + 1}`}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPackageForm({ ...packageForm, itineraryDays: packageForm.itineraryDays.filter((_, k) => k !== i) })}
+                        className="text-on-error-container hover:underline text-xs"
+                      >
+                        {isHindi ? "हटाएँ" : "Remove"}
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <input type="text" placeholder="Title (English)" value={d.titleEn} onChange={(e) => setPackageForm({ ...packageForm, itineraryDays: packageForm.itineraryDays.map((x, k) => (k === i ? { ...x, titleEn: e.target.value } : x)) })} className="bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[40px]" />
+                      <input type="text" placeholder="शीर्षक (हिन्दी)" value={d.titleHi} onChange={(e) => setPackageForm({ ...packageForm, itineraryDays: packageForm.itineraryDays.map((x, k) => (k === i ? { ...x, titleHi: e.target.value } : x)) })} className="bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[40px]" />
+                      <textarea rows={3} placeholder="What happens this day (English)" value={d.detailsEn} onChange={(e) => setPackageForm({ ...packageForm, itineraryDays: packageForm.itineraryDays.map((x, k) => (k === i ? { ...x, detailsEn: e.target.value } : x)) })} className="bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
+                      <textarea rows={3} placeholder="इस दिन का कार्यक्रम (हिन्दी)" value={d.detailsHi} onChange={(e) => setPackageForm({ ...packageForm, itineraryDays: packageForm.itineraryDays.map((x, k) => (k === i ? { ...x, detailsHi: e.target.value } : x)) })} className="bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Inclusions, exclusions and materials: one item per line */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {(
+                  [
+                    ["inclusionsEn", "Inclusions (English), one per line"],
+                    ["inclusionsHi", "सम्मिलित (हिन्दी), हर पंक्ति में एक"],
+                    ["exclusionsEn", "Exclusions (English), one per line"],
+                    ["exclusionsHi", "सम्मिलित नहीं (हिन्दी), हर पंक्ति में एक"],
+                    ["materialsEn", "Material list (English), one per line"],
+                    ["materialsHi", "सामग्री सूची (हिन्दी), हर पंक्ति में एक"],
+                  ] as const
+                ).map(([key, lab]) => (
+                  <div key={key}>
+                    <label className="block text-xs font-bold uppercase text-secondary mb-1">{lab}</label>
+                    <textarea rows={4} value={packageForm[key]} onChange={(e) => setPackageForm({ ...packageForm, [key]: e.target.value })} className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Image, video and links */}
+              <ImageUrlField
+                label="Package image"
+                value={packageForm.imageUrl}
+                onChange={(url) => setPackageForm({ ...packageForm, imageUrl: url })}
+                folder="services"
+              />
+              <YouTubeUrlField value={packageForm.youtubeUrl} onChange={(v) => setPackageForm({ ...packageForm, youtubeUrl: v })} />
+              <LinksEditor
+                links={packageForm.additionalLinks}
+                onChange={(additionalLinks) => setPackageForm({ ...packageForm, additionalLinks })}
+                label="Additional links (Hindi and English labels)"
+              />
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">Slug (URL key, auto if empty)</label>

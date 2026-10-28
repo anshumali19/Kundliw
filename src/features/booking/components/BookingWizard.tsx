@@ -29,7 +29,7 @@ export interface BookingServiceSummary {
   slug: string;
   titleEn: string;
   titleHi: string;
-  packages?: { id: string; titleEn: string; titleHi: string; descriptionEn?: string | null; descriptionHi?: string | null }[];
+  packages?: { id: string; titleEn: string; titleHi: string; descriptionEn?: string | null; descriptionHi?: string | null; availability?: { status: "open" | "full" | "closed"; seatsLeft: number | null; reason?: "full" | "started" | "ended" } }[];
   plans: {
     id: string;
     packageId?: string | null;
@@ -143,7 +143,7 @@ export function BookingWizard({
   const [selectedPackageId, setSelectedPackageId] = useState<string>(activePlan?.packageId ?? "");
   const packageOptions = [
     ...(activeService?.packages ?? []).filter((k) => activeService?.plans.some((p) => p.packageId === k.id)),
-    ...(activeService?.plans.some((p) => !p.packageId) ? [{ id: "", titleEn: "Standard", titleHi: "मानक", descriptionEn: null, descriptionHi: null }] : []),
+    ...(activeService?.plans.some((p) => !p.packageId) ? [{ id: "", titleEn: "Standard", titleHi: "मानक", descriptionEn: null, descriptionHi: null, availability: undefined }] : []),
   ];
   const showPackages = packageOptions.length > 1 || (packageOptions.length === 1 && packageOptions[0].id !== "");
   // Kundli services: select Kundli > fill the form > choose a plan > pay (the plan comes after the form)
@@ -445,10 +445,12 @@ export function BookingWizard({
                     {packageOptions.map((k) => {
                       const on = k.id === selectedPackageId;
                       const desc = isHindi ? k.descriptionHi || k.descriptionEn : k.descriptionEn || k.descriptionHi;
+                      const shut = k.availability && k.availability.status !== "open";
                       return (
                         <button
                           key={k.id || "standard"}
                           type="button"
+                          disabled={Boolean(shut)}
                           onClick={() => {
                             setSelectedPackageId(k.id);
                             const first = activeService.plans.find((p) => (p.packageId ?? "") === k.id);
@@ -458,9 +460,18 @@ export function BookingWizard({
                             on
                               ? "bg-surface border-2 border-primary ring-1 ring-primary/20 font-bold text-secondary"
                               : "bg-surface-container-low border-outline-variant/60 hover:bg-surface text-on-surface"
-                          }`}
+                          } ${shut ? "opacity-60 cursor-not-allowed" : ""}`}
                         >
                           <span className="block font-semibold">{isHindi ? k.titleHi : k.titleEn}</span>
+                          {k.availability && (shut || k.availability.seatsLeft != null) && (
+                            <span className={`block text-[11px] font-bold mt-0.5 ${shut ? "text-on-error-container" : "text-primary"}`}>
+                              {shut
+                                ? k.availability.reason === "full"
+                                  ? isHindi ? "सभी स्थान भर चुके हैं" : "Fully booked"
+                                  : isHindi ? "बुकिंग बंद" : "Booking closed"
+                                : isHindi ? `${k.availability.seatsLeft} स्थान शेष` : `${k.availability.seatsLeft} seats left`}
+                            </span>
+                          )}
                           {desc && <span className="block text-[11px] font-normal text-on-surface-variant mt-0.5">{desc}</span>}
                         </button>
                       );

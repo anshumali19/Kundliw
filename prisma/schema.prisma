@@ -193,6 +193,22 @@ model ServicePackage {
   titleHi       String
   descriptionEn String?  @db.Text
   descriptionHi String?  @db.Text
+  numberOfDays  Int?
+  startDate     DateTime?
+  endDate       DateTime?
+  /// Most bookings this package can take (empty = no limit). Used to close it when full.
+  seats         Int?
+  /// Day by day programme: [{ titleEn, titleHi, detailsEn, detailsHi }]
+  itineraryDays Json?
+  inclusionsEn  String[] @default([])
+  inclusionsHi  String[] @default([])
+  exclusionsEn  String[] @default([])
+  exclusionsHi  String[] @default([])
+  materialsEn   String[] @default([])
+  materialsHi   String[] @default([])
+  youtubeUrl    String?
+  imageUrl      String?
+  additionalLinks Json?
   orderIndex    Int      @default(0)
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())

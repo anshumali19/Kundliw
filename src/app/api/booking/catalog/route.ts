@@ -1,3 +1,4 @@
+import { bookedSeatsByPackage, computeAvailability, type PackageAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -22,17 +23,24 @@ export async function GET() {
         packages: {
           where: { isActive: true },
           orderBy: { orderIndex: "asc" },
-          select: { id: true, titleEn: true, titleHi: true },
+          select: { id: true, titleEn: true, titleHi: true, seats: true, startDate: true, endDate: true },
         },
       },
     });
+    const booked = await bookedSeatsByPackage(services.flatMap((s) => s.packages.map((k) => k.id)));
     // Service > Package > Plan. Plans without a package are grouped as "Standard"; plans of a switched-off package are left out.
     const shaped = services
       .map((s) => {
         const ids = new Set(s.packages.map((k) => k.id));
         const plans = s.plans.filter((p) => !p.packageId || ids.has(p.packageId));
-        const packages = s.packages
-          .map((k) => ({ ...k, plans: plans.filter((p) => p.packageId === k.id) }))
+        const packages: Array<{ id: string; titleEn: string; titleHi: string; plans: typeof plans; availability?: PackageAvailability }> = s.packages
+          .map((k) => ({
+            id: k.id,
+            titleEn: k.titleEn,
+            titleHi: k.titleHi,
+            plans: plans.filter((p) => p.packageId === k.id),
+            availability: computeAvailability(k, booked[k.id] ?? 0),
+          }))
           .filter((k) => k.plans.length > 0);
         const loose = plans.filter((p) => !p.packageId);
         if (loose.length > 0) packages.push({ id: "", titleEn: "Standard", titleHi: "मानक", plans: loose });

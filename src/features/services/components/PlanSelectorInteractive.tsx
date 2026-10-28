@@ -1,5 +1,6 @@
 "use client";
 
+import { PackageDetails, type PackageDetailDTO } from "./PackageDetails";
 import { useState } from "react";
 import Link from "next/link";
 import { formatPaiseToInr } from "@/lib/billing/gst";
@@ -38,13 +39,7 @@ export interface PlanDTO {
   packageId?: string | null;
 }
 
-export interface PackageDTO {
-  id: string;
-  titleEn: string;
-  titleHi: string;
-  descriptionEn?: string | null;
-  descriptionHi?: string | null;
-}
+export type PackageDTO = PackageDetailDTO;
 
 interface PlanSelectorInteractiveProps {
   plans: PlanDTO[];
@@ -216,12 +211,25 @@ export function PlanSelectorInteractive({
                     }`}
                   >
                     <span className="block font-serif font-bold text-base">{isHindi ? k.titleHi : k.titleEn}</span>
-                    {desc && <span className={`block text-xs mt-0.5 ${on ? "text-on-maroon/90" : "text-on-surface-variant"}`}>{desc}</span>}
+                    {k.availability && k.availability.status !== "open" ? (
+                      <span className={`block text-xs mt-0.5 font-bold ${on ? "text-on-maroon" : "text-on-error-container"}`}>
+                        {k.availability.reason === "full" ? (isHindi ? "सभी स्थान भर चुके हैं" : "Fully booked") : k.availability.reason === "ended" ? (isHindi ? "समाप्त" : "Ended") : isHindi ? "बुकिंग बंद" : "Booking closed"}
+                      </span>
+                    ) : k.availability?.seatsLeft != null ? (
+                      <span className={`block text-xs mt-0.5 font-semibold ${on ? "text-on-maroon" : "text-primary"}`}>
+                        {isHindi ? `${k.availability.seatsLeft} स्थान शेष` : `${k.availability.seatsLeft} seats left`}
+                      </span>
+                    ) : null}
+                    {desc && !k.itineraryDays && <span className={`block text-xs mt-0.5 ${on ? "text-on-maroon/90" : "text-on-surface-variant"}`}>{desc}</span>}
                   </button>
                 );
               })}
           </div>
-          <div className="mt-6 text-xs uppercase tracking-widest text-primary font-bold">
+          {(() => {
+            const chosen = packageList.find((k) => k.id === selectedPackageId);
+            return chosen && chosen.id !== "__none" ? <PackageDetails pkg={chosen} isHindi={isHindi} /> : null;
+          })()}
+          <div className="mt-8 text-xs uppercase tracking-widest text-primary font-bold">
             {isHindi ? "चरण 2: प्लान चुनें" : "Step 2: Choose a plan"}
           </div>
         </div>
@@ -622,13 +630,25 @@ export function PlanSelectorInteractive({
 
           {/* Proceed to Booking Details CTA */}
           <div className="w-full md:w-auto">
-            <Link
-              href={bookingHref}
-              className="w-full md:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded shadow-sm transition-colors border border-primary text-center"
-            >
-              <span>{isHindi ? "जन्म विवरण दर्ज करें" : "Proceed to Birth Details"}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {(() => {
+              const chosen = packageList.find((k) => k.id === selectedPackageId);
+              const closed = chosen?.availability && chosen.availability.status !== "open";
+              return closed ? (
+                <span className="w-full md:w-auto min-h-[44px] inline-flex items-center justify-center px-6 py-2.5 bg-surface-container-high text-on-surface-variant font-bold text-xs uppercase tracking-wider rounded border border-outline-variant text-center">
+                  {chosen?.availability?.reason === "full"
+                    ? isHindi ? "सभी स्थान भर चुके हैं" : "Fully booked"
+                    : isHindi ? "बुकिंग बंद है" : "Booking is closed"}
+                </span>
+              ) : (
+                <Link
+                  href={bookingHref}
+                  className="w-full md:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded shadow-sm transition-colors border border-primary text-center"
+                >
+                  <span>{isHindi ? "जन्म विवरण दर्ज करें" : "Proceed to Birth Details"}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              );
+            })()}
           </div>
         </div>
       </aside>

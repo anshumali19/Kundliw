@@ -1,3 +1,4 @@
+import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
@@ -66,6 +67,8 @@ export default async function BookingPage(props: BookingPageProps) {
     orderBy: { orderIndex: "asc" },
   });
 
+  const booked = await bookedSeatsByPackage(services.flatMap((s) => s.packages.map((k) => k.id)));
+
   const servicesData: BookingServiceSummary[] = services.map((s) => ({
     id: s.id,
     slug: s.slug,
@@ -77,6 +80,7 @@ export default async function BookingPage(props: BookingPageProps) {
       titleHi: k.titleHi,
       descriptionEn: k.descriptionEn,
       descriptionHi: k.descriptionHi,
+      availability: computeAvailability(k, booked[k.id] ?? 0),
     })),
     // Plans of a package that is switched off are not offered
     plans: s.plans
