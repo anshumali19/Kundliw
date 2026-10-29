@@ -644,6 +644,11 @@ export function PlanSelectorInteractive({
 
           {/* Proceed to Booking Details CTA */}
           <div className="w-full md:w-auto">
+            {plans.length > 1 && (
+              <p className="text-[11px] text-on-surface-variant mb-2 md:text-right">
+                {isHindi ? "अगली स्क्रीन पर इसी सेवा के 2 या 3 प्लान एक साथ जोड़ सकते हैं।" : "On the next screen you can add 2 or 3 plans together in one booking."}
+              </p>
+            )}
             {(() => {
               const chosen = packageList.find((k) => k.id === selectedPackageId);
               const closed = chosen?.availability && chosen.availability.status !== "open";

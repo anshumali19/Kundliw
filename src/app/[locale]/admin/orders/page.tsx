@@ -1,4 +1,5 @@
 import { requireAdmin } from "@/lib/auth/guards";
+import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { prisma } from "@/lib/prisma";
 import {
   AdminOrdersManager,
@@ -42,6 +43,7 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
     },
     take: 100,
   });
+  const planMap = await loadPlanTitleMap(rawOrders.flatMap((o) => o.extraPlanIds));
 
   const approvedAssociates = await prisma.associateProfile.findMany({
     where: { status: "APPROVED" },
@@ -92,9 +94,7 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
       serviceTitle: isHindi
         ? o.service?.titleHi || "Vedic Service"
         : o.service?.titleEn || "Vedic Service",
-      planTitle: isHindi
-        ? o.plan?.titleHi || "Standard"
-        : o.plan?.titleEn || "Standard",
+      planTitle: bundleTitle(o, planMap, isHindi, "Standard"),
       statusEvents: o.statusEvents.map((e) => ({
         id: e.id,
         status: e.status,

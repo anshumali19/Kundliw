@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { requireUser } from "@/lib/auth/guards";
 import { isDemoMode } from "@/lib/config/demo";
 import { razorpayConfigured } from "@/lib/payments/gateway";
@@ -81,7 +82,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
     netAmountPaise: order.netAmountPaise,
     offerCode: order.offerCode,
     serviceTitle: isHindi ? order.service?.titleHi || "" : order.service?.titleEn || "",
-    planTitle: isHindi ? order.plan?.titleHi || "" : order.plan?.titleEn || "",
+    planTitle: bundleTitle(order, await loadPlanTitleMap(order.extraPlanIds), isHindi),
     jatakaName,
     rejectionReason: order.rejectionReason,
     slotTime,

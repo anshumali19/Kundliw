@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { Role } from "@prisma/client";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
@@ -58,6 +59,7 @@ export default async function AccountPage(props: AccountPageProps) {
       },
     },
   });
+  const planMap = await loadPlanTitleMap(orders.flatMap((o) => o.extraPlanIds));
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-10 text-left space-y-8">
@@ -187,7 +189,7 @@ export default async function AccountPage(props: AccountPageProps) {
                           : order.service?.titleEn || "Vedic Service"}
                       </h3>
                       <p className="text-xs text-primary font-medium">
-                        {isHindi ? order.plan?.titleHi : order.plan?.titleEn} • {formatPaiseToInr(order.netAmountPaise)}
+                        {bundleTitle(order, planMap, isHindi)} • {formatPaiseToInr(order.netAmountPaise)}
                       </p>
                     </div>
 

@@ -36,6 +36,8 @@ export const jatakaDetailsSchema = z.object({
 export const createBookingOrderSchema = z.object({
   serviceSlug: z.string().min(1, "Service is required"),
   planSlug: z.string().min(1, "Plan tier is required"),
+  // Up to two more plans of the same service booked together in this order
+  extraPlanSlugs: z.array(z.string().min(1)).max(2, "You can combine at most 3 plans").optional(),
   offerCode: z.string().trim().toUpperCase().optional().or(z.literal("")),
   referralCode: z.string().trim().toUpperCase().optional().or(z.literal("")),
   slotId: z.string().optional().or(z.literal("")),

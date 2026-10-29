@@ -139,6 +139,15 @@ export function BookingWizard({
     activeService?.plans.find((p) => p.slug === selectedPlanSlug) ||
     activeService?.plans[0];
 
+  // Plans combined in one booking: the chosen plan plus up to two more of the same service
+  const MAX_BUNDLE = 3;
+  const [extraPlanSlugs, setExtraPlanSlugs] = useState<string[]>([]);
+  const extraPlans = (activeService?.plans ?? []).filter((p) => extraPlanSlugs.includes(p.slug) && p.slug !== activePlan?.slug);
+  const bundlePlans = activePlan ? [activePlan, ...extraPlans] : [];
+  const bundleHasCall = bundlePlans.some((p) => p.hasCall);
+  const toggleExtraPlan = (slug: string) =>
+    setExtraPlanSlugs((cur) => (cur.includes(slug) ? cur.filter((x) => x !== slug) : cur.length + 1 < MAX_BUNDLE ? [...cur, slug] : cur));
+
   // Service > Package > Plan: the plans shown are those of the chosen package
   const [selectedPackageId, setSelectedPackageId] = useState<string>(activePlan?.packageId ?? "");
   const packageOptions = [
@@ -149,6 +158,10 @@ export function BookingWizard({
   // Kundli services: select Kundli > fill the form > choose a plan > pay (the plan comes after the form)
   const kundliMode = isKundliService(activeService?.slug);
   const visiblePlans = (activeService?.plans ?? []).filter((p) => !showPackages || (p.packageId ?? "") === selectedPackageId);
+
+  useEffect(() => {
+    setExtraPlanSlugs([]);
+  }, [selectedServiceSlug]);
 
   // Appointment Slot
   const [selectedSlotId, setSelectedSlotId] = useState<string>("");
@@ -308,6 +321,7 @@ export function BookingWizard({
         body: JSON.stringify({
           code,
           planId: activePlan.id,
+          extraPlanIds: extraPlans.map((p) => p.id),
         }),
       });
 
@@ -355,12 +369,12 @@ export function BookingWizard({
       handleValidateOffer(appliedOffer.code, offerIsAuto);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePlan?.id]);
+  }, [activePlan?.id, extraPlanSlugs.join(",")]);
 
   // Submit Order
   const handleCreateOrder = async () => {
     if (!activeService || !activePlan) return;
-    if (kundliMode && activePlan.hasCall && initialSlots.length > 0 && !selectedSlotId) {
+    if (kundliMode && bundleHasCall && initialSlots.length > 0 && !selectedSlotId) {
       setSubmissionError(
         isHindi ? "कृपया परामर्श हेतु एक समय स्लॉट चुनें।" : "Please select an appointment slot for the consultation call."
       );
@@ -373,9 +387,10 @@ export function BookingWizard({
       const payload = {
         serviceSlug: activeService.slug,
         planSlug: activePlan.slug,
+        extraPlanSlugs: extraPlans.length > 0 ? extraPlans.map((p) => p.slug) : undefined,
         offerCode: appliedOffer ? appliedOffer.code : undefined,
         referralCode: referralApplied || undefined,
-        slotId: activePlan.hasCall ? selectedSlotId : undefined,
+        slotId: bundleHasCall ? selectedSlotId : undefined,
         jatakaDetails: {
           name: formData.name.trim(),
           gender: formData.gender,
@@ -437,7 +452,7 @@ export function BookingWizard({
   const isMatchingService = activeService?.slug === "kundli-matching";
 
   // Calculations
-  const basePricePaise = activePlan ? activePlan.pricePaise : 0;
+  const basePricePaise = bundlePlans.reduce((sum, p) => sum + p.pricePaise, 0);
   const discountPaise = appliedOffer ? appliedOffer.discountPaise : 0;
   const taxablePaise = Math.max(0, basePricePaise - discountPaise);
   const gstPaise = Math.round((taxablePaise * gstRateBasisPoints) / 10000);
@@ -464,9 +479,8 @@ export function BookingWizard({
                           type="button"
                           disabled={Boolean(shut)}
                           onClick={() => {
+                            // Only changes which plans are listed: plans already chosen stay in the booking
                             setSelectedPackageId(k.id);
-                            const first = activeService.plans.find((p) => (p.packageId ?? "") === k.id);
-                            if (first) setSelectedPlanSlug(first.slug);
                           }}
                           className={`min-h-[44px] p-3 rounded text-left border transition-all text-xs ${
                             on
@@ -504,7 +518,12 @@ export function BookingWizard({
                       return (
                         <div
                           key={p.id}
-                          onClick={() => setSelectedPlanSlug(p.slug)}
+                          onClick={() => {
+                            if (p.slug === selectedPlanSlug) return;
+                            // A plan already added becomes the main plan; the previous main plan stays in the booking
+                            setExtraPlanSlugs((cur) => (cur.includes(p.slug) ? cur.map((x) => (x === p.slug ? selectedPlanSlug : x)) : cur));
+                            setSelectedPlanSlug(p.slug);
+                          }}
                           className={`p-4 rounded-lg border cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left ${
                             isSelected
                               ? "bg-surface border-2 border-primary shadow-sm ring-1 ring-primary/20"
@@ -537,13 +556,61 @@ export function BookingWizard({
                             </div>
                           </div>
 
-                          <div className="font-serif font-bold text-lg text-secondary shrink-0">
-                            {formatPaiseToInr(p.pricePaise)}
+                          <div className="shrink-0 flex flex-col items-start sm:items-end gap-2">
+                            <div className="font-serif font-bold text-lg text-secondary">{formatPaiseToInr(p.pricePaise)}</div>
+                            {!isSelected && (() => {
+                              const added = extraPlanSlugs.includes(p.slug);
+                              const full = !added && bundlePlans.length >= MAX_BUNDLE;
+                              return (
+                                <button
+                                  type="button"
+                                  disabled={full}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleExtraPlan(p.slug);
+                                  }}
+                                  aria-pressed={added}
+                                  className={`min-h-[40px] px-3 rounded border text-[11px] font-bold ${
+                                    added ? "bg-brand text-on-brand border-brand" : "bg-surface text-secondary border-maroon hover:bg-gold"
+                                  } disabled:opacity-40`}
+                                >
+                                  {added
+                                    ? isHindi ? "✓ बुकिंग में जुड़ा (हटाएँ)" : "✓ Added to booking (remove)"
+                                    : full
+                                    ? isHindi ? "अधिकतम 3 प्लान" : "Maximum 3 plans"
+                                    : isHindi ? "+ इसे भी जोड़ें" : "+ Add this plan too"}
+                                </button>
+                              );
+                            })()}
                           </div>
                         </div>
                       );
                     })}
                   </div>
+                  {activeService.plans.length > 1 && (
+                    <p className="text-[11px] text-on-surface-variant mt-2">
+                      {isHindi
+                        ? "आप इसी सेवा के 2 या 3 प्लान एक साथ बुक कर सकते हैं (अधिकतम 3)। हर प्लान के लिए पैकेज बदलकर 'इसे भी जोड़ें' दबाएँ।"
+                        : "You can book 2 or 3 plans of this service together (maximum 3). Switch package above and press 'Add this plan too' on any plan."}
+                    </p>
+                  )}
+                  {bundlePlans.length > 0 && activeService.plans.length > 1 && (
+                    <div className="mt-3 rounded-lg border border-primary/40 bg-primary-container/40 p-3 text-xs space-y-1">
+                      <div className="font-bold text-secondary">
+                        {isHindi ? `आपकी बुकिंग में ${bundlePlans.length} प्लान` : `Your booking has ${bundlePlans.length} plan${bundlePlans.length === 1 ? "" : "s"}`}
+                      </div>
+                      {bundlePlans.map((bp) => (
+                        <div key={bp.id} className="flex items-center justify-between gap-2">
+                          <span>{isHindi ? bp.titleHi : bp.titleEn}</span>
+                          <span className="font-semibold">{formatPaiseToInr(bp.pricePaise)}</span>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between gap-2 border-t border-primary/30 pt-1 font-bold text-secondary">
+                        <span>{isHindi ? "कुल" : "Total"}</span>
+                        <span>{formatPaiseToInr(basePricePaise)}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -553,7 +620,7 @@ export function BookingWizard({
   const slotPickerJsx = (
     <>
               {/* Appointment Slot Selection (Required if plan has live call) */}
-              {activePlan?.hasCall && (
+              {bundleHasCall && (
                 <div className="pt-4 border-t border-outline-variant/30 space-y-3">
                   <div className="font-serif font-bold text-sm text-secondary flex items-center gap-2">
                     <PhoneCall className="w-4 h-4 text-primary" />
@@ -1086,7 +1153,7 @@ export function BookingWizard({
                       );
                       return;
                     }
-                    if (!kundliMode && activePlan?.hasCall && initialSlots.length > 0 && !selectedSlotId) {
+                    if (!kundliMode && bundleHasCall && initialSlots.length > 0 && !selectedSlotId) {
                       setSubmissionError(
                         isHindi
                           ? "कृपया परामर्श हेतु एक समय स्लॉट चुनें।"
@@ -1248,12 +1315,15 @@ export function BookingWizard({
               <div className="font-serif font-bold text-sm text-secondary">
                 {isHindi ? activeService.titleHi : activeService.titleEn}
               </div>
-              <div className="text-xs text-primary font-medium">
-                {isHindi ? activePlan.titleHi : activePlan.titleEn}
-              </div>
+              {bundlePlans.map((bp) => (
+                <div key={bp.id} className="text-xs text-primary font-medium">
+                  {isHindi ? bp.titleHi : bp.titleEn}
+                  {bundlePlans.length > 1 ? ` · ${formatPaiseToInr(bp.pricePaise)}` : ""}
+                </div>
+              ))}
               <div className="flex items-center gap-2 text-[11px] text-on-surface-variant pt-1">
                 <Clock className="w-3 h-3 text-secondary" />
-                <span>{activePlan.deliveryDays} {isHindi ? "कार्यदिवस वितरण" : "days delivery"}</span>
+                <span>{Math.max(...bundlePlans.map((bp) => bp.deliveryDays))} {isHindi ? "कार्यदिवस वितरण" : "days delivery"}</span>
               </div>
             </div>
           )}

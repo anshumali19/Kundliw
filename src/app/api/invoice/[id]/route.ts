@@ -1,4 +1,5 @@
 import { kendraEmail } from "@/lib/content/contact";
+import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       customerPhone,
       customerEmail,
       serviceTitle: order.service?.titleEn || "Astrological Consultation",
-      planTitle: order.plan?.titleEn || "Standard Tier",
+      planTitle: bundleTitle(order, await loadPlanTitleMap(order.extraPlanIds), false, "Standard Tier"),
       baseAmountPaise: order.baseAmountPaise,
       discountAmountPaise: order.discountAmountPaise,
       taxableAmountPaise: order.taxableAmountPaise,

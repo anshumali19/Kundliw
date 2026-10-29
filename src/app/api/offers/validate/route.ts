@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { code, planId } = parsed.data;
+    const { code, planId, extraPlanIds = [] } = parsed.data;
 
     // Fetch plan from database - NEVER trust client price
     // Release abandoned reservations first so coupon usage counts are accurate.
@@ -66,6 +66,19 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Plans combined in the same booking must belong to the same service
+    const extraPlans = extraPlanIds.length
+      ? await prisma.plan.findMany({
+          where: { id: { in: extraPlanIds.filter((id) => id !== plan.id) }, isActive: true, service: { slug: plan.service?.slug } },
+          select: { id: true, pricePaise: true },
+        })
+      : [];
+    if (extraPlans.length !== new Set(extraPlanIds.filter((id) => id !== plan.id)).size) {
+      return NextResponse.json({ isValid: false, reason: GENERIC_UNAVAILABLE_MESSAGE });
+    }
+    const totalPaise = plan.pricePaise + extraPlans.reduce((sum, p) => sum + p.pricePaise, 0);
+    const allPlanIds = [plan.id, ...extraPlans.map((p) => p.id)];
+
     // Fetch offer from database
     const offer = await prisma.offer.findUnique({
       where: { code },
@@ -88,9 +101,10 @@ export async function POST(request: NextRequest) {
           })
             .catch(() => 0)
         : 0;
-    const evalResult = applyOffer(offer, plan.pricePaise, new Date(), {
+    const evalResult = applyOffer(offer, totalPaise, new Date(), {
       serviceSlug: plan.service?.slug,
       planId: plan.id,
+      planIds: allPlanIds,
       userUses,
     });
 
@@ -106,7 +120,7 @@ export async function POST(request: NextRequest) {
     // order creation, so preview and checkout totals always match.
     const gst = await getGstSettings();
     const billing = calculateGst({
-      baseAmountPaise: plan.pricePaise,
+      baseAmountPaise: totalPaise,
       discountAmountPaise: evalResult.discountPaise,
       gstRateBasisPoints: gst.rateBasisPoints,
     });

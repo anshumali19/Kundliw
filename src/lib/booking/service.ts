@@ -103,13 +103,43 @@ export async function createBookingOrder(
       throw new BookingError("Requested consultation tier is unavailable or inactive.");
     }
 
-    // Package availability: dates and seats. The package row is locked so two customers cannot take the last seat together.
-    if (plan.package) {
-      await tx.$queryRaw`SELECT "id" FROM "ServicePackage" WHERE "id" = ${plan.package.id} FOR UPDATE`;
-      const held = await tx.order.count({
-        where: { plan: { packageId: plan.package.id }, paymentStatus: { notIn: [PaymentStatus.FAILED, PaymentStatus.REFUNDED] } },
+    // Plans combined in one booking: the first plus up to two more, all from this service and all different
+    const extraSlugs = Array.from(new Set((input.extraPlanSlugs ?? []).map((x) => x.trim()).filter(Boolean)));
+    if (extraSlugs.includes(plan.slug)) {
+      throw new BookingError("The same plan cannot be added twice.");
+    }
+    if (extraSlugs.length > 2) {
+      throw new BookingError("You can combine at most 3 plans in one booking.");
+    }
+    const extraPlans = [];
+    for (const slug of extraSlugs) {
+      const extra = await tx.plan.findUnique({
+        where: { serviceId_slug: { serviceId: service.id, slug } },
+        include: { package: { select: { id: true, isActive: true, seats: true, startDate: true, endDate: true } } },
       });
-      const availability = computeAvailability(plan.package, held);
+      if (!extra || !extra.isActive || (extra.package && !extra.package.isActive)) {
+        throw new BookingError("One of the plans you combined is unavailable. Please review your selection.");
+      }
+      extraPlans.push(extra);
+    }
+    const allPlans = [plan, ...extraPlans];
+    const totalBasePaise = allPlans.reduce((sum, p) => sum + p.pricePaise, 0);
+    const allPlanIds = allPlans.map((p) => p.id);
+
+    // Package availability: dates and seats. The package row is locked so two customers cannot take the last seat together.
+    const checkedPackages = new Set<string>();
+    for (const pl of allPlans) {
+      if (!pl.package || checkedPackages.has(pl.package.id)) continue;
+      checkedPackages.add(pl.package.id);
+      await tx.$queryRaw`SELECT "id" FROM "ServicePackage" WHERE "id" = ${pl.package.id} FOR UPDATE`;
+      const planIdsInPackage = (await tx.plan.findMany({ where: { packageId: pl.package.id }, select: { id: true } })).map((x) => x.id);
+      const held = await tx.order.count({
+        where: {
+          OR: [{ plan: { packageId: pl.package.id } }, { extraPlanIds: { hasSome: planIdsInPackage } }],
+          paymentStatus: { notIn: [PaymentStatus.FAILED, PaymentStatus.REFUNDED] },
+        },
+      });
+      const availability = computeAvailability(pl.package, held);
       if (availability.status !== "open") {
         throw new BookingError(
           availability.reason === "full"
@@ -119,9 +149,9 @@ export async function createBookingOrder(
       }
     }
 
-    // 3. If plan includes live call, validate and reserve appointment slot
+    // 3. If any plan includes a live call, validate and reserve one appointment slot for the booking
     let reservedSlotId: string | null = null;
-    if (plan.hasCall) {
+    if (allPlans.some((p) => p.hasCall)) {
       if (!input.slotId) {
         throw new BookingError("An appointment slot is required for consultation calls.");
       }
@@ -176,7 +206,7 @@ export async function createBookingOrder(
         userUsesByCode = Object.fromEntries(used.map((u) => [u.offerCode ?? "", u._count._all]));
       }
       const eligible = autoOffers.filter((o) => !(o.perUserLimit > 0 && (userUsesByCode[o.code] ?? 0) >= o.perUserLimit));
-      const best = pickBestAutoOffer(eligible, plan.pricePaise, new Date(), { serviceSlug: service.slug, planId: plan.id });
+      const best = pickBestAutoOffer(eligible, totalBasePaise, new Date(), { serviceSlug: service.slug, planId: plan.id, planIds: allPlanIds });
       if (best) offerCodeToClaim = best.offer.code;
     }
 
@@ -185,9 +215,9 @@ export async function createBookingOrder(
       const claimResult = await claimOfferInTransaction(
         tx,
         cleanCode,
-        plan.pricePaise,
+        totalBasePaise,
         new Date(),
-        { serviceSlug: service.slug, planId: plan.id, userId }
+        { serviceSlug: service.slug, planId: plan.id, planIds: allPlanIds, userId }
       );
 
       discountPaise = claimResult.discountPaise;
@@ -208,7 +238,7 @@ export async function createBookingOrder(
 
     // 6. Compute GST calculation strictly from database prices
     const billing = calculateGst({
-      baseAmountPaise: plan.pricePaise,
+      baseAmountPaise: totalBasePaise,
       discountAmountPaise: discountPaise,
       gstRateBasisPoints: gst.rateBasisPoints,
     });
@@ -231,6 +261,7 @@ export async function createBookingOrder(
         userId,
         serviceId: service.id,
         planId: plan.id,
+        extraPlanIds: extraPlans.map((x) => x.id),
         slotId: reservedSlotId,
         appointmentStatus: reservedSlotId ? AppointmentStatus.PENDING : null,
         offerId: claimedOfferId,

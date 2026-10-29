@@ -1,4 +1,5 @@
 import { HelpEmail } from "@/components/content/HelpEmail";
+import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
@@ -62,6 +63,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
     notFound();
   }
 
+  const planMap = await loadPlanTitleMap(order.extraPlanIds);
   const jataka = (order.jatakaDetails as Record<string, unknown>) || {};
   const partner = jataka.partnerDetails as Record<string, unknown> | undefined;
 
@@ -193,11 +195,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
                   : "Astrological Consultation"}
               </div>
               <div className="text-xs text-primary font-medium mt-0.5">
-                {order.plan
-                  ? isHindi
-                    ? order.plan.titleHi
-                    : order.plan.titleEn
-                  : "Standard Tier"}
+                {bundleTitle(order, planMap, isHindi, "Standard Tier")}
               </div>
             </div>
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { normalizePhoneNumber } from "@/lib/auth/validation";
@@ -101,6 +102,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: GENERIC_ERROR }, { status: 404 });
     }
 
+    const trackMap = await loadPlanTitleMap(order.extraPlanIds);
     // Return sanitized tracking payload
     return NextResponse.json({
       success: true,
@@ -114,8 +116,8 @@ export async function POST(request: NextRequest) {
         paymentStatus: order.paymentStatus,
         serviceTitleEn: order.service?.titleEn || "Vedic Service",
         serviceTitleHi: order.service?.titleHi || "Vedic Service",
-        planTitleEn: order.plan?.titleEn || "Standard",
-        planTitleHi: order.plan?.titleHi || "Standard",
+        planTitleEn: bundleTitle(order, trackMap, false, "Standard"),
+        planTitleHi: bundleTitle(order, trackMap, true, "Standard"),
         jatakaName: String(jataka.name || order.user?.name || "Customer"),
         statusEvents: order.statusEvents.map((e) => ({
           id: e.id,

@@ -1,4 +1,5 @@
 import { kendraEmail } from "@/lib/content/contact";
+import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       [hi ? "बुकिंग नंबर" : "Booking number", order.orderNumber],
       [hi ? "ग्राहक" : "Customer", customer],
       [hi ? "सेवा" : "Service", (hi ? order.service?.titleHi : order.service?.titleEn) || ""],
-      [hi ? "प्लान" : "Plan", (hi ? order.plan?.titleHi : order.plan?.titleEn) || ""],
+      [hi ? "प्लान" : "Plan", bundleTitle(order, await loadPlanTitleMap(order.extraPlanIds), hi)],
       [hi ? "भुगतान" : "Payment", String(order.paymentStatus).replace(/_/g, " ")],
     ];
     if (cfg.showAmount !== false) rows.push([hi ? "राशि" : "Amount", formatPaiseToInr(order.netAmountPaise)]);

@@ -148,6 +148,8 @@ export const updateOfferInputSchema = baseOfferInputSchema
 export const validateOfferQuerySchema = z.object({
   code: z.string().trim().toUpperCase(),
   planId: z.string().min(1),
+  // Other plans combined in the same booking (same service)
+  extraPlanIds: z.array(z.string().min(1)).max(2).optional(),
 });
 
 const dayInputSchema = z.object({
