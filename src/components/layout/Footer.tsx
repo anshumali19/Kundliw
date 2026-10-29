@@ -58,7 +58,7 @@ export async function Footer() {
     .catch(() => null);
   const legalLinks = livePages ? LEGAL_PAGES.filter((l) => livePages.has(l.slug)) : LEGAL_PAGES.slice(0, 2);
 
-  const phone1 = settings?.phone1;
+  const phone1 = settings?.phone1 || "+91 98279 91224";
   const phone2 = settings?.phone2;
   const email = kendraEmail(settings?.email);
   const addressLine1 =
@@ -84,7 +84,7 @@ export async function Footer() {
         <div className="lg:col-span-3 min-w-0">
           <LocationMap settings={settings || {}} title={mapTitle} address={addressLine1} isHindi={hi} />
         </div>
-        <div className="lg:col-span-2 rounded-2xl border border-[#800000]/20 border-t-4 border-t-[#F96706] bg-gradient-to-br from-[#FFC105]/20 via-[#FFF8EC] to-[#F96706]/10 p-5 space-y-4 self-start shadow-sm">
+        <div className="lg:col-span-2 rounded-2xl border border-[#800000]/20 border-t-4 border-t-[#F96706] bg-gradient-to-br from-[#FFC105]/20 via-[#FFF8EC] to-[#F96706]/10 p-5 space-y-4 lg:mt-8 lg:self-stretch shadow-sm">
           <h2 className="font-serif text-xl font-bold text-[#800000] pb-2 border-b border-[#800000]/15">{hi ? "सहायता, पूछताछ एवं सहयोग" : "Help, Enquiry & Support"}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {helpCards.map((c) => (
