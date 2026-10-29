@@ -9,7 +9,8 @@ import { kendraEmail } from "@/lib/content/contact";
 import { ownKundliHref } from "@/lib/content/ownKundli";
 import { isCorePageSlug } from "@/lib/content/pages";
 import { LocationMap } from "@/components/content/LocationMap";
-import { ExternalLink, Phone, Mail, Clock, Globe, HelpCircle, MessageSquare, Headphones } from "lucide-react";
+import QRCode from "qrcode";
+import { ExternalLink, Phone, Mail, Clock, Globe, HelpCircle, MessageSquare, Headphones, Download, Smartphone } from "lucide-react";
 
 export async function Footer() {
   const locale = await getLocale();
@@ -47,6 +48,7 @@ export async function Footer() {
     { slug: "privacy", label: t("privacyLink") },
     { slug: "terms", label: t("termsLink") },
     { slug: "refund", label: locale === "hi" ? "धनवापसी नीति" : "Refund Policy" },
+    { slug: "cancellation", label: locale === "hi" ? "रद्दीकरण नीति" : "Cancellation Policy" },
     { slug: "platform-guidelines", label: locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines" },
     { slug: "member-agreement", label: locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement" },
     { slug: "rules-regulations", label: locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations" },
@@ -57,6 +59,16 @@ export async function Footer() {
     .then((rows) => new Set(rows.map((r) => r.slug.replace(/^legal\//, ""))))
     .catch(() => null);
   const legalLinks = livePages ? LEGAL_PAGES.filter((l) => livePages.has(l.slug)) : LEGAL_PAGES.slice(0, 2);
+
+  // Android app: the admin's Mobile app settings (Google Play, App Store, direct APK) or the older single link
+  const appCfg = await getSection("mobileApp");
+  const playUrl = String(appCfg.playStoreUrl || "").trim();
+  const storeUrl = String(appCfg.appStoreUrl || "").trim();
+  const apkUrl = String(appCfg.apkUrl || "").trim();
+  const primaryAppUrl = playUrl || apkUrl || storeUrl || String(settings?.appDownloadUrl || "").trim();
+  const showApp = appCfg.enabled !== false && Boolean(primaryAppUrl);
+  const appQr = showApp ? await QRCode.toDataURL(primaryAppUrl, { margin: 1, width: 220, color: { dark: "#641E2B", light: "#FFFFFF" } }).catch(() => null) : null;
+  const appText = pickG(appCfg, "appText");
 
   const phone1 = settings?.phone1 || "+91 98279 91224";
   const phone2 = settings?.phone2;
@@ -192,6 +204,11 @@ export async function Footer() {
                   {tNav("pricingPlansShort")}
                 </Link>
               </li>
+              <li>
+                <Link href="/services#packages" className="hover:text-white hover:underline transition-colors block py-0.5">
+                  {locale === "hi" ? "पैकेज" : "Packages"}
+                </Link>
+              </li>
               {(
 <li>
                 <Link href={ownKundliHref("/kundli") as never} className="hover:text-white hover:underline transition-colors block py-0.5">
@@ -240,7 +257,7 @@ export async function Footer() {
                   </Link>
                 </li>
               ))}
-              {settings?.appDownloadUrl && (
+              {showApp && (
                 <li>
                   <Link href="/app" className="hover:text-white hover:underline transition-colors block py-0.5">
                     {locale === "hi" ? "एंड्रॉइड ऐप" : "Android App"}
@@ -383,6 +400,51 @@ export async function Footer() {
             </ul>
           </div>
         </div>
+
+        {showApp && (
+          <section aria-label={locale === "hi" ? "ऐप डाउनलोड" : "Download the app"} className="my-6 rounded-xl border border-gold/40 bg-black/15 p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-3 min-w-0">
+              <div className="flex items-center gap-2 font-serif text-lg font-bold text-white">
+                <Smartphone className="w-5 h-5 text-gold" aria-hidden="true" />
+                {locale === "hi" ? "हमारा एंड्रॉइड ऐप डाउनलोड करें" : "Download Our Android App"}
+              </div>
+              <p className="text-sm text-on-maroon">
+                {appText || (locale === "hi" ? "बुकिंग करें, ऑर्डर ट्रैक करें और अपडेट पाएँ, अपने फ़ोन पर।" : "Book services, track orders and get updates on your phone.")}
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                {(playUrl || primaryAppUrl) && (
+                  <a
+                    href={playUrl || primaryAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 min-h-[44px] px-5 rounded-lg bg-gold text-on-gold font-bold text-sm hover:opacity-90"
+                  >
+                    <Download className="w-4 h-4" aria-hidden="true" />
+                    {playUrl ? (locale === "hi" ? "Google Play पर पाएँ" : "Get it on Google Play") : locale === "hi" ? "ऐप डाउनलोड करें" : "Download the app"}
+                  </a>
+                )}
+                {storeUrl && (
+                  <a href={storeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-[44px] px-5 rounded-lg border border-gold text-white font-bold text-sm hover:bg-white/10">
+                    <Download className="w-4 h-4" aria-hidden="true" />
+                    App Store
+                  </a>
+                )}
+                {apkUrl && playUrl && (
+                  <a href={apkUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-on-maroon underline underline-offset-2 hover:text-white">
+                    {locale === "hi" ? "सीधा APK डाउनलोड" : "Direct APK download"}
+                  </a>
+                )}
+              </div>
+            </div>
+            {appQr && (
+              <a href={primaryAppUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 self-start md:self-auto text-center text-xs text-on-maroon" aria-label={locale === "hi" ? "ऐप डाउनलोड" : "Download the app"}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={appQr} alt={locale === "hi" ? "ऐप डाउनलोड के लिए QR कोड" : "QR code to download the app"} width={120} height={120} className="h-28 w-28 rounded-lg bg-white p-1" />
+                <span className="block mt-1">{locale === "hi" ? "स्कैन करें / क्लिक करें" : "Scan / click to download"}</span>
+              </a>
+            )}
+          </section>
+        )}
 
         {extraLinks.length > 0 && (
           <nav aria-label={locale === "hi" ? "और लिंक" : "More links"} className="py-4 border-b border-gold/30 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
