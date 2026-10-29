@@ -244,6 +244,11 @@ export function BookingWizard({
     email: userEmail || "",
     language: (locale === "en" ? "en" : "hi") as "hi" | "en",
     queries: "",
+    fatherName: "",
+    motherName: "",
+    grandfatherName: "",
+    gotra: "",
+    address: "",
     partnerName: initialJataka?.partnerName || "",
     partnerGender: "FEMALE" as "MALE" | "FEMALE" | "OTHER",
     partnerDob: initialJataka?.partnerDob || "1996-01-01",
@@ -382,6 +387,13 @@ export function BookingWizard({
           email: formData.email.trim() || undefined,
           language: formData.language,
           queries: formData.queries.trim() || undefined,
+          ...(isKundliService(activeService.slug) && {
+            fatherName: formData.fatherName.trim(),
+            motherName: formData.motherName.trim(),
+            grandfatherName: formData.grandfatherName.trim(),
+            gotra: formData.gotra.trim(),
+            address: formData.address.trim(),
+          }),
           ...(activeService.slug === "kundli-matching" && {
             partnerDetails: {
               name: formData.partnerName.trim(),
@@ -901,6 +913,47 @@ export function BookingWizard({
                   </div>
                 </div>
 
+                {kundliMode && (
+                  <div className="pt-4 border-t border-outline-variant/30 space-y-4">
+                    <div className="font-serif font-bold text-sm text-secondary">
+                      {isHindi ? "परिवार विवरण (कुण्डली हेतु आवश्यक)" : "Family details (needed for the Kundli)"}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {(
+                        [
+                          ["fatherName", "पिता का नाम *", "Father's name *"],
+                          ["motherName", "माता का नाम *", "Mother's name *"],
+                          ["grandfatherName", "दादा का नाम *", "Grandfather's name *"],
+                          ["gotra", "गोत्र *", "Gotra *"],
+                        ] as const
+                      ).map(([key, hi, en]) => (
+                        <div key={key}>
+                          <label className="block text-xs font-bold uppercase text-secondary mb-1">{isHindi ? hi : en}</label>
+                          <input
+                            type="text"
+                            required
+                            maxLength={120}
+                            value={formData[key]}
+                            onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
+                            className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-secondary mb-1">{isHindi ? "पता *" : "Address *"}</label>
+                      <textarea
+                        rows={2}
+                        required
+                        maxLength={500}
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Specific Queries */}
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
@@ -1014,6 +1067,17 @@ export function BookingWizard({
                       );
                       return;
                     }
+                    if (
+                      kundliMode &&
+                      !(formData.fatherName.trim() && formData.motherName.trim() && formData.grandfatherName.trim() && formData.gotra.trim() && formData.address.trim())
+                    ) {
+                      setSubmissionError(
+                        isHindi
+                          ? "कृपया पिता, माता, दादा का नाम, गोत्र और पता दर्ज करें।"
+                          : "Please fill in father's, mother's and grandfather's name, gotra and address."
+                      );
+                      return;
+                    }
                     if (isMatchingService && (!formData.partnerName.trim() || !formData.partnerPob.trim())) {
                       setSubmissionError(
                         isHindi
@@ -1107,6 +1171,25 @@ export function BookingWizard({
                     <span className="text-on-surface-variant">{isHindi ? "भाषा:" : "Language:"}</span>{" "}
                     <strong>{formData.language === "hi" ? "हिन्दी" : "English"}</strong>
                   </div>
+                  {kundliMode && (
+                    <>
+                      <div>
+                        <span className="text-on-surface-variant">{isHindi ? "पिता:" : "Father:"}</span> <strong>{formData.fatherName}</strong>
+                      </div>
+                      <div>
+                        <span className="text-on-surface-variant">{isHindi ? "माता:" : "Mother:"}</span> <strong>{formData.motherName}</strong>
+                      </div>
+                      <div>
+                        <span className="text-on-surface-variant">{isHindi ? "दादा:" : "Grandfather:"}</span> <strong>{formData.grandfatherName}</strong>
+                      </div>
+                      <div>
+                        <span className="text-on-surface-variant">{isHindi ? "गोत्र:" : "Gotra:"}</span> <strong>{formData.gotra}</strong>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <span className="text-on-surface-variant">{isHindi ? "पता:" : "Address:"}</span> <strong>{formData.address}</strong>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {formData.queries && (

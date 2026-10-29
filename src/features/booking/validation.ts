@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isKundliService } from "@/lib/content/ownKundli";
 
 export const jatakaDetailsSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters"),
@@ -14,6 +15,12 @@ export const jatakaDetailsSchema = z.object({
   email: z.string().trim().email("Invalid email address").optional().or(z.literal("")),
   language: z.enum(["hi", "en"]).default("hi"),
   queries: z.string().trim().max(1000, "Queries cannot exceed 1000 characters").optional(),
+  // Family details the Kendra needs to prepare a Kundli (required for the Kundli services, see createBookingOrderSchema)
+  fatherName: z.string().trim().max(120).optional().or(z.literal("")),
+  motherName: z.string().trim().max(120).optional().or(z.literal("")),
+  grandfatherName: z.string().trim().max(120).optional().or(z.literal("")),
+  gotra: z.string().trim().max(120).optional().or(z.literal("")),
+  address: z.string().trim().max(500).optional().or(z.literal("")),
   partnerDetails: z
     .object({
       name: z.string().trim().min(2, "Partner name must be at least 2 characters"),
@@ -35,6 +42,20 @@ export const createBookingOrderSchema = z.object({
   idempotencyKey: z.string().trim().optional(),
   jatakaDetails: jatakaDetailsSchema,
   // Note: Client cannot provide prices or discounts. Any price passed is ignored!
+}).superRefine((v, ctx) => {
+  if (!isKundliService(v.serviceSlug)) return;
+  const need: Array<[keyof typeof v.jatakaDetails, string]> = [
+    ["fatherName", "Father's name is required"],
+    ["motherName", "Mother's name is required"],
+    ["grandfatherName", "Grandfather's name is required"],
+    ["gotra", "Gotra is required"],
+    ["address", "Address is required"],
+  ];
+  for (const [key, message] of need) {
+    if (!String(v.jatakaDetails[key] ?? "").trim()) {
+      ctx.addIssue({ code: "custom", path: ["jatakaDetails", key], message });
+    }
+  }
 });
 
 export type CreateBookingOrderInput = z.infer<typeof createBookingOrderSchema>;

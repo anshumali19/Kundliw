@@ -246,6 +246,22 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
                 <span className="text-on-surface-variant block">{isHindi ? "जन्म स्थान:" : "POB:"}</span>
                 <span className="font-semibold">{String(jataka.pob || "N/A")}</span>
               </div>
+              {(
+                [
+                  ["fatherName", "पिता का नाम:", "Father:"],
+                  ["motherName", "माता का नाम:", "Mother:"],
+                  ["grandfatherName", "दादा का नाम:", "Grandfather:"],
+                  ["gotra", "गोत्र:", "Gotra:"],
+                  ["address", "पता:", "Address:"],
+                ] as const
+              ).map(([key, hi, en]) =>
+                jataka[key] ? (
+                  <div key={key} className={key === "address" ? "sm:col-span-2" : ""}>
+                    <span className="text-on-surface-variant block">{isHindi ? hi : en}</span>
+                    <span className="font-semibold">{String(jataka[key])}</span>
+                  </div>
+                ) : null
+              )}
             </div>
 
             {partner && (

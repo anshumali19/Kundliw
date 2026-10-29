@@ -38,6 +38,8 @@ export interface SerializedOrder {
   associateId?: string | null;
   jatakaName: string;
   jatakaPhone: string;
+  /** Kundli family details (father, mother, grandfather, gotra, address), empty for other services */
+  jatakaFamily?: Array<[string, string]>;
   serviceTitle: string;
   planTitle: string;
   statusEvents: Array<{
@@ -388,6 +390,17 @@ export function AdminOrdersManager({
                         {order.jatakaName} ({order.jatakaPhone})
                       </span>
                     </div>
+
+                    {order.jatakaFamily && order.jatakaFamily.length > 0 && (
+                      <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                        {order.jatakaFamily.map(([label, value]) => (
+                          <div key={label}>
+                            <span className="text-on-surface-variant">{label}: </span>
+                            <span className="font-semibold text-on-surface">{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     <div>
                       <span className="text-on-surface-variant block">

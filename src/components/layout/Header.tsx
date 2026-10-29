@@ -9,6 +9,7 @@ import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { AccountMenu } from "./AccountMenu";
 import { QuickBookingPanel } from "./QuickBookingPanel";
+import { ServicesMenu } from "./ServicesMenu";
 import { ownKundliHref } from "@/lib/content/ownKundli";
 import {
   Phone,
@@ -257,6 +258,9 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
           <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 2xl:gap-3 h-20 ml-2 xl:ml-3">
             {primaryLinks.map((link) => {
               const isActive = checkIsActive(link.href);
+              if (link.href === "/services") {
+                return <ServicesMenu key={link.href} label={link.label} active={isActive} />;
+              }
               if (link.href === "/services#plans" || link.href === "/booking") {
                 return (
                   <div

@@ -78,6 +78,17 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
       associateId: o.associateId,
       jatakaName: String(j.name || o.user?.name || "Customer"),
       jatakaPhone: String(j.phone || o.user?.phone || ""),
+      jatakaFamily: (
+        [
+          ["fatherName", "पिता", "Father"],
+          ["motherName", "माता", "Mother"],
+          ["grandfatherName", "दादा", "Grandfather"],
+          ["gotra", "गोत्र", "Gotra"],
+          ["address", "पता", "Address"],
+        ] as const
+      )
+        .filter(([key]) => j[key])
+        .map(([key, hi, en]) => [isHindi ? hi : en, String(j[key])] as [string, string]),
       serviceTitle: isHindi
         ? o.service?.titleHi || "Vedic Service"
         : o.service?.titleEn || "Vedic Service",
