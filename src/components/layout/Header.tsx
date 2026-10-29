@@ -7,7 +7,8 @@ import { SocialIcon } from "@/components/content/SocialIcon";
 import { DateStrip, type DateStripData } from "./DateStrip";
 import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-import { AccountMenu } from "./AccountMenu";
+import { AccountMenu, homeForRole } from "./AccountMenu";
+import { useSession } from "next-auth/react";
 import { QuickBookingPanel } from "./QuickBookingPanel";
 import { ServicesMenu } from "./ServicesMenu";
 import { ownKundliHref } from "@/lib/content/ownKundli";
@@ -46,6 +47,8 @@ interface HeaderProps {
 }
 
 export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, menu, pages = [] }: HeaderProps = {}) {
+  const { data: session, status: authStatus } = useSession();
+  const signedIn = authStatus === "authenticated";
   const activePhone = phone || "+91 98279 91224";
   const cleanPhone = activePhone.replace(/[^\d+]/g, "");
   const cleanWa = activePhone.replace(/[^\d]/g, "");
@@ -173,7 +176,9 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
     { href: "/auth/signin", label: tNav("signIn") },
   ]);
   const mobileExtra = pages.map((p) => ({ href: p.href, label: isHindi ? p.labelHi || p.labelEn : p.labelEn || p.labelHi }));
-  const mobileLinks = [...srsMobileMenu, ...mobileExtra.filter((x) => !srsMobileMenu.some((m) => m.href === x.href))];
+  const mobileLinks = [...srsMobileMenu, ...mobileExtra.filter((x) => !srsMobileMenu.some((m) => m.href === x.href))].filter(
+    (l) => !(signedIn && (l.href === "/auth/register" || l.href === "/auth/signin"))
+  );
 
   return (
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
@@ -216,7 +221,13 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
                 <span className="font-semibold">{phone}</span>
               </a>
             )}
-            {tb("showAuthLinks") && (
+            {tb("showAuthLinks") && signedIn && (
+              <Link href={homeForRole(session?.user?.role)} className="hidden md:inline-flex items-center gap-1 hover:underline text-xs font-semibold">
+                <User className="w-3 h-3 text-gold shrink-0" />
+                <span>{isHindi ? "मेरा खाता" : "My account"}</span>
+              </Link>
+            )}
+            {tb("showAuthLinks") && !signedIn && (
               <>
             <Link href="/auth/signin" className="hidden md:inline-flex items-center gap-1 hover:underline text-xs font-semibold">
               <LogIn className="w-3 h-3 text-gold shrink-0" />
