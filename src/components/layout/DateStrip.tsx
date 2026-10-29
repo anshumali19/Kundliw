@@ -70,11 +70,8 @@ export function DateStrip({ data, isHindi, show = {} }: { data: DateStripData | 
   const p = now ? istParts(now) : null;
   const sep = <span aria-hidden="true" className="text-gold/60">|</span>;
 
-  return (
-    <div
-      className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto whitespace-nowrap min-w-0 text-[11px] sm:text-xs font-semibold text-on-maroon [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      aria-label={isHindi ? "आज की तिथि और समय" : "Today's date and time"}
-    >
+  const content = (
+    <>
       {on("time") && (
         <span className="inline-flex items-center gap-1 tabular-nums shrink-0">
           <Clock className="w-3 h-3 text-gold" aria-hidden="true" />
@@ -113,6 +110,18 @@ export function DateStrip({ data, isHindi, show = {} }: { data: DateStripData | 
           )}
         </>
       )}
+    </>
+  );
+
+  return (
+    <div
+      className="strip-marquee flex-1 min-w-0 overflow-hidden text-[11px] sm:text-xs font-semibold text-on-maroon"
+      aria-label={isHindi ? "आज की तिथि और समय" : "Today's date and time"}
+    >
+      <div className="strip-marquee-track inline-flex items-center whitespace-nowrap">
+        <div className="inline-flex items-center gap-2.5 sm:gap-3 pr-10">{content}</div>
+        <div className="inline-flex items-center gap-2.5 sm:gap-3 pr-10" aria-hidden="true">{content}</div>
+      </div>
     </div>
   );
 }

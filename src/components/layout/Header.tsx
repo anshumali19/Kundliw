@@ -179,7 +179,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
     <header className="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40">
       {/* 1. One-line bar: time, day, date, month, paksha, tithi and Samvat; contact and sign-in on the right */}
       <div className={tb("showBar") ? "bg-[rgb(var(--topbar-bg-rgb,128_0_0))]" : "hidden"}>
-        <div className="w-full px-3 sm:px-6 xl:px-6 2xl:px-10 h-9 flex items-center justify-between gap-3 text-xs text-on-maroon font-medium [&_a]:!text-on-maroon">
+        <div className="w-full pl-3 pr-5 sm:pl-6 sm:pr-10 xl:pl-6 xl:pr-12 2xl:pl-10 2xl:pr-16 h-9 flex items-center justify-between gap-4 text-xs text-on-maroon font-medium [&_a]:!text-on-maroon">
           <DateStrip
             data={panchang?.parts ?? null}
             isHindi={isHindi}
@@ -188,7 +188,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
 
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             {tb("showSocial") && social.length > 0 && (
-              <ul className="hidden xl:flex items-center gap-2" aria-label="Social media">
+              <ul className="hidden lg:flex items-center gap-1.5 -mr-1" aria-label="Social media">
                 {social.map((l) => (
                   <li key={l.id}>
                     <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} className="inline-flex items-center justify-center w-6 h-6 rounded-full hover:bg-white/15">

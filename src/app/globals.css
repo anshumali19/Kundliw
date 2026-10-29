@@ -164,3 +164,9 @@ body:has(.fixed.inset-0[class*="z-[70]"]),
 body:has(.fixed.inset-0[class*="z-[60]"]),
 body:has(.fixed.inset-0[class*="z-[80]"]),
 body:has(.fixed.inset-0[class*="z-50"]) { overflow: hidden; }
+
+/* Top date strip: scrolls right to left so nothing is hidden when icons take space */
+@keyframes strip-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.strip-marquee-track { animation: strip-scroll 28s linear infinite; will-change: transform; }
+.strip-marquee:hover .strip-marquee-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .strip-marquee-track { animation: none; } }
