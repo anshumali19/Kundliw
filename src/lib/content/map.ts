@@ -76,9 +76,21 @@ export function mapIframeSrc(settings: MapSettings): string | null {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
 }
 
+/** The pinned place inside a Google embed link (its destination, else its centre), when no coordinates were typed. */
+function embedPlace(settings: MapSettings): LatLng | null {
+  const embed = safeMapEmbedUrl(settings.googleMapEmbedUrl);
+  if (!embed) return null;
+  const pins = [...embed.matchAll(/!1d(-?\d+(?:\.\d+)?)!2d(-?\d+(?:\.\d+)?)/g)];
+  const last = pins[pins.length - 1];
+  if (last) return valid(parseFloat(last[1]), parseFloat(last[2]));
+  const c = embed.match(/!2d(-?\d+(?:\.\d+)?)!3d(-?\d+(?:\.\d+)?)/);
+  return c ? valid(parseFloat(c[2]), parseFloat(c[1])) : null;
+}
+
 export function directionsUrl(settings: MapSettings): string | null {
   const lat = settings.mapLatitude;
   const lng = settings.mapLongitude;
-  if (lat == null || lng == null || !valid(lat, lng)) return null;
-  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  const place = lat != null && lng != null ? valid(lat, lng) : embedPlace(settings);
+  if (!place) return null;
+  return `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
 }

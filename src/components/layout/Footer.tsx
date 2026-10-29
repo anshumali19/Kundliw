@@ -79,18 +79,18 @@ export async function Footer() {
   return (
     <>
     {showBand && (
-    <section aria-label={hi ? "स्थान और सहायता" : "Location and support"} className="w-full bg-surface-container-low border-t border-outline-variant/50">
+    <section aria-label={hi ? "स्थान और सहायता" : "Location and support"} className="w-full bg-gradient-to-b from-[#FFC105]/10 via-[#F96706]/5 to-[#800000]/5 border-t-2 border-gold/60">
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8 grid grid-cols-1 lg:grid-cols-5 gap-6 text-left">
         <div className="lg:col-span-3 min-w-0">
           <LocationMap settings={settings || {}} title={mapTitle} address={addressLine1} isHindi={hi} />
         </div>
-        <div className="lg:col-span-2 rounded-xl border border-outline-variant/60 bg-surface p-5 space-y-4 self-start">
-          <h2 className="font-serif text-xl font-bold text-secondary">{hi ? "सहायता, पूछताछ एवं सहयोग" : "Help, Enquiry & Support"}</h2>
+        <div className="lg:col-span-2 rounded-2xl border border-[#800000]/20 border-t-4 border-t-[#F96706] bg-gradient-to-br from-[#FFC105]/20 via-[#FFF8EC] to-[#F96706]/10 p-5 space-y-4 self-start shadow-sm">
+          <h2 className="font-serif text-xl font-bold text-[#800000] pb-2 border-b border-[#800000]/15">{hi ? "सहायता, पूछताछ एवं सहयोग" : "Help, Enquiry & Support"}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {helpCards.map((c) => (
-              <Link key={c.href} href={c.href} className="rounded-lg border border-outline-variant/60 p-3 hover:bg-surface-container-high min-h-[44px]">
+              <Link key={c.href} href={c.href} className="rounded-xl border border-[#800000]/20 bg-white/60 p-3 hover:bg-[#FFC105]/25 hover:border-[#F96706]/60 transition-colors min-h-[44px]">
                 <div className="flex items-center gap-2 font-bold text-secondary text-sm">
-                  <c.icon className="w-4 h-4 text-primary" aria-hidden="true" />
+                  <c.icon className="w-5 h-5 text-[#F96706]" aria-hidden="true" />
                   {c.title}
                 </div>
                 <p className="text-xs text-on-surface-variant mt-1">{c.body}</p>
@@ -98,8 +98,8 @@ export async function Footer() {
             ))}
           </div>
           <div>
-            <div className="flex items-center gap-2 font-bold text-secondary text-sm mb-2">
-              <Headphones className="w-4 h-4 text-primary" aria-hidden="true" />
+            <div className="flex items-center gap-2 font-bold text-[#800000] text-sm mb-2 pt-3 border-t border-[#800000]/15">
+              <Headphones className="w-5 h-5 text-[#F96706]" aria-hidden="true" />
               {pickG(mapCfg, "supportLabel") || (hi ? "सहयोग (संपर्क)" : "Support")}
             </div>
             <ul className="space-y-2 text-sm">

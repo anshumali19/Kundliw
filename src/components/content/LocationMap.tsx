@@ -59,8 +59,7 @@ export function LocationMap({
           href={directions}
           target="_blank"
           rel="noopener noreferrer"
-          className={`inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold hover:underline ${onDark ? "text-white" : "text-primary"}`}
-        >
+          className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-full text-sm font-bold shadow-sm transition-colors ${onDark ? "bg-gold text-on-gold hover:opacity-90" : "bg-brand text-on-brand hover:bg-brand-hover"}`}>
           <Navigation className="w-4 h-4" aria-hidden="true" />
           {isHindi ? "रास्ता देखें" : "Get directions"}
         </a>
