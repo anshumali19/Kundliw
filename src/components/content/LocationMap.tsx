@@ -59,7 +59,7 @@ export function LocationMap({
           href={directions}
           target="_blank"
           rel="noopener noreferrer"
-          className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-full text-sm font-bold shadow-sm transition-colors ${onDark ? "bg-gold text-on-gold hover:opacity-90" : "bg-[#4CAF50] text-white border border-[#2E7D32]/50 hover:bg-[#3E9B42]"}`}>
+          className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-full text-sm font-bold shadow-sm transition-colors ${onDark ? "bg-gold text-on-gold hover:opacity-90" : "bg-[rgb(var(--map-button-rgb,34_197_94))] text-[rgb(var(--on-map-button-rgb,255_255_255))] border border-black/10 hover:brightness-95"}`}>
           <Navigation className="w-4 h-4" aria-hidden="true" />
           {isHindi ? "रास्ता देखें" : "Get directions"}
         </a>

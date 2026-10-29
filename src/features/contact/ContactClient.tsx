@@ -208,7 +208,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
             href={googleMapsDirectionsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 rounded-lg bg-brand text-on-brand text-xs font-bold hover:bg-brand-hover flex items-center gap-1.5 transition-colors shadow-sm"
+            className="px-4 py-2 rounded-lg bg-[rgb(var(--map-button-rgb,34_197_94))] text-[rgb(var(--on-map-button-rgb,255_255_255))] text-xs font-bold hover:brightness-95 flex items-center gap-1.5 transition-colors shadow-sm"
           >
             <span>{isHindi ? "दिशा-निर्देश प्राप्त करें (Google Maps)" : "Get Directions on Google Maps"}</span>
             <ExternalLink className="w-3.5 h-3.5" />

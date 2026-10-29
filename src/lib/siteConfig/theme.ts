@@ -96,6 +96,11 @@ export function themeCss(theme: Record<string, string | boolean | number>): stri
   const topbarBg = pick("topbarBg");
   if (topbarBg) set("topbar-bg", topbarBg);
 
+  const mapBtn = pick("mapButton");
+  if (mapBtn) set("map-button", mapBtn);
+  const mapBtnText = pick("mapButtonText");
+  if (mapBtnText) set("on-map-button", mapBtnText);
+
   const entries = Object.entries(vars);
   const rules: string[] = [];
   if (entries.length > 0) rules.push(`:root{${entries.map(([k, v]) => `${k}:${v}`).join(";")}}`);

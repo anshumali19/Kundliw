@@ -438,6 +438,8 @@ export const SECTIONS: SectionDef[] = [
       { key: "border", en: "Lines and borders", hi: "रेखाएँ व किनारे", type: "color" },
       { key: "footerBg", en: "Footer background", hi: "फुटर की पृष्ठभूमि", type: "color" },
       { key: "topbarBg", en: "Top bar background", hi: "ऊपरी पट्टी की पृष्ठभूमि", type: "color" },
+      { key: "mapButton", en: "Get directions button colour", hi: "रास्ता देखें बटन का रंग", type: "color" },
+      { key: "mapButtonText", en: "Get directions button text", hi: "रास्ता देखें बटन की लिखावट", type: "color" },
       { key: "bodyFont", en: "Text font - Poppins, Noto Sans, Arial, Verdana, Tahoma or Trebuchet MS", hi: "लिखावट का फ़ॉन्ट (जैसे Georgia)", type: "text", max: 60 },
       { key: "headingFont", en: "Headings font - Cormorant Garamond, Georgia, Times New Roman or Palatino", hi: "शीर्षक का फ़ॉन्ट (जैसे Georgia)", type: "text", max: 60 },
     ],
