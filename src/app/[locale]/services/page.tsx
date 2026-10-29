@@ -1,4 +1,5 @@
 import { activePlanWhere } from "@/lib/content/packages";
+import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
@@ -54,11 +55,13 @@ export default async function ServicesListingPage(
       packages: {
         where: { isActive: true },
         orderBy: { orderIndex: "asc" },
-        select: { id: true, slug: true, titleEn: true, titleHi: true, descriptionEn: true, descriptionHi: true },
+        select: { id: true, slug: true, titleEn: true, titleHi: true, descriptionEn: true, descriptionHi: true, imageUrl: true, numberOfDays: true, startDate: true, endDate: true, seats: true },
       },
     },
     orderBy: { orderIndex: "asc" },
   });
+
+  const seatsHeld = await bookedSeatsByPackage(services.flatMap((s) => s.packages.map((k) => k.id))).catch(() => ({} as Record<string, number>));
 
   const serialized = services.map((s) => ({
     id: s.id,
@@ -80,7 +83,24 @@ export default async function ServicesListingPage(
     youtubeUrl: s.youtubeUrl,
     packages: s.packages
       .filter((k) => s.plans.some((p) => p.packageId === k.id))
-      .map((k) => ({ id: k.id, slug: k.slug, titleEn: k.titleEn, titleHi: k.titleHi, descriptionEn: k.descriptionEn, descriptionHi: k.descriptionHi })),
+      .map((k) => {
+        const a = computeAvailability(k, seatsHeld[k.id] ?? 0);
+        return {
+          id: k.id,
+          slug: k.slug,
+          titleEn: k.titleEn,
+          titleHi: k.titleHi,
+          descriptionEn: k.descriptionEn,
+          descriptionHi: k.descriptionHi,
+          imageUrl: k.imageUrl,
+          numberOfDays: k.numberOfDays,
+          startDate: k.startDate ? k.startDate.toISOString().slice(0, 10) : null,
+          endDate: k.endDate ? k.endDate.toISOString().slice(0, 10) : null,
+          seatsLeft: a.seatsLeft,
+          status: a.status,
+          reason: a.reason ?? null,
+        };
+      }),
     plans: s.plans.map((p) => ({
       packageId: p.packageId,
       id: p.id,

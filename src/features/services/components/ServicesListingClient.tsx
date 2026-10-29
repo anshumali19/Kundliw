@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
+import { isSafeImageSrc } from "@/lib/content/media";
 import {
   LayoutGrid,
   List,
@@ -15,6 +16,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Video,
+  Search,
 } from "lucide-react";
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
@@ -26,6 +28,13 @@ export interface SerializedPackage {
   titleHi: string;
   descriptionEn?: string | null;
   descriptionHi?: string | null;
+  imageUrl?: string | null;
+  numberOfDays?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  seatsLeft?: number | null;
+  status?: "open" | "full" | "closed";
+  reason?: "full" | "started" | "ended" | null;
 }
 
 export interface SerializedPlan {
@@ -89,6 +98,23 @@ export function ServicesListingClient({
   const [isMounted, setIsMounted] = useState(false);
 
   // Enquiry modal state
+  // Packages section: search words and the chosen service filter
+  const [pkgQuery, setPkgQuery] = useState("");
+  const [pkgFilter, setPkgFilter] = useState("all");
+  const allPackageCards = services.flatMap((svc) =>
+    (svc.packages ?? []).map((k) => {
+      const inPkg = svc.plans.filter((p) => p.packageId === k.id);
+      return { svc, k, inPkg, from: inPkg.length ? Math.min(...inPkg.map((p) => p.pricePaise)) : null };
+    })
+  );
+  const packageServices = services.filter((svc) => (svc.packages ?? []).length > 0);
+  const visiblePackageCards = allPackageCards.filter(({ svc, k }) => {
+    if (pkgFilter !== "all" && svc.id !== pkgFilter) return false;
+    const q = pkgQuery.trim().toLowerCase();
+    if (!q) return true;
+    return [k.titleEn, k.titleHi, k.descriptionEn, k.descriptionHi, svc.titleEn, svc.titleHi].some((t) => (t ?? "").toLowerCase().includes(q));
+  });
+
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
   const [selectedServiceTitle, setSelectedServiceTitle] = useState("");
 
@@ -454,9 +480,9 @@ export function ServicesListingClient({
         </div>
       </section>
 
-      {/* All packages, grouped by service (target of the "Packages" menu item) */}
+      {/* All packages: search, filter by service, picture cards (target of the "Packages" menu item) */}
       <section id="packages" className="scroll-mt-32 w-full px-4 sm:px-8 lg:px-12 pb-16">
-        <div className="max-w-6xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-5">
           <div>
             <div className="text-xs uppercase tracking-widest text-primary font-bold">{isHindi ? "सभी पैकेज" : "All packages"}</div>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-secondary mt-1">
@@ -466,44 +492,103 @@ export function ServicesListingClient({
               {isHindi ? "सेवा → पैकेज → प्लान। पैकेज चुनकर उसके प्लान देखें।" : "Service → Package → Plan. Pick a package to see its plans."}
             </p>
           </div>
-          {services.filter((s) => (s.packages ?? []).length > 0).length === 0 && (
+
+          {allPackageCards.length === 0 ? (
             <p className="text-sm text-on-surface-variant">{isHindi ? "अभी कोई पैकेज उपलब्ध नहीं है।" : "No packages are available right now."}</p>
-          )}
-          {services
-            .filter((s) => (s.packages ?? []).length > 0)
-            .map((s) => (
-              <div key={s.id} className="rounded-xl border border-outline-variant/50 bg-surface overflow-hidden">
-                <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-surface-container-low border-b border-outline-variant/40">
-                  <h3 className="font-serif text-lg font-bold text-secondary">{isHindi ? s.titleHi : s.titleEn}</h3>
-                  <Link href={`/services/${s.slug}`} className="text-xs font-bold text-primary hover:underline">
-                    {isHindi ? "सेवा देखें →" : "View service →"}
-                  </Link>
+          ) : (
+            <>
+              <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-3.5 w-4 h-4 text-on-surface-variant" aria-hidden="true" />
+                  <input
+                    type="search"
+                    value={pkgQuery}
+                    onChange={(e) => setPkgQuery(e.target.value)}
+                    placeholder={isHindi ? "पैकेज खोजें..." : "Search packages..."}
+                    aria-label={isHindi ? "पैकेज खोजें" : "Search packages"}
+                    className="w-full min-h-[44px] pl-9 pr-3 rounded-lg border border-outline-variant bg-surface text-sm focus:border-secondary focus:outline-none"
+                  />
                 </div>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
-                  {(s.packages ?? []).map((k) => {
-                    const inPkg = s.plans.filter((p) => p.packageId === k.id);
-                    const from = inPkg.length ? Math.min(...inPkg.map((p) => p.pricePaise)) : null;
+                <div className="flex flex-wrap gap-2" role="group" aria-label={isHindi ? "सेवा के अनुसार छाँटें" : "Filter by service"}>
+                  {[{ id: "all", en: "All", hi: "सभी" }, ...packageServices.map((s) => ({ id: s.id, en: s.titleEn, hi: s.titleHi }))].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setPkgFilter(f.id)}
+                      aria-pressed={pkgFilter === f.id}
+                      className={`min-h-[44px] px-4 rounded-full text-xs font-bold border transition-colors ${
+                        pkgFilter === f.id ? "bg-brand text-on-brand border-brand" : "bg-surface text-secondary border-outline-variant hover:bg-gold/30"
+                      }`}
+                    >
+                      {isHindi ? f.hi : f.en}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-on-surface-variant">
+                {visiblePackageCards.length} {isHindi ? "पैकेज मिले" : visiblePackageCards.length === 1 ? "package found" : "packages found"}
+              </p>
+
+              {visiblePackageCards.length === 0 ? (
+                <p className="text-sm text-on-surface-variant">{isHindi ? "कोई पैकेज नहीं मिला।" : "No package matches your search."}</p>
+              ) : (
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {visiblePackageCards.map(({ svc, k, inPkg, from }) => {
                     const desc = isHindi ? k.descriptionHi || k.descriptionEn : k.descriptionEn || k.descriptionHi;
+                    const shut = k.status && k.status !== "open";
+                    const seatText = shut
+                      ? k.reason === "full"
+                        ? isHindi ? "सभी स्थान भर चुके" : "Fully booked"
+                        : isHindi ? "बुकिंग बंद" : "Booking closed"
+                      : k.seatsLeft != null
+                      ? isHindi ? `${k.seatsLeft} स्थान शेष` : `${k.seatsLeft} seats left`
+                      : "";
+                    const when = [
+                      k.numberOfDays ? `${k.numberOfDays} ${isHindi ? "दिन" : k.numberOfDays === 1 ? "day" : "days"}` : "",
+                      k.startDate ? `${k.startDate}${k.endDate ? ` → ${k.endDate}` : ""}` : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ");
                     return (
                       <li key={k.id}>
                         <Link
-                          href={`/services/${s.slug}?package=${encodeURIComponent(k.id)}`}
-                          className="block h-full rounded-lg border border-outline-variant/60 bg-surface-container-low/60 p-4 hover:bg-gold/20 hover:border-saffron/60 transition-colors min-h-[44px]"
+                          href={`/services/${svc.slug}?package=${encodeURIComponent(k.id)}`}
+                          className="group flex h-full flex-col overflow-hidden rounded-xl border border-outline-variant/60 bg-surface hover:shadow-md hover:border-saffron/60 transition"
                         >
-                          <div className="font-serif font-bold text-secondary">{isHindi ? k.titleHi : k.titleEn}</div>
-                          {desc && <p className="text-xs text-on-surface-variant mt-1 line-clamp-2">{desc}</p>}
-                          <div className="mt-2 text-xs text-on-surface-variant">
-                            {inPkg.length} {isHindi ? "प्लान" : inPkg.length === 1 ? "plan" : "plans"}
-                            {from !== null ? ` · ${isHindi ? "शुरू" : "from"} ${formatPaiseToInr(from)}` : ""}
+                          <div className="relative h-40 bg-gradient-to-br from-gold/40 via-saffron/20 to-maroon/20">
+                            {k.imageUrl && isSafeImageSrc(k.imageUrl) && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={k.imageUrl} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                            )}
+                            <span className="absolute left-3 top-3 rounded-full bg-saffron px-3 py-1 text-[11px] font-bold text-on-saffron">
+                              {isHindi ? svc.titleHi : svc.titleEn}
+                            </span>
+                            {seatText && (
+                              <span className={`absolute right-3 bottom-3 rounded-full px-3 py-1 text-[11px] font-bold ${shut ? "bg-signal text-on-signal" : "bg-surface/95 text-secondary"}`}>
+                                {seatText}
+                              </span>
+                            )}
                           </div>
-                          <div className="mt-2 text-xs font-bold text-primary">{isHindi ? "प्लान देखें →" : "See plans →"}</div>
+                          <div className="flex flex-1 flex-col p-4">
+                            <div className="font-serif text-lg font-bold text-secondary">{isHindi ? k.titleHi : k.titleEn}</div>
+                            {desc && <p className="mt-1 text-xs text-on-surface-variant line-clamp-2">{desc}</p>}
+                            {when && <div className="mt-2 text-xs text-on-surface-variant">{when}</div>}
+                            <div className="mt-auto pt-3 flex items-center justify-between text-xs">
+                              <span className="text-on-surface-variant">
+                                {inPkg.length} {isHindi ? "प्लान" : inPkg.length === 1 ? "plan" : "plans"}
+                                {from !== null ? ` · ${isHindi ? "शुरू" : "from"} ${formatPaiseToInr(from)}` : ""}
+                              </span>
+                              <span className="font-bold text-primary group-hover:underline">{isHindi ? "प्लान देखें →" : "See plans →"}</span>
+                            </div>
+                          </div>
                         </Link>
                       </li>
                     );
                   })}
                 </ul>
-              </div>
-            ))}
+              )}
+            </>
+          )}
         </div>
       </section>
 
