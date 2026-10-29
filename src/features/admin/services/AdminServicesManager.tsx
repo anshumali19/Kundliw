@@ -5,7 +5,7 @@ import { useState } from "react";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { paiseToRupees } from "@/lib/billing/money";
 import { LinkItem, normalizeLinks } from "@/lib/content/media";
-import { ImageUrlField, LinksEditor, YouTubeUrlField } from "@/components/admin/MediaFields";
+import { ImageUrlField, LinksEditor, VideoField } from "@/components/admin/MediaFields";
 import {
   Plus,
   Edit2,
@@ -1259,18 +1259,7 @@ export function AdminServicesManager({
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase text-secondary mb-1">
-                    Video link: YouTube, Vimeo, Google Drive or a direct .mp4 link
-                  </label>
-                  <input
-                    type="url"
-                    value={serviceForm.youtubeUrl}
-                    onChange={(e) => setServiceForm({ ...serviceForm, youtubeUrl: e.target.value })}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]"
-                  />
-                </div>
+                <VideoField value={serviceForm.youtubeUrl} onChange={(v) => setServiceForm({ ...serviceForm, youtubeUrl: v })} />
               </div>
 
               {/* Itinerary (#12) */}
@@ -1474,7 +1463,7 @@ export function AdminServicesManager({
                 onChange={(url) => setPackageForm({ ...packageForm, imageUrl: url })}
                 folder="services"
               />
-              <YouTubeUrlField value={packageForm.youtubeUrl} onChange={(v) => setPackageForm({ ...packageForm, youtubeUrl: v })} />
+              <VideoField value={packageForm.youtubeUrl} onChange={(v) => setPackageForm({ ...packageForm, youtubeUrl: v })} />
               <LinksEditor
                 links={packageForm.additionalLinks}
                 onChange={(additionalLinks) => setPackageForm({ ...packageForm, additionalLinks })}
@@ -1772,7 +1761,7 @@ export function AdminServicesManager({
                 value={planForm.imageUrl}
                 onChange={(imageUrl) => setPlanForm({ ...planForm, imageUrl })}
               />
-              <YouTubeUrlField
+              <VideoField
                 value={planForm.youtubeUrl}
                 onChange={(youtubeUrl) => setPlanForm({ ...planForm, youtubeUrl })}
               />

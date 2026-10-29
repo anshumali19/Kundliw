@@ -99,6 +99,7 @@ export function videoSource(raw: string | null | undefined): VideoSource | null 
     const id = m ? m[1] : u.searchParams.get("id");
     if (id && /^[A-Za-z0-9_-]{10,}$/.test(id)) return { kind: "iframe", src: `https://drive.google.com/file/d/${id}/preview` };
   }
+  if (host.endsWith(".public.blob.vercel-storage.com") && u.pathname.startsWith("/videos/")) return { kind: "file", src: u.toString() };
   if (/\.(mp4|webm|ogg|mov|m4v)$/i.test(u.pathname)) return { kind: "file", src: u.toString() };
   return null;
 }

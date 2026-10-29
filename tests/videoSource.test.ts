@@ -16,6 +16,12 @@ describe("videoSource", () => {
     expect(videoSource("https://example.com/a/b.WEBM?x=1")?.kind).toBe("file");
   });
 
+  it("plays videos from the public video store whatever the file name", () => {
+    expect(videoSource("https://abc123.public.blob.vercel-storage.com/videos/puja-AbC.mp4")?.kind).toBe("file");
+    expect(videoSource("https://abc123.public.blob.vercel-storage.com/videos/puja")?.kind).toBe("file");
+    expect(videoSource("https://abc123.public.blob.vercel-storage.com/other/x")).toBeNull();
+  });
+
   it("rejects everything else", () => {
     expect(videoSource("javascript:alert(1)")).toBeNull();
     expect(videoSource("https://example.com/page")).toBeNull();

@@ -1,7 +1,8 @@
 "use client";
 
 import { LinkTextarea } from "@/components/admin/LinkTextarea";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { upload as uploadToBlob } from "@vercel/blob/client";
 import { ArrowDown, ArrowUp, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 import { BLOCK_TYPES, BlockType, ContentBlock, LinkItem } from "@/lib/content/media";
 
@@ -107,6 +108,110 @@ export function YouTubeUrlField({
         placeholder="https://www.youtube.com/watch?v=..."
         className={inputCls}
       />
+    </div>
+  );
+}
+
+/**
+ * Video field: paste a link (YouTube, Vimeo, Google Drive, direct .mp4) or upload the full video file.
+ * Uploads go straight to the video store, so large files work.
+ */
+export function VideoField({
+  value,
+  onChange,
+  label = "Video",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  label?: string;
+}) {
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [maxMb, setMaxMb] = useState(500);
+  const [progress, setProgress] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch("/api/admin/media/video-upload")
+      .then((r) => r.json())
+      .then((d) => {
+        if (!live) return;
+        setEnabled(!!d.enabled);
+        if (d.maxMb) setMaxMb(d.maxMb);
+      })
+      .catch(() => live && setEnabled(false));
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const send = async (file: File) => {
+    setError(null);
+    if (file.size > maxMb * 1024 * 1024) {
+      setError(`Video is larger than ${maxMb} MB. Upload it to YouTube and paste the link instead.`);
+      return;
+    }
+    setProgress(0);
+    try {
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const blob = await uploadToBlob(`videos/${safe}`, file, {
+        access: "public",
+        handleUploadUrl: "/api/admin/media/video-upload",
+        multipart: true,
+        contentType: file.type || undefined,
+        onUploadProgress: (p) => setProgress(Math.round(p.percentage)),
+      });
+      onChange(blob.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Video upload failed");
+    } finally {
+      setProgress(null);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div>
+      <label className={labelCls}>{label}</label>
+      <input
+        type="url"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Paste a YouTube, Vimeo, Google Drive or .mp4 link, or upload a video below"
+        className={inputCls}
+      />
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime,video/ogg,.mp4,.webm,.mov,.m4v"
+          disabled={progress !== null || enabled === false}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void send(f);
+          }}
+          className="text-xs"
+        />
+        {progress !== null && <span className="text-xs text-on-surface-variant">Uploading… {progress}%</span>}
+        {value && (
+          <button type="button" onClick={() => onChange("")} className="text-xs underline text-on-surface-variant">
+            Remove video
+          </button>
+        )}
+      </div>
+      {progress !== null && (
+        <div className="mt-2 h-2 w-full max-w-xs rounded bg-surface-container-high overflow-hidden" aria-hidden="true">
+          <div className="h-full bg-brand" style={{ width: `${progress}%` }} />
+        </div>
+      )}
+      {enabled === false && (
+        <p className="mt-1 text-xs text-on-surface-variant">
+          Video upload is not switched on yet. Paste a link for now (the developer sets up the video store once).
+        </p>
+      )}
+      {enabled && <p className="mt-1 text-[11px] text-on-surface-variant">MP4, WebM or MOV, up to {maxMb} MB.</p>}
+      {error && <p className="mt-1 text-xs text-on-error-container">{error}</p>}
     </div>
   );
 }
