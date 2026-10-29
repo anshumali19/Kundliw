@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatPaiseToInr } from "@/lib/billing/gst";
-import { Copy, Share2, Wallet, FileDown } from "lucide-react";
+import { Copy, Share2, Wallet, FileDown, Mail, RefreshCw } from "lucide-react";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 import { PayoutDetails } from "./PayoutDetails";
 
@@ -53,6 +53,49 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
   }, [load]);
 
   const referralLink = data ? `${siteUrl}/r/${data.profile.referralCode}` : "";
+
+  // Send the link by Gmail: opens a ready-written message in Gmail, optionally to one address
+  const [friendEmail, setFriendEmail] = useState("");
+  const [customCode, setCustomCode] = useState("");
+  const gmailHref = (() => {
+    const subject = t("Book your Kundli and Jyotish consultation", "अपनी कुंडली और ज्योतिष परामर्श बुक करें");
+    const body = t(
+      `Namaste,\n\nYou can book Kundli, Kundli matching and other Jyotish services with Maharshi Kanad Jyotish Kendra here:\n${referralLink}\n\nReferral code: ${data?.profile.referralCode ?? ""}`,
+      `नमस्ते,\n\nमहर्षि कणाद ज्योतिष केंद्र में कुंडली, कुंडली मिलान और अन्य ज्योतिष सेवाएँ यहाँ से बुक करें:\n${referralLink}\n\nरेफ़रल कोड: ${data?.profile.referralCode ?? ""}`
+    );
+    const to = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(friendEmail.trim()) ? `&to=${encodeURIComponent(friendEmail.trim())}` : "";
+    return `https://mail.google.com/mail/?view=cm&fs=1${to}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  })();
+
+  const changeCode = async (mode: "generate" | "custom") => {
+    if (
+      !window.confirm(
+        t(
+          "Links you already shared with the old code will stop working. Continue?",
+          "पुराने कोड वाले पहले से भेजे गए लिंक काम करना बंद कर देंगे। आगे बढ़ें?"
+        )
+      )
+    )
+      return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/associate/referral-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, code: mode === "custom" ? customCode : undefined }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || "Could not change the code.");
+      setCustomCode("");
+      setMessage({ type: "ok", text: t("Your new referral code is ready.", "आपका नया रेफ़रल कोड तैयार है।") });
+      await load();
+    } catch (err) {
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Could not change the code." });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const copyLink = async () => {
     try {
@@ -179,6 +222,29 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
               <Share2 className="w-4 h-4" />
               WhatsApp
             </a>
+            <a
+              href={gmailHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-h-[44px] px-4 inline-flex items-center gap-2 rounded border border-maroon text-sm font-bold text-secondary hover:bg-gold"
+            >
+              <Mail className="w-4 h-4" />
+              Gmail
+            </a>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <label className="text-xs font-bold text-secondary" htmlFor="friend-email">
+              {t("Send by Gmail to (optional):", "Gmail से भेजें (वैकल्पिक):")}
+            </label>
+            <input
+              id="friend-email"
+              type="email"
+              inputMode="email"
+              value={friendEmail}
+              onChange={(e) => setFriendEmail(e.target.value)}
+              placeholder={t("friend@example.com", "friend@example.com")}
+              className="min-h-[44px] flex-1 min-w-[200px] max-w-sm px-3 rounded border border-outline-variant bg-surface text-sm focus:border-secondary focus:outline-none"
+            />
           </div>
           <p className="text-xs text-on-surface-variant mt-2">
             {t("Code:", "कोड:")} <strong>{profile.referralCode}</strong>.{" "}
@@ -187,6 +253,44 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
               "बुकिंग आपके नाम दर्ज होगी जब कोई आपका लिंक खोले (30 दिन मान्य) या बुकिंग के समय 'रेफरल कोड' में आपका कोड डाले।"
             )}
           </p>
+
+          <div className="mt-4 pt-4 border-t border-outline-variant/50 space-y-2">
+            <h3 className="text-sm font-bold text-secondary">{t("Make a new referral code", "नया रेफ़रल कोड बनाएँ")}</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => changeCode("generate")}
+                className="min-h-[44px] px-4 inline-flex items-center gap-2 rounded bg-brand hover:bg-brand-hover text-on-brand text-sm font-bold border border-maroon disabled:opacity-50"
+              >
+                <RefreshCw className="w-4 h-4" />
+                {t("Generate a new code", "नया कोड बनाएँ")}
+              </button>
+              <span className="text-xs text-on-surface-variant">{t("or choose your own:", "या अपना कोड चुनें:")}</span>
+              <input
+                type="text"
+                value={customCode}
+                onChange={(e) => setCustomCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16))}
+                placeholder={t("6 to 16 letters or numbers", "6 से 16 अक्षर या अंक")}
+                aria-label={t("Your own referral code", "आपका अपना रेफ़रल कोड")}
+                className="min-h-[44px] w-56 px-3 rounded border border-outline-variant bg-surface text-sm font-mono tracking-wider focus:border-secondary focus:outline-none"
+              />
+              <button
+                type="button"
+                disabled={busy || customCode.length < 6}
+                onClick={() => changeCode("custom")}
+                className="min-h-[44px] px-4 rounded border border-maroon text-sm font-bold text-secondary hover:bg-gold disabled:opacity-50"
+              >
+                {t("Use this code", "यह कोड रखें")}
+              </button>
+            </div>
+            <p className="text-xs text-on-surface-variant">
+              {t(
+                "Links you shared with the old code stop working after a change. You can change the code up to 5 times a day.",
+                "बदलने के बाद पुराने कोड वाले लिंक काम नहीं करेंगे। आप दिन में अधिकतम 5 बार कोड बदल सकते हैं।"
+              )}
+            </p>
+          </div>
         </div>
       )}
 
