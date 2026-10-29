@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { SubPageNav } from "@/components/layout/SubPageNav";
@@ -13,7 +14,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: {
@@ -43,6 +43,7 @@ export default async function AstroSagePage(
   }
 ) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

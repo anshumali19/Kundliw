@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
@@ -17,7 +18,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: {
@@ -48,6 +48,7 @@ export default async function OtherServicesPage(
   }
 ) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

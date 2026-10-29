@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { BlocksView, LinkList, YouTubeEmbed } from "@/components/content/MediaView";
@@ -13,7 +14,6 @@ interface FounderPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: FounderPageProps): Promise<Metadata> {
   const { locale } = await props.params;
@@ -31,6 +31,7 @@ export async function generateMetadata(props: FounderPageProps): Promise<Metadat
 
 export default async function FounderPage(props: FounderPageProps) {
   const { locale } = await props.params;
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
 
   const founder = await prisma.founderProfile

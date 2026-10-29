@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -10,7 +11,6 @@ interface FaqPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: FaqPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -33,6 +33,7 @@ export async function generateMetadata(props: FaqPageProps): Promise<Metadata> {
 
 export default async function FaqPage(props: FaqPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

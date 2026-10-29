@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { Metadata } from "next";
 import { PrashnaRequestClient } from "@/features/astro/components/PrashnaRequestClient";
 
@@ -7,7 +8,6 @@ interface PrashnaPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: PrashnaPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -29,6 +29,7 @@ export async function generateMetadata(props: PrashnaPageProps): Promise<Metadat
 
 export default async function PrashnaPage(props: PrashnaPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

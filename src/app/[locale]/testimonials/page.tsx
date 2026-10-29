@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { stripRich } from "@/lib/content/richText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
@@ -12,7 +13,6 @@ interface TestimonialsPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: TestimonialsPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -35,6 +35,7 @@ export async function generateMetadata(props: TestimonialsPageProps): Promise<Me
 
 export default async function TestimonialsPage(props: TestimonialsPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

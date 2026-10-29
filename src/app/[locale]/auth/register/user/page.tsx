@@ -10,3 +10,6 @@ export const metadata: Metadata = {
 export default function RegisterPage() {
   return <RegisterForm accountType="USER" />;
 }
+
+// Reads the visitor (session or address details), so this page is built fresh for every visit
+export const dynamic = "force-dynamic";

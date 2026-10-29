@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { RichText } from "@/components/content/RichText";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -15,7 +16,6 @@ interface LegalPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: LegalPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -46,6 +46,7 @@ export async function generateMetadata(props: LegalPageProps): Promise<Metadata>
 
 export default async function LegalPage(props: LegalPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale,
@@ -132,4 +133,9 @@ export default async function LegalPage(props: LegalPageProps) {
       </div>
     </div>
   );
+}
+
+// Pages are saved the first time they are opened (no database reads during the build)
+export function generateStaticParams() {
+  return [];
 }

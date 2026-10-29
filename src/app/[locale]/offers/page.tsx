@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
@@ -5,7 +6,6 @@ import { pageAlternates } from "@/lib/seo";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { Percent } from "lucide-react";
 
-export const dynamic = "force-dynamic";
 
 interface OffersPageProps {
   params: Promise<{ locale: string }>;
@@ -23,6 +23,7 @@ export async function generateMetadata(props: OffersPageProps): Promise<Metadata
 
 export default async function OffersPage(props: OffersPageProps) {
   const { locale } = await props.params;
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
   const now = new Date();
 

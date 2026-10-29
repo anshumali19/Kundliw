@@ -10,3 +10,6 @@ export const metadata: Metadata = {
 export default function SignInPage() {
   return <SignInForm portal="associate" />;
 }
+
+// Reads the visitor (session or address details), so this page is built fresh for every visit
+export const dynamic = "force-dynamic";

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
+import { revalidatePath } from "next/cache";
 
 /**
  * Validates request origin against Host / Forwarded-Host header for state-changing HTTP requests.
@@ -8,7 +9,7 @@ export type CsrfValidationResult =
   | { isValid: true }
   | { isValid: false; errorResponse: NextResponse };
 
-export function validateCsrfOrigin(request: NextRequest): CsrfValidationResult {
+function checkOrigin(request: NextRequest): CsrfValidationResult {
   const method = request.method.toUpperCase();
   const safeMethods = ["GET", "HEAD", "OPTIONS"];
   if (safeMethods.includes(method)) {
@@ -80,4 +81,20 @@ export function validateCsrfOrigin(request: NextRequest): CsrfValidationResult {
   }
 
   return { isValid: true };
+}
+
+/**
+ * Same check as above. For an administrator's change it also schedules a refresh of the saved public pages.
+ * That runs after the change has been answered, so visitors see the update straight away.
+ */
+export function validateCsrfOrigin(request: NextRequest): CsrfValidationResult {
+  const result = checkOrigin(request);
+  if (result.isValid && !["GET", "HEAD", "OPTIONS"].includes(request.method.toUpperCase()) && request.nextUrl?.pathname.startsWith("/api/admin")) {
+    try {
+      after(() => revalidatePath("/", "layout"));
+    } catch {
+      /* outside a live request (for example in unit tests): nothing to refresh */
+    }
+  }
+  return result;
 }

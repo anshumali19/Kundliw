@@ -1,9 +1,9 @@
+import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { pageAlternates } from "@/lib/seo";
 import { getSection } from "@/lib/siteConfig/service";
 import { EmbedFrame, ToolOff, embedAddress } from "@/components/content/EmbedFrame";
 
-export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -19,6 +19,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function Page(props: Props) {
   const { locale } = await props.params;
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
   const cfg = await getSection("tools");
   const tech = await getSection("technology");

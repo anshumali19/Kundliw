@@ -13,3 +13,6 @@ export default async function TrackerRedirect(
 
   redirect(`/${locale}/track`);
 }
+
+// Reads the visitor (session or address details), so this page is built fresh for every visit
+export const dynamic = "force-dynamic";

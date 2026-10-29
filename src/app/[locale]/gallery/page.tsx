@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -11,7 +12,6 @@ interface GalleryPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: GalleryPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -34,6 +34,7 @@ export async function generateMetadata(props: GalleryPageProps): Promise<Metadat
 
 export default async function GalleryPage(props: GalleryPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

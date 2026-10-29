@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { stripRich } from "@/lib/content/richText";
 import { RichText } from "@/components/content/RichText";
 import { Metadata } from "next";
@@ -15,7 +16,6 @@ interface BlogPostPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: BlogPostPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -37,6 +37,7 @@ export async function generateMetadata(props: BlogPostPageProps): Promise<Metada
 
 export default async function BlogPostPage(props: BlogPostPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale,
@@ -106,4 +107,9 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
       />
     </div>
   );
+}
+
+// Pages are saved the first time they are opened (no database reads during the build)
+export function generateStaticParams() {
+  return [];
 }

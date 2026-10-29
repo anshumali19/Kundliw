@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
@@ -7,7 +8,6 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE_URL, absoluteUrl, localizedPath, pageAlternates } from "@/lib/seo";
 import { ServiceDetailView, ServiceDetailDTO } from "@/features/services/components/ServiceDetailView";
 
-export const dynamic = "force-dynamic";
 
 interface ServiceDetailPageProps {
   params: Promise<{
@@ -42,6 +42,7 @@ export async function generateMetadata(props: ServiceDetailPageProps): Promise<M
 
 export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale,
@@ -201,4 +202,9 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
       />
      </>
   );
+}
+
+// Pages are saved the first time they are opened (no database reads during the build)
+export function generateStaticParams() {
+  return [];
 }

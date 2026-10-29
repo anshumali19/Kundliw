@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
@@ -14,7 +15,6 @@ interface AboutPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: AboutPageProps): Promise<Metadata> {
   const { locale } = await props.params;
@@ -32,6 +32,7 @@ export async function generateMetadata(props: AboutPageProps): Promise<Metadata>
 
 export default async function AboutPage(props: AboutPageProps) {
   const { locale } = await props.params;
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
 
   const contentCfg = await getSection("content");

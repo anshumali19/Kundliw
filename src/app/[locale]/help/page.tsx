@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { kendraEmail } from "@/lib/content/contact";
 import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
@@ -14,7 +15,6 @@ interface HelpPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: HelpPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -37,6 +37,7 @@ export async function generateMetadata(props: HelpPageProps): Promise<Metadata> 
 
 export default async function HelpPage(props: HelpPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

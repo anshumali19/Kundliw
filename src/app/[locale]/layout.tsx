@@ -2,7 +2,7 @@ import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
 import { Poppins, Noto_Sans, Cormorant_Garamond, Noto_Serif_Devanagari } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { Header } from "@/components/layout/Header";
 import { PageNavButtons } from "@/components/layout/PageNavButtons";
 import { Footer } from "@/components/layout/Footer";
@@ -137,8 +137,14 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
   };
 }
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// Public pages are saved for up to a minute and served from the nearest edge; admin saves refresh them at once.
+// Pages that need the signed-in visitor opt out themselves (they read the session, so they stay live).
+export const revalidate = 60;
+
+// No pages are built ahead of time (no database reads during the build); each page is saved the first time it is opened
+export function generateStaticParams() {
+  return [];
+}
 
 export default async function LocaleLayout(
   props: {
@@ -155,6 +161,9 @@ export default async function LocaleLayout(
   const {
     children
   } = props;
+
+  // Tells next-intl the language without reading request headers, so the page can be saved and reused
+  setRequestLocale(locale);
 
   // All of the layout's database reads run together instead of one after another
   const [messages, topBanners, bottomBanners, marqueeItems, features, panchang, activeSocial, toolsCfg, menuPages, settings, catalogue, themeCfg, topbarCfg, floatCfg, introCfg, menuRows] = await Promise.all([

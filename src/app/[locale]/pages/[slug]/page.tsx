@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { RichText } from "@/components/content/RichText";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -6,7 +7,6 @@ import { BlocksView } from "@/components/content/MediaView";
 import { normalizeBlocks } from "@/lib/content/media";
 import { isCorePageSlug } from "@/lib/content/pages";
 
-export const dynamic = "force-dynamic";
 
 interface CustomPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -32,6 +32,7 @@ export async function generateMetadata(props: CustomPageProps): Promise<Metadata
 
 export default async function CustomPage(props: CustomPageProps) {
   const { locale, slug } = await props.params;
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
   const page = await loadPage(slug);
   if (!page) notFound();
@@ -48,4 +49,9 @@ export default async function CustomPage(props: CustomPageProps) {
       <BlocksView blocks={normalizeBlocks(page.blocks)} isHindi={isHindi} />
     </div>
   );
+}
+
+// Pages are saved the first time they are opened (no database reads during the build)
+export function generateStaticParams() {
+  return [];
 }

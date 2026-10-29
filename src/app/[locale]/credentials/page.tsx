@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { pageAlternates } from "@/lib/seo";
@@ -5,7 +6,6 @@ import { CREDENTIAL_LABEL, CredentialKind } from "@/lib/content/credentials";
 import { CredentialsGrid } from "@/features/credentials/CredentialsGrid";
 import { BadgeCheck } from "lucide-react";
 
-export const dynamic = "force-dynamic";
 
 interface CredentialsPageProps {
   params: Promise<{ locale: string }>;
@@ -25,6 +25,7 @@ export async function generateMetadata(props: CredentialsPageProps): Promise<Met
 
 export default async function CredentialsPage(props: CredentialsPageProps) {
   const { locale } = await props.params;
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
 
   const rows = await prisma.credential

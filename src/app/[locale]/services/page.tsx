@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { activePlanWhere } from "@/lib/content/packages";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import type { Metadata } from "next";
@@ -6,7 +7,6 @@ import { prisma } from "@/lib/prisma";
 import { pageAlternates } from "@/lib/seo";
 import { ServicesListingClient } from "@/features/services/components/ServicesListingClient";
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: {
@@ -37,6 +37,7 @@ export default async function ServicesListingPage(
   }
 ) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

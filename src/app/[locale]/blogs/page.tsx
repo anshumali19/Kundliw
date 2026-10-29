@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { stripRich } from "@/lib/content/richText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
@@ -11,7 +12,6 @@ interface BlogsPageProps {
   }>;
 }
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: BlogsPageProps): Promise<Metadata> {
   const params = await props.params;
@@ -34,6 +34,7 @@ export async function generateMetadata(props: BlogsPageProps): Promise<Metadata>
 
 export default async function BlogsPage(props: BlogsPageProps) {
   const params = await props.params;
+  setRequestLocale(params.locale);
 
   const {
     locale

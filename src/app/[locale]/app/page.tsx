@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import QRCode from "qrcode";
 import { getSection } from "@/lib/siteConfig/service";
@@ -5,7 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { pageAlternates } from "@/lib/seo";
 import { Smartphone, Download } from "lucide-react";
 
-export const dynamic = "force-dynamic";
 
 interface AppPageProps {
   params: Promise<{ locale: string }>;
@@ -25,6 +25,7 @@ export async function generateMetadata(props: AppPageProps): Promise<Metadata> {
 
 export default async function AppDownloadPage(props: AppPageProps) {
   const { locale } = await props.params;
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
 
   const settings = await prisma.adminSettings

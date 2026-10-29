@@ -1,6 +1,7 @@
 import { activePlanWhere } from "@/lib/content/packages";
 import { kendraEmail } from "@/lib/content/contact";
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
 import { getSection } from "@/lib/siteConfig/service";
@@ -18,7 +19,6 @@ import { pageAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowUpRight, Check, Phone, Plus } from "lucide-react";
 
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await props.params;
@@ -39,6 +39,7 @@ type Cfg = Record<string, string | boolean | number>;
 export default async function HomePage(props: { params: Promise<{ locale: string }> }) {
   const { locale: rawLocale } = await props.params;
   const locale = rawLocale || "hi";
+  setRequestLocale(locale);
   const isHindi = locale === "hi";
   const tr = (en: string, hi: string) => (isHindi ? hi : en);
 
