@@ -209,7 +209,7 @@ export function MobileNav() {
                   <button
                     type="button"
                     onClick={() => signOut({ callbackUrl: `/${locale}` })}
-                    className={`${tile} !border-error text-on-error-container`}
+                    className={`${tile} !border-maroon !bg-maroon !text-on-maroon font-bold`}
                   >
                     <LogOut className="w-4 h-4 shrink-0" />
                     <span className="truncate">{tNav("signOut")}</span>

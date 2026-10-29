@@ -1,5 +1,6 @@
 "use client";
 
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useState } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
@@ -158,12 +159,12 @@ export function ResetPasswordForm({ token }: { token: string }) {
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className={label} htmlFor="rp-pass">{hi ? "नया पासवर्ड" : "New password"}</label>
-              <input id="rp-pass" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={input} />
+              <PasswordInput id="rp-pass" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={input} />
               <p className="mt-1 text-[11px] text-on-surface-variant">{hi ? "कम से कम 8 अक्षर।" : "At least 8 characters."}</p>
             </div>
             <div>
               <label className={label} htmlFor="rp-confirm">{hi ? "पासवर्ड दोबारा लिखें" : "Confirm password"}</label>
-              <input id="rp-confirm" type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} className={input} />
+              <PasswordInput id="rp-confirm" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} className={input} />
             </div>
             {error && (
               <p className="text-xs text-on-error-container" role="alert">

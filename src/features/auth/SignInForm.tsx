@@ -1,5 +1,6 @@
 "use client";
 
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useState, useEffect } from "react";
 import { signIn, getProviders } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -406,16 +407,14 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                 <label className="block text-xs uppercase tracking-wider font-bold text-secondary mb-1">
                   {tAuth("passwordLabel")}
                 </label>
-                <div className="relative">
-                  <input
-                    type="password"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full bg-surface-container-lowest text-on-surface px-3 py-2.5 rounded border border-outline-variant focus:border-secondary focus:outline-none text-sm min-h-[44px]"
-                    required
-                  />
-                </div>
+                <PasswordInput
+                  autoComplete="current-password"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-surface-container-lowest text-on-surface px-3 py-2.5 rounded border border-outline-variant focus:border-secondary focus:outline-none text-sm min-h-[44px]"
+                  required
+                />
               </div>
               <div className="-mt-2 text-right">
                 <Link href="/auth/forgot-password" className="text-xs font-semibold text-primary hover:underline">

@@ -45,7 +45,7 @@ export default async function AdminLayout(props: AdminLayoutProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono opacity-90">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono">
             <span className="hidden md:inline">
               {isHindi ? "प्रशासक:" : "Admin:"} {admin.email || admin.phone || admin.name}
             </span>
@@ -56,7 +56,7 @@ export default async function AdminLayout(props: AdminLayoutProps) {
               <span>{isHindi ? "सार्वजनिक पोर्टल" : "Public Site"}</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
-            <SignOutButton label={isHindi ? "लॉग आउट" : "Log out"} className="!min-h-[36px] !px-3 !text-xs !bg-surface" />
+            <SignOutButton label={isHindi ? "लॉग आउट" : "Log out"} className="!min-h-[40px] !px-4 !text-sm !font-bold !bg-white !text-maroon !border-white hover:!bg-gold hover:!text-on-gold shadow-md" />
           </div>
         </div>
       </div>

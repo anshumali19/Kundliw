@@ -10,7 +10,7 @@ export function SignOutButton({ label, className = "" }: { label: string; classN
     <button
       type="button"
       onClick={() => signOut({ callbackUrl: `/${locale}` })}
-      className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-lg border border-error text-on-error-container hover:bg-error-container text-sm font-bold ${className}`}
+      className={`inline-flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-lg border-2 border-maroon bg-surface text-maroon hover:bg-maroon hover:text-on-maroon text-sm font-bold ${className}`}
     >
       <LogOut className="w-4 h-4" />
       {label}

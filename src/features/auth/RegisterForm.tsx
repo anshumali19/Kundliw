@@ -1,5 +1,6 @@
 "use client";
 
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -172,17 +173,15 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
               <label className="block text-xs uppercase tracking-wider font-bold text-secondary mb-1">
                 {tAuth("passwordLabel")} {isAssociate ? "*" : "(Optional)"}
               </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
-                  minLength={8}
-                  required={isAssociate}
-                  className="w-full bg-surface-container-lowest text-on-surface px-3 py-2.5 rounded border border-outline-variant focus:border-secondary focus:outline-none text-sm min-h-[44px]"
-                />
-              </div>
+              <PasswordInput
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimum 8 characters"
+                minLength={8}
+                required={isAssociate}
+                className="w-full bg-surface-container-lowest text-on-surface px-3 py-2.5 rounded border border-outline-variant focus:border-secondary focus:outline-none text-sm min-h-[44px]"
+              />
               <span className="block text-[11px] text-on-surface-variant mt-0.5">
                 {isAssociate
                   ? "Associates sign in with email and password, or Mobile OTP."

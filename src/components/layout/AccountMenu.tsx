@@ -79,7 +79,7 @@ export function AccountMenu() {
             type="button"
             role="menuitem"
             onClick={() => signOut({ callbackUrl: `/${locale}` })}
-            className="w-full flex items-center gap-2.5 px-4 min-h-[44px] text-sm font-semibold text-on-error-container hover:bg-error-container"
+            className="w-[calc(100%-1.5rem)] mx-3 mt-1 flex items-center justify-center gap-2 min-h-[44px] rounded-lg bg-maroon text-on-maroon text-sm font-bold hover:opacity-90"
           >
             <LogOut className="w-4 h-4" />
             {tNav("signOut")}
