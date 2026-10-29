@@ -27,6 +27,14 @@ function fontStack(raw: unknown): string {
   return loaded ? `${loaded},${/cormorant/i.test(name) ? "Georgia,serif" : "sans-serif"}` : `"${name}",sans-serif`;
 }
 
+/** Buttons the admin can colour one by one. The text colour is chosen automatically for contrast. */
+export const BUTTON_COLOUR_KEYS = ["book", "account", "panchang", "lang", "call", "whatsapp", "ai", "chat"] as const;
+
+function readableOn(hex: string): string {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? "#261B17" : "#FFFFFF";
+}
+
 /** Returns CSS text for a <style> tag, or "" when nothing was changed. */
 export function themeCss(theme: Record<string, string | boolean | number>): string {
   const pick = (k: string) => {
@@ -100,6 +108,14 @@ export function themeCss(theme: Record<string, string | boolean | number>): stri
   if (mapBtn) set("map-button", mapBtn);
   const mapBtnText = pick("mapButtonText");
   if (mapBtnText) set("on-map-button", mapBtnText);
+
+  for (const k of BUTTON_COLOUR_KEYS) {
+    const c = pick(`btn_${k}`);
+    if (c) {
+      set(`btn-${k}`, c);
+      set(`on-btn-${k}`, readableOn(c));
+    }
+  }
 
   const entries = Object.entries(vars);
   const rules: string[] = [];

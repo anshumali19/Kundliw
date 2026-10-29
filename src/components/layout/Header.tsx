@@ -201,10 +201,10 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
             {tb("showPanchangButton") && hideTools([{ href: "/panchang" }]).length > 0 && (
             <Link
               href="/panchang"
-              className="hidden sm:inline-flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-[11px] font-bold !text-on-gold hover:opacity-90 whitespace-nowrap"
+              className="hidden sm:inline-flex items-center gap-1 rounded-full bg-[rgb(var(--btn-panchang-rgb,var(--gold-rgb)))] px-2.5 py-1 text-[11px] font-bold !text-[rgb(var(--on-btn-panchang-rgb,var(--on-gold-rgb)))] hover:opacity-90 whitespace-nowrap"
             >
               <BookOpen className="w-3 h-3 shrink-0" aria-hidden="true" />
-              <span className="!text-on-gold">{tNav("panchangCalendar")}</span>
+              <span className="!text-[rgb(var(--on-btn-panchang-rgb,var(--on-gold-rgb)))]">{tNav("panchangCalendar")}</span>
             </Link>
             )}
             {tb("showPhone") && phone && (
@@ -387,7 +387,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
                 aria-expanded={bookOpen}
                 aria-label={tCommon("bookConsultation")}
                 title={tCommon("bookConsultation")}
-                className="inline-flex items-center justify-center gap-1 px-3 py-2 bg-brand hover:bg-brand-hover text-on-brand text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
+                className="inline-flex items-center justify-center gap-1 px-3 py-2 bg-[rgb(var(--btn-book-rgb,var(--brand-rgb)))] hover:brightness-90 text-[rgb(var(--on-btn-book-rgb,var(--on-brand-rgb)))] text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
               >
                 <Calendar className="w-4 h-4 shrink-0" />
                 <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
@@ -466,7 +466,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
               <Link
                 href="/services"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center px-4 py-3 bg-brand text-on-brand font-bold text-xs uppercase tracking-wider rounded border border-primary min-h-[44px]"
+                className="w-full flex items-center justify-center px-4 py-3 bg-[rgb(var(--btn-book-rgb,var(--brand-rgb)))] text-[rgb(var(--on-btn-book-rgb,var(--on-brand-rgb)))] font-bold text-xs uppercase tracking-wider rounded border border-primary min-h-[44px]"
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 {tCommon("bookConsultation")}

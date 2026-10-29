@@ -16,7 +16,7 @@ export function LanguageSwitcher({ tone = "dark" }: { tone?: "dark" | "light" })
   };
 
   const frame = tone === "dark" ? "border-gold/70" : "border-secondary/50";
-  const on = tone === "dark" ? "bg-gold text-on-gold font-bold" : "bg-brand text-on-brand font-bold";
+  const on = tone === "dark" ? "bg-[rgb(var(--btn-lang-rgb,var(--gold-rgb)))] text-[rgb(var(--on-btn-lang-rgb,var(--on-gold-rgb)))] font-bold" : "bg-[rgb(var(--btn-lang-rgb,var(--brand-rgb)))] text-[rgb(var(--on-btn-lang-rgb,var(--on-brand-rgb)))] font-bold";
   const off = tone === "dark" ? "bg-transparent text-on-maroon hover:bg-white/10" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high";
   const base = "px-3 py-1 text-xs font-semibold tracking-wider transition-colors min-h-[40px] min-w-[40px] !min-w-0";
 

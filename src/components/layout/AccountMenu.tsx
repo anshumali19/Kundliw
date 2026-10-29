@@ -31,7 +31,7 @@ export function AccountMenu() {
   }, []);
 
   const btn =
-    "w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand flex items-center justify-center text-on-brand hover:opacity-90 transition-opacity min-h-[36px] min-w-[36px] shrink-0 shadow-sm";
+    "w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[rgb(var(--btn-account-rgb,var(--brand-rgb)))] flex items-center justify-center text-[rgb(var(--on-btn-account-rgb,var(--on-brand-rgb)))] hover:opacity-90 transition-opacity min-h-[36px] min-w-[36px] shrink-0 shadow-sm";
 
   if (status !== "authenticated") {
     return (

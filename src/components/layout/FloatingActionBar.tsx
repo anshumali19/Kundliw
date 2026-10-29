@@ -37,12 +37,12 @@ interface FloatingActionBarProps {
 type LeadStep = "ASK_NAME" | "ASK_PHONE" | "ASK_NEED" | "COMPLETE";
 
 const FAB_BASE =
-  "flex flex-col items-center justify-center gap-0.5 w-[3.75rem] h-[3.75rem] lg:w-16 lg:h-16 rounded-2xl border border-white/70 text-white shadow-[0_6px_18px_rgba(64,36,28,0.22)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:brightness-110 active:scale-95";
+  "flex flex-col items-center justify-center gap-0.5 w-[3.75rem] h-[3.75rem] lg:w-16 lg:h-16 rounded-2xl border border-white/70 shadow-[0_6px_18px_rgba(64,36,28,0.22)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:brightness-110 active:scale-95";
 /** Each button keeps its own colour: call blue, WhatsApp green, AI purple, chat orange. */
-const FAB_CALL = `${FAB_BASE} bg-[#2563EB]`;
-const FAB_WHATSAPP = `${FAB_BASE} bg-[#25A244]`;
-const FAB_AI = `${FAB_BASE} bg-[#7C3AED]`;
-const FAB_CHAT = `${FAB_BASE} bg-[#D95A24]`;
+const FAB_CALL = `${FAB_BASE} bg-[rgb(var(--btn-call-rgb,37_99_235))] text-[rgb(var(--on-btn-call-rgb,255_255_255))]`;
+const FAB_WHATSAPP = `${FAB_BASE} bg-[rgb(var(--btn-whatsapp-rgb,37_162_68))] text-[rgb(var(--on-btn-whatsapp-rgb,255_255_255))]`;
+const FAB_AI = `${FAB_BASE} bg-[rgb(var(--btn-ai-rgb,124_58_237))] text-[rgb(var(--on-btn-ai-rgb,255_255_255))]`;
+const FAB_CHAT = `${FAB_BASE} bg-[rgb(var(--btn-chat-rgb,217_90_36))] text-[rgb(var(--on-btn-chat-rgb,255_255_255))]`;
 
 /** Renders **bold** segments from chat text without exposing the asterisks. */
 function renderBold(text: string): React.ReactNode[] {
