@@ -145,7 +145,7 @@ export default async function HelpPage(props: HelpPageProps) {
                 <Phone className="w-4 h-4 text-primary shrink-0" />
                 <div>
                   <div className="text-[10px] uppercase text-outline">{isHindi ? "हेल्पलाइन १" : "Helpline 1"}</div>
-                  <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="font-semibold text-secondary hover:underline">
+                  <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="inline-flex items-center min-h-[44px] font-semibold text-secondary hover:underline break-all">
                     {phone1}
                   </a>
                 </div>
@@ -156,7 +156,7 @@ export default async function HelpPage(props: HelpPageProps) {
                 <Phone className="w-4 h-4 text-primary shrink-0" />
                 <div>
                   <div className="text-[10px] uppercase text-outline">{isHindi ? "हेल्पलाइन २" : "Helpline 2"}</div>
-                  <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="font-semibold text-secondary hover:underline">
+                  <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="inline-flex items-center min-h-[44px] font-semibold text-secondary hover:underline break-all">
                     {phone2}
                   </a>
                 </div>
@@ -167,7 +167,7 @@ export default async function HelpPage(props: HelpPageProps) {
                 <Mail className="w-4 h-4 text-primary shrink-0" />
                 <div>
                   <div className="text-[10px] uppercase text-outline">{isHindi ? "ईमेल संपर्क" : "Email Support"}</div>
-                  <a href={`mailto:${email}`} className="font-semibold text-secondary hover:underline">
+                  <a href={`mailto:${email}`} className="inline-flex items-center min-h-[44px] font-semibold text-secondary hover:underline break-all">
                     {email}
                   </a>
                 </div>

@@ -53,7 +53,7 @@ export function SubPageNav({
           <li>
             <Link
               href="/"
-              className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+              className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] hover:text-primary transition-colors"
               title={isHindi ? "मुख्य पृष्ठ" : "Home"}
             >
               <Home className="w-3.5 h-3.5 text-primary" />

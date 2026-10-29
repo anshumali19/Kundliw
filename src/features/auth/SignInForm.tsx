@@ -229,7 +229,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                 <span>{tAuth("noAccount")} </span>
                 <Link
                   href={`/auth/register/${portal}?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-                  className="font-bold text-primary hover:underline uppercase tracking-wider"
+                  className="inline-flex items-center min-h-[44px] font-bold text-primary hover:underline uppercase tracking-wider"
                 >
                   {tAuth(portal === "associate" ? "associateRegisterTitle" : "userRegisterTitle")} →
                 </Link>
@@ -238,7 +238,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
             <div>
               <Link
                 href="/auth/signin"
-                className="font-bold text-secondary hover:underline uppercase tracking-wider"
+                className="inline-flex items-center min-h-[44px] font-bold text-secondary hover:underline uppercase tracking-wider"
               >
                 ← {tAuth("chooseLoginType")}
               </Link>
@@ -417,7 +417,7 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
                 />
               </div>
               <div className="-mt-2 text-right">
-                <Link href="/auth/forgot-password" className="text-xs font-semibold text-primary hover:underline">
+                <Link href="/auth/forgot-password" className="inline-flex items-center min-h-[44px] text-xs font-semibold text-primary hover:underline">
                   {locale === "hi" ? "पासवर्ड भूल गए?" : "Forgot password?"}
                 </Link>
               </div>

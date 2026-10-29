@@ -70,7 +70,7 @@ export function LinkTextarea({
         <button
           type="button"
           onClick={openDialog}
-          className="inline-flex items-center gap-1.5 min-h-[34px] px-2.5 rounded border border-outline-variant text-xs font-semibold text-secondary hover:bg-surface-container-high"
+          className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded border border-outline-variant text-xs font-semibold text-secondary hover:bg-surface-container-high"
         >
           <Link2 className="w-3.5 h-3.5" aria-hidden="true" />
           {tr("Add link", "लिंक जोड़ें")}

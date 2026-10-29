@@ -264,7 +264,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
                     onChange={(e) => setSocial((l) => l.map((r, j) => (j === i ? { ...r, url: e.target.value } : r)))}
                   />
                   <select
-                    className={`${field} col-span-1`}
+                    className={`${field} col-span-2 sm:col-span-1`}
                     aria-label={tr("Status", "स्थिति")}
                     value={row.active ? "1" : "0"}
                     onChange={(e) => setSocial((l) => l.map((r, j) => (j === i ? { ...r, active: e.target.value === "1" } : r)))}
@@ -273,11 +273,11 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
                     <option value="0">{tr("Hide", "छिपाएँ (Hide)")}</option>
                   </select>
                   {row.url ? (
-                    <a href={row.url} target="_blank" rel="noopener noreferrer" aria-label={tr("Open link", "लिंक खोलें")} className="inline-flex justify-center text-primary">
+                    <a href={row.url} target="_blank" rel="noopener noreferrer" aria-label={tr("Open link", "लिंक खोलें")} className="inline-flex justify-center items-center min-h-[44px] col-span-2 sm:col-span-1 text-primary">
                       <ExternalLink className="w-5 h-5" />
                     </a>
                   ) : (
-                    <span />
+                    <span className="hidden sm:block" />
                   )}
                 </div>
               ))}

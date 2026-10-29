@@ -57,6 +57,10 @@ export const registerSchema = z
     phone: phoneSchema,
     email: emailSchema,
     password: passwordSchema.optional(),
+    /** Age gate: the person registering confirms they are 18 or older and accept the Terms and Privacy Policy. */
+    adultConfirmed: z
+      .boolean({ message: "Please confirm you are 18 or older and accept the Terms and Privacy Policy" })
+      .refine((v) => v === true, { message: "Please confirm you are 18 or older and accept the Terms and Privacy Policy" }),
   })
   .refine((v) => v.accountType !== "ASSOCIATE" || !!v.password, {
     message: "Password is required for Associate accounts",

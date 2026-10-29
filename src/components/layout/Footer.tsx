@@ -9,7 +9,7 @@ import { kendraEmail } from "@/lib/content/contact";
 import { ownKundliHref } from "@/lib/content/ownKundli";
 import { isCorePageSlug } from "@/lib/content/pages";
 import { LocationMap } from "@/components/content/LocationMap";
-import { ExternalLink, Phone, Mail, Clock, Globe } from "lucide-react";
+import { ExternalLink, Phone, Mail, Clock, Globe, HelpCircle, MessageSquare, Headphones } from "lucide-react";
 
 export async function Footer() {
   const locale = await getLocale();
@@ -50,7 +50,73 @@ export async function Footer() {
       ? settings?.addressHi || settings?.addressEn
       : settings?.addressEn || settings?.addressHi) || "";
 
+  const wa = String(settings?.whatsappNumber || phone1 || "").replace(/[^\d]/g, "");
+  const hi = locale === "hi";
+  const mapCfg = await getSection("mapPage");
+  const showBand = mapCfg.showFooterBand !== false;
+  const mapTitle = (hi ? settings?.mapLabelHi : settings?.mapLabelEn) || (hi ? "हमारा स्थान" : "Find us");
+  const helpCards: Array<{ href: string; external?: boolean; icon: typeof Phone; title: string; body: string }> = [
+    { href: "/help", icon: HelpCircle, title: hi ? "सहायता" : "Help", body: hi ? "सामान्य प्रश्न और बुकिंग में मदद" : "Answers and help with booking" },
+    { href: "/contact#enquiry", icon: MessageSquare, title: pickG(mapCfg, "enquiryLabel") || (hi ? "पूछताछ" : "Enquiry"), body: hi ? "अपनी जिज्ञासा हमें भेजें" : "Send us your question" },
+  ];
+
   return (
+    <>
+    {showBand && (
+    <section aria-label={hi ? "स्थान और सहायता" : "Location and support"} className="w-full bg-surface-container-low border-t border-outline-variant/50">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8 grid grid-cols-1 lg:grid-cols-5 gap-6 text-left">
+        <div className="lg:col-span-3 min-w-0">
+          <LocationMap settings={settings || {}} title={mapTitle} address={addressLine1} isHindi={hi} />
+        </div>
+        <div className="lg:col-span-2 rounded-xl border border-outline-variant/60 bg-surface p-5 space-y-4 self-start">
+          <h2 className="font-serif text-xl font-bold text-secondary">{hi ? "सहायता, पूछताछ एवं सहयोग" : "Help, Enquiry & Support"}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {helpCards.map((c) => (
+              <Link key={c.href} href={c.href} className="rounded-lg border border-outline-variant/60 p-3 hover:bg-surface-container-high min-h-[44px]">
+                <div className="flex items-center gap-2 font-bold text-secondary text-sm">
+                  <c.icon className="w-4 h-4 text-primary" aria-hidden="true" />
+                  {c.title}
+                </div>
+                <p className="text-xs text-on-surface-variant mt-1">{c.body}</p>
+              </Link>
+            ))}
+          </div>
+          <div>
+            <div className="flex items-center gap-2 font-bold text-secondary text-sm mb-2">
+              <Headphones className="w-4 h-4 text-primary" aria-hidden="true" />
+              {pickG(mapCfg, "supportLabel") || (hi ? "सहयोग (संपर्क)" : "Support")}
+            </div>
+            <ul className="space-y-2 text-sm">
+              {[phone1, phone2].filter(Boolean).map((p) => (
+                <li key={p}>
+                  <a href={`tel:${String(p).replace(/[^\d+]/g, "")}`} className="inline-flex items-center gap-2 min-h-[44px] font-semibold text-on-surface hover:text-primary">
+                    <Phone className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                    {p}
+                  </a>
+                </li>
+              ))}
+              {wa && (
+                <li>
+                  <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-[44px] font-semibold text-on-surface hover:text-primary">
+                    <MessageSquare className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                    WhatsApp
+                  </a>
+                </li>
+              )}
+              {email && (
+                <li>
+                  <a href={`mailto:${email}`} className="inline-flex items-center gap-2 min-h-[44px] font-semibold text-on-surface hover:text-primary break-all">
+                    <Mail className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+                    {email}
+                  </a>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    )}
     <footer className="w-full bg-[rgb(var(--footer-bg-rgb,128_0_0))] text-on-maroon border-t-4 border-gold pt-8 pb-6 text-left">
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 xl:gap-8 pb-8 border-b border-gold/40 text-left">
@@ -71,9 +137,9 @@ export async function Footer() {
             <div className="text-xs text-on-maroon leading-relaxed space-y-2 [&_a]:!text-white [&_a]:underline">
               <RichText text={pickG(general, "footerNote") || t("bio")} />
             </div>
-            {(business.ownerName || business.msmeNumber || Number(business.foundedYear) > 0) && (
+            {(pickG(business, "businessName") || business.ownerName || business.msmeNumber || Number(business.foundedYear) > 0) && (
               <p className="text-[11px] text-on-maroon/80">
-                {[business.ownerName ? `${locale === "hi" ? "संचालक" : "Proprietor"}: ${business.ownerName}` : "", business.msmeNumber ? `MSME: ${business.msmeNumber}` : "", Number(business.foundedYear) > 0 ? `${locale === "hi" ? "स्थापना" : "Since"} ${business.foundedYear}` : ""].filter(Boolean).join(" · ")}
+                {[pickG(business, "businessName"), business.ownerName ? `${locale === "hi" ? "संचालक" : "Proprietor"}: ${business.ownerName}` : "", business.msmeNumber ? `MSME: ${business.msmeNumber}` : "", Number(business.foundedYear) > 0 ? `${locale === "hi" ? "स्थापना" : "Since"} ${business.foundedYear}` : ""].filter(Boolean).join(" · ")}
               </p>
             )}
             {addressLine1 && (
@@ -107,7 +173,7 @@ export async function Footer() {
               </li>
               <li>
                 <Link href="/services#plans" className="hover:text-white hover:underline transition-colors block py-0.5">
-                  {tNav("pricingPlans")}
+                  {tNav("pricingPlansShort")}
                 </Link>
               </li>
               {(
@@ -322,15 +388,6 @@ export async function Footer() {
                 </li>
               )}
             </ul>
-            <div className="mt-4">
-              <LocationMap
-                settings={settings || {}}
-                title={(locale === "hi" ? settings?.mapLabelHi : settings?.mapLabelEn) || (locale === "hi" ? "हमारा स्थान" : "Find us")}
-                isHindi={locale === "hi"}
-                compact
-                onDark
-              />
-            </div>
           </div>
         </div>
 
@@ -365,5 +422,6 @@ export async function Footer() {
         )}
       </div>
     </footer>
+    </>
   );
 }

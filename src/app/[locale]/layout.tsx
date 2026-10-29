@@ -100,11 +100,11 @@ const baseMetadata: Metadata = {
       "Book Vedic astrology consultations, Kundli and Kundli matching online, and track your order until delivery.",
     locale: "hi_IN",
     alternateLocale: ["en_IN"],
-    images: [{ url: "https://placehold.co/1200x600/8B4513/ffffff?text=Site+Image", width: 734, height: 416, alt: SITE_NAME }],
+    images: [{ url: "/logo.png", width: 640, height: 480, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["https://placehold.co/1200x600/8B4513/ffffff?text=Site+Image"],
+    images: ["/logo.png"],
     title: `${SITE_NAME} | ${SITE_NAME_HI}`,
     description:
       "Vedic astrology consultations, Kundli and Kundli matching with online booking.",
@@ -314,8 +314,8 @@ export default async function LocaleLayout(
       </head>
       <body className="bg-surface font-sans text-on-surface antialiased flex flex-col min-h-screen w-full max-w-full overflow-x-clip relative">
         <JsonLd data={structuredData} />
-        <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <GoogleAnalytics />
           <AuthProvider>
           <ToolsProvider hidden={hiddenTools}>
             <IntroSplash

@@ -1,4 +1,4 @@
-import Script from "next/script";
+import { AnalyticsGate } from "./AnalyticsGate";
 import { getSection } from "@/lib/siteConfig/service";
 import { getCredential } from "@/lib/config/credentials";
 
@@ -17,20 +17,5 @@ export async function GoogleAnalytics() {
     return null;
   }
 
-  return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${gaId.trim()}`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${gaId.trim()}');
-        `}
-      </Script>
-    </>
-  );
+  return <AnalyticsGate gaId={gaId.trim()} />;
 }

@@ -35,6 +35,7 @@ import {
   UserPlus,
   LogOut,
   Languages,
+  Tag,
 } from "lucide-react";
 
 /**
@@ -70,7 +71,7 @@ export function MobileNav() {
     { key: "home", href: "/", label: tNav("home"), icon: Home },
     { key: "services", href: "/services", label: tNav("services"), icon: Compass },
     { key: "offers", href: "/offers", label: tNav("offers"), icon: Percent },
-    { key: "login", href: accountHref, label: signedIn ? tNav("account") : tNav("login"), icon: UserCircle },
+    { key: "login", href: accountHref, label: signedIn ? (locale === "hi" ? "खाता" : "Account") : tNav("login"), icon: UserCircle },
   ];
 
   const isActive = (href: string) => {
@@ -81,6 +82,7 @@ export function MobileNav() {
 
   const sheetLinks = hideTools([
     { href: "/services", label: tNav("services"), icon: Compass },
+    { href: "/services#plans", label: tNav("pricingPlansShort"), icon: Tag },
     { href: "/gallery", label: tNav("gallery"), icon: ImageIcon },
     { href: "/blogs", label: tNav("blogs"), icon: FileText },
     { href: "/offers", label: tNav("offers"), icon: Percent },

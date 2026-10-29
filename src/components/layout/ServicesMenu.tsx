@@ -61,17 +61,18 @@ export function ServicesMenu({ label, active }: { label: string; active: boolean
 
   return (
     <div className="relative h-full flex items-center" onMouseEnter={() => setOpen(true)} onMouseLeave={close}>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
+      <Link
+        href="/services"
+        onClick={close}
         aria-expanded={open}
+        aria-haspopup="true"
         className={`h-full flex items-center gap-1 px-1.5 2xl:px-2.5 text-[13px] font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
           active || open ? "text-primary border-saffron font-bold" : "text-secondary hover:text-primary border-transparent hover:border-saffron/50"
         }`}
       >
         {label}
         <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
-      </button>
+      </Link>
 
       {open && (
         <div className="absolute top-full left-0 pt-1 z-50 text-left w-[min(46rem,94vw)]">

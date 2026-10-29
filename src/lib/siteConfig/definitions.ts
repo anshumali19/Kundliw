@@ -512,7 +512,8 @@ export const SECTIONS: SectionDef[] = [
     noteHi: "संपर्क पेज के आइकन: मैप, नेविगेशन, पूछताछ, सहायता और टिकट। मैप, पता, फ़ोन और ईमेल 'सेटिंग्स' में भरें।",
     fields: [
       { key: "showIcons", en: "Show the icon row", hi: "आइकन की पंक्ति दिखाएँ", type: "toggle", def: true },
-      { key: "showMap", en: "Show the Google map", hi: "गूगल मैप दिखाएँ", type: "toggle", def: true },
+      { key: "showMap", en: "Show the Google map on the Contact page", hi: "संपर्क पेज पर गूगल मैप दिखाएँ", type: "toggle", def: true },
+      { key: "showFooterBand", en: "Show the map with Help, Enquiry and Support just above the footer (every page)", hi: "फ़ुटर के ऊपर मैप तथा सहायता, पूछताछ और सहयोग दिखाएँ (हर पेज पर)", type: "toggle", def: true },
       { key: "showNavigation", en: "Navigation icon (opens directions)", hi: "नेविगेशन आइकन (रास्ता खुले)", type: "toggle", def: true },
       { key: "showEnquiry", en: "Enquiry icon (goes to the enquiry form)", hi: "पूछताछ आइकन (फ़ॉर्म पर ले जाए)", type: "toggle", def: true },
       { key: "showSupport", en: "Support icon", hi: "सहायता आइकन", type: "toggle", def: true },

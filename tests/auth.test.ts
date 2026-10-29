@@ -46,6 +46,7 @@ describe("Auth Validation Schemas", () => {
       name: "Aditya Sharma",
       phone: "9827991224",
       email: "aditya@example.com",
+      adultConfirmed: true,
     };
     const parsed = registerSchema.parse(valid);
     expect(parsed.name).toBe("Aditya Sharma");
@@ -60,6 +61,7 @@ describe("Auth Validation Schemas", () => {
       name: "Rohit Verma",
       phone: "9827991224",
       email: "rohit@example.com",
+      adultConfirmed: true as const,
     };
     expect(() => registerSchema.parse(base)).toThrow("Password is required");
     expect(registerSchema.parse({ ...base, password: "longenough1" }).accountType).toBe("ASSOCIATE");
@@ -73,8 +75,16 @@ describe("Auth Validation Schemas", () => {
         phone: "9827991224",
         email: "m@example.com",
         password: "longenough1",
+        adultConfirmed: true,
       })
     ).toThrow();
+  });
+
+  it("refuses registration without the 18+ and terms confirmation", () => {
+    const base = { name: "Aditya Sharma", phone: "9827991224", email: "aditya@example.com" };
+    expect(() => registerSchema.parse(base)).toThrow("18 or older");
+    expect(() => registerSchema.parse({ ...base, adultConfirmed: false })).toThrow("18 or older");
+    expect(registerSchema.parse({ ...base, adultConfirmed: true }).name).toBe("Aditya Sharma");
   });
 });
 

@@ -134,7 +134,7 @@ export function ServicesListingClient({
             <button
               type="button"
               onClick={() => handleToggleView("grid")}
-              className={`p-2 rounded-lg flex items-center gap-1.5 text-xs font-semibold transition-all ${
+              className={`p-2 min-w-[44px] min-h-[44px] justify-center rounded-lg flex items-center gap-1.5 text-xs font-semibold transition-all ${
                 viewMode === "grid"
                   ? "bg-brand text-on-brand shadow-xs"
                   : "text-on-surface-variant hover:text-on-surface"
@@ -149,7 +149,7 @@ export function ServicesListingClient({
             <button
               type="button"
               onClick={() => handleToggleView("list")}
-              className={`p-2 rounded-lg flex items-center gap-1.5 text-xs font-semibold transition-all ${
+              className={`p-2 min-w-[44px] min-h-[44px] justify-center rounded-lg flex items-center gap-1.5 text-xs font-semibold transition-all ${
                 viewMode === "list"
                   ? "bg-brand text-on-brand shadow-xs"
                   : "text-on-surface-variant hover:text-on-surface"
@@ -387,6 +387,60 @@ export function ServicesListingClient({
             })}
           </div>
         )}
+      </section>
+
+      {/* All plans, grouped by service (target of the "Plans" menu item) */}
+      <section id="plans" className="scroll-mt-32 w-full px-4 sm:px-8 lg:px-12 pb-16">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-primary font-bold">{isHindi ? "सभी प्लान" : "All plans"}</div>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-secondary mt-1">
+              {isHindi ? "सभी सेवाओं के प्लान और दक्षिणा" : "Plans and prices for every service"}
+            </h2>
+          </div>
+          {services.filter((s) => s.plans.length > 0).length === 0 && (
+            <p className="text-sm text-on-surface-variant">{isHindi ? "अभी कोई प्लान उपलब्ध नहीं है।" : "No plans are available right now."}</p>
+          )}
+          {services
+            .filter((s) => s.plans.length > 0)
+            .map((s) => (
+              <div key={s.id} className="rounded-xl border border-outline-variant/50 bg-surface overflow-hidden">
+                <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-surface-container-low border-b border-outline-variant/40">
+                  <h3 className="font-serif text-lg font-bold text-secondary">{isHindi ? s.titleHi : s.titleEn}</h3>
+                  <Link href={`/services/${s.slug}`} className="text-xs font-bold text-primary hover:underline">
+                    {isHindi ? "विवरण देखें →" : "View details →"}
+                  </Link>
+                </div>
+                <ul className="divide-y divide-outline-variant/30">
+                  {s.plans.map((p) => (
+                    <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0">
+                        <div className="font-semibold text-on-surface text-sm">
+                          {isHindi ? p.titleHi : p.titleEn}
+                          {p.isPopular && (
+                            <span className="ml-2 text-[10px] font-bold uppercase bg-brand text-on-brand rounded-full px-2 py-0.5">{isHindi ? "लोकप्रिय" : "Popular"}</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-on-surface-variant">
+                          {p.deliveryDays} {isHindi ? "कार्यदिवस" : "working days"}
+                          {p.hasCall && p.callDurationMinutes ? ` · ${p.callDurationMinutes} ${isHindi ? "मिनट परामर्श" : "min call"}` : ""}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-serif text-lg font-bold text-secondary">{formatPaiseToInr(p.pricePaise)}</span>
+                        <Link
+                          href={`/booking?service=${encodeURIComponent(s.slug)}&plan=${encodeURIComponent(p.slug)}`}
+                          className="min-h-[40px] inline-flex items-center px-4 rounded bg-brand text-on-brand hover:bg-brand-hover text-xs font-bold"
+                        >
+                          {isHindi ? "बुक करें" : "Book"}
+                        </Link>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+        </div>
       </section>
 
       {/* Service Enquiry Modal (#35) */}

@@ -1,6 +1,7 @@
 import { KENDRA_EMAIL } from "@/lib/content/contact";
 import nodemailer from "nodemailer";
 import { getCredential } from "@/lib/config/credentials";
+import { prisma } from "@/lib/prisma";
 
 export interface NotificationInput {
   email?: string | null;
@@ -55,14 +56,20 @@ export async function sendNotification(input: NotificationInput): Promise<Notifi
       auth: { user, pass },
     });
 
+    // The Kendra's postal address and phone go under every email (a legal expectation for business mail)
+    const settings = await prisma.adminSettings
+      .findUnique({ where: { id: "default" }, select: { addressEn: true, phone1: true } })
+      .catch(() => null);
+    const contactLine = [settings?.addressEn, settings?.phone1].filter(Boolean).join(" | ");
+
     const safe = escapeHtml(input.message).replace(/\n/g, "<br>");
     await transport.sendMail({
       from: from || user,
       to: input.email,
       replyTo: KENDRA_EMAIL,
       subject: input.subject,
-      text: `${input.message}\n\nMaharshi Kanad Jyotish Kendra\n${KENDRA_EMAIL}`,
-      html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1a0000">${safe}<br><br><strong>Maharshi Kanad Jyotish Kendra</strong><br><a href="mailto:${KENDRA_EMAIL}" style="color:#800000">${KENDRA_EMAIL}</a></div>`,
+      text: `${input.message}\n\nMaharshi Kanad Jyotish Kendra\n${KENDRA_EMAIL}${contactLine ? `\n${contactLine}` : ""}`,
+      html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1a0000">${safe}<br><br><strong>Maharshi Kanad Jyotish Kendra</strong><br><a href="mailto:${KENDRA_EMAIL}" style="color:#800000">${KENDRA_EMAIL}</a>${contactLine ? `<br><span style="color:#555;font-size:13px">${escapeHtml(contactLine)}</span>` : ""}</div>`,
     });
     return { emailSent: true };
   } catch (error) {

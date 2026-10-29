@@ -263,13 +263,13 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
                   </div>
                   <div className="space-y-1 font-mono text-secondary font-semibold">
                     <div>
-                      <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="hover:underline">
+                      <a href={`tel:${phone1.replace(/\s+/g, "")}`} className="inline-flex items-center min-h-[44px] hover:underline">
                         {phone1}
                       </a>
                     </div>
                     {phone2 && (
                     <div>
-                      <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="hover:underline">
+                      <a href={`tel:${phone2.replace(/\s+/g, "")}`} className="inline-flex items-center min-h-[44px] hover:underline">
                         {phone2}
                       </a>
                     </div>
@@ -284,7 +284,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
                 <Mail className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div>
                   <div className="font-bold text-on-surface mb-0.5">{isHindi ? "ईमेल" : "Email"}</div>
-                  <a href={`mailto:${emailAddr}`} className="text-secondary font-mono hover:underline">{emailAddr}</a>
+                  <a href={`mailto:${emailAddr}`} className="inline-flex items-center min-h-[44px] text-secondary font-mono hover:underline break-all">{emailAddr}</a>
                 </div>
               </div>
               )}

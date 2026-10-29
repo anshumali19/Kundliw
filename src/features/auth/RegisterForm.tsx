@@ -23,6 +23,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [adult, setAdult] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -42,6 +43,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
           phone,
           email,
           password: password || undefined,
+          adultConfirmed: adult,
         }),
       });
 
@@ -92,7 +94,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
               <span>{tAuth("haveAccount")} </span>
               <Link
                 href={`/auth/signin/${portal}?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-                className="font-bold text-primary hover:underline uppercase tracking-wider"
+                className="inline-flex items-center min-h-[44px] font-bold text-primary hover:underline uppercase tracking-wider"
               >
                 {tAuth(isAssociate ? "associateLoginTitle" : "userLoginTitle")} →
               </Link>
@@ -100,7 +102,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
             <div>
               <Link
                 href="/auth/register"
-                className="font-bold text-secondary hover:underline uppercase tracking-wider"
+                className="inline-flex items-center min-h-[44px] font-bold text-secondary hover:underline uppercase tracking-wider"
               >
                 ← {tAuth("chooseRegisterType")}
               </Link>
@@ -188,6 +190,22 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
                   : "You can always sign in instantly via Mobile OTP without a password."}
               </span>
             </div>
+
+            <label className="flex items-start gap-3 text-xs text-on-surface cursor-pointer">
+              <input
+                type="checkbox"
+                required
+                checked={adult}
+                onChange={(e) => setAdult(e.target.checked)}
+                className="mt-0.5 w-5 h-5 shrink-0 accent-[#800000]"
+              />
+              <span>
+                I am 18 years or older and I accept the{" "}
+                <Link href="/legal/terms" target="_blank" className="font-bold text-primary underline">Terms</Link> and{" "}
+                <Link href="/legal/privacy" target="_blank" className="font-bold text-primary underline">Privacy Policy</Link>.
+                <span className="block text-on-surface-variant mt-0.5">मैं 18 वर्ष या उससे अधिक आयु का हूँ और नियम तथा गोपनीयता नीति स्वीकार करता/करती हूँ।</span>
+              </span>
+            </label>
 
             <button
               type="submit"

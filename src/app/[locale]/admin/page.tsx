@@ -158,7 +158,7 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
             </ul>
           )}
           <div className="px-4 py-3 border-t border-outline-variant/50">
-            <Link href="/admin/orders" className="text-sm font-bold text-primary uppercase tracking-wider hover:underline">
+            <Link href="/admin/orders" className="inline-flex items-center min-h-[44px] text-sm font-bold text-primary uppercase tracking-wider hover:underline">
               {t("All orders", "सभी ऑर्डर")}
             </Link>
           </div>

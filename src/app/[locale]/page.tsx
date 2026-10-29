@@ -93,11 +93,11 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     key: s.slug,
     title: isHindi ? s.titleHi : s.titleEn,
     desc: (isHindi ? s.taglineHi : s.taglineEn) || "",
-    image: s.imageUrl || (s.slug === "prashna-kundli" ? "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1" : s.slug === "kundli-matching" ? "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2" : "https://placehold.co/800x600/8B4513/ffffff?text=Astrology"),
+    image: s.imageUrl || (s.slug === "prashna-kundli" ? "/logo.png1" : s.slug === "kundli-matching" ? "/logo.png2" : "/ref/astrology.webp"),
     href: `/services/${s.slug}`,
     external: null as string | null,
   }));
-  const FALLBACK_IMAGES = ["https://placehold.co/800x600/8B4513/ffffff?text=Astrology", "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1", "https://placehold.co/800x600/8B4513/ffffff?text=Vastu", "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2"];
+  const FALLBACK_IMAGES = ["/ref/astrology.webp", "/logo.png1", "/ref/vastu.webp", "/logo.png2"];
   const otherCards = others.map((o, idx) => ({
     key: o.slug,
     title: isHindi ? o.titleHi : o.titleEn,
@@ -112,11 +112,11 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     gallery.length > 0
       ? gallery.map((g) => ({ src: g.imageUrl, caption: isHindi ? g.titleHi : g.titleEn }))
       : [
-          { src: "https://placehold.co/800x600/6B3A2A/ffffff?text=About+Us", caption: "Maharshi Kanad Jyotish Kendra" },
-          { src: "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1", caption: tr("Vedic Astrology", "वैदिक ज्योतिष") },
-          { src: "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2", caption: tr("Spiritual Guidance", "आध्यात्मिक मार्गदर्शन") },
-          { src: "https://placehold.co/800x600/8B4513/ffffff?text=Astrology", caption: tr("Astrology", "ज्योतिष") },
-          { src: "https://placehold.co/800x600/8B4513/ffffff?text=Vastu", caption: tr("Vastu", "वास्तु") },
+          { src: "/ref/about.webp", caption: "Maharshi Kanad Jyotish Kendra" },
+          { src: "/logo.png1", caption: tr("Vedic Astrology", "वैदिक ज्योतिष") },
+          { src: "/logo.png2", caption: tr("Spiritual Guidance", "आध्यात्मिक मार्गदर्शन") },
+          { src: "/ref/astrology.webp", caption: tr("Astrology", "ज्योतिष") },
+          { src: "/ref/vastu.webp", caption: tr("Vastu", "वास्तु") },
         ];
 
   const faqList = faqs.map((f) => ({ q: isHindi ? f.questionHi : f.questionEn, a: isHindi ? f.answerHi : f.answerEn }));
@@ -128,8 +128,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const card = "bg-surface-container-lowest border border-outline-variant shadow-[0_18px_45px_rgba(73,38,24,0.09)]";
   const telHref = `tel:${phone.replace(/[^\d+]/g, "")}`;
 
-  const heroImg1 = String(heroBox.image1 || "").trim() || "https://placehold.co/1200x600/8B4513/ffffff?text=Hero+Image+1";
-  const heroImg2 = String(heroBox.image2 || "").trim() || "https://placehold.co/1200x600/6B3A2A/ffffff?text=Hero+Image+2";
+  const heroImg1 = String(heroBox.image1 || "").trim() || "/logo.png1";
+  const heroImg2 = String(heroBox.image2 || "").trim() || "/logo.png2";
   const overlay = Math.min(90, Math.max(0, Number(heroBox.overlay ?? 60)));
   const cta1Url = link(heroBox.cta1Url, "/services");
   const cta2Url = link(heroBox.cta2Url, "/kundli");
@@ -282,7 +282,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
             <div className="relative pb-8 pl-8">
               <div className="absolute bottom-0 left-0 h-3/4 w-[70%] bg-saffron" aria-hidden="true" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={String(cardsCfg.aboutImage || "").trim() || "https://placehold.co/800x600/6B3A2A/ffffff?text=About+Us"} alt={tr("Maharshi Kanad Jyotish Kendra", "महर्षि कणाद ज्योतिष केंद्र")} className="relative h-[360px] sm:h-[480px] lg:h-[540px] w-full object-cover" />
+              <img src={String(cardsCfg.aboutImage || "").trim() || "/ref/about.webp"} alt={tr("Maharshi Kanad Jyotish Kendra", "महर्षि कणाद ज्योतिष केंद्र")} className="relative h-[360px] sm:h-[480px] lg:h-[540px] w-full object-cover" />
             </div>
             <div>
               <SectionHead
@@ -586,7 +586,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                     <li key={i}>{l}</li>
                   ))}
               </ol>
-              <Link href="/offers" className="text-xs font-bold text-primary hover:underline">{tr("See current offers", "वर्तमान ऑफ़र देखें")}</Link>
+              <Link href="/offers" className="inline-flex items-center min-h-[44px] text-xs font-bold text-primary hover:underline">{tr("See current offers", "वर्तमान ऑफ़र देखें")}</Link>
             </article>
             <article className="bg-maroon text-white p-8 sm:p-10">
               <h3 className="font-serif text-3xl font-bold mb-4">{h("payGatewayTitle", "Payment Gateway", "पेमेंट गेटवे")}</h3>

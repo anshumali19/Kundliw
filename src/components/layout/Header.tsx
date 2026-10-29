@@ -29,6 +29,7 @@ import {
   Search,
   UserPlus,
   LogIn,
+  Tag,
 } from "lucide-react";
 
 interface HeaderProps {
@@ -110,6 +111,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
   // Secondary/lineage items accessible in dropdown & mobile
   const kendraLinks = hideTools([
     { href: "/about", label: tNav("about"), icon: Compass },
+    { href: "/services#plans", label: tNav("pricingPlansShort"), icon: Tag },
     { href: "/founder", label: tNav("founder"), icon: Sparkles },
     { href: "/other-services", label: tNav("otherServices"), icon: Sparkles },
     { href: "/kundli/astrosage", label: tNav("astrosageTool"), icon: BookOpen },
