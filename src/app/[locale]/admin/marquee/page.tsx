@@ -147,6 +147,7 @@ export default function AdminMarqueePage() {
         setSuccess(editingId ? "Marquee announcement updated" : "Marquee announcement created");
         cancelEdit();
         fetchItems();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         setError(data.error || "Failed to create announcement");
       }
@@ -221,13 +222,18 @@ export default function AdminMarqueePage() {
           <Plus className="w-4 h-4 text-primary" />
           <span>{editingId ? "सूचना पट्टी संपादित करें • Edit Marquee Announcement" : "नई सूचना पट्टी जोड़ें • Add Marquee Announcement"}</span>
           {editingId && (
-            <button type="button" onClick={cancelEdit} className="ml-auto min-h-[44px] px-3 inline-flex items-center gap-1 rounded border border-maroon text-xs font-bold">
-              <X className="w-4 h-4" /> Cancel edit
-            </button>
+            <span className="ml-auto flex flex-wrap items-center gap-2">
+              <button type="submit" form="marquee-form" disabled={submitting} className="min-h-[44px] px-4 inline-flex items-center gap-1.5 rounded bg-brand text-on-brand text-xs font-bold uppercase tracking-wider disabled:opacity-50">
+                <CheckCircle2 className="w-4 h-4" /> {submitting ? "Saving..." : "Save changes"}
+              </button>
+              <button type="button" onClick={cancelEdit} className="min-h-[44px] px-3 inline-flex items-center gap-1 rounded border border-maroon text-xs font-bold">
+                <X className="w-4 h-4" /> Cancel edit
+              </button>
+            </span>
           )}
         </h2>
 
-        <form onSubmit={handleCreate} className="space-y-4">
+        <form id="marquee-form" onSubmit={handleCreate} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
@@ -379,7 +385,7 @@ export default function AdminMarqueePage() {
             disabled={submitting}
             className="min-h-[44px] px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 disabled:opacity-50"
           >
-            <Plus className="w-4 h-4" />
+            {editingId ? <CheckCircle2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             <span>{submitting ? "Saving..." : editingId ? "Save changes" : "Add Marquee Notice"}</span>
           </button>
           </div>
