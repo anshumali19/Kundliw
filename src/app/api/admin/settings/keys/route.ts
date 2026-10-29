@@ -10,7 +10,7 @@ import {
 import { encryptSecret } from "@/lib/security/crypto";
 import { z } from "zod";
 
-const updateKeysSchema = z.record(z.string().nullable().optional());
+const updateKeysSchema = z.record(z.string(), z.string().nullable().optional());
 
 export async function GET() {
   const guard = await guardApiAdmin();

@@ -137,7 +137,7 @@ describe("Phase 3: Zod Input Validation & Business Rules", () => {
     const parsed = offerInputSchema.safeParse(invalidDateOffer);
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
-      expect(parsed.error.errors[0].message).toContain("Valid Until date must be later than Valid From date");
+      expect(parsed.error.issues[0].message).toContain("Valid Until date must be later than Valid From date");
     }
   });
 });

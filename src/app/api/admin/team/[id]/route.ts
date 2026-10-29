@@ -1,3 +1,4 @@
+import { partialUpdate } from "@/lib/validation/partialUpdate";
 import { NextRequest, NextResponse } from "next/server";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
@@ -13,7 +14,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
   const csrf = validateCsrfOrigin(request);
   if (!csrf.isValid) return csrf.errorResponse;
   try {
-    const parsed = teamSchema.partial().safeParse(await request.json());
+    const parsed = partialUpdate(teamSchema).safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json({ error: "Validation failed", details: parsed.error.flatten() }, { status: 400 });
     }

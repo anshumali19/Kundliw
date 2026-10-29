@@ -1,3 +1,4 @@
+import { partialUpdate } from "@/lib/validation/partialUpdate";
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +16,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
 
   try {
     const body = await request.json();
-    const parsed = serviceInputSchema.partial().safeParse(body);
+    const parsed = partialUpdate(serviceInputSchema).safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(

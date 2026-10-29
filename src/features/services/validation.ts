@@ -1,3 +1,4 @@
+import { partialUpdate } from "@/lib/validation/partialUpdate";
 import { z } from "zod";
 import { DiscountType } from "@prisma/client";
 import { linksInputSchema } from "@/lib/content/media";
@@ -118,8 +119,7 @@ export const offerInputSchema = baseOfferInputSchema
     }
   );
 
-export const updateOfferInputSchema = baseOfferInputSchema
-  .partial()
+export const updateOfferInputSchema = partialUpdate(baseOfferInputSchema)
   .refine(
     (data) => {
       if (data.discountType === DiscountType.PERCENTAGE && data.discountValue !== undefined) {

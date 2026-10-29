@@ -31,7 +31,7 @@ export async function POST(request: NextRequest, props: { params: Promise<{ id: 
     const parsed = updateStatusSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: parsed.error.errors[0]?.message || "Invalid status payload" },
+        { error: parsed.error.issues[0]?.message || "Invalid status payload" },
         { status: 400 }
       );
     }

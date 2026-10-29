@@ -1,3 +1,4 @@
+import { partialUpdate } from "@/lib/validation/partialUpdate";
 import { z } from "zod";
 
 export const CREDENTIAL_KINDS = ["GST", "MSME", "TRADEMARK", "ISO", "OTHER"] as const;
@@ -32,4 +33,4 @@ export const credentialInputSchema = z.object({
   orderIndex: z.number().int().min(0).max(9999).default(0),
 });
 
-export const credentialUpdateSchema = credentialInputSchema.partial();
+export const credentialUpdateSchema = partialUpdate(credentialInputSchema);

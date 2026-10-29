@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   try {
     const parsed = slotBatchSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.errors[0]?.message || "Invalid slot details." }, { status: 400 });
+      return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid slot details." }, { status: 400 });
     }
     const v = parsed.data;
     const today = new Date().toISOString().slice(0, 10);
