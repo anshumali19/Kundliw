@@ -31,6 +31,8 @@ import {
   UserPlus,
   LogIn,
   Tag,
+  Package,
+  Percent,
 } from "lucide-react";
 
 interface HeaderProps {
@@ -115,6 +117,8 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
   const kendraLinks = hideTools([
     { href: "/about", label: tNav("about"), icon: Compass },
     { href: "/services#plans", label: tNav("pricingPlansShort"), icon: Tag },
+    { href: "/services#packages", label: isHindi ? "पैकेज" : "Packages", icon: Package },
+    { href: "/offers", label: tNav("offers"), icon: Percent },
     { href: "/founder", label: tNav("founder"), icon: Sparkles },
     { href: "/other-services", label: tNav("otherServices"), icon: Sparkles },
     { href: "/kundli/astrosage", label: tNav("astrosageTool"), icon: BookOpen },
@@ -160,6 +164,8 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
   const srsMobileMenu = customMenu ? hideTools(customMenu) : hideTools([
     { href: "/services", label: tNav("services") },
     { href: "/services#plans", label: tNav("pricingPlans") },
+    { href: "/services#packages", label: isHindi ? "पैकेज" : "Packages" },
+    { href: "/offers", label: tNav("offers") },
     { href: ownKundliHref("/kundli"), label: tNav("kundli") },
     { href: ownKundliHref("/kundli/matching"), label: tNav("kundliMatching") },
     { href: ownKundliHref("/kundli/prashna"), label: tNav("prashna") },

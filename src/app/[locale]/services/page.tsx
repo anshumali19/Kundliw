@@ -51,6 +51,11 @@ export default async function ServicesListingPage(
         where: activePlanWhere,
         orderBy: { orderIndex: "asc" },
       },
+      packages: {
+        where: { isActive: true },
+        orderBy: { orderIndex: "asc" },
+        select: { id: true, slug: true, titleEn: true, titleHi: true, descriptionEn: true, descriptionHi: true },
+      },
     },
     orderBy: { orderIndex: "asc" },
   });
@@ -73,7 +78,11 @@ export default async function ServicesListingPage(
     samagriEn: s.samagriEn,
     samagriHi: s.samagriHi,
     youtubeUrl: s.youtubeUrl,
+    packages: s.packages
+      .filter((k) => s.plans.some((p) => p.packageId === k.id))
+      .map((k) => ({ id: k.id, slug: k.slug, titleEn: k.titleEn, titleHi: k.titleHi, descriptionEn: k.descriptionEn, descriptionHi: k.descriptionHi })),
     plans: s.plans.map((p) => ({
+      packageId: p.packageId,
       id: p.id,
       slug: p.slug,
       titleEn: p.titleEn,

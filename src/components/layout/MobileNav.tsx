@@ -36,6 +36,7 @@ import {
   LogOut,
   Languages,
   Tag,
+  Package,
 } from "lucide-react";
 
 /**
@@ -83,6 +84,7 @@ export function MobileNav() {
   const sheetLinks = hideTools([
     { href: "/services", label: tNav("services"), icon: Compass },
     { href: "/services#plans", label: tNav("pricingPlansShort"), icon: Tag },
+    { href: "/services#packages", label: locale === "hi" ? "पैकेज" : "Packages", icon: Package },
     { href: "/gallery", label: tNav("gallery"), icon: ImageIcon },
     { href: "/blogs", label: tNav("blogs"), icon: FileText },
     { href: "/offers", label: tNav("offers"), icon: Percent },

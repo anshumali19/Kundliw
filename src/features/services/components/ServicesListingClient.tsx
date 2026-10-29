@@ -19,7 +19,17 @@ import {
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
 
+export interface SerializedPackage {
+  id: string;
+  slug: string;
+  titleEn: string;
+  titleHi: string;
+  descriptionEn?: string | null;
+  descriptionHi?: string | null;
+}
+
 export interface SerializedPlan {
+  packageId?: string | null;
   id: string;
   slug: string;
   titleEn: string;
@@ -54,6 +64,7 @@ export interface SerializedService {
   samagriHi?: string | null;
   youtubeUrl?: string | null;
   plans: SerializedPlan[];
+  packages?: SerializedPackage[];
 }
 
 export interface ServicesListingClientProps {
@@ -437,6 +448,59 @@ export function ServicesListingClient({
                       </div>
                     </li>
                   ))}
+                </ul>
+              </div>
+            ))}
+        </div>
+      </section>
+
+      {/* All packages, grouped by service (target of the "Packages" menu item) */}
+      <section id="packages" className="scroll-mt-32 w-full px-4 sm:px-8 lg:px-12 pb-16">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-primary font-bold">{isHindi ? "सभी पैकेज" : "All packages"}</div>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-secondary mt-1">
+              {isHindi ? "हर सेवा के पैकेज" : "Packages for every service"}
+            </h2>
+            <p className="text-sm text-on-surface-variant mt-1">
+              {isHindi ? "सेवा → पैकेज → प्लान। पैकेज चुनकर उसके प्लान देखें।" : "Service → Package → Plan. Pick a package to see its plans."}
+            </p>
+          </div>
+          {services.filter((s) => (s.packages ?? []).length > 0).length === 0 && (
+            <p className="text-sm text-on-surface-variant">{isHindi ? "अभी कोई पैकेज उपलब्ध नहीं है।" : "No packages are available right now."}</p>
+          )}
+          {services
+            .filter((s) => (s.packages ?? []).length > 0)
+            .map((s) => (
+              <div key={s.id} className="rounded-xl border border-outline-variant/50 bg-surface overflow-hidden">
+                <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-surface-container-low border-b border-outline-variant/40">
+                  <h3 className="font-serif text-lg font-bold text-secondary">{isHindi ? s.titleHi : s.titleEn}</h3>
+                  <Link href={`/services/${s.slug}`} className="text-xs font-bold text-primary hover:underline">
+                    {isHindi ? "सेवा देखें →" : "View service →"}
+                  </Link>
+                </div>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
+                  {(s.packages ?? []).map((k) => {
+                    const inPkg = s.plans.filter((p) => p.packageId === k.id);
+                    const from = inPkg.length ? Math.min(...inPkg.map((p) => p.pricePaise)) : null;
+                    const desc = isHindi ? k.descriptionHi || k.descriptionEn : k.descriptionEn || k.descriptionHi;
+                    return (
+                      <li key={k.id}>
+                        <Link
+                          href={`/services/${s.slug}?package=${encodeURIComponent(k.id)}`}
+                          className="block h-full rounded-lg border border-outline-variant/60 bg-surface-container-low/60 p-4 hover:bg-gold/20 hover:border-saffron/60 transition-colors min-h-[44px]"
+                        >
+                          <div className="font-serif font-bold text-secondary">{isHindi ? k.titleHi : k.titleEn}</div>
+                          {desc && <p className="text-xs text-on-surface-variant mt-1 line-clamp-2">{desc}</p>}
+                          <div className="mt-2 text-xs text-on-surface-variant">
+                            {inPkg.length} {isHindi ? "प्लान" : inPkg.length === 1 ? "plan" : "plans"}
+                            {from !== null ? ` · ${isHindi ? "शुरू" : "from"} ${formatPaiseToInr(from)}` : ""}
+                          </div>
+                          <div className="mt-2 text-xs font-bold text-primary">{isHindi ? "प्लान देखें →" : "See plans →"}</div>
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}

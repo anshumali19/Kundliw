@@ -2,7 +2,7 @@
 
 import { YouTubeEmbed } from "@/components/content/MediaView";
 import { PackageDetails, type PackageDetailDTO } from "./PackageDetails";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import {
@@ -86,6 +86,18 @@ export function PlanSelectorInteractive({
   const [selectedPlanId, setSelectedPlanId] = useState<string>(
     defaultPlan ? defaultPlan.id : ""
   );
+
+  // Arriving from the Packages list (?package=<id>): open that package and its default plan
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get("package");
+    if (!wanted) return;
+    const k = packageList.find((x) => x.id === wanted);
+    if (!k) return;
+    setSelectedPackageId(k.id);
+    const pick = pickDefault(allPlans.filter((p) => planPackage(p) === k.id));
+    if (pick) setSelectedPlanId(pick.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [couponInput, setCouponInput] = useState<string>("VEDIC2025");
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
