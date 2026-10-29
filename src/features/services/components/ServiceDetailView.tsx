@@ -307,11 +307,33 @@ export function ServiceDetailView({
                 {isHindi ? "उपलब्ध परामर्श प्रारूप" : "Available Consultation Formats"}
               </div>
 
-              {service.plans.map((p) => (
+              {(() => {
+                const pkgs = service.packages ?? [];
+                const order = (id?: string | null) => {
+                  const i = pkgs.findIndex((k) => k.id === id);
+                  return i < 0 ? 9999 : i;
+                };
+                return [...service.plans].sort((x, y) => order(x.packageId) - order(y.packageId));
+              })().map((p, idx, arr) => {
+                const pkg = (service.packages ?? []).find((k) => k.id === p.packageId);
+                const prev = arr[idx - 1];
+                const newGroup = idx === 0 || prev.packageId !== p.packageId;
+                const svcName = isHindi ? service.titleHi : service.titleEn;
+                const pkgName = pkg ? (isHindi ? pkg.titleHi : pkg.titleEn) : "";
+                return (
+                <React.Fragment key={p.id}>
+                {newGroup && pkgName && (
+                  <div className="pt-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+                    {isHindi ? "पैकेज" : "Package"}: {pkgName}
+                  </div>
+                )}
                 <div
-                  key={p.id}
                   className="p-3.5 bg-surface rounded-xl border border-outline-variant/40 text-left space-y-2"
                 >
+                  <div className="text-[10px] text-on-surface-variant">
+                    {svcName}
+                    {pkgName ? ` › ${pkgName}` : ""} › <span className="font-semibold text-secondary">{isHindi ? p.titleHi : p.titleEn}</span>
+                  </div>
                   <div className="flex items-center justify-between font-serif font-bold text-secondary text-xs">
                     <span>{isHindi ? p.titleHi : p.titleEn}</span>
                     <span>{formatPaiseToInr(p.pricePaise)}</span>
@@ -345,7 +367,9 @@ export function ServiceDetailView({
                     </div>
                   )}
                 </div>
-              ))}
+                </React.Fragment>
+                );
+              })}
             </div>
 
             {/* Quick Consultation CTA */}
