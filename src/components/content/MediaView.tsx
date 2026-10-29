@@ -6,7 +6,7 @@ import {
   isSafeImageSrc,
   isWebUrl,
   linkLabel,
-  youtubeEmbedUrl,
+  videoSource,
 } from "@/lib/content/media";
 
 /** Responsive YouTube player. Falls back to a plain link when the address is not a YouTube video. */
@@ -20,7 +20,20 @@ export function YouTubeEmbed({
   isHindi: boolean;
 }) {
   if (!url) return null;
-  const embed = youtubeEmbedUrl(url);
+  const video = videoSource(url);
+  const embed = video?.kind === "iframe" ? video.src : null;
+  if (video?.kind === "file") {
+    return (
+      <video
+        src={video.src}
+        title={title}
+        controls
+        preload="metadata"
+        playsInline
+        className="w-full aspect-video rounded-xl bg-black border border-outline-variant/30"
+      />
+    );
+  }
   if (!embed) {
     if (!isWebUrl(url)) return null;
     return (

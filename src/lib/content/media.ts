@@ -78,6 +78,31 @@ export function youtubeEmbedUrl(raw: string | null | undefined): string | null {
   return `https://www.youtube-nocookie.com/embed/${id}`;
 }
 
+export type VideoSource = { kind: "iframe" | "file"; src: string };
+
+/**
+ * Any video link the admin can paste: YouTube, Vimeo, a Google Drive share link, or a direct
+ * video file address (.mp4, .webm, .ogg, .mov). Returns null when it is none of these.
+ */
+export function videoSource(raw: string | null | undefined): VideoSource | null {
+  if (!raw || !isWebUrl(raw)) return null;
+  const yt = youtubeEmbedUrl(raw);
+  if (yt) return { kind: "iframe", src: yt };
+  const u = new URL(raw.trim());
+  const host = u.hostname.replace(/^www\./, "");
+  if (host === "vimeo.com" || host === "player.vimeo.com") {
+    const m = u.pathname.match(/\/(?:video\/)?(\d{5,12})/);
+    if (m) return { kind: "iframe", src: `https://player.vimeo.com/video/${m[1]}` };
+  }
+  if (host === "drive.google.com") {
+    const m = u.pathname.match(/\/file\/d\/([A-Za-z0-9_-]{10,})/) || null;
+    const id = m ? m[1] : u.searchParams.get("id");
+    if (id && /^[A-Za-z0-9_-]{10,}$/.test(id)) return { kind: "iframe", src: `https://drive.google.com/file/d/${id}/preview` };
+  }
+  if (/\.(mp4|webm|ogg|mov|m4v)$/i.test(u.pathname)) return { kind: "file", src: u.toString() };
+  return null;
+}
+
 /** Rich page content: the admin stacks these blocks and can switch each one on or off. */
 export const BLOCK_TYPES = ["text", "image", "youtube", "link"] as const;
 export type BlockType = (typeof BLOCK_TYPES)[number];

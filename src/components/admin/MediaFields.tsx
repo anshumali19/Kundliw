@@ -91,7 +91,7 @@ export function ImageUrlField({
 export function YouTubeUrlField({
   value,
   onChange,
-  label = "YouTube video link (optional)",
+  label = "Video link (optional): YouTube, Vimeo, Google Drive or a direct .mp4 link",
 }: {
   value: string;
   onChange: (v: string) => void;

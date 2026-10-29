@@ -1261,7 +1261,7 @@ export function AdminServicesManager({
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
-                    YouTube Video URL
+                    Video link: YouTube, Vimeo, Google Drive or a direct .mp4 link
                   </label>
                   <input
                     type="url"

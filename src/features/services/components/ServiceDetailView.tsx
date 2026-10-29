@@ -120,6 +120,7 @@ export function ServiceDetailView({
     isPopular: p.isPopular,
     orderIndex: p.orderIndex,
     packageId: p.packageId ?? null,
+    youtubeUrl: p.youtubeUrl ?? null,
   }));
 
   const lowestPrice =
@@ -256,7 +257,7 @@ export function ServiceDetailView({
 
             {/* Plan images, videos and links */}
             {service.plans
-              .filter((p) => p.imageUrl || p.youtubeUrl || normalizeLinks(p.additionalLinks).length > 0)
+              .filter((p) => p.imageUrl || normalizeLinks(p.additionalLinks).length > 0)
               .map((p) => (
                 <div key={p.id} className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 shadow-xs">
                   <h2 className="font-serif text-base font-bold text-secondary">
@@ -271,7 +272,6 @@ export function ServiceDetailView({
                       className="w-full max-h-[420px] object-cover rounded-xl border border-outline-variant/40"
                     />
                   )}
-                  <YouTubeEmbed url={p.youtubeUrl} title={isHindi ? p.titleHi : p.titleEn} isHindi={isHindi} />
                   <LinkList links={normalizeLinks(p.additionalLinks)} isHindi={isHindi} />
                 </div>
               ))}

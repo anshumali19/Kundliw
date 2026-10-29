@@ -1,5 +1,6 @@
 "use client";
 
+import { YouTubeEmbed } from "@/components/content/MediaView";
 import { PackageDetails, type PackageDetailDTO } from "./PackageDetails";
 import { useState } from "react";
 import Link from "next/link";
@@ -17,6 +18,7 @@ import {
   AlertCircle,
   HelpCircle,
   X,
+  Video,
 } from "lucide-react";
 
 export interface PlanDTO {
@@ -37,6 +39,8 @@ export interface PlanDTO {
   isPopular: boolean;
   orderIndex: number;
   packageId?: string | null;
+  /** Video link the admin added for this plan (YouTube, Vimeo, Drive or a direct file) */
+  youtubeUrl?: string | null;
 }
 
 export type PackageDTO = PackageDetailDTO;
@@ -405,6 +409,16 @@ export function PlanSelectorInteractive({
             );
           })}
         </div>
+
+        {selectedPlan?.youtubeUrl && (
+          <div className="mt-6 max-w-3xl text-left space-y-2">
+            <h3 className="font-serif text-base font-bold text-secondary flex items-center gap-2">
+              <Video className="w-4 h-4 text-primary" aria-hidden="true" />
+              {isHindi ? `${selectedPlan.titleHi} – वीडियो` : `${selectedPlan.titleEn} – video`}
+            </h3>
+            <YouTubeEmbed url={selectedPlan.youtubeUrl} title={isHindi ? selectedPlan.titleHi : selectedPlan.titleEn} isHindi={isHindi} />
+          </div>
+        )}
       </div>
 
       {/* 2. Full Specification Matrix Comparative Table (Dynamic across any plan count) */}
