@@ -100,11 +100,11 @@ const baseMetadata: Metadata = {
       "Book Vedic astrology consultations, Kundli and Kundli matching online, and track your order until delivery.",
     locale: "hi_IN",
     alternateLocale: ["en_IN"],
-    images: [{ url: "/logo.png", width: 640, height: 480, alt: SITE_NAME }],
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/logo.png"],
+    images: ["/og-image.jpg"],
     title: `${SITE_NAME} | ${SITE_NAME_HI}`,
     description:
       "Vedic astrology consultations, Kundli and Kundli matching with online booking.",

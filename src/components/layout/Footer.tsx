@@ -42,6 +42,22 @@ export async function Footer() {
     .then((rows) => rows.filter((r) => !isCorePageSlug(r.slug)))
     .catch(() => []);
 
+  // Legal pages are listed only when they exist and are switched on, so no footer link leads to a missing page
+  const LEGAL_PAGES: Array<{ slug: string; label: string }> = [
+    { slug: "privacy", label: t("privacyLink") },
+    { slug: "terms", label: t("termsLink") },
+    { slug: "refund", label: locale === "hi" ? "धनवापसी नीति" : "Refund Policy" },
+    { slug: "platform-guidelines", label: locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines" },
+    { slug: "member-agreement", label: locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement" },
+    { slug: "rules-regulations", label: locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations" },
+    { slug: "ephemeris-sources", label: t("ephemerisLink") },
+  ];
+  const livePages = await prisma.staticPage
+    .findMany({ where: { isActive: true, slug: { in: LEGAL_PAGES.flatMap((l) => [`legal/${l.slug}`, l.slug]) } }, select: { slug: true } })
+    .then((rows) => new Set(rows.map((r) => r.slug.replace(/^legal\//, ""))))
+    .catch(() => null);
+  const legalLinks = livePages ? LEGAL_PAGES.filter((l) => livePages.has(l.slug)) : LEGAL_PAGES.slice(0, 2);
+
   const phone1 = settings?.phone1;
   const phone2 = settings?.phone2;
   const email = kendraEmail(settings?.email);
@@ -122,9 +138,9 @@ export async function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 xl:gap-8 pb-8 border-b border-gold/40 text-left">
           {/* Col 1: Identity & Sanctum Address with Logo */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2.5">
+            <Link href="/" aria-label={t("title")} className="flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={String(logoCfg.logoUrl || "") || "/Logo.jpeg"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
+              <img src={String(logoCfg.logoUrl || "") || "/logo-small.webp"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
               <div className="flex flex-col">
                 <span className="font-serif text-base font-bold text-white leading-tight">
                   {t("title")}
@@ -133,7 +149,7 @@ export async function Footer() {
                   {pickG(general, "tagline") || tCommon("tagline")}
                 </span>
               </div>
-            </div>
+            </Link>
             <div className="text-xs text-on-maroon leading-relaxed space-y-2 [&_a]:!text-white [&_a]:underline">
               <RichText text={pickG(general, "footerNote") || t("bio")} />
             </div>
@@ -247,36 +263,13 @@ export async function Footer() {
                 </Link>
               </li>
             )}
-            <li>
-              <Link href="/legal/privacy" className="hover:text-white hover:underline transition-colors block py-0.5">
-                {t("privacyLink")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/legal/terms" className="hover:text-white hover:underline transition-colors block py-0.5">
-                {t("termsLink")}
-              </Link>
-            </li>
-            <li>
-              <Link href="/legal/platform-guidelines" className="hover:text-white hover:underline transition-colors block py-0.5">
-                {locale === "hi" ? "प्लेटफ़ॉर्म दिशानिर्देश" : "Platform Guidelines"}
-              </Link>
-            </li>
-            <li>
-              <Link href="/legal/member-agreement" className="hover:text-white hover:underline transition-colors block py-0.5">
-                {locale === "hi" ? "सदस्य अनुबंध" : "Member Agreement"}
-              </Link>
-            </li>
-            <li>
-              <Link href="/legal/rules-regulations" className="hover:text-white hover:underline transition-colors block py-0.5">
-                {locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations"}
-              </Link>
-            </li>
-            <li>
-              <Link href="/legal/ephemeris-sources" className="hover:text-white hover:underline transition-colors block py-0.5">
-                {t("ephemerisLink")}
-              </Link>
-            </li>
+            {legalLinks.map((l) => (
+              <li key={l.slug}>
+                <Link href={`/legal/${l.slug}`} className="hover:text-white hover:underline transition-colors block py-0.5">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
           </ul>
           </div>
 
@@ -410,7 +403,7 @@ export async function Footer() {
         {/* Bottom Bar: Broadsheet Copyright & Lineage Seal */}
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-on-maroon">
           <div className="text-left">
-            {pickG(general, "copyright") || t("copyright")}
+            {pickG(general, "copyright") || t("copyright", { year: new Intl.NumberFormat(locale === "hi" ? "hi-IN-u-nu-deva" : "en-IN", { useGrouping: false }).format(new Date().getFullYear()) })}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-white font-semibold">दृग्गणित सिद्धान्त</span>

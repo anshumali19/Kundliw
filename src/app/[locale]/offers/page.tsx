@@ -17,7 +17,7 @@ export async function generateMetadata(props: OffersPageProps): Promise<Metadata
   return {
     alternates: pageAlternates(locale, "/offers"),
     title: isHindi ? "ऑफ़र • महर्षि कणाद ज्योतिष केंद्र" : "Offers • Maharshi Kanad Jyotish Kendra",
-    description: isHindi ? "वर्तमान में उपलब्ध छूट एवं ऑफ़र।" : "Current discounts and offer codes.",
+    description: isHindi ? "महर्षि कणाद ज्योतिष केंद्र की सेवाओं पर वर्तमान में उपलब्ध छूट, प्रोमो कोड और ऑफ़र देखें।" : "See the discounts, promo codes and offers currently running on Maharshi Kanad Jyotish Kendra services.",
   };
 }
 

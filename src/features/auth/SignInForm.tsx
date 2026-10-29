@@ -290,6 +290,13 @@ export function SignInForm({ portal }: { portal: LoginPortal }) {
             </div>
           )}
 
+          {searchParams.get("registered") === "1" && !successMsg && !errorMsg && (
+            <div role="status" className="mb-4 p-3 bg-surface-container-high border border-primary/40 rounded text-primary text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>{locale === "hi" ? "आपका खाता बन गया है। कृपया साइन इन करें।" : "Your account has been created. Please sign in."}</span>
+            </div>
+          )}
+
           {successMsg && (
             <div className="mb-4 p-3 bg-surface-container-high border border-primary/40 rounded text-primary text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />

@@ -24,8 +24,8 @@ export async function generateMetadata(props: FounderPageProps): Promise<Metadat
       ? "संस्थापक परिचय | महर्षि कणाद ज्योतिष केंद्र"
       : "About the Founder | Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "महर्षि कणाद ज्योतिष केंद्र के संस्थापक का परिचय।"
-      : "Background of the founder of Maharshi Kanad Jyotish Kendra.",
+      ? "महर्षि कणाद ज्योतिष केंद्र के संस्थापक का परिचय, उनकी परंपरा, अनुभव और ज्योतिष सेवा का संकल्प।"
+      : "Background of the founder of Maharshi Kanad Jyotish Kendra: the tradition, experience and commitment behind the Kendra's astrology services.",
   };
 }
 

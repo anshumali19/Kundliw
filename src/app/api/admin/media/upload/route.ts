@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import {
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    let buffer: Buffer = Buffer.from(arrayBuffer);
 
     const validation = validateFileMagicBytes(buffer);
     if (!validation.isValid) {
@@ -46,6 +47,24 @@ export async function POST(request: NextRequest) {
         { error: "Invalid file type. Only PDF, PNG, JPEG, and WEBP files are accepted." },
         { status: 400 }
       );
+    }
+
+    // Photos are shrunk before they are stored (at most 2000 px on the long side, tuned quality), so pages load fast.
+    // The result is only used when it is really smaller; anything that cannot be read as an image is kept as it was.
+    const mime = validation.detectedMime || file.type;
+    if (/^image\/(jpeg|png|webp)$/.test(mime || "")) {
+      try {
+        const base = sharp(buffer, { failOn: "none" }).rotate().resize({ width: 2000, height: 2000, fit: "inside", withoutEnlargement: true });
+        const shrunk =
+          mime === "image/jpeg"
+            ? await base.jpeg({ quality: 82, mozjpeg: true }).toBuffer()
+            : mime === "image/webp"
+              ? await base.webp({ quality: 82 }).toBuffer()
+              : await base.png({ compressionLevel: 9, palette: true }).toBuffer();
+        if (shrunk.length < buffer.length) buffer = shrunk;
+      } catch (error) {
+        console.error("Image compression skipped:", error);
+      }
     }
 
     const storage = getStorageProvider();

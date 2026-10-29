@@ -28,8 +28,8 @@ export async function generateMetadata(props: TestimonialsPageProps): Promise<Me
       ? "ग्राहक अनुभव एवं संस्तुतियाँ • महर्षि कणाद ज्योतिष केंद्र"
       : "Client Experiences & Testimonials • Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "महर्षि कणाद ज्योतिष केंद्र के ग्राहकों के अनुभव।"
-      : "Client feedback for Maharshi Kanad Jyotish Kendra.",
+      ? "महर्षि कणाद ज्योतिष केंद्र के ग्राहकों के अनुभव और समीक्षाएँ, कुंडली, परामर्श और पूजा सेवाओं के बारे में।"
+      : "Client feedback and reviews for Maharshi Kanad Jyotish Kendra on Kundli, consultation and puja services.",
   };
 }
 

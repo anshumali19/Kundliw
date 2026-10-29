@@ -1,5 +1,11 @@
 import { getCurrentUser } from "@/lib/auth/guards";
 import { TrackOrderClient } from "@/features/orders/components/TrackOrderClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Track your order • Maharshi Kanad Jyotish Kendra",
+  description: "Enter your order number and mobile number to see the progress of your Kundli or consultation order.",
+};
 
 interface TrackPageProps {
   params: Promise<{

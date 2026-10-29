@@ -8,6 +8,8 @@ import { SocialLinks } from "@/components/content/SocialLinks";
 import { RichText } from "@/components/content/RichText";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { Band, SectionHead, rupees } from "@/components/home/HomeParts";
+import { HeroSlider } from "@/components/home/HeroSlider";
+import { HERO_SLIDES_KEY, normalizeHeroSlides, slideIsShowable } from "@/lib/content/heroSlides";
 import { KundliRequestForm } from "@/components/home/KundliRequestForm";
 import { whatsappLink } from "@/lib/content/whatsapp";
 import { safeHref, stripRich } from "@/lib/content/richText";
@@ -93,11 +95,11 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     key: s.slug,
     title: isHindi ? s.titleHi : s.titleEn,
     desc: (isHindi ? s.taglineHi : s.taglineEn) || "",
-    image: s.imageUrl || (s.slug === "prashna-kundli" ? "/logo.png1" : s.slug === "kundli-matching" ? "/logo.png2" : "/ref/astrology.webp"),
+    image: s.imageUrl || (s.slug === "prashna-kundli" ? "/ref/hero-1.webp" : s.slug === "kundli-matching" ? "/ref/hero-2.webp" : "/ref/astrology.webp"),
     href: `/services/${s.slug}`,
     external: null as string | null,
   }));
-  const FALLBACK_IMAGES = ["/ref/astrology.webp", "/logo.png1", "/ref/vastu.webp", "/logo.png2"];
+  const FALLBACK_IMAGES = ["/ref/astrology.webp", "/ref/hero-1.webp", "/ref/vastu.webp", "/ref/hero-2.webp"];
   const otherCards = others.map((o, idx) => ({
     key: o.slug,
     title: isHindi ? o.titleHi : o.titleEn,
@@ -113,8 +115,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       ? gallery.map((g) => ({ src: g.imageUrl, caption: isHindi ? g.titleHi : g.titleEn }))
       : [
           { src: "/ref/about.webp", caption: "Maharshi Kanad Jyotish Kendra" },
-          { src: "/logo.png1", caption: tr("Vedic Astrology", "वैदिक ज्योतिष") },
-          { src: "/logo.png2", caption: tr("Spiritual Guidance", "आध्यात्मिक मार्गदर्शन") },
+          { src: "/ref/hero-1.webp", caption: tr("Vedic Astrology", "वैदिक ज्योतिष") },
+          { src: "/ref/hero-2.webp", caption: tr("Spiritual Guidance", "आध्यात्मिक मार्गदर्शन") },
           { src: "/ref/astrology.webp", caption: tr("Astrology", "ज्योतिष") },
           { src: "/ref/vastu.webp", caption: tr("Vastu", "वास्तु") },
         ];
@@ -128,8 +130,28 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const card = "bg-surface-container-lowest border border-outline-variant shadow-[0_18px_45px_rgba(73,38,24,0.09)]";
   const telHref = `tel:${phone.replace(/[^\d+]/g, "")}`;
 
-  const heroImg1 = String(heroBox.image1 || "").trim() || "/logo.png1";
-  const heroImg2 = String(heroBox.image2 || "").trim() || "/logo.png2";
+  // Admin > Home hero slides: up to 10 pictures, each may be tied to a service whose picture it can reuse
+  const savedSlides = await prisma.siteConfig
+    .findUnique({ where: { key: HERO_SLIDES_KEY } })
+    .then((r) => normalizeHeroSlides(r?.value))
+    .catch(() => []);
+  const sliderSlides = savedSlides
+    .map((sl) => {
+      const svc = services.find((v) => v.slug === sl.serviceSlug);
+      return { sl, svc, image: sl.imageUrl || svc?.imageUrl || "" };
+    })
+    .filter(({ sl, image }) => slideIsShowable(sl, image))
+    .map(({ sl, svc, image }) => ({
+      id: sl.id,
+      image,
+      title: (isHindi ? sl.titleHi || sl.titleEn : sl.titleEn || sl.titleHi).trim(),
+      desc: (isHindi ? sl.descHi || sl.descEn : sl.descEn || sl.descHi).trim(),
+      youtubeUrl: sl.youtubeUrl,
+      serviceHref: svc ? `/services/${svc.slug}` : "",
+    }));
+
+  const heroImg1 = String(heroBox.image1 || "").trim() || "/ref/hero-1.webp";
+  const heroImg2 = String(heroBox.image2 || "").trim() || "/ref/hero-2.webp";
   const overlay = Math.min(90, Math.max(0, Number(heroBox.overlay ?? 60)));
   const cta1Url = link(heroBox.cta1Url, "/services");
   const cta2Url = link(heroBox.cta2Url, "/kundli");
@@ -165,6 +187,9 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       )}
 
       {/* Hero */}
+      {sliderSlides.length > 0 ? (
+        <HeroSlider slides={sliderSlides} isHindi={isHindi} overlay={overlay} />
+      ) : (
       <section id="home" className="relative min-h-[560px] lg:min-h-[680px] bg-maroon-deep overflow-hidden">
         {/* eslint-disable @next/next/no-img-element */}
         <img src={heroImg1} alt="" className="hero-fade-a absolute inset-0 h-full w-full object-cover" />
@@ -210,6 +235,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
           </div>
         </div>
       </section>
+      )}
 
       {/* Three quick cards */}
       {on("showQuickCards") && (

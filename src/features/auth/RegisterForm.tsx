@@ -54,7 +54,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
 
       // Automatically redirect to Sign In with the phone pre-filled
       router.push(
-        `/${locale}/auth/signin/${portal}?callbackUrl=${encodeURIComponent(callbackUrl)}`
+        `/${locale}/auth/signin/${portal}?callbackUrl=${encodeURIComponent(callbackUrl)}&registered=1`
       );
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Failed to register account");

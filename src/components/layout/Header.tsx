@@ -240,7 +240,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 min-w-0 shrink sm:shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={logoUrl || "/Logo.jpeg"}
+              src={logoUrl || "/logo-small.webp"}
               alt={tCommon("siteNameHi")}
               width={64}
               height={48}

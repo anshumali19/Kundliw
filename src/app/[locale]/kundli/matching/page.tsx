@@ -13,7 +13,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     alternates: pageAlternates(locale, "/kundli/matching"),
     title: isHindi ? "कुंडली मिलान • महर्षि कणाद ज्योतिष केंद्र" : "Kundli Matching • Maharshi Kanad Jyotish Kendra",
-    description: isHindi ? "वर-कन्या के अष्टकूट गुण मिलान और मांगलिक विचार।" : "Ashtakoot guna matching and Manglik check for the couple.",
+    description: isHindi ? "विवाह से पहले वर-कन्या के अष्टकूट गुण मिलान और मांगलिक विचार, या केंद्र से विस्तृत कुंडली मिलान रिपोर्ट।" : "Ashtakoot guna matching and Manglik check for the couple before marriage, or a detailed matching report from the Kendra.",
   };
 }
 

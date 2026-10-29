@@ -27,8 +27,8 @@ export async function generateMetadata(props: GalleryPageProps): Promise<Metadat
       ? "चित्र एवं वीडियो दीर्घा • महर्षि कणाद ज्योतिष केंद्र"
       : "Gallery • Maharshi Kanad Jyotish Kendra",
     description: isHindi
-      ? "महर्षि कणाद ज्योतिष केंद्र की तस्वीरें और वीडियो।"
-      : "Photos and videos from Maharshi Kanad Jyotish Kendra.",
+      ? "महर्षि कणाद ज्योतिष केंद्र की तस्वीरें और वीडियो: पूजा, अनुष्ठान, यात्राएँ और केंद्र के कार्यक्रमों की झलक।"
+      : "Photos and videos from Maharshi Kanad Jyotish Kendra: pujas, rituals, pilgrimages and a glimpse of the Kendra's events.",
   };
 }
 

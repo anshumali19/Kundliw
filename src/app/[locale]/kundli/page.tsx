@@ -13,7 +13,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     alternates: pageAlternates(locale, "/kundli"),
     title: isHindi ? "निःशुल्क जन्म कुंडली • महर्षि कणाद ज्योतिष केंद्र" : "Free Kundli (Birth Chart) • Maharshi Kanad Jyotish Kendra",
-    description: isHindi ? "जन्म विवरण भरकर अपनी वास्तविक जन्म कुंडली बनाएँ।" : "Enter your birth details to create your real birth chart.",
+    description: isHindi ? "जन्म तिथि, समय और स्थान भरकर अपनी वास्तविक जन्म कुंडली बनाएँ, और चाहें तो केंद्र से विस्तृत कुंडली बनवाएँ।" : "Enter your date, time and place of birth to create your real birth chart, or order a detailed Kundli from the Kendra.",
   };
 }
 

@@ -69,6 +69,7 @@ const GROUPS: Array<{ en: string; hi: string; items: Item[] }> = [
     hi: "वेबसाइट",
     items: [
       { href: "/admin/website", en: "Website settings", hi: "वेबसाइट सेटिंग", icon: Globe },
+      { href: "/admin/hero-slides", en: "Home hero slides", hi: "होम हीरो स्लाइड", icon: ImageIcon },
       { href: "/admin/banners", en: "Banners", hi: "बैनर", icon: ImageIcon },
       { href: "/admin/marquee", en: "Scrolling notice", hi: "स्क्रॉलिंग सूचना", icon: Megaphone },
       { href: "/admin/pages", en: "Pages & legal", hi: "पेज व कानूनी", icon: FileText },

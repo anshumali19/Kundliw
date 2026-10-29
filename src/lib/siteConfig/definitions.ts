@@ -414,7 +414,7 @@ export const SECTIONS: SectionDef[] = [
       ...bi("title", "Name shown", "दिखने वाला नाम", "text", 80),
       ...bi("tagline", "Line under the name", "नाम के नीचे की पंक्ति", "text", 120),
       ...bi("sub", "Small capital line", "छोटी पंक्ति", "text", 80),
-      { key: "logoImage", en: "Photo of Maharshi Kanad shown under the Om (clear it to hide)", hi: "ओम के नीचे महर्षि कणाद की फोटो (हटाने के लिए खाली करें)", type: "image", def: "/logo-intro.jpg" },
+      { key: "logoImage", en: "Photo of Maharshi Kanad shown under the Om (clear it to hide)", hi: "ओम के नीचे महर्षि कणाद की फोटो (हटाने के लिए खाली करें)", type: "image", def: "/logo-intro-small.jpg" },
       { key: "symbol", en: "Symbol in the circle", hi: "सर्कल का चिह्न", type: "text", max: 4, def: "ॐ" },
     ],
   },
