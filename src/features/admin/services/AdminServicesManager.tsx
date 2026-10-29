@@ -1091,6 +1091,13 @@ export function AdminServicesManager({
               </button>
             </div>
 
+            <div className="mt-4 rounded-lg border border-gold/60 bg-gold/15 p-3 text-xs text-secondary leading-relaxed">
+              <div className="font-bold mb-1">{isHindi ? "पैकेज और प्लान कहाँ जोड़ें" : "Where do packages and plans go?"}</div>
+              {isHindi
+                ? "यह फ़ॉर्म केवल सेवा की जानकारी के लिए है। सेवा सहेजने के बाद, सूची में उस सेवा के कार्ड पर 'पैकेज जोड़ें' और 'संस्करण जोड़ें (Plan)' बटन दबाएँ। क्रम: सेवा → पैकेज → प्लान। पैकेज और प्लान की कोई सीमा नहीं है। ऑफ़र 'प्रोमो कोड' पेज से जोड़ें।"
+                : "This form is only for the service itself. Save it, then on that service's card in the list press 'Add Package' and 'Add Plan'. Order: Service → Package → Plan. There is no limit on the number of packages or plans. Offers are added from the 'Promo codes' page."}
+            </div>
+
             <form onSubmit={handleSaveService} className="mt-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
