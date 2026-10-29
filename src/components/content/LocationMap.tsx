@@ -17,9 +17,24 @@ export function LocationMap({
   compact?: boolean;
   onDark?: boolean;
 }) {
-  const src = mapIframeSrc(settings);
-  if (!src) return null;
-  const directions = directionsUrl(settings);
+  const addr = (address || "").trim();
+  // No saved pin or embed: fall back to searching the typed address so the map still shows
+  const src = mapIframeSrc(settings) || (settings.mapEnabled !== false && addr ? `https://maps.google.com/maps?q=${encodeURIComponent(addr)}&output=embed` : null);
+  const directions = directionsUrl(settings) || (addr ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}` : null);
+  if (!src) {
+    if (settings.mapEnabled === false) return null;
+    return (
+      <section aria-label={isHindi ? "हमारा स्थान" : "Our location"} className="space-y-2">
+        <div className="flex items-center gap-2 font-bold text-base text-secondary">
+          <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
+          <span>{title || (isHindi ? "हमारा स्थान" : "Our location")}</span>
+        </div>
+        <div className="rounded-xl border border-dashed border-outline-variant bg-surface-container h-72 sm:h-80 flex items-center justify-center p-6 text-center text-sm text-on-surface-variant">
+          {isHindi ? "नक्शा जल्द उपलब्ध होगा। (एडमिन > सेटिंग्स में पता या मैप लिंक जोड़ें)" : "Map coming soon. (Admin: add the address or map link in Settings.)"}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section aria-label={isHindi ? "हमारा स्थान" : "Our location"} className="space-y-2">
