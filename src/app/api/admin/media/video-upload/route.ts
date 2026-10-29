@@ -23,17 +23,18 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!TOKEN()) {
-      return NextResponse.json({ error: "Video upload is not set up yet. Add VIDEO_BLOB_READ_WRITE_TOKEN." }, { status: 503 });
-    }
-    const body = (await request.json()) as HandleUploadBody;
+    const body = (await request.json().catch(() => ({}))) as HandleUploadBody;
 
-    // Only token requests come from a signed-in admin; Vercel's own "upload finished" call is signed by Vercel.
-    if (body.type === "blob.generate-client-token") {
+    // Everything needs a signed-in admin, except Vercel's own signed "upload finished" call.
+    if (body.type !== "blob.upload-completed") {
       const guard = await guardApiAdmin();
       if (!guard.ok) return guard.errorResponse;
       const csrf = validateCsrfOrigin(request);
       if (!csrf.isValid) return csrf.errorResponse;
+    }
+
+    if (!TOKEN()) {
+      return NextResponse.json({ error: "Video upload is not set up yet. Add VIDEO_BLOB_READ_WRITE_TOKEN." }, { status: 503 });
     }
 
     const json = await handleUpload({
