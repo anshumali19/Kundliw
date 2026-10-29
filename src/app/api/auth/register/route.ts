@@ -4,9 +4,16 @@ import { registerSchema } from "@/lib/auth/validation";
 import * as bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
 import { ensureAssociateProfile, getAssociateRules } from "@/lib/associates/service";
+import { checkDbRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Stops bots from creating accounts in bulk
+    const limit = await checkDbRateLimit({ scope: "REGISTER_IP", identifier: getClientIp(request.headers), windowSeconds: 3600, maxAllowed: 10 });
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "Too many sign-up attempts. Please try again later." }, { status: 429 });
+    }
+
     const body = await request.json();
     const parsed = registerSchema.safeParse(body);
 

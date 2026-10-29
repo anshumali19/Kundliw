@@ -63,6 +63,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ path:
       headers: {
         "Content-Type": mimeType,
         "Content-Length": buffer.length.toString(),
+        "X-Content-Type-Options": "nosniff",
         "Cache-Control": storageKey.startsWith("payment-proofs/") ? "private, max-age=3600" : "public, max-age=86400",
       },
     });

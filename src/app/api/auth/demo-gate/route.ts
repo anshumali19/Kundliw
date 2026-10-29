@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
+import { checkDbRateLimit, getClientIp } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +14,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, message: "Demo gate not active" });
     }
 
-    if (password !== expectedPassword) {
+    const limit = await checkDbRateLimit({ scope: "DEMOGATE_IP", identifier: getClientIp(req.headers), windowSeconds: 900, maxAllowed: 10 });
+    if (!limit.allowed) {
+      return NextResponse.json({ success: false, error: "Too many attempts. Please try again later." }, { status: 429 });
+    }
+
+    const given = Buffer.from(String(password ?? ""));
+    const want = Buffer.from(expectedPassword);
+    if (given.length !== want.length || !timingSafeEqual(given, want)) {
       return NextResponse.json(
         { success: false, error: "Invalid demo password" },
         { status: 401 }
