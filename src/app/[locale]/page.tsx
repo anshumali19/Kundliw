@@ -9,6 +9,7 @@ import { RichText } from "@/components/content/RichText";
 import { BannerSlot } from "@/components/banners/BannerSlot";
 import { Band, SectionHead, rupees } from "@/components/home/HomeParts";
 import { HeroSlider } from "@/components/home/HeroSlider";
+import { HomeTrustBands, HomeMoreBands } from "@/components/home/HomeExtras";
 import { HERO_SLIDES_KEY, normalizeHeroSlides, slideIsShowable } from "@/lib/content/heroSlides";
 import { KundliRequestForm } from "@/components/home/KundliRequestForm";
 import { whatsappLink } from "@/lib/content/whatsapp";
@@ -355,6 +356,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         </Band>
       )}
 
+      <HomeTrustBands locale={locale} />
+
       {/* All services */}
       {on("showServices") && (
         <Band id="services" tone="soft">
@@ -648,6 +651,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
           </div>
         </Band>
       )}
+
+      <HomeMoreBands locale={locale} />
 
       {/* FAQ */}
       {on("showFaq") && faqList.length > 0 && (
