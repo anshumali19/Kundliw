@@ -1,10 +1,6 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { prisma } from "@/lib/prisma";
-import {
-  AdminVaultManager,
-  SerializedVaultFile,
-  UserOption,
-} from "@/features/admin/components/AdminVaultManager";
+import { searchVault } from "@/lib/vault/search";
+import { AdminVaultManager } from "@/features/admin/components/AdminVaultManager";
 
 interface AdminVaultPageProps {
   params: Promise<{
@@ -24,48 +20,7 @@ export default async function AdminVaultPage(props: AdminVaultPageProps) {
   await requireAdmin("/admin/vault", locale);
   const isHindi = locale === "hi";
 
-  const [rawFiles, rawUsers] = await Promise.all([
-    prisma.vaultFile.findMany({
-      orderBy: { uploadedAt: "desc" },
-      include: {
-        user: true,
-        order: true,
-      },
-      take: 100,
-    }),
-    prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        orders: {
-          select: { id: true, orderNumber: true },
-        },
-      },
-      take: 200,
-    }),
-  ]);
-
-  const files: SerializedVaultFile[] = rawFiles.map((f) => ({
-    id: f.id,
-    titleEn: f.titleEn,
-    titleHi: f.titleHi,
-    fileName: f.fileName,
-    fileSize: f.fileSize,
-    uploadedAt: f.uploadedAt.toISOString(),
-    userName: f.user.name || "Customer",
-    userEmail: f.user.email,
-    userPhone: f.user.phone,
-    orderNumber: f.order?.orderNumber || null,
-    mimeType: f.mimeType,
-    uploadedByRole: f.uploadedByRole,
-  }));
-
-  const users: UserOption[] = rawUsers.map((u) => ({
-    id: u.id,
-    name: u.name || "Customer",
-    email: u.email,
-    phone: u.phone,
-    orders: u.orders,
-  }));
+  const { files, users } = await searchVault("", "all");
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left space-y-6">

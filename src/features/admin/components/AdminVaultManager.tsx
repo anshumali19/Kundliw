@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { VaultFileActions } from "@/features/vault/VaultFileActions";
 import { SelectedFilePreview } from "@/components/content/FileViewer";
 import { DOCUMENT_ACCEPT } from "@/lib/storage/fileTypes";
@@ -22,6 +22,7 @@ export interface SerializedVaultFile {
   fileName: string;
   fileSize: number;
   uploadedAt: string;
+  userId?: string;
   userName: string;
   userEmail?: string | null;
   userPhone?: string | null;
@@ -46,12 +47,29 @@ interface AdminVaultManagerProps {
 
 export function AdminVaultManager({
   files: initialFiles,
-  users,
+  users: initialUsers,
   locale,
 }: AdminVaultManagerProps) {
   const isHindi = locale === "hi";
   const [files, setFiles] = useState<SerializedVaultFile[]>(initialFiles);
-  const [search, setSearch] = useState("");
+  const [users, setUsers] = useState<UserOption[]>(initialUsers);
+
+  // Searching: by customer ID, name, mobile number or e-mail
+  type Field = "all" | "id" | "name" | "mobile" | "email";
+  const [listQuery, setListQuery] = useState("");
+  const [listField, setListField] = useState<Field>("all");
+  const [userQuery, setUserQuery] = useState("");
+  const [userField, setUserField] = useState<Field>("all");
+  const [listBusy, setListBusy] = useState(false);
+  const firstRun = useRef(true);
+  const userFirst = useRef(true);
+  const fieldLabels: Array<[Field, string, string]> = [
+    ["all", "All fields", "सभी"],
+    ["id", "Customer ID", "ग्राहक ID"],
+    ["name", "Name", "नाम"],
+    ["mobile", "Mobile no.", "मोबाइल नं."],
+    ["email", "Email / Gmail", "ईमेल / जीमेल"],
+  ];
 
   // Form state
   const [selectedUserId, setSelectedUserId] = useState(users[0]?.id || "");
@@ -65,16 +83,53 @@ export function AdminVaultManager({
 
   const selectedUser = users.find((u) => u.id === selectedUserId);
 
-  const filteredFiles = files.filter((f) => {
-    const q = search.toLowerCase();
-    return (
-      f.titleEn.toLowerCase().includes(q) ||
-      f.titleHi.toLowerCase().includes(q) ||
-      f.fileName.toLowerCase().includes(q) ||
-      f.userName.toLowerCase().includes(q) ||
-      (f.orderNumber && f.orderNumber.toLowerCase().includes(q))
-    );
-  });
+  const runSearch = async (q: string, field: Field) => {
+    const res = await fetch(`/api/admin/vault/search?q=${encodeURIComponent(q)}&field=${field}`);
+    if (!res.ok) throw new Error("Search failed");
+    return (await res.json()) as { files: SerializedVaultFile[]; users: UserOption[] };
+  };
+
+  // File list: search as the admin types
+  useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
+    }
+    const t = setTimeout(async () => {
+      setListBusy(true);
+      try {
+        setFiles((await runSearch(listQuery, listField)).files);
+      } catch {
+        setError(isHindi ? "खोज नहीं हो सकी।" : "Search could not be completed.");
+      } finally {
+        setListBusy(false);
+      }
+    }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listQuery, listField]);
+
+  // Customer picker: narrow the list of customers
+  useEffect(() => {
+    if (userFirst.current) {
+      userFirst.current = false;
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const found = (await runSearch(userQuery, userField)).users;
+        setUsers(found);
+        setSelectedUserId((cur) => (found.some((u) => u.id === cur) ? cur : found[0]?.id || ""));
+        setSelectedOrderId("");
+      } catch {
+        /* keep the current list */
+      }
+    }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userQuery, userField]);
+
+  const filteredFiles = files;
 
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +180,7 @@ export function AdminVaultManager({
         fileName: data.vaultFile.fileName,
         fileSize: data.vaultFile.fileSize,
         uploadedAt: data.vaultFile.uploadedAt,
+        userId: selectedUser?.id,
         userName: selectedUser?.name || "Customer",
         userEmail: selectedUser?.email,
         userPhone: selectedUser?.phone,
@@ -177,6 +233,27 @@ export function AdminVaultManager({
               <label className="block text-xs font-bold uppercase text-on-surface-variant mb-1">
                 {isHindi ? "लक्षित ग्राहक चुनें *" : "Select Target Customer *"}
               </label>
+              <div className="flex gap-2 mb-2">
+                <select
+                  value={userField}
+                  onChange={(e) => setUserField(e.target.value as Field)}
+                  aria-label={isHindi ? "खोज का प्रकार" : "Search by"}
+                  className="min-h-[44px] px-2 bg-surface border border-outline-variant rounded text-xs font-semibold focus:border-secondary focus:outline-none"
+                >
+                  {fieldLabels.map(([id, en, hi]) => (
+                    <option key={id} value={id}>
+                      {isHindi ? hi : en}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="search"
+                  value={userQuery}
+                  onChange={(e) => setUserQuery(e.target.value)}
+                  placeholder={isHindi ? "ID, नाम, मोबाइल या ईमेल से ग्राहक खोजें" : "Find customer by ID, name, mobile or email"}
+                  className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
+                />
+              </div>
               <select
                 value={selectedUserId}
                 onChange={(e) => {
@@ -185,12 +262,16 @@ export function AdminVaultManager({
                 }}
                 className="w-full min-h-[44px] px-3 py-2 bg-surface border border-outline-variant rounded text-xs font-semibold focus:border-secondary focus:outline-none"
               >
+                {users.length === 0 && <option value="">{isHindi ? "कोई ग्राहक नहीं मिला" : "No customer found"}</option>}
                 {users.map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.name} {u.phone ? `(${u.phone})` : ""} {u.email ? `• ${u.email}` : ""}
+                    {u.name} {u.phone ? `(${u.phone})` : ""} {u.email ? `• ${u.email}` : ""} • ID {u.id.slice(-8)}
                   </option>
                 ))}
               </select>
+              <p className="text-[11px] text-on-surface-variant mt-1">
+                {users.length} {isHindi ? "ग्राहक" : "customers"}
+              </p>
             </div>
 
             {/* Target Order (optional) */}
@@ -290,15 +371,30 @@ export function AdminVaultManager({
             </span>
           </div>
 
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-3 w-4 h-4 text-on-surface-variant" />
-            <input
-              type="text"
-              placeholder={isHindi ? "शीर्षक, ग्राहक या फाइल से खोजें..." : "Search documents..."}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full min-h-[44px] pl-9 pr-3 py-2 bg-surface border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
-            />
+          <div className="flex w-full sm:w-auto gap-2">
+            <select
+              value={listField}
+              onChange={(e) => setListField(e.target.value as Field)}
+              aria-label={isHindi ? "खोज का प्रकार" : "Filter by"}
+              className="min-h-[44px] px-2 bg-surface border border-outline-variant rounded text-xs font-semibold focus:border-secondary focus:outline-none"
+            >
+              {fieldLabels.map(([id, en, hi]) => (
+                <option key={id} value={id}>
+                  {isHindi ? hi : en}
+                </option>
+              ))}
+            </select>
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3 top-3 w-4 h-4 text-on-surface-variant" />
+              <input
+                type="search"
+                placeholder={isHindi ? "ID, नाम, मोबाइल, ईमेल या शीर्षक से खोजें..." : "Search by ID, name, mobile, email or title..."}
+                value={listQuery}
+                onChange={(e) => setListQuery(e.target.value)}
+                className="w-full min-h-[44px] pl-9 pr-3 py-2 bg-surface border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none"
+              />
+            </div>
+            {listBusy && <span className="self-center text-[11px] text-on-surface-variant">…</span>}
           </div>
         </div>
 
@@ -326,6 +422,9 @@ export function AdminVaultManager({
                         <UserIcon className="w-3 h-3 inline mr-1" />
                         {doc.userName}
                       </span>
+                      {doc.userPhone && <span>{doc.userPhone}</span>}
+                      {doc.userEmail && <span>{doc.userEmail}</span>}
+                      {doc.userId && <span className="font-mono">ID {doc.userId.slice(-8)}</span>}
                       {doc.orderNumber && (
                         <span className="font-mono text-primary font-bold">
                           Ref: {doc.orderNumber}
