@@ -148,6 +148,10 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       desc: (isHindi ? sl.descHi || sl.descEn : sl.descEn || sl.descHi).trim(),
       youtubeUrl: sl.youtubeUrl,
       serviceHref: svc ? `/services/${svc.slug}` : "",
+      titleColor: sl.titleColor,
+      descColor: sl.descColor,
+      animation: sl.animation,
+      animSpeed: sl.animSpeed,
     }));
 
   const heroImg1 = String(heroBox.image1 || "").trim() || "/ref/hero-1.webp";

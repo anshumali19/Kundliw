@@ -16,7 +16,18 @@ export interface HeroSlide {
   /** Slug of the service this slide promotes. Its picture is used when the slide has none. */
   serviceSlug: string;
   isActive: boolean;
+  /** Heading colour (#rrggbb); empty keeps the theme gold */
+  titleColor: string;
+  /** Description text colour (#rrggbb); empty keeps the theme text colour */
+  descColor: string;
+  /** How the heading and description appear when the slide shows */
+  animation: HeroAnimation;
+  /** Animation speed */
+  animSpeed: "slow" | "normal" | "fast";
 }
+
+export const HERO_ANIMATIONS = ["none", "rise", "fade", "slide", "zoom", "words", "letters", "wave", "typewriter"] as const;
+export type HeroAnimation = (typeof HERO_ANIMATIONS)[number];
 
 const text = (max: number) => z.string().trim().max(max).default("");
 
@@ -40,6 +51,10 @@ const slideSchema = z.object({
     .refine((v) => v === "" || isWebUrl(v), "YouTube link must start with https://"),
   serviceSlug: text(120),
   isActive: z.boolean().default(true),
+  titleColor: z.string().trim().default("").refine((v) => v === "" || /^#[0-9a-fA-F]{6}$/.test(v), "Colour must look like #FFC105"),
+  descColor: z.string().trim().default("").refine((v) => v === "" || /^#[0-9a-fA-F]{6}$/.test(v), "Colour must look like #261B17"),
+  animation: z.enum(HERO_ANIMATIONS).default("rise"),
+  animSpeed: z.enum(["slow", "normal", "fast"]).default("normal"),
 });
 
 export const heroSlidesSchema = z.object({ items: z.array(slideSchema).max(MAX_HERO_SLIDES, `At most ${MAX_HERO_SLIDES} slides`) });

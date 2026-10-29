@@ -170,3 +170,22 @@ body:has(.fixed.inset-0[class*="z-50"]) { overflow: hidden; }
 .strip-marquee-track { animation: strip-scroll 28s linear infinite; will-change: transform; }
 .strip-marquee:hover .strip-marquee-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .strip-marquee-track { animation: none; } }
+
+/* Home hero slides: heading motion chosen by the admin (kinetic typography) */
+@keyframes ktWord { from { opacity: 0; transform: translateY(0.6em) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes ktLetter { from { opacity: 0; transform: translateY(0.7em) rotate(6deg); } to { opacity: 1; transform: none; } }
+@keyframes ktWave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.18em); } }
+@keyframes ktFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ktSlide { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: none; } }
+@keyframes ktZoom { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: none; } }
+@keyframes ktType { from { width: 0; } to { width: 100%; } }
+.kt-word, .kt-letter { opacity: 0; animation-fill-mode: both; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
+.kt-word { animation-name: ktWord; }
+.kt-letter { animation-name: ktLetter; }
+.kt-wave { animation: ktWave ease-in-out infinite; }
+.kt-fade { animation: ktFade both; }
+.kt-slide { animation: ktSlide both cubic-bezier(0.2, 0.7, 0.2, 1); }
+.kt-zoom { animation: ktZoom both cubic-bezier(0.2, 0.7, 0.2, 1); }
+.kt-type { animation-name: ktType; animation-fill-mode: both; }
+.kt-desc { animation-name: ktFade; animation-fill-mode: both; }
+@media (prefers-reduced-motion: reduce) { .kt-word, .kt-letter, .kt-wave, .kt-fade, .kt-slide, .kt-zoom, .kt-type, .kt-desc { animation: none; opacity: 1; width: auto; } }

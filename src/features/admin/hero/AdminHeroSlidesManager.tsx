@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, CheckCircle2, AlertCircle, Eye, EyeOff, Loader2, Plus, Trash2 } from "lucide-react";
 import { ImageUrlField } from "@/components/admin/MediaFields";
-import { HeroSlide, MAX_HERO_SLIDES } from "@/lib/content/heroSlides";
+import { HeroSlide, HeroAnimation, MAX_HERO_SLIDES } from "@/lib/content/heroSlides";
 
 interface ServiceOption {
   slug: string;
@@ -28,7 +28,23 @@ const blank = (): HeroSlide => ({
   youtubeUrl: "",
   serviceSlug: "",
   isActive: true,
+  titleColor: "",
+  descColor: "",
+  animation: "rise",
+  animSpeed: "normal",
 });
+
+const ANIMATIONS: Array<{ id: HeroAnimation; en: string; hi: string }> = [
+  { id: "none", en: "None (no movement)", hi: "कोई नहीं" },
+  { id: "rise", en: "Rise up", hi: "नीचे से ऊपर" },
+  { id: "fade", en: "Fade in", hi: "धीरे से उभरना" },
+  { id: "slide", en: "Slide in from left", hi: "बाएँ से आना" },
+  { id: "zoom", en: "Zoom in", hi: "ज़ूम इन" },
+  { id: "words", en: "Word by word", hi: "शब्द-दर-शब्द" },
+  { id: "letters", en: "Letter by letter (kinetic)", hi: "अक्षर-दर-अक्षर (किनेटिक)" },
+  { id: "wave", en: "Waving letters (kinetic)", hi: "लहराते अक्षर (किनेटिक)" },
+  { id: "typewriter", en: "Typewriter", hi: "टाइपराइटर" },
+];
 
 export function AdminHeroSlidesManager({ locale, services }: { locale: string; services: ServiceOption[] }) {
   const isHindi = locale === "hi";
@@ -166,6 +182,52 @@ export function AdminHeroSlidesManager({ locale, services }: { locale: string; s
                 <div>
                   <label className={label}>{tr("Description (Hindi)", "विवरण (हिंदी)")}</label>
                   <textarea rows={3} className={input} maxLength={600} value={s.descHi} onChange={(e) => update(i, { descHi: e.target.value })} />
+                </div>
+                <div className="rounded-lg border border-outline-variant/60 p-3 space-y-3">
+                  <div className="text-xs font-bold uppercase text-secondary">{tr("Text colour and animation", "लेख का रंग और एनिमेशन")}</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {([
+                      ["titleColor", tr("Heading colour", "शीर्षक का रंग"), "#D8A341"],
+                      ["descColor", tr("Description colour", "विवरण का रंग"), "#47342D"],
+                    ] as const).map(([key, text, fallback]) => (
+                      <div key={key} className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          aria-label={text}
+                          value={s[key] || fallback}
+                          onChange={(e) => update(i, { [key]: e.target.value } as Partial<HeroSlide>)}
+                          className="w-12 h-11 rounded border border-outline-variant bg-transparent cursor-pointer"
+                        />
+                        <span className="text-xs font-semibold">{text}</span>
+                        {s[key] && (
+                          <button type="button" className="ml-auto text-xs underline text-secondary min-h-[44px]" onClick={() => update(i, { [key]: "" } as Partial<HeroSlide>)}>
+                            {tr("Use default", "डिफ़ॉल्ट")}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className={label}>{tr("Heading animation", "शीर्षक एनिमेशन")}</label>
+                      <select className={input} value={s.animation} onChange={(e) => update(i, { animation: e.target.value as HeroAnimation })}>
+                        {ANIMATIONS.map((a) => (
+                          <option key={a.id} value={a.id}>
+                            {isHindi ? a.hi : a.en}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={label}>{tr("Animation speed", "एनिमेशन की गति")}</label>
+                      <select className={input} value={s.animSpeed} onChange={(e) => update(i, { animSpeed: e.target.value as HeroSlide["animSpeed"] })}>
+                        <option value="slow">{tr("Slow", "धीमी")}</option>
+                        <option value="normal">{tr("Normal", "सामान्य")}</option>
+                        <option value="fast">{tr("Fast", "तेज़")}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-xs text-on-surface-variant">{tr("Leave the colours on default to follow the site theme. The description fades in after the heading.", "रंग डिफ़ॉल्ट रखने पर साइट की थीम के अनुसार दिखेंगे। विवरण शीर्षक के बाद धीरे से उभरता है।")}</p>
                 </div>
               </div>
             </div>

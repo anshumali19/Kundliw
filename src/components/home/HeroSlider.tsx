@@ -12,6 +12,57 @@ export interface HeroSlideView {
   youtubeUrl: string;
   /** Page of the linked service, when one is chosen */
   serviceHref: string;
+  titleColor: string;
+  descColor: string;
+  animation: string;
+  animSpeed: "slow" | "normal" | "fast";
+}
+
+const SPEED: Record<string, number> = { slow: 1.6, normal: 1, fast: 0.55 };
+
+/** Heading with the admin's chosen motion: whole block, word by word, letter by letter, wave or typewriter. */
+function KineticTitle({ text, animation, speed, color }: { text: string; animation: string; speed: number; color: string }) {
+  const style = color ? { color } : undefined;
+  const cls = "font-serif font-bold text-3xl sm:text-5xl lg:text-6xl leading-[1.1] mb-5 text-gold drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]";
+  if (animation === "words" || animation === "letters" || animation === "wave") {
+    const words = text.split(" ");
+    let n = 0;
+    return (
+      <h1 className={cls} style={style} aria-label={text}>
+        {words.map((w, wi) => (
+          <span key={wi} aria-hidden="true" className="inline-block whitespace-nowrap mr-[0.28em]">
+            {animation === "words" ? (
+              <span className="kt-word inline-block" style={{ animationDelay: `${(wi * 0.16 * speed).toFixed(2)}s`, animationDuration: `${(0.7 * speed).toFixed(2)}s` }}>{w}</span>
+            ) : (
+              Array.from(w).map((ch, ci) => {
+                const d = (n++ * 0.045 * speed).toFixed(2);
+                return (
+                  <span key={ci} className={animation === "wave" ? "kt-wave inline-block" : "kt-letter inline-block"} style={{ animationDelay: `${d}s`, animationDuration: `${(animation === "wave" ? 1.6 : 0.6) * speed}s` }}>
+                    {ch}
+                  </span>
+                );
+              })
+            )}
+          </span>
+        ))}
+      </h1>
+    );
+  }
+  if (animation === "typewriter") {
+    return (
+      <h1 className={cls} style={style} aria-label={text}>
+        <span aria-hidden="true" className="kt-type inline-block max-w-full overflow-hidden whitespace-nowrap align-bottom border-r-4 border-current" style={{ animationDuration: `${(Math.max(1.2, text.length * 0.06) * speed).toFixed(2)}s`, animationTimingFunction: `steps(${Math.max(8, text.length)}, end)` }}>
+          {text}
+        </span>
+      </h1>
+    );
+  }
+  const one = animation === "fade" ? "kt-fade" : animation === "slide" ? "kt-slide" : animation === "zoom" ? "kt-zoom" : animation === "rise" ? "hero-rise" : "";
+  return (
+    <h1 className={`${cls} ${one}`} style={{ ...style, animationDuration: one ? `${(0.9 * speed).toFixed(2)}s` : undefined }}>
+      {text}
+    </h1>
+  );
 }
 
 interface Props {
@@ -78,10 +129,15 @@ export function HeroSlider({ slides, isHindi, overlay, intervalMs = 6500 }: Prop
       />
 
       <div className="relative mx-auto flex min-h-[620px] sm:min-h-[600px] lg:min-h-[600px] w-full max-w-[1240px] flex-col justify-center px-5 sm:px-8 pt-12 pb-28">
-        <div key={cur.id} className="max-w-3xl hero-rise" aria-live="polite">
-          <h1 className="font-serif font-bold text-3xl sm:text-5xl lg:text-6xl leading-[1.1] mb-5 text-gold drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]">{cur.title}</h1>
+        <div key={cur.id} className="max-w-3xl" aria-live="polite">
+          <KineticTitle text={cur.title} animation={cur.animation} speed={SPEED[cur.animSpeed] ?? 1} color={cur.titleColor} />
           {cur.desc && (
-            <p className="max-w-2xl rounded-xl bg-white/85 px-4 py-3 text-[15px] sm:text-base leading-relaxed text-on-surface shadow-lg mb-6">{cur.desc}</p>
+            <p
+              className={`max-w-2xl rounded-xl bg-white/85 px-4 py-3 text-[15px] sm:text-base leading-relaxed text-on-surface shadow-lg mb-6 ${cur.animation === "none" ? "" : "kt-desc"}`}
+              style={{ ...(cur.descColor ? { color: cur.descColor } : {}), animationDelay: `${(0.35 * (SPEED[cur.animSpeed] ?? 1)).toFixed(2)}s`, animationDuration: `${(0.8 * (SPEED[cur.animSpeed] ?? 1)).toFixed(2)}s` }}
+            >
+              {cur.desc}
+            </p>
           )}
           <div className="flex flex-wrap items-center gap-3">
             {cur.serviceHref && (
