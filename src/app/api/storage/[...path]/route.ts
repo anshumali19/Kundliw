@@ -56,7 +56,32 @@ export async function GET(request: NextRequest, props: { params: Promise<{ path:
     }
 
     const storage = getStorageProvider();
-    const { buffer, mimeType } = await storage.getFile(storageKey);
+    const { buffer: original, mimeType } = await storage.getFile(storageKey);
+    let buffer = original;
+
+    // Public pictures can be asked for at a smaller size (?w=160): a 330 KB logo becomes a few KB.
+    // Private files (payment proofs, vault) are never resized or cached publicly.
+    const isPrivate = storageKey.startsWith("payment-proofs/") || storageKey.startsWith("vault/");
+    const wanted = Number(request.nextUrl.searchParams.get("w"));
+    if (!isPrivate && wanted > 0 && /^image\/(jpeg|png|webp)$/.test(mimeType)) {
+      const width = [96, 160, 320, 640, 1024, 1600].find((w) => w >= wanted) ?? 1600;
+      try {
+        const sharp = (await import("sharp")).default;
+        buffer = await sharp(original).rotate().resize({ width, withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
+        return new NextResponse(new Uint8Array(buffer), {
+          status: 200,
+          headers: {
+            "Content-Type": "image/webp",
+            "Content-Length": buffer.length.toString(),
+            "X-Content-Type-Options": "nosniff",
+            // File names carry a timestamp, so a changed picture always has a new address
+            "Cache-Control": "public, max-age=31536000, immutable",
+          },
+        });
+      } catch {
+        buffer = original; // resizing failed: send the original picture
+      }
+    }
 
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,

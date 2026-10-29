@@ -94,9 +94,9 @@ export function DateStrip({ data, isHindi, show = {} }: { data: DateStripData | 
           {(on("paksha") || on("tithi") || on("masa")) && (on("time") || on("day") || on("date")) && sep}
           {on("paksha") && <span className="shrink-0">{isHindi ? data.pakshaHi : data.pakshaEn}</span>}
           {on("tithi") && (
-            <span className="shrink-0 text-gold">
+            <span className="shrink-0 text-white">
               {isHindi ? data.tithiHi : data.tithiEn}
-              {data.tithiEnd && <span className="hidden md:inline text-on-maroon/80 font-medium">{isHindi ? ` (${data.tithiEnd} तक)` : ` (till ${data.tithiEnd})`}</span>}
+              {data.tithiEnd && <span className="hidden md:inline text-white font-medium">{isHindi ? ` (${data.tithiEnd} तक)` : ` (till ${data.tithiEnd})`}</span>}
             </span>
           )}
           {on("masa") && <span className="shrink-0">{isHindi ? data.masaHi : data.masaEn}</span>}
@@ -115,7 +115,7 @@ export function DateStrip({ data, isHindi, show = {} }: { data: DateStripData | 
 
   return (
     <div
-      className="strip-marquee flex-1 min-w-0 overflow-hidden text-[11px] sm:text-xs font-semibold text-on-maroon"
+      className="strip-marquee flex-1 min-w-0 overflow-hidden text-[11px] sm:text-xs font-semibold text-white"
       aria-label={isHindi ? "आज की तिथि और समय" : "Today's date and time"}
     >
       <div className="strip-marquee-track inline-flex items-center whitespace-nowrap">

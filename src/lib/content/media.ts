@@ -172,3 +172,9 @@ export function isSafeImageSrc(value: string | null | undefined): value is strin
   if (v.startsWith("//")) return false;
   return v.startsWith("/") || isWebUrl(v);
 }
+
+/** Asks for a smaller copy of a picture stored on this site (?w=160); other addresses are left alone. */
+export function sizedImage(src: string | null | undefined, width: number): string | undefined {
+  if (!src) return undefined;
+  return src.startsWith("/api/storage/") && !src.includes("?") ? `${src}?w=${width}` : src;
+}

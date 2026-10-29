@@ -22,6 +22,7 @@ import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { prisma } from "@/lib/prisma";
 import { isCorePageSlug } from "@/lib/content/pages";
+import { sizedImage } from "@/lib/content/media";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE_NAME, SITE_NAME_HI, SITE_URL } from "@/lib/seo";
 import "@/app/globals.css";
@@ -155,53 +156,78 @@ export default async function LocaleLayout(
     children
   } = props;
 
-  const messages = await getMessages();
-
-  const topBanners = await prisma.banner
-    .findMany({
-      where: { isActive: true, position: "TOP" },
-      orderBy: { orderIndex: "asc" },
-    })
-    .catch(() => []);
-
-  const bottomBanners = await prisma.banner
-    .findMany({
-      where: { isActive: true, position: "BOTTOM" },
-      orderBy: { orderIndex: "asc" },
-    })
-    .catch(() => []);
-
-  const marqueeItems = await prisma.marqueeItem
-    .findMany({
-      where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
-      select: {
-        id: true,
-        textEn: true,
-        textHi: true,
-        speedSec: true,
-        fontSize: true,
-        bgColor: true,
-        textColor: true,
-        position: true,
-      },
-    })
-    .catch(() => []);
-  const features = await getSection("features");
-  const panchang = await getDailyPanchang();
-  const social = (await getActiveSocialLinks()).map(({ id, name, url }) => ({ id, name, url }));
-  const toolsCfg = await getSection("tools");
-  const [themeCfg, topbarCfg, floatCfg, introCfg, menuRows] = await Promise.all([
+  // All of the layout's database reads run together instead of one after another
+  const [messages, topBanners, bottomBanners, marqueeItems, features, panchang, activeSocial, toolsCfg, menuPages, settings, catalogue, themeCfg, topbarCfg, floatCfg, introCfg, menuRows] = await Promise.all([
+    getMessages(),
+    prisma.banner
+        .findMany({
+          where: { isActive: true, position: "TOP" },
+          orderBy: { orderIndex: "asc" },
+        })
+        .catch(() => []),
+    prisma.banner
+        .findMany({
+          where: { isActive: true, position: "BOTTOM" },
+          orderBy: { orderIndex: "asc" },
+        })
+        .catch(() => []),
+    prisma.marqueeItem
+        .findMany({
+          where: { isActive: true },
+          orderBy: { orderIndex: "asc" },
+          select: {
+            id: true,
+            textEn: true,
+            textHi: true,
+            speedSec: true,
+            fontSize: true,
+            bgColor: true,
+            textColor: true,
+            position: true,
+          },
+        })
+        .catch(() => []),
+    getSection("features"),
+    getDailyPanchang(),
+    getActiveSocialLinks(),
+    getSection("tools"),
+    prisma.staticPage
+        .findMany({ where: { isActive: true, showInMenu: true }, orderBy: { updatedAt: "asc" }, select: { slug: true, titleEn: true, titleHi: true }, take: 12 })
+        .then((rows) => rows.filter((r) => !isCorePageSlug(r.slug)))
+        .catch(() => []),
+    prisma.adminSettings
+        .findFirst({
+          select: {
+            phone1: true,
+            email: true,
+            addressEn: true,
+            city: true,
+            whatsappNumber: true,
+            socialWhatsapp: true,
+            socialFacebook: true,
+            socialInstagram: true,
+            socialTwitter: true,
+            socialYoutube: true,
+          },
+        })
+        .catch(() => null),
+    prisma.service
+        .findMany({
+          where: { isActive: true },
+          orderBy: { orderIndex: "asc" },
+          select: { slug: true, titleEn: true, plans: { where: activePlanWhere, select: { titleEn: true, pricePaise: true } } },
+        })
+        .catch(() => []),
     getSection("theme"),
     getSection("topbar"),
     getSection("floating"),
     getSection("intro"),
     getLinkList("menu"),
   ]);
-  const menuPages = await prisma.staticPage
-    .findMany({ where: { isActive: true, showInMenu: true }, orderBy: { updatedAt: "asc" }, select: { slug: true, titleEn: true, titleHi: true }, take: 12 })
-    .then((rows) => rows.filter((r) => !isCorePageSlug(r.slug)))
-    .catch(() => []);
+  const social = activeSocial.map(({ id, name, url }) => ({ id, name, url }));
+
+
+
   const themeStyles = themeCss(themeCfg);
   const introOn = introCfg.enabled !== false;
   const hiddenTools = [
@@ -214,31 +240,8 @@ export default async function LocaleLayout(
   const topMarquee = marqueeItems.filter((m) => m.position === "TOP");
   const bottomMarquee = marqueeItems.filter((m) => m.position === "BOTTOM");
 
-  const settings = await prisma.adminSettings
-    .findFirst({
-      select: {
-        phone1: true,
-        email: true,
-        addressEn: true,
-        city: true,
-        whatsappNumber: true,
-        socialWhatsapp: true,
-        socialFacebook: true,
-        socialInstagram: true,
-        socialTwitter: true,
-        socialYoutube: true,
-      },
-    })
-    .catch(() => null);
 
   const sameAs = social.map((l) => l.url).filter((u) => /^https?:\/\//.test(u));
-  const catalogue = await prisma.service
-    .findMany({
-      where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
-      select: { slug: true, titleEn: true, plans: { where: activePlanWhere, select: { titleEn: true, pricePaise: true } } },
-    })
-    .catch(() => []);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -338,7 +341,7 @@ export default async function LocaleLayout(
               menu={menuRows.map((m) => ({ href: m.href, labelEn: m.labelEn, labelHi: m.labelHi }))}
               phone={settings?.phone1 ?? undefined}
               pages={menuPages.map((p) => ({ href: `/pages/${p.slug}`, labelEn: p.titleEn, labelHi: p.titleHi }))}
-              panchang={panchang} social={social} logoUrl={String((await getSection("logo")).logoUrl || "") || undefined} />
+              panchang={panchang} social={social} logoUrl={sizedImage(String((await getSection("logo")).logoUrl || ""), 160)} />
             <div className="pt-[116px] w-full max-w-full overflow-x-hidden">
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>

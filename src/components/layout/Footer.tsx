@@ -11,6 +11,7 @@ import { isCorePageSlug } from "@/lib/content/pages";
 import { LocationMap } from "@/components/content/LocationMap";
 import QRCode from "qrcode";
 import { ExternalLink, Phone, Mail, Clock, Globe, HelpCircle, MessageSquare, Headphones, Download, Smartphone } from "lucide-react";
+import { sizedImage } from "@/lib/content/media";
 
 export async function Footer() {
   const locale = await getLocale();
@@ -27,14 +28,14 @@ export async function Footer() {
   const pickG = (cfg: Record<string, string | boolean | number>, k: string) => String(cfg[k + (locale === "hi" ? "Hi" : "En")] || "").trim();
 
   // Fetch admin settings for live contact numbers, address, and social links
-  const settings = await prisma.adminSettings
+  const settingsP = prisma.adminSettings
     .findUnique({
       where: { id: "default" },
     })
     .catch(() => null);
 
   // Custom pages the admin chose to list under Quick Links
-  const footerPages = await prisma.staticPage
+  const footerPagesP = prisma.staticPage
     .findMany({
       where: { isActive: true, showInFooter: true },
       orderBy: { updatedAt: "asc" },
@@ -54,10 +55,12 @@ export async function Footer() {
     { slug: "rules-regulations", label: locale === "hi" ? "नियम एवं विनियम" : "Rules & Regulations" },
     { slug: "ephemeris-sources", label: t("ephemerisLink") },
   ];
-  const livePages = await prisma.staticPage
+  const livePagesP = prisma.staticPage
     .findMany({ where: { isActive: true, slug: { in: LEGAL_PAGES.flatMap((l) => [`legal/${l.slug}`, l.slug]) } }, select: { slug: true } })
     .then((rows) => new Set(rows.map((r) => r.slug.replace(/^legal\//, ""))))
     .catch(() => null);
+  // The three database reads run together
+  const [settings, footerPages, livePages] = await Promise.all([settingsP, footerPagesP, livePagesP]);
   const legalLinks = livePages ? LEGAL_PAGES.filter((l) => livePages.has(l.slug)) : LEGAL_PAGES.slice(0, 2);
 
   // Android app: the admin's Mobile app settings (Google Play, App Store, direct APK) or the older single link
@@ -152,7 +155,7 @@ export async function Footer() {
           <div className="space-y-3">
             <Link href="/" aria-label={t("title")} className="flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={String(logoCfg.logoUrl || "") || "/logo-small.webp"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
+              <img src={sizedImage(String(logoCfg.logoUrl || ""), 160) || "/logo-small.webp"} alt={t("title")} width={72} height={54} className="h-14 w-auto rounded-md bg-surface shrink-0" />
               <div className="flex flex-col">
                 <span className="font-serif text-base font-bold text-white leading-tight">
                   {t("title")}

@@ -212,10 +212,10 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
             {tb("showPanchangButton") && hideTools([{ href: "/panchang" }]).length > 0 && (
             <Link
               href="/panchang"
-              className="hidden sm:inline-flex items-center gap-1 rounded-full bg-[rgb(var(--btn-panchang-rgb,var(--gold-rgb)))] px-2.5 py-1 text-[11px] font-bold !text-[rgb(var(--on-btn-panchang-rgb,var(--on-gold-rgb)))] hover:opacity-90 whitespace-nowrap"
+              className="hidden sm:inline-flex items-center gap-1 rounded-full bg-[rgb(var(--btn-panchang-rgb,var(--saffron-rgb)))] px-2.5 py-1 text-[11px] font-bold !text-[rgb(var(--on-btn-panchang-rgb,var(--on-saffron-rgb)))] hover:opacity-90 whitespace-nowrap"
             >
               <BookOpen className="w-3 h-3 shrink-0" aria-hidden="true" />
-              <span className="!text-[rgb(var(--on-btn-panchang-rgb,var(--on-gold-rgb)))]">{tNav("panchangCalendar")}</span>
+              <span className="!text-[rgb(var(--on-btn-panchang-rgb,var(--on-saffron-rgb)))]">{tNav("panchangCalendar")}</span>
             </Link>
             )}
             {tb("showPhone") && phone && (

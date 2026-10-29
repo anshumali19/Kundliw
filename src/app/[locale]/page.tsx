@@ -62,7 +62,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const on = (k: string) => secCfg[k] !== false;
   const link = (v: unknown, fallback: string) => safeHref(String(v || ""))?.href ?? fallback;
 
-  const [settings, services, others, gallery, faqs, testimonials, leftBanners, rightBanners] = await Promise.all([
+  const [settings, services, others, gallery, faqs, testimonials, leftBanners, rightBanners, savedSlides] = await Promise.all([
     prisma.adminSettings
       .findUnique({
         where: { id: "default" },
@@ -82,6 +82,10 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     prisma.testimonial.findMany({ where: { isActive: true, isVerified: true }, orderBy: { orderIndex: "asc" }, take: 3 }).catch(() => []),
     prisma.banner.findMany({ where: { isActive: true, position: "LEFT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
     prisma.banner.findMany({ where: { isActive: true, position: "RIGHT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.siteConfig
+      .findUnique({ where: { key: HERO_SLIDES_KEY } })
+      .then((r) => normalizeHeroSlides(r?.value))
+      .catch(() => []),
   ]);
 
   const phone = settings?.phone1 || "+91 98279 91224";
@@ -132,10 +136,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const telHref = `tel:${phone.replace(/[^\d+]/g, "")}`;
 
   // Admin > Home hero slides: up to 10 pictures, each may be tied to a service whose picture it can reuse
-  const savedSlides = await prisma.siteConfig
-    .findUnique({ where: { key: HERO_SLIDES_KEY } })
-    .then((r) => normalizeHeroSlides(r?.value))
-    .catch(() => []);
   const sliderSlides = savedSlides
     .map((sl) => {
       const svc = services.find((v) => v.slug === sl.serviceSlug);
