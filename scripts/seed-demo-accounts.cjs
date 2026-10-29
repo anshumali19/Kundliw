@@ -1,5 +1,5 @@
 /* Creates (or resets) a demo customer and a demo associate with sample orders, for client testing.
-   Usage: DATABASE_URL=... node scripts/seed-demo-accounts.cjs
+   Usage: DATABASE_URL=... node scripts/seed-demo-accounts.cjs   (add --remove to delete the demo users and their DEMO-2026-* orders)
    Safe to re-run. Do not run against production unless you want these demo accounts there. */
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
@@ -30,7 +30,18 @@ async function makeOrder({ n, user, plan, status, associateId, jataka }) {
   return order;
 }
 
+async function removeDemo() {
+  const orders = await prisma.order.findMany({ where: { orderNumber: { startsWith: "DEMO-2026-" } }, select: { id: true } });
+  const ids = orders.map((o) => o.id);
+  await prisma.commission.deleteMany({ where: { orderId: { in: ids } } });
+  await prisma.orderStatusEvent.deleteMany({ where: { orderId: { in: ids } } });
+  await prisma.order.deleteMany({ where: { id: { in: ids } } });
+  const gone = await prisma.user.deleteMany({ where: { email: { in: [USER.email, ASSOC.email] } } });
+  console.log(`Removed ${ids.length} demo orders and ${gone.count} demo users.`);
+}
+
 (async () => {
+  if (process.argv.includes("--remove")) return removeDemo();
   const user = await upsertUser(USER, "USER");
   const assocUser = await upsertUser(ASSOC, "ASSOCIATE");
   const assoc = await prisma.associateProfile.upsert({
