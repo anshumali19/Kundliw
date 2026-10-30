@@ -8,5 +8,8 @@
       "path": "/api/cron/backup",
       "schedule": "30 20 * * *"
     }
+  ],
+  "regions": [
+    "sin1"
   ]
 }
