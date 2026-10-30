@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useHiddenTools } from "@/components/providers/ToolsProvider";
-import { SocialIcon } from "@/components/content/SocialIcon";
+import { SocialIcon, socialBackground } from "@/components/content/SocialIcon";
 import { DateStrip, type DateStripData } from "./DateStrip";
 import { Link, usePathname } from "@/i18n/routing";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -202,8 +202,8 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
               <ul className="hidden lg:flex items-center gap-1.5 -mr-1" aria-label="Social media">
                 {social.map((l) => (
                   <li key={l.id}>
-                    <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} className="inline-flex items-center justify-center w-6 h-6 rounded-full hover:bg-white/15">
-                      <SocialIcon id={l.id} className="w-3.5 h-3.5 text-gold" />
+                    <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} style={{ background: socialBackground(l.id) }} className="inline-flex items-center justify-center w-6 h-6 rounded-full ring-1 ring-white/30 transition hover:scale-110 hover:brightness-110">
+                      <SocialIcon id={l.id} className="w-3.5 h-3.5 text-white" />
                     </a>
                   </li>
                 ))}

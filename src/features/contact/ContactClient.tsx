@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { directionsUrl, mapIframeSrc } from "@/lib/content/map";
 import { RichText } from "@/components/content/RichText";
-import { SocialIcon } from "@/components/content/SocialIcon";
+import { SocialIcon, socialBackground } from "@/components/content/SocialIcon";
 import { Link } from "@/i18n/routing";
 import { LifeBuoy, Ticket, Map as MapIcon } from "lucide-react";
 
@@ -307,7 +307,7 @@ export function ContactClient({ settings, locale, extra }: ContactClientProps) {
                   <ul className="flex flex-wrap gap-2">
                     {extra.social.map((l) => (
                       <li key={l.id}>
-                        <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} className="w-10 h-10 inline-flex items-center justify-center rounded-full border border-outline-variant text-secondary hover:bg-surface-container-high">
+                        <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} style={{ background: socialBackground(l.id) }} className="w-10 h-10 inline-flex items-center justify-center rounded-full text-white shadow-sm transition hover:scale-110 hover:brightness-110">
                           <SocialIcon id={l.id} />
                         </a>
                       </li>
