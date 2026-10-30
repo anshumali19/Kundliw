@@ -49,8 +49,11 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
   }, []);
 
   const service = services?.find((s) => s.slug === serviceSlug);
-  // Kundli: select Kundli > form > plan. The plan is chosen after the form, on the booking page.
-  const kundli = isKundliService(service?.slug);
+  // Every service, the Kundli ones too, follows Service > Package > Plan > Offer here. The short "form first" version
+  // is used only for a Kundli service that has no plan yet, so the visitor is never left with an empty choice.
+  const kundliNoPlans = isKundliService(service?.slug) && (service?.plans.length ?? 0) === 0;
+  const kundli = kundliNoPlans;
+  const kundliWithPlans = isKundliService(service?.slug) && !kundliNoPlans;
   const pkg = service?.packages.find((k) => k.id === packageId);
   const plan = pkg?.plans.find((p) => p.slug === planSlug);
   const planId = plan?.id;
@@ -151,6 +154,13 @@ export function QuickBookingPanel({ onDone }: { onDone?: () => void }) {
         </select>
       </div>
 
+      {kundliWithPlans && (
+        <p className="sm:col-span-2 text-xs text-on-surface-variant">
+          {hi
+            ? "यहाँ पैकेज, प्लान और ऑफर चुनें। फिर बुकिंग पेज पर जन्म विवरण भरेंगे और भुगतान करेंगे।"
+            : "Choose the package, plan and offer here. Next, fill in the birth details on the booking page, then pay."}
+        </p>
+      )}
       {kundli && (
         <p className="sm:col-span-2 text-xs text-on-surface-variant">
           {hi
