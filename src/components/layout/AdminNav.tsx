@@ -48,10 +48,11 @@ const GROUPS: Array<{ en: string; hi: string; items: Item[] }> = [
     hi: "बुकिंग व भुगतान",
     items: [
       { href: "/admin/orders", en: "Orders", hi: "ऑर्डर", icon: ShoppingBag },
-      { href: "/admin/services", en: "Services & plans", hi: "सेवाएँ व प्लान", icon: Layers },
+      { href: "/admin/catalogue", en: "Catalogue (service to offer)", hi: "कैटलॉग (सेवा से ऑफ़र)", icon: Layers },
+      { href: "/admin/services", en: "Services, packages & plans", hi: "सेवाएँ, पैकेज व प्लान", icon: Layers },
       { href: "/admin/other-services", en: "Other services", hi: "अन्य सेवाएँ", icon: Sparkles },
       { href: "/admin/slots", en: "Appointment slots", hi: "अपॉइंटमेंट स्लॉट", icon: CalendarClock },
-      { href: "/admin/offers", en: "Promo codes", hi: "प्रोमो कोड", icon: Tag },
+      { href: "/admin/offers", en: "Offers (promo codes)", hi: "ऑफ़र (प्रोमो कोड)", icon: Tag },
       { href: "/admin/enquiries", en: "Enquiries", hi: "पूछताछ", icon: Inbox },
     ],
   },

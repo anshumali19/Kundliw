@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE_URL, absoluteUrl, localizedPath, pageAlternates } from "@/lib/seo";
+import { applyOffer } from "@/lib/offers/apply";
+import { formatPaiseToInr } from "@/lib/billing/gst";
 import { ServiceDetailView, ServiceDetailDTO } from "@/features/services/components/ServiceDetailView";
 
 
@@ -162,6 +164,18 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     })),
   };
 
+  // Offers customers can use on this service (the last step of Service > Package > Plan > Offer)
+  const now = new Date();
+  const offerRows = service.plans.length
+    ? await prisma.offer.findMany({ where: { isActive: true, showOnPlan: true }, orderBy: { createdAt: "desc" }, take: 20 }).catch(() => [])
+    : [];
+  const serviceOffers = offerRows
+    .map((o) => {
+      const plansFor = service.plans.filter((p) => applyOffer(o, p.pricePaise, now, { serviceSlug: service.slug, planId: p.id }).isValid);
+      return plansFor.length ? { o, count: plansFor.length, all: plansFor.length === service.plans.length } : null;
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
+
   const prices = service.plans.map((p) => p.pricePaise / 100);
   const serviceJsonLd = {
     "@context": "https://schema.org",
@@ -200,6 +214,27 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
         }
         locale={locale}
       />
+      {serviceOffers.length > 0 && (
+        <section aria-label={isHindi ? "इस सेवा के ऑफ़र" : "Offers on this service"} className="w-full px-4 sm:px-8 lg:px-12 pb-10">
+          <div className="max-w-6xl mx-auto rounded-xl border border-gold/60 bg-gold/10 p-5 space-y-3 text-left">
+            <h2 className="font-serif text-xl font-bold text-secondary">{isHindi ? "इस सेवा पर उपलब्ध ऑफ़र" : "Offers on this service"}</h2>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {serviceOffers.map(({ o, count, all }) => (
+                <li key={o.id} className="rounded-lg border border-outline-variant bg-surface p-4">
+                  <div className="font-mono text-sm font-bold text-primary">{o.code}</div>
+                  <div className="font-semibold text-secondary">{isHindi ? o.titleHi : o.titleEn}</div>
+                  <div className="text-sm">{o.discountType === "PERCENTAGE" ? `${o.discountValuePaise}% ${isHindi ? "छूट" : "off"}` : `${formatPaiseToInr(o.discountValuePaise)} ${isHindi ? "छूट" : "off"}`}</div>
+                  <div className="text-xs text-on-surface-variant mt-1">
+                    {all ? (isHindi ? "सभी प्लान पर लागू" : "Works on every plan") : isHindi ? `${count} प्लान पर लागू` : `Works on ${count} plan${count === 1 ? "" : "s"}`}
+                    {" · "}
+                    {isHindi ? "बुकिंग के समय कोड डालें" : "enter the code while booking"}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
      </>
   );
 }

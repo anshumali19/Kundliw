@@ -22,6 +22,7 @@ const updateOtherServiceSchema = z.object({
   descriptionHi: z.string().trim().min(10, "Hindi description is required").optional(),
   imageUrl: z.string().trim().optional().nullable(),
   actionUrl: z.string().trim().url().optional().nullable(),
+  serviceSlug: z.string().trim().max(120).optional().nullable(),
   actionTextEn: z.string().trim().optional().nullable(),
   actionTextHi: z.string().trim().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),

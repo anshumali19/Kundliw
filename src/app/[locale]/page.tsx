@@ -63,7 +63,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const on = (k: string) => secCfg[k] !== false;
   const link = (v: unknown, fallback: string) => safeHref(String(v || ""))?.href ?? fallback;
 
-  const [settings, services, others, gallery, faqs, testimonials, leftBanners, rightBanners, savedSlides] = await Promise.all([
+  const [settings, services, others, gallery, faqs, testimonials, leftBanners, rightBanners, activeServiceSlugs, savedSlides] = await Promise.all([
     prisma.adminSettings
       .findUnique({
         where: { id: "default" },
@@ -83,6 +83,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     prisma.testimonial.findMany({ where: { isActive: true, isVerified: true }, orderBy: { orderIndex: "asc" }, take: 3 }).catch(() => []),
     prisma.banner.findMany({ where: { isActive: true, position: "LEFT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
     prisma.banner.findMany({ where: { isActive: true, position: "RIGHT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.service.findMany({ where: { isActive: true }, select: { slug: true } }).catch(() => []),
     prisma.siteConfig
       .findUnique({ where: { key: HERO_SLIDES_KEY } })
       .then((r) => normalizeHeroSlides(r?.value))
@@ -93,6 +94,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const waNumber = String(floatCfg.whatsappNumber || "").trim() || settings?.whatsappNumber || settings?.socialWhatsapp || phone;
   const wa = (text: string) => whatsappLink(waNumber, text);
 
+  const bookableSlugs = new Set(activeServiceSlugs.map((s) => s.slug));
   const planGroups = (["janam-kundli", "prashna-kundli", "kundli-matching"] as const)
     .map((slug) => services.find((s) => s.slug === slug))
     .filter((s): s is NonNullable<typeof s> => !!s && s.plans.length > 0);
@@ -111,7 +113,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     title: isHindi ? o.titleHi : o.titleEn,
     desc: isHindi ? o.descriptionHi : o.descriptionEn,
     image: o.imageUrl || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length],
-    href: null as string | null,
+    href: (o.serviceSlug && bookableSlugs.has(o.serviceSlug) ? `/services/${o.serviceSlug}` : null) as string | null,
     external: o.actionUrl,
   }));
   const allServices = [...coreServices, ...otherCards];

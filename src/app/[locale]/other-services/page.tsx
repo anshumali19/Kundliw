@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
 import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
@@ -64,6 +65,8 @@ export default async function OtherServicesPage(
     .catch(() => []);
 
   const items = dbItems;
+  // Cards linked to a service that is switched on get a booking button (that service has the packages, plans and offers)
+  const bookable = new Set((await prisma.service.findMany({ where: { isActive: true }, select: { slug: true } }).catch(() => [])).map((s) => s.slug));
 
   return (
     <div className="w-full flex flex-col text-on-surface text-left">
@@ -127,6 +130,17 @@ export default async function OtherServicesPage(
                   <div className="text-sm text-on-surface-variant leading-relaxed space-y-2">
                     <RichText text={description} />
                   </div>
+
+                  {item.serviceSlug && bookable.has(item.serviceSlug) && (
+                    <div className="pt-2">
+                      <Link
+                        href={`/services/${item.serviceSlug}` as never}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors font-semibold text-xs shadow-sm"
+                      >
+                        {isHindi ? "पैकेज, प्लान व बुकिंग देखें" : "See packages, plans & book"}
+                      </Link>
+                    </div>
+                  )}
 
                   {item.actionUrl && (
                     <div className="pt-2">

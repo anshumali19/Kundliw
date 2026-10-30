@@ -664,6 +664,8 @@ model OtherService {
   descriptionHi   String   @db.Text
   imageUrl        String?
   actionUrl       String?
+  /// Slug of a bookable Service whose packages, plans and offers this card uses (empty = plain link card)
+  serviceSlug     String?
   actionTextEn    String?  @default("Visit Portal / Learn More")
   actionTextHi    String?  @default("पोर्टल पर जाएं / विवरण देखें")
   youtubeUrl      String?

@@ -29,6 +29,7 @@ export interface OtherServiceItem {
   descriptionHi: string;
   imageUrl?: string | null;
   actionUrl?: string | null;
+  serviceSlug?: string | null;
   actionTextEn?: string | null;
   actionTextHi?: string | null;
   youtubeUrl?: string | null;
@@ -56,6 +57,15 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
   const [descriptionHi, setDescriptionHi] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [actionUrl, setActionUrl] = useState("");
+  // Packages, plans and offers: link this card to a bookable service
+  const [serviceSlug, setServiceSlug] = useState("");
+  const [serviceChoices, setServiceChoices] = useState<Array<{ slug: string; titleEn: string; titleHi: string }>>([]);
+  useEffect(() => {
+    fetch("/api/admin/services?limit=100")
+      .then((r) => r.json())
+      .then((j) => setServiceChoices(((j.services || j.items || []) as Array<{ slug: string; titleEn: string; titleHi: string }>).map((s) => ({ slug: s.slug, titleEn: s.titleEn, titleHi: s.titleHi }))))
+      .catch(() => setServiceChoices([]));
+  }, []);
   const [actionTextEn, setActionTextEn] = useState("");
   const [actionTextHi, setActionTextHi] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -99,6 +109,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setDescriptionHi(item.descriptionHi);
       setImageUrl(item.imageUrl || "");
       setActionUrl(item.actionUrl || "");
+      setServiceSlug(item.serviceSlug || "");
       setActionTextEn(item.actionTextEn || "Visit Portal / Learn More");
       setActionTextHi(item.actionTextHi || "पोर्टल पर जाएं / विवरण देखें");
       setYoutubeUrl(item.youtubeUrl || "");
@@ -116,6 +127,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setDescriptionHi("");
       setImageUrl("");
       setActionUrl("");
+      setServiceSlug("");
       setActionTextEn("Visit Portal / Learn More");
       setActionTextHi("पोर्टल पर जाएं / विवरण देखें");
       setYoutubeUrl("");
@@ -141,6 +153,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       descriptionHi: descriptionHi.trim(),
       imageUrl: imageUrl.trim() || null,
       actionUrl: actionUrl.trim() || null,
+      serviceSlug: serviceSlug || null,
       actionTextEn: actionTextEn.trim() || null,
       actionTextHi: actionTextHi.trim() || null,
       youtubeUrl: youtubeUrl.trim() || null,
@@ -475,6 +488,16 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                     placeholder="https://vindhyavivahsanskar.com"
                     className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface"
                   />
+                </div>
+                <div className="sm:col-span-2 rounded-xl border border-gold/60 bg-gold/10 p-3">
+                  <label className="font-semibold block mb-1" htmlFor="os-service">Packages, plans and offers (optional)</label>
+                  <select id="os-service" value={serviceSlug} onChange={(e) => setServiceSlug(e.target.value)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface">
+                    <option value="">No: this card only shows information or a link</option>
+                    {serviceChoices.map((s) => (
+                      <option key={s.slug} value={s.slug}>{s.titleEn} (/{s.slug})</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-on-surface-variant mt-1">To sell this service with packages, plans and offers, first add it in Services, packages &amp; plans (and its offers in Offers), then choose it here. The card then shows a booking button.</p>
                 </div>
                 <div>
                   <label className="font-semibold block mb-1">Action Button Text (English)</label>
