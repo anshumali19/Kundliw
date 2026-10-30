@@ -18,8 +18,9 @@ export function LanguageSwitcher({ tone = "dark" }: { tone?: "dark" | "light" })
   const frame = tone === "dark" ? "border-gold/70" : "border-secondary/50";
   // Hindi is saffron and English is a soft red; the chosen language is bold with a light inner line.
   // A colour set in Admin > Website settings > Theme (language switch) still overrides both.
-  const hiColour = "bg-[rgb(var(--btn-lang-rgb,var(--saffron-rgb)))] text-[rgb(var(--on-btn-lang-rgb,255_255_255))]";
-  const enColour = "bg-[rgb(var(--btn-lang-rgb,184_69_58))] text-[rgb(var(--on-btn-lang-rgb,255_255_255))]";
+  // Light saffron-orange with dark text for Hindi, deep red with white text for English: easy to tell apart at a glance
+  const hiColour = "bg-[rgb(var(--btn-lang-hi-rgb,246_166_35))] text-[rgb(var(--on-btn-lang-hi-rgb,39_27_27))]";
+  const enColour = "bg-[rgb(var(--btn-lang-en-rgb,158_43_37))] text-[rgb(var(--on-btn-lang-en-rgb,255_255_255))]";
   const chosen = "font-bold ring-2 ring-inset ring-white/80";
   const notChosen = "opacity-70 hover:opacity-100";
   const base = "px-3 py-1 text-xs font-semibold tracking-wider transition-colors min-h-[40px] min-w-[40px] !min-w-0";
