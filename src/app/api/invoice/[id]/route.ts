@@ -7,11 +7,10 @@ import { Role } from "@prisma/client";
 import { generateInvoicePdf } from "@/lib/billing/invoicePdf";
 import { formatPaiseToInr, formatGstRateBasisPoints } from "@/lib/billing/gst";
 import { escapeHtml } from "@/lib/billing/html";
-import { isDemoMode } from "@/lib/config/demo";
 import { getSection } from "@/lib/siteConfig/service";
 import { loadInvoiceLogo } from "@/lib/billing/logo";
 import { createHash } from "node:crypto";
-import { DEFAULT_INVOICE_TERMS, type InvoiceOptions } from "@/lib/billing/invoicePdf";
+import { DEFAULT_INVOICE_TERMS, DEFAULT_INVOICE_FOOTER, type InvoiceOptions } from "@/lib/billing/invoicePdf";
 
 export const dynamic = "force-dynamic";
 
@@ -124,7 +123,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
         title: escapeHtml(opts.title || "TAX INVOICE / DAKSHINA RECEIPT"),
         tagline: escapeHtml(opts.tagline || "Vedic Astrological Heritage & Mathematical Computation Centre"),
         numberLabel: escapeHtml(opts.numberLabel || "Invoice Number"),
-        footerLine: escapeHtml(opts.footerLine || ""),
+        footerLine: escapeHtml(opts.footerLine || DEFAULT_INVOICE_FOOTER),
         signature: escapeHtml([opts.signatureName, opts.signatureTitle].filter(Boolean).join(" - ")),
         terms: (opts.terms && opts.terms.length > 0 ? opts.terms : DEFAULT_INVOICE_TERMS).map((t, i) => `${i + 1}. ${escapeHtml(t)}`).join("<br>"),
         gstin: invoiceData.gstin ? escapeHtml(invoiceData.gstin) : null,
@@ -161,7 +160,8 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     .text-right { text-align: right; }
     .total-box { margin-left: auto; width: 300px; font-size: 13px; line-height: 1.8; }
     .grand-total { font-size: 18px; font-weight: bold; color: #6b1d1d; border-top: 2px solid #6b1d1d; padding-top: 8px; margin-top: 8px; }
-    .demo-watermark { position: absolute; top: 35%; left: 15%; transform: rotate(-30deg); font-size: 60px; font-weight: bold; color: rgba(152,71,0,0.12); pointer-events: none; }
+    .watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; overflow: hidden; }
+    .watermark span { transform: rotate(-30deg); font-size: 110px; font-weight: bold; letter-spacing: .1em; color: rgba(152,71,0,0.08); }
     .footer-note { margin-top: 40px; padding: 16px; background: #fff8f6; border: 1px solid #dec1b1; font-size: 11px; color: #574237; }
     @media print {
       body { padding: 0; }
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
 <body>
   <div class="no-print" style="max-width:800px;margin:0 auto 12px;text-align:right"><button id="print-btn" type="button" style="min-height:44px;padding:0 20px;border:0;border-radius:8px;background:#6b1d1d;color:#fff;font-weight:bold;cursor:pointer">Print / Save as PDF</button></div>
   <div class="invoice-card">
-    ${isDemoMode() && process.env.NODE_ENV !== "production" ? '<div class="demo-watermark">DEMO INVOICE (नमूना)</div>' : ""}
+    <div class="watermark" aria-hidden="true"><span>INVOICE</span></div>
     <div class="header">
       ${logo ? `<img src="${logo.dataUri}" alt="" style="float:right;max-height:64px;max-width:120px">` : ""}
       <h1 class="title">${safe.siteName}</h1>
@@ -232,7 +232,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
         <span>${escapeHtml(formatPaiseToInr(invoiceData.gstAmountPaise))}</span>
       </div>
       <div class="grand-total" style="display: flex; justify-content: space-between;">
-        <span>Total Auspicious Dakshina:</span>
+        <span>Total Amount:</span>
         <span>${escapeHtml(formatPaiseToInr(invoiceData.netAmountPaise))}</span>
       </div>
     </div>

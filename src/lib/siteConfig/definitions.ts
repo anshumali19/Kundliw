@@ -536,7 +536,7 @@ export const SECTIONS: SectionDef[] = [
       { key: "showCustomerEmail", en: "Print customer email", hi: "ग्राहक का ईमेल छापें", type: "toggle", def: true },
       { key: "showOfferCode", en: "Print the offer code used", hi: "प्रयुक्त ऑफर कोड छापें", type: "toggle", def: true },
       { key: "terms", en: "Terms and declaration (one point per line)", hi: "नियम व घोषणा (हर पंक्ति में एक बिंदु)", type: "textarea", max: 800 },
-      { key: "footerLine", en: "Blessing / closing line", hi: "समापन पंक्ति", type: "text", max: 160, def: "Om Sarve Bhavantu Sukhinah Sarve Santu Niramayah" },
+      { key: "footerLine", en: "Blessing / closing line", hi: "समापन पंक्ति", type: "text", max: 160, def: "ॐ सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः॥" },
       { key: "signatureName", en: "Name for the signature", hi: "हस्ताक्षर का नाम", type: "text", max: 80 },
       { key: "signatureTitle", en: "Designation under the signature", hi: "हस्ताक्षर के नीचे पद", type: "text", max: 80 },
       { key: "userCanDownload", en: "Customers can download their invoice", hi: "ग्राहक अपना इनवॉइस डाउनलोड कर सकें", type: "toggle", def: true },

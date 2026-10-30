@@ -58,6 +58,8 @@ vi.mock("pdfkit", () => {
       this.handlers[event] = cb;
       return this;
     }
+    registerFont() { return this; }
+    image() { return this; }
     save() { return this; }
     restore() { return this; }
     rotate() { return this; }

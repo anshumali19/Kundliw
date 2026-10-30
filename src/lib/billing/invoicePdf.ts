@@ -3,7 +3,9 @@ import { formatPaiseToInr as inrWithSign, formatGstRateBasisPoints } from "./gst
 
 /** Money for the PDF: the built-in PDF font cannot draw the rupee sign, so it reads "Rs. 1,100". */
 const formatPaiseToInr = (paise: number) => inrWithSign(paise).replace("₹", "Rs. ");
-import { isDemoMode } from "@/lib/config/demo";
+import { DEVANAGARI_FONT_BASE64 } from "./fontDevanagari";
+
+const HINDI = /[\u0900-\u097F]/;
 
 export interface InvoicePdfData {
   invoiceNumber: string;
@@ -50,6 +52,9 @@ export interface InvoiceOptions {
   signatureTitle?: string;
 }
 
+/** The Kendra's blessing, in Hindi, when no closing line is set in the admin */
+export const DEFAULT_INVOICE_FOOTER = "ॐ सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः॥";
+
 export const DEFAULT_INVOICE_TERMS = [
   "All calculations strictly adhere to Surya Siddhanta, Parashara Hora Shastra, and Drik mathematical systems.",
   "Astrological Dakshina is utilized for Kendra preservation, Vedic pandits, and scholarly research.",
@@ -73,23 +78,23 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
         },
       });
 
+      // Hindi text (the closing line, a Hindi customer name) needs this font; the built-in one cannot draw Devanagari
+      doc.registerFont("Deva", Buffer.from(DEVANAGARI_FONT_BASE64, "base64"));
+      const faceFor = (text: string, latin: string) => (HINDI.test(text) ? "Deva" : latin);
+
       const chunks: Buffer[] = [];
       doc.on("data", (chunk) => chunks.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", (err) => reject(err));
 
-      // DEMO WATERMARK (if DEMO_MODE is on)
-      if (isDemoMode() && process.env.NODE_ENV !== "production") {
-        doc.save();
-        doc.rotate(-35, { origin: [300, 420] });
-        doc.fontSize(52);
-        doc.fillColor("#b09080");
-        doc.opacity(0.14);
-        doc.text("DEMO INVOICE", 100, 400, { align: "center", width: 450 });
-        doc.fontSize(16);
-        doc.text("NOT A LIVE TAX DOCUMENT", 100, 460, { align: "center", width: 450 });
-        doc.restore();
-      }
+      // Faint "INVOICE" mark in the middle of the page
+      doc.save();
+      doc.rotate(-35, { origin: [297.5, 421] });
+      doc.fontSize(96);
+      doc.fillColor("#b09080");
+      doc.opacity(0.1);
+      doc.font("Helvetica-Bold").text("INVOICE", 0, 372, { align: "center", width: 595 });
+      doc.restore();
 
       // Top Header
       if (data.logoPng) {
@@ -149,7 +154,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       // Customer Details (Right column)
       doc.font("Helvetica-Bold").text("BILLED TO (CUSTOMER):", 330, 115);
       doc.font("Helvetica");
-      doc.text(`Name: ${data.customerName}`, 330, 130);
+      doc.font(faceFor(data.customerName, "Helvetica")).text(`Name: ${data.customerName}`, 330, 130).font("Helvetica");
       doc.text(`Phone: ${data.customerPhone}`, 330, 142);
       if (data.customerEmail && o.showCustomerEmail !== false) {
         doc.text(`Email: ${data.customerEmail}`, 330, 154);
@@ -205,7 +210,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.strokeColor("#6B1D1D").lineWidth(1).moveTo(340, calcY + 30).lineTo(555, calcY + 30).stroke();
 
       doc.fillColor("#6B1D1D").font("Helvetica-Bold").fontSize(10);
-      doc.text("TOTAL DAKSHINA:", 340, calcY + 36);
+      doc.text("TOTAL AMOUNT:", 340, calcY + 36);
       doc.text(formatPaiseToInr(data.netAmountPaise), 475, calcY + 36, { width: 75, align: "right" });
 
       // Notes and declaration
@@ -224,16 +229,17 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       let afterY = notesY + boxH + 30;
       if (o.signatureName || o.signatureTitle) {
         doc.fillColor("#241915").font("Helvetica-Bold").fontSize(9);
-        if (o.signatureName) doc.text(o.signatureName, 340, afterY, { width: 215, align: "right" });
+        if (o.signatureName) doc.font(faceFor(o.signatureName, "Helvetica-Bold")).text(o.signatureName, 340, afterY, { width: 215, align: "right" });
         doc.font("Helvetica").fontSize(8).fillColor("#574237");
-        if (o.signatureTitle) doc.text(o.signatureTitle, 340, afterY + 12, { width: 215, align: "right" });
+        if (o.signatureTitle) doc.font(faceFor(o.signatureTitle, "Helvetica")).text(o.signatureTitle, 340, afterY + 12, { width: 215, align: "right" });
         afterY += 34;
       }
 
       // Auspicious Footer Shloka
-      doc.fillColor("#984700").font("Helvetica-Bold").fontSize(9);
+      const closing = o.footerLine || DEFAULT_INVOICE_FOOTER;
+      doc.fillColor("#984700").font(faceFor(closing, "Helvetica-Bold")).fontSize(10);
       doc.text(
-        o.footerLine || "Om Sarve Bhavantu Sukhinah Sarve Santu Niramayah",
+        closing,
         40,
         afterY,
         { align: "center", width: 515 }
