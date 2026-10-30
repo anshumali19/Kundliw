@@ -157,7 +157,11 @@ describe("C3 - invoice HTML hardening", () => {
 
     // Protective headers.
     expect(res.headers.get("content-security-policy")).toContain("default-src 'none'");
-    expect(res.headers.get("content-security-policy")).toContain("script-src 'none'");
+    // Only the Print button's own script is allowed, by its fingerprint: never inline scripts in general
+    const csp = res.headers.get("content-security-policy") || "";
+    expect(csp).toMatch(/script-src 'sha256-[A-Za-z0-9+/=]+'/);
+    expect(csp).not.toMatch(/script-src[^;]*unsafe/);
+    expect(html.match(/<script>/g)?.length).toBe(1);
     expect(res.headers.get("content-disposition")).toContain("inline; filename=");
     expect(res.headers.get("x-content-type-options")).toBe("nosniff");
   });

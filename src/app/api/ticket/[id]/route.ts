@@ -7,6 +7,7 @@ import { Role, PaymentStatus } from "@prisma/client";
 import { escapeHtml } from "@/lib/billing/html";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { getSection } from "@/lib/siteConfig/service";
+import { loadInvoiceLogo } from "@/lib/billing/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -83,9 +84,12 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     }
     rows.push([hi ? "बुकिंग की तारीख" : "Booked on", order.createdAt.toLocaleDateString("en-IN")]);
 
+    const logo = await loadInvoiceLogo(new URL(request.url).origin);
     const contact: string[] = [];
     if (cfg.showPhone !== false && settings?.phone1) contact.push(`${hi ? "फ़ोन" : "Phone"}: ${settings.phone1}`);
     contact.push(`${hi ? "ईमेल" : "Email"}: ${kendraEmail(settings?.email)}`);
+    const gstNo = order.gstin || settings?.gstin;
+    if (gstNo) contact.push(`GSTIN: ${gstNo}`);
     if (cfg.showAddress !== false) {
       const a = hi ? settings?.addressHi || settings?.addressEn : settings?.addressEn || settings?.addressHi;
       if (a) contact.push(a);
@@ -118,6 +122,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
 </head>
 <body>
 <div class="ticket">
+  ${logo ? `<img src="${logo.dataUri}" alt="" style="float:right;max-height:64px;max-width:110px">` : ""}
   <div class="brand">${escapeHtml(siteName)}</div>
   <h1>${escapeHtml(title)}</h1>
   <div class="ok">${hi ? "पुष्टि हो गई" : "Confirmed"}</div>

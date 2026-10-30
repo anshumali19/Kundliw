@@ -1,5 +1,8 @@
 import PDFDocument from "pdfkit";
-import { formatPaiseToInr, formatGstRateBasisPoints } from "./gst";
+import { formatPaiseToInr as inrWithSign, formatGstRateBasisPoints } from "./gst";
+
+/** Money for the PDF: the built-in PDF font cannot draw the rupee sign, so it reads "Rs. 1,100". */
+const formatPaiseToInr = (paise: number) => inrWithSign(paise).replace("₹", "Rs. ");
 import { isDemoMode } from "@/lib/config/demo";
 
 export interface InvoicePdfData {
@@ -11,6 +14,8 @@ export interface InvoicePdfData {
   sitePhone: string;
   siteEmail: string;
   gstin?: string | null;
+  /** The Kendra logo as PNG, printed top right when present */
+  logoPng?: Buffer | null;
   customerName: string;
   customerPhone: string;
   customerEmail?: string | null;
@@ -80,13 +85,20 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
         doc.fontSize(52);
         doc.fillColor("#b09080");
         doc.opacity(0.14);
-        doc.text("DEMO INVOICE (नमूना)", 100, 400, { align: "center", width: 450 });
+        doc.text("DEMO INVOICE", 100, 400, { align: "center", width: 450 });
         doc.fontSize(16);
         doc.text("NOT A LIVE TAX DOCUMENT", 100, 460, { align: "center", width: 450 });
         doc.restore();
       }
 
       // Top Header
+      if (data.logoPng) {
+        try {
+          doc.image(data.logoPng, 485, 34, { fit: [70, 58], align: "right" });
+        } catch {
+          /* a logo that cannot be drawn is left out */
+        }
+      }
       doc.fillColor("#6B1D1D"); // Maroon
       doc.fontSize(18);
       doc.font("Helvetica-Bold").text(data.siteName.toUpperCase(), 40, 40);
@@ -107,19 +119,20 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
           .filter(Boolean)
           .join(" | "),
         40,
-        75
+        75,
+        { width: 430 }
       );
 
       if (o.showGstin === false) {
         // GSTIN switched off by the admin
       } else if (data.gstin) {
-        doc.text(`GSTIN: ${data.gstin} (Composite / Regulated Astrology Service)`, 40, 87);
+        doc.font("Helvetica-Bold").text(`GSTIN: ${data.gstin}`, 40, 98).font("Helvetica");
       } else {
-        doc.text("GST: Not Applicable (Unregistered / Direct Kendra Consultation)", 40, 87);
+        doc.text("GST: Not Applicable (Unregistered / Direct Kendra Consultation)", 40, 98);
       }
 
       // Horizontal Hairline
-      doc.strokeColor("#6B1D1D").lineWidth(1.5).moveTo(40, 102).lineTo(555, 102).stroke();
+      doc.strokeColor("#6B1D1D").lineWidth(1.5).moveTo(40, 112).lineTo(555, 112).stroke();
 
       // Invoice & Customer Meta Box (Split 2-Column)
       doc.fillColor("#241915");
@@ -168,7 +181,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.fillColor("#241915").fontSize(8.5);
       doc.text(formatPaiseToInr(data.baseAmountPaise), 360, rowY, { width: 50, align: "right" });
       doc.text(
-        data.discountAmountPaise > 0 ? `-${formatPaiseToInr(data.discountAmountPaise)}` : "₹0",
+        data.discountAmountPaise > 0 ? `-${formatPaiseToInr(data.discountAmountPaise)}` : "Rs. 0",
         420,
         rowY,
         { width: 55, align: "right" }
@@ -183,7 +196,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       const calcY = rowY + 50;
       doc.font("Helvetica").fontSize(8.5).fillColor("#574237");
 
-      doc.text("Taxable Value (कर योग्य दक्षिणा):", 340, calcY);
+      doc.text("Taxable Value:", 340, calcY);
       doc.text(formatPaiseToInr(data.taxableAmountPaise), 485, calcY, { width: 65, align: "right" });
 
       doc.text(`Goods & Services Tax (GST @ ${formatGstRateBasisPoints(data.gstRateBasisPoints ?? 1800)}%):`, 340, calcY + 14);
@@ -192,7 +205,7 @@ export async function generateInvoicePdf(data: InvoicePdfData): Promise<Buffer> 
       doc.strokeColor("#6B1D1D").lineWidth(1).moveTo(340, calcY + 30).lineTo(555, calcY + 30).stroke();
 
       doc.fillColor("#6B1D1D").font("Helvetica-Bold").fontSize(10);
-      doc.text("TOTAL DAKSHINA (कुल देय):", 340, calcY + 36);
+      doc.text("TOTAL DAKSHINA:", 340, calcY + 36);
       doc.text(formatPaiseToInr(data.netAmountPaise), 475, calcY + 36, { width: 75, align: "right" });
 
       // Notes and declaration

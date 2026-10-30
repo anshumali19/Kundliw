@@ -35,13 +35,19 @@ const nextConfig = {
             value: "camera=(), microphone=(), geolocation=(self)",
           },
           {
-            // Only the parts that cannot break maps, payments or embeds
-            key: "Content-Security-Policy",
-            value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
-          },
-          {
             key: "Strict-Transport-Security",
             value: "max-age=31536000; includeSubDomains; preload",
+          },
+        ],
+      },
+      {
+        // Pages only. Downloads (invoice, ticket, customer files) set their own, stricter policy.
+        // These are only the parts that cannot break maps, payments or embeds.
+        source: "/((?!api/).*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
           },
         ],
       },

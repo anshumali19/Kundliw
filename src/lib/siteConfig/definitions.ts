@@ -531,6 +531,7 @@ export const SECTIONS: SectionDef[] = [
       { key: "showAddress", en: "Print business address", hi: "व्यवसाय का पता छापें", type: "toggle", def: true },
       { key: "showPhone", en: "Print business phone", hi: "व्यवसाय का फ़ोन छापें", type: "toggle", def: true },
       { key: "showEmail", en: "Print business email", hi: "व्यवसाय का ईमेल छापें", type: "toggle", def: true },
+      { key: "showLogo", en: "Print the logo", hi: "लोगो छापें", type: "toggle", def: true },
       { key: "showGstin", en: "Print GSTIN", hi: "GSTIN छापें", type: "toggle", def: true },
       { key: "showCustomerEmail", en: "Print customer email", hi: "ग्राहक का ईमेल छापें", type: "toggle", def: true },
       { key: "showOfferCode", en: "Print the offer code used", hi: "प्रयुक्त ऑफर कोड छापें", type: "toggle", def: true },

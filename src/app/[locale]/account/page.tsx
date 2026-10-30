@@ -19,6 +19,9 @@ import {
   CreditCard,
   FileText,
   AlertCircle,
+  Printer,
+  BookOpen,
+  Eye,
 } from "lucide-react";
 
 interface AccountPageProps {
@@ -122,6 +125,26 @@ export default async function AccountPage(props: AccountPageProps) {
           {isHindi ? "प्रमाणपत्र एवं दस्तावेज़" : "Credentials and documents"}
         </Link>
         <SignOutButton label={isHindi ? "लॉग आउट" : "Log out"} className="ml-auto" />
+      </div>
+
+      {/* User guide: the words are edited by the admin in Pages & legal */}
+      <div className="rounded-lg border border-outline-variant bg-surface p-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2 mr-auto">
+          <BookOpen className="w-5 h-5 text-primary" />
+          <span className="font-serif text-lg font-bold text-secondary">{isHindi ? "उपयोगकर्ता मार्गदर्शिका" : "User Guide"}</span>
+        </div>
+        <Link href="/guides/user" className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-1.5 transition-colors">
+          <Eye className="w-3.5 h-3.5 text-primary" />
+          <span>{isHindi ? "देखें" : "View"}</span>
+        </Link>
+        <a href={`/api/guides/user?lang=${isHindi ? "hi" : "en"}&download=1`} className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-1.5 transition-colors">
+          <Download className="w-3.5 h-3.5 text-primary" />
+          <span>{isHindi ? "डाउनलोड" : "Download"}</span>
+        </a>
+        <a href={`/api/guides/user?lang=${isHindi ? "hi" : "en"}&print=1`} target="_blank" rel="noreferrer" className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-1.5 transition-colors">
+          <Printer className="w-3.5 h-3.5 text-primary" />
+          <span>{isHindi ? "प्रिंट करें" : "Print"}</span>
+        </a>
       </div>
 
       {/* Orders Section */}
@@ -296,6 +319,15 @@ export default async function AccountPage(props: AccountPageProps) {
                           >
                             <FileText className="w-3.5 h-3.5 text-primary" />
                             <span>{isHindi ? "बीजक (HTML)" : "Invoice (HTML)"}</span>
+                          </a>
+                          <a
+                            href={`/api/invoice/${order.id}?format=html&print=1`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-1.5 transition-colors"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-primary" />
+                            <span>{isHindi ? "बीजक प्रिंट करें" : "Print Invoice"}</span>
                           </a>
                         </>
                       )}

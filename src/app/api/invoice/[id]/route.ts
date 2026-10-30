@@ -9,9 +9,16 @@ import { formatPaiseToInr, formatGstRateBasisPoints } from "@/lib/billing/gst";
 import { escapeHtml } from "@/lib/billing/html";
 import { isDemoMode } from "@/lib/config/demo";
 import { getSection } from "@/lib/siteConfig/service";
+import { loadInvoiceLogo } from "@/lib/billing/logo";
+import { createHash } from "node:crypto";
 import { DEFAULT_INVOICE_TERMS, type InvoiceOptions } from "@/lib/billing/invoicePdf";
 
 export const dynamic = "force-dynamic";
+
+// The only script on the printable invoice: the Print button, and printing straight away when opened with ?print=1.
+// The page's security policy allows exactly this script (by its fingerprint) and nothing else.
+const PRINT_SCRIPT = "document.getElementById('print-btn').addEventListener('click',function(){window.print()});if(location.search.indexOf('print=1')>-1){window.addEventListener('load',function(){setTimeout(function(){window.print()},400)})}";
+const PRINT_SCRIPT_HASH = createHash("sha256").update(PRINT_SCRIPT).digest("base64");
 
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -71,6 +78,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     const customerPhone = String(jataka.phone || order.user?.phone || "");
     const customerEmail = (jataka.email as string) || order.user?.email || null;
 
+    const logo = cfg.showLogo === false ? null : await loadInvoiceLogo(new URL(request.url).origin);
     const invoiceNumber = order.invoiceNumber || `INV-TEMP-${order.orderNumber}`;
 
     const invoiceData = {
@@ -81,7 +89,9 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       siteAddress: adminSettings?.addressEn || "",
       sitePhone: adminSettings?.phone1 || "+91-9827991224",
       siteEmail: kendraEmail(adminSettings?.email),
-      gstin: adminSettings?.gstin || null,
+      // The GST number saved with the order, else the Kendra's current one
+      gstin: order.gstin || adminSettings?.gstin || null,
+      logoPng: logo?.png ?? null,
       customerName,
       customerPhone,
       customerEmail,
@@ -161,13 +171,15 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
   </style>
 </head>
 <body>
+  <div class="no-print" style="max-width:800px;margin:0 auto 12px;text-align:right"><button id="print-btn" type="button" style="min-height:44px;padding:0 20px;border:0;border-radius:8px;background:#6b1d1d;color:#fff;font-weight:bold;cursor:pointer">Print / Save as PDF</button></div>
   <div class="invoice-card">
     ${isDemoMode() && process.env.NODE_ENV !== "production" ? '<div class="demo-watermark">DEMO INVOICE (नमूना)</div>' : ""}
     <div class="header">
+      ${logo ? `<img src="${logo.dataUri}" alt="" style="float:right;max-height:64px;max-width:120px">` : ""}
       <h1 class="title">${safe.siteName}</h1>
       <div class="subtitle">${safe.tagline}</div>
       <div style="font-size: 11px; color: #574237;">${[opts.showAddress === false ? "" : safe.siteAddress, opts.showPhone === false || !safe.sitePhone ? "" : `Phone: ${safe.sitePhone}`, opts.showEmail === false || !safe.siteEmail ? "" : `Email: ${safe.siteEmail}`].filter(Boolean).join(" | ")}</div>
-      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${opts.showGstin === false ? "" : safe.gstin ? `GSTIN: ${safe.gstin}` : "GST: Not Applicable (Unregistered Kendra)"}</div>
+      <div style="font-size: 11px; color: #574237; margin-top: 4px;">${opts.showGstin === false ? "" : safe.gstin ? `<strong>GSTIN: ${safe.gstin}</strong>` : "GST: Not Applicable (Unregistered Kendra)"}</div>
     </div>
 
     <div class="meta-grid">
@@ -232,6 +244,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     ${safe.signature ? `<div style="margin-top:28px;text-align:right;font-size:12px;"><strong>${safe.signature}</strong></div>` : ""}
     ${safe.footerLine ? `<div style="margin-top:20px;text-align:center;font-size:12px;color:#984700;font-weight:bold;">${safe.footerLine}</div>` : ""}
   </div>
+<script>${PRINT_SCRIPT}</script>
 </body>
 </html>`;
 
@@ -241,7 +254,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
           "Content-Type": "text/html; charset=utf-8",
           "Content-Disposition": `inline; filename="Invoice-${safeFileBase}.html"`,
           "Content-Security-Policy":
-            "default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; script-src 'none'; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'",
+            `default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; script-src 'sha256-${PRINT_SCRIPT_HASH}'; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'`,
           "X-Content-Type-Options": "nosniff",
           "X-Frame-Options": "DENY",
           "Referrer-Policy": "no-referrer",
