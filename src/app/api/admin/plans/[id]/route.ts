@@ -48,6 +48,9 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
 
     return NextResponse.json({ success: true, plan });
   } catch (error) {
+    if ((error as { code?: string })?.code === "P2002") {
+      return NextResponse.json({ error: "The other service already has a plan with this URL key. Change the key first." }, { status: 409 });
+    }
     console.error("Error updating plan:", error);
     return NextResponse.json(
       { error: "Failed to update plan" },

@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
+import { CatalogueSteps } from "@/components/admin/CatalogueSteps";
 import { AdminOffersManager, AdminOfferItem } from "@/features/admin/offers/AdminOffersManager";
 
 interface AdminOffersPageProps {
@@ -55,8 +56,13 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
   const services = await prisma.service.findMany({
     where: { isActive: true },
     orderBy: { orderIndex: "asc" },
-    select: { slug: true, titleEn: true, titleHi: true, plans: { where: { isActive: true }, orderBy: { orderIndex: "asc" }, select: { id: true, titleEn: true, titleHi: true } } },
+    select: { slug: true, titleEn: true, titleHi: true, packages: { where: { isActive: true }, orderBy: { orderIndex: "asc" }, select: { id: true, titleEn: true, titleHi: true } }, plans: { where: { isActive: true }, orderBy: { orderIndex: "asc" }, select: { id: true, packageId: true, titleEn: true, titleHi: true } } },
   });
 
-  return <AdminOffersManager initialOffers={offersData} services={services} locale={locale} />;
+  return (
+    <>
+      <CatalogueSteps current="offers" isHindi={locale === "hi"} />
+      <AdminOffersManager initialOffers={offersData} services={services} locale={locale} />
+    </>
+  );
 }

@@ -4,6 +4,7 @@ import { Role } from "@prisma/client";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
+import { ServiceExplorer } from "@/components/content/ServiceExplorer";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { OrderStatusStepper } from "@/features/orders/components/OrderStatusStepper";
@@ -349,6 +350,8 @@ export default async function AccountPage(props: AccountPageProps) {
           </div>
         )}
       </div>
+
+      <ServiceExplorer userId={user.id} locale={locale} />
     </div>
   );
 }

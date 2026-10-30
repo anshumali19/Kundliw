@@ -6,6 +6,8 @@ import { formatPaiseToInr } from "@/lib/billing/gst";
 import { paiseToRupees } from "@/lib/billing/money";
 import { LinkItem, normalizeLinks } from "@/lib/content/media";
 import { ImageUrlField, LinksEditor, VideoField } from "@/components/admin/MediaFields";
+import { InfoTip } from "@/components/admin/InfoTip";
+import { Link } from "@/i18n/routing";
 import {
   Plus,
   Edit2,
@@ -131,13 +133,29 @@ export interface AdminServiceItem {
   };
 }
 
+export interface AdminOfferRef {
+  id: string;
+  code: string;
+  titleEn: string;
+  titleHi: string;
+  serviceSlugs: string[];
+  planIds: string[];
+  isActive: boolean;
+}
+
+export type CatalogueView = "services" | "packages" | "plans";
+
 interface AdminServicesManagerProps {
   initialServices: AdminServiceItem[];
+  offers?: AdminOfferRef[];
+  view?: CatalogueView;
   locale: string;
 }
 
 export function AdminServicesManager({
   initialServices,
+  offers = [],
+  view = "services",
   locale,
 }: AdminServicesManagerProps) {
   const isHindi = locale === "hi";
@@ -384,7 +402,7 @@ export function AdminServicesManager({
   };
 
   // Open Plan Modal
-  const handleOpenPlanModal = (serviceId: string, plan?: AdminPlanItem) => {
+  const handleOpenPlanModal = (serviceId: string, plan?: AdminPlanItem, presetPackageId?: string) => {
     setErrorMsg(null);
     setSuccessMsg(null);
     setSelectedServiceForPlan(serviceId);
@@ -424,7 +442,7 @@ export function AdminServicesManager({
       setEditingPlan(null);
       const parent = services.find((s) => s.id === serviceId);
       setPlanForm({
-        packageId: parent?.packages[0]?.id || "",
+        packageId: presetPackageId ?? "",
         slug: "",
         titleEn: "",
         titleHi: "",
@@ -460,7 +478,12 @@ export function AdminServicesManager({
   // Save Plan
   const handleSavePlan = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedServiceForPlan) return;
+    const pkgOwner = services.find((sv) => sv.packages.some((pk) => pk.id === planForm.packageId));
+    const planServiceId = pkgOwner?.id ?? selectedServiceForPlan;
+    if (!planServiceId) {
+      setErrorMsg(isHindi ? "पहले पैकेज चुनें।" : "Choose a package first.");
+      return;
+    }
 
     setLoading(true);
     setErrorMsg(null);
@@ -468,7 +491,7 @@ export function AdminServicesManager({
 
     try {
       const payload = {
-        serviceId: selectedServiceForPlan,
+        serviceId: planServiceId,
         packageId: planForm.packageId || null,
         slug: planForm.slug,
         titleEn: planForm.titleEn,
@@ -525,13 +548,11 @@ export function AdminServicesManager({
         throw new Error(data.error || "Failed to save plan");
       }
 
+      // the plan may have moved to a package under another service, so take it out everywhere first
       setServices((prev) =>
         prev.map((s) => {
-          if (s.id !== selectedServiceForPlan) return s;
-          const updatedPlans = editingPlan
-            ? s.plans.map((p) => (p.id === editingPlan.id ? data.plan : p))
-            : [...s.plans, data.plan];
-          return { ...s, plans: updatedPlans };
+          const others = s.plans.filter((p) => p.id !== data.plan.id);
+          return s.id === planServiceId ? { ...s, plans: [...others, data.plan] } : { ...s, plans: others };
         })
       );
 
@@ -660,9 +681,71 @@ export function AdminServicesManager({
     setPackageModal({ serviceId, editing: pkg || null });
   };
 
+  /** Puts a saved package under its service; when it moved, takes it (and its plans) out of the old one. */
+  const applySavedPackage = (saved: AdminPackageItem, toServiceId: string) => {
+    setServices((prev) => {
+      const plansOf = prev.flatMap((s) => s.plans.filter((p) => p.packageId === saved.id));
+      return prev.map((s) => {
+        const pkgs = s.packages.filter((p) => p.id !== saved.id);
+        const plans = s.plans.filter((p) => p.packageId !== saved.id);
+        if (s.id !== toServiceId) return { ...s, packages: pkgs, plans };
+        return { ...s, packages: [...pkgs, saved].sort((a, b) => a.orderIndex - b.orderIndex), plans: [...plans, ...plansOf] };
+      });
+    });
+  };
+
+  /** Quick re-assign: move a package (with all its plans) to another service. */
+  const handleMovePackage = async (pkg: AdminPackageItem, toServiceId: string) => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const res = await fetch(`/api/admin/packages/${pkg.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ moveOnly: true, serviceId: toServiceId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not move the package");
+      applySavedPackage({ ...data.package, booked: pkg.booked ?? 0 }, toServiceId);
+      setSuccessMsg(isHindi ? "पैकेज दूसरी सेवा में ले जाया गया।" : "Package moved to the other service, with its plans.");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Could not move the package");
+    }
+  };
+
+  /** Quick re-assign: put a plan under a different package (and so a different service). */
+  const handleMovePlan = async (plan: AdminPlanItem, toPackageId: string) => {
+    const owner = services.find((sv) => sv.packages.some((pk) => pk.id === toPackageId));
+    if (!owner) return;
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    try {
+      const res = await fetch(`/api/admin/plans/${plan.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ serviceId: owner.id, packageId: toPackageId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not move the plan");
+      setServices((prev) =>
+        prev.map((s) => {
+          const others = s.plans.filter((p) => p.id !== plan.id);
+          return s.id === owner.id ? { ...s, plans: [...others, { ...plan, ...data.plan }] } : { ...s, plans: others };
+        })
+      );
+      setSuccessMsg(isHindi ? "प्लान दूसरे पैकेज में ले जाया गया।" : "Plan moved to the other package.");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Could not move the plan");
+    }
+  };
+
   const handleSavePackage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!packageModal) return;
+    if (!packageModal.serviceId) {
+      setErrorMsg(isHindi ? "पहले सेवा चुनें।" : "Choose the service this package belongs to.");
+      return;
+    }
     setLoading(true);
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -702,14 +785,7 @@ export function AdminServicesManager({
         const detail = data.details ? Object.values(data.details).flat().join(" ") : "";
         throw new Error(data.error ? `${data.error} ${detail}`.trim() : "Failed to save package");
       }
-      setServices((prev) =>
-        prev.map((s) => {
-          if (s.id !== packageModal.serviceId) return s;
-          const saved = { ...data.package, booked: editing?.booked ?? 0 };
-          const list = editing ? s.packages.map((p) => (p.id === editing.id ? saved : p)) : [...s.packages, saved];
-          return { ...s, packages: list.sort((a, b) => a.orderIndex - b.orderIndex) };
-        })
-      );
+      applySavedPackage({ ...data.package, booked: editing?.booked ?? 0 }, packageModal.serviceId);
       setSuccessMsg(editing ? "Package updated." : "Package added. Now add plans under it.");
       setPackageModal(null);
     } catch (err) {
@@ -770,22 +846,41 @@ export function AdminServicesManager({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/40 pb-4">
         <div>
           <h1 className="font-serif text-2xl font-bold text-secondary">
-            {isHindi ? "वैदिक सेवा एवं संस्करण प्रबंधन" : "Services & Plans Catalog"}
+            {view === "services" ? (isHindi ? "1. सेवाएँ" : "1. Services") : view === "packages" ? (isHindi ? "2. पैकेज" : "2. Packages") : isHindi ? "3. प्लान" : "3. Plans"}{" "}
+            <InfoTip
+              text={
+                view === "services"
+                  ? isHindi
+                    ? "यहाँ केवल सेवाओं की सूची है। किसी सेवा पर क्लिक करके उसका विवरण देखें, और 'संपादित करें' से नाम, चित्र, वीडियो (YouTube), विवरण या लिंक बदलें। सेवाओं की कोई सीमा नहीं।"
+                    : "Only the list of services is here. Click a service to open it, and use Edit to change its name, picture, video (YouTube), description or links. There is no limit on services."
+                  : view === "packages"
+                  ? isHindi
+                    ? "पैकेज सेवा का एक रूप है (जैसे साधारण, मध्यम, उत्तम)। हर सेवा के नीचे उसके पैकेज दिखते हैं। 'सेवा' वाले ड्रॉपडाउन से पैकेज को किसी भी सेवा में ले जाएँ; उसके प्लान साथ जाते हैं। पैकेज की कोई सीमा नहीं।"
+                    : "A package is a version of a service (for example Sadharan, Madhyam, Uttam). Each service lists its packages. Use the Service dropdown to move a package into any service; its plans go with it. There is no limit on packages."
+                  : isHindi
+                  ? "प्लान वह है जिसे ग्राहक खरीदता है: कीमत, डिलीवरी और क्या शामिल है। हर प्लान एक पैकेज में रहता है। 'पैकेज' ड्रॉपडाउन से उसे दूसरे पैकेज में ले जाएँ। प्लान की कोई सीमा नहीं; ऑफ़र अगले चरण में जुड़ते हैं।"
+                  : "A plan is what the customer buys: price, delivery and what is included. Each plan sits in one package. Use the Package dropdown to move it to another package. There is no limit on plans; offers are attached in the next step."
+              }
+            />
           </h1>
           <p className="text-xs text-on-surface-variant mt-1">
-            {isHindi
-              ? "शास्त्रसम्मत सेवाएँ, परामर्श योजनाएँ एवं दक्षिणा दरें नियंत्रित करें। (रुपये में प्रविष्टि, पैसे में संग्रहण)"
-              : "Manage bilingual services, consultation plans, and dakshina rates. (Entered in Rupees, saved in Paise)"}
+            {view === "services"
+              ? isHindi ? "सेवाएँ जोड़ें और बदलें। अगला चरण: पैकेज।" : "Add and edit your services. Next step: Packages."
+              : view === "packages"
+              ? isHindi ? "हर सेवा के पैकेज जोड़ें और बदलें। अगला चरण: प्लान।" : "Add and edit the packages of each service. Next step: Plans."
+              : isHindi ? "हर पैकेज के प्लान और कीमतें जोड़ें (रुपये में लिखें)। अगला चरण: ऑफ़र।" : "Add the plans and prices of each package (type rupees). Next step: Offers."}
           </p>
         </div>
 
         <button
           type="button"
-          onClick={() => handleOpenServiceModal()}
+          onClick={() => (view === "packages" ? handleOpenPackageModal("") : view === "plans" ? handleOpenPlanModal("") : handleOpenServiceModal())}
           className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>{isHindi ? "नई सेवा जोड़ें" : "Add Service"}</span>
+          <span>
+            {view === "packages" ? (isHindi ? "नया पैकेज जोड़ें" : "Add Package") : view === "plans" ? (isHindi ? "नया प्लान जोड़ें" : "Add Plan") : isHindi ? "नई सेवा जोड़ें" : "Add Service"}
+          </span>
         </button>
       </div>
 
@@ -804,269 +899,249 @@ export function AdminServicesManager({
         </div>
       )}
 
-      {/* Services List Accordion */}
-      <div className="space-y-4">
-        {services.length === 0 ? (
-          <div className="p-8 text-center bg-surface-container-low rounded border border-outline-variant/50 text-on-surface-variant text-sm">
-            {isHindi ? "कोई सेवा प्रविष्टि उपलब्ध नहीं है।" : "No services created yet."}
-          </div>
-        ) : (
-          services.map((service) => {
-            const isExpanded = expandedServiceId === service.id;
-            return (
-              <div
-                key={service.id}
-                className="rounded-lg border border-outline-variant/60 bg-surface overflow-hidden shadow-sm"
-              >
-                {/* Service Row Header */}
-                <div
-                  onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
-                  className="p-4 bg-surface-container-low/70 hover:bg-surface-container-low flex flex-col lg:flex-row lg:items-center justify-between gap-3 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <button
-                      type="button"
-                      className="p-1 text-secondary"
-                      aria-label="Toggle plans"
-                    >
-                      {isExpanded ? (
-                        <ChevronDown className="w-5 h-5" />
-                      ) : (
-                        <ChevronRight className="w-5 h-5" />
-                      )}
-                    </button>
-
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-serif font-bold text-base text-secondary">
-                          {isHindi ? service.titleHi : service.titleEn}
-                        </span>
-                        <span className="text-xs font-mono text-on-surface-variant bg-surface px-2 py-0.5 rounded border border-outline-variant/40">
-                          /{service.slug}
-                        </span>
-                        <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-                            service.isActive
-                              ? "bg-tertiary-fixed text-on-tertiary-fixed"
-                              : "bg-surface-container-high text-outline"
-                          }`}
-                        >
-                          {service.isActive ? (isHindi ? "सक्रिय" : "Active") : isHindi ? "निष्क्रिय" : "Inactive"}
-                        </span>
-                      </div>
-                      <div className="text-xs text-on-surface-variant mt-0.5">
-                        {service.plans.length} {isHindi ? "संस्करण योजनाएँ" : "Plans"} • {service._count?.orders ?? 0} {isHindi ? "ऐतिहासिक आदेश" : "Orders"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
+      {/* One list per step: Services, Packages or Plans (the step bar above switches between them) */}
+      {view === "services" && (
+        <div className="space-y-3">
+          {services.length === 0 ? (
+            <div className="p-8 text-center bg-surface-container-low rounded border border-outline-variant/50 text-on-surface-variant text-sm">
+              {isHindi ? "कोई सेवा नहीं है। 'नई सेवा जोड़ें' दबाएँ।" : "No services yet. Press 'Add Service' to create the first one."}
+            </div>
+          ) : (
+            services.map((service) => {
+              const isExpanded = expandedServiceId === service.id;
+              return (
+                <div key={service.id} className="rounded-lg border border-outline-variant/60 bg-surface overflow-hidden shadow-sm">
                   <div
-                    className="flex flex-wrap items-center gap-2 lg:shrink-0"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                    className="p-4 bg-surface-container-low/70 hover:bg-surface-container-low flex flex-col lg:flex-row lg:items-center justify-between gap-3 cursor-pointer transition-colors"
                   >
-                    <button
-                      type="button"
-                      onClick={() => handleToggleServiceActive(service)}
-                      className="min-h-[38px] px-2.5 py-1 text-xs border border-outline-variant rounded hover:bg-surface transition-colors"
-                    >
-                      {service.isActive ? (isHindi ? "अक्षम करें" : "Deactivate") : isHindi ? "सक्रिय करें" : "Activate"}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleOpenServiceModal(service)}
-                      className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand transition-colors flex items-center gap-1"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                      <span>{isHindi ? "संपादित करें" : "Edit"}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteService(service)}
-                      className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-error text-on-error-container rounded hover:bg-error-container transition-colors flex items-center gap-1"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>{isHindi ? "हटाएँ" : "Remove"}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleOpenPlanModal(service.id)}
-                      className="min-h-[38px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded transition-colors flex items-center gap-1"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>{isHindi ? "संस्करण जोड़ें" : "Add Plan"}</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Service Plans Details (Nested) */}
-                {isExpanded && (
-                  <div className="p-4 border-t border-outline-variant/30 space-y-4 bg-surface">
-                    {/* Packages: Service > Package > Plan */}
-                    <div className="rounded-lg border border-outline-variant/50 bg-surface-container-low p-3 space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="text-xs font-bold uppercase tracking-wider text-primary">
-                          {isHindi ? "पैकेज (जैसे साधारण, मध्यम, उत्तम)" : "Packages (for example Sadharan, Madhyam, Uttam)"}
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <span className="p-1 text-secondary" aria-hidden="true">
+                        {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-serif font-bold text-base text-secondary">{isHindi ? service.titleHi : service.titleEn}</span>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${service.isActive ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-surface-container-high text-outline"}`}>
+                            {service.isActive ? (isHindi ? "सक्रिय" : "Active") : isHindi ? "निष्क्रिय" : "Inactive"}
+                          </span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenPackageModal(service.id)}
-                          className="min-h-[36px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded flex items-center gap-1"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>{isHindi ? "पैकेज जोड़ें" : "Add Package"}</span>
-                        </button>
+                        <div className="text-xs text-on-surface-variant mt-0.5">
+                          {service.packages.length} {isHindi ? "पैकेज" : "packages"} • {service.plans.length} {isHindi ? "प्लान" : "plans"} • {service._count?.orders ?? 0} {isHindi ? "ऑर्डर" : "orders"}
+                        </div>
                       </div>
-                      {service.packages.length === 0 ? (
-                        <p className="text-xs text-on-surface-variant">
-                          {isHindi
-                            ? "अभी कोई पैकेज नहीं है। पैकेज बनाइए, फिर हर पैकेज में प्लान जोड़िए। ग्राहक पहले पैकेज, फिर प्लान चुनेगा।"
-                            : "No packages yet. Create a package, then add plans under it. Customers choose the package first, then the plan."}
-                        </p>
-                      ) : (
-                        <ul className="divide-y divide-outline-variant/40">
-                          {service.packages.map((pkg) => (
-                            <li key={pkg.id} className={`py-2 flex items-center justify-between gap-2 ${pkg.isActive ? "" : "opacity-60"}`}>
-                              <div className="min-w-0">
-                                <div className="text-sm font-semibold text-secondary truncate">{isHindi ? pkg.titleHi : pkg.titleEn}</div>
-                                <div className="text-[11px] text-on-surface-variant">
-                                  {service.plans.filter((p) => p.packageId === pkg.id).length} {isHindi ? "प्लान" : "plan(s)"}
-                                  {pkg.numberOfDays ? ` · ${pkg.numberOfDays} ${isHindi ? "दिन" : "days"}` : ""}
-                                  {pkg.startDate ? ` · ${pkg.startDate.slice(0, 10)}${pkg.endDate ? " → " + pkg.endDate.slice(0, 10) : ""}` : ""}
-                                  {pkg.seats ? ` · ${pkg.booked ?? 0}/${pkg.seats} ${isHindi ? "सीट भरीं" : "seats taken"}` : pkg.booked ? ` · ${pkg.booked} ${isHindi ? "बुकिंग" : "booked"}` : ""}
-                                  {!pkg.isActive ? (isHindi ? " · बंद" : " · switched off") : ""}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <button type="button" onClick={() => handleOpenPackageModal(service.id, pkg)} className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand">
-                                  {isHindi ? "संपादित करें" : "Edit"}
-                                </button>
-                                <button type="button" onClick={() => handleDeletePackage(service.id, pkg)} className="min-h-[36px] text-xs px-2 py-1 border border-error text-on-error-container rounded hover:bg-error-container">
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
                     </div>
-
-                    <div className="text-xs font-bold uppercase tracking-wider text-primary">
-                      {isHindi ? "इस सेवा के अंतर्गत उपलब्ध संस्करण (Plans)" : "Plans (each belongs to a package)"}
+                    <div className="flex flex-wrap items-center gap-2 lg:shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <button type="button" onClick={() => handleToggleServiceActive(service)} className="min-h-[38px] px-2.5 py-1 text-xs border border-outline-variant rounded hover:bg-surface transition-colors">
+                        {service.isActive ? (isHindi ? "अक्षम करें" : "Deactivate") : isHindi ? "सक्रिय करें" : "Activate"}
+                      </button>
+                      <button type="button" onClick={() => handleOpenServiceModal(service)} className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand transition-colors flex items-center gap-1">
+                        <Edit2 className="w-3.5 h-3.5" />
+                        <span>{isHindi ? "संपादित करें" : "Edit"}</span>
+                      </button>
+                      <button type="button" onClick={() => handleDeleteService(service)} className="min-h-[38px] px-2.5 py-1 text-xs bg-surface border border-error text-on-error-container rounded hover:bg-error-container transition-colors flex items-center gap-1">
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>{isHindi ? "हटाएँ" : "Remove"}</span>
+                      </button>
                     </div>
-
-                    {service.plans.length === 0 ? (
-                      <div className="p-4 text-center bg-surface-container-low rounded border border-dashed border-outline-variant text-xs text-on-surface-variant">
-                        {isHindi
-                          ? "इस सेवा में अभी कोई संस्करण नहीं है। 'संस्करण जोड़ें' पर क्लिक करें।"
-                          : "No plans under this service. Click 'Add Plan' to create one."}
+                  </div>
+                  {isExpanded && (
+                    <div className="p-4 border-t border-outline-variant/30 bg-surface space-y-3 text-sm">
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        {service.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={service.imageUrl} alt="" className="h-24 w-24 shrink-0 rounded-lg object-cover border border-outline-variant" />
+                        ) : null}
+                        <div className="min-w-0 space-y-1 text-xs text-on-surface-variant">
+                          <p className="line-clamp-3 text-sm text-on-surface">{(isHindi ? service.descriptionHi : service.descriptionEn) || "—"}</p>
+                          <p>/{service.slug}{service.youtubeUrl ? ` • ${isHindi ? "वीडियो जुड़ा है" : "video added"}` : ""}</p>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[...service.plans]
-                          .sort((a, b) => {
-                            const oa = service.packages.find((p) => p.id === a.packageId)?.orderIndex ?? 9999;
-                            const ob = service.packages.find((p) => p.id === b.packageId)?.orderIndex ?? 9999;
-                            return oa - ob || a.orderIndex - b.orderIndex;
-                          })
-                          .map((plan) => (
-                          <div
-                            key={plan.id}
-                            className={`p-4 rounded-lg border flex flex-col justify-between ${
-                              plan.isActive
-                                ? "border-outline-variant/60 bg-surface"
-                                : "border-outline-variant/30 bg-surface-container-low opacity-60"
-                            }`}
-                          >
-                            <div>
-                              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/30">
-                                <span className="text-xs font-serif font-bold text-secondary">
-                                  {isHindi ? plan.titleHi : plan.titleEn}
-                                  <span className="block text-[10px] font-sans font-semibold text-primary">
-                                    {(() => {
-                                      const pk = service.packages.find((p) => p.id === plan.packageId);
-                                      return pk ? (isHindi ? pk.titleHi : pk.titleEn) : isHindi ? "पैकेज नहीं चुना" : "No package chosen";
-                                    })()}
-                                  </span>
-                                </span>
-                                {plan.isPopular && (
-                                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand text-on-brand">
-                                    {isHindi ? "लोकप्रिय" : "Popular"}
-                                  </span>
-                                )}
-                              </div>
+                      <div>
+                        <div className="text-xs font-bold uppercase tracking-wider text-primary mb-1">
+                          {isHindi ? "इस सेवा के पैकेज" : "Packages in this service"}
+                        </div>
+                        {service.packages.length === 0 ? (
+                          <p className="text-xs text-on-surface-variant">{isHindi ? "अभी कोई पैकेज नहीं।" : "No packages yet."}</p>
+                        ) : (
+                          <ul className="flex flex-wrap gap-2">
+                            {service.packages.map((pk) => (
+                              <li key={pk.id} className="rounded-full border border-outline-variant bg-surface-container-low px-3 py-1 text-xs text-secondary">
+                                {isHindi ? pk.titleHi : pk.titleEn} <span className="text-on-surface-variant">({service.plans.filter((p) => p.packageId === pk.id).length} {isHindi ? "प्लान" : "plans"})</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        <Link href="/admin/packages" className="mt-2 inline-block text-xs font-bold text-primary hover:underline">
+                          {isHindi ? "पैकेज जोड़ें या बदलें →" : "Add or change packages →"}
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
 
-                              <div className="mt-3 flex items-baseline gap-2">
-                                <span className="font-serif text-2xl font-bold text-secondary">
-                                  {formatPaiseToInr(plan.pricePaise)}
-                                </span>
-                                {plan.originalPricePaise && (
-                                  <span className="text-xs line-through text-outline">
-                                    {formatPaiseToInr(plan.originalPricePaise)}
-                                  </span>
-                                )}
-                              </div>
-
-                              <div className="mt-3 space-y-1.5 text-xs text-on-surface-variant">
-                                <div className="flex items-center gap-1.5">
-                                  <Clock className="w-3.5 h-3.5 text-secondary" />
-                                  <span>{plan.deliveryDays} {isHindi ? "कार्यदिवस" : "days delivery"}</span>
-                                </div>
-                                {plan.pages && (
-                                  <div className="flex items-center gap-1.5">
-                                    <FileText className="w-3.5 h-3.5 text-secondary" />
-                                    <span>{plan.pages} {isHindi ? "पृष्ठ" : "Pages"}</span>
-                                  </div>
-                                )}
-                                {plan.hasCall && (
-                                  <div className="flex items-center gap-1.5 text-primary font-medium">
-                                    <PhoneCall className="w-3.5 h-3.5" />
-                                    <span>{plan.callDurationMinutes} {isHindi ? "मिनट परामर्श" : "mins call"}</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="mt-4 pt-3 border-t border-outline-variant/30 flex items-center justify-between gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleTogglePlanActive(service.id, plan)}
-                                className="min-h-[36px] text-xs px-2 py-1 border border-outline-variant rounded hover:bg-surface-container"
-                              >
-                                {plan.isActive ? (isHindi ? "अक्षम करें" : "Deactivate") : isHindi ? "सक्रिय करें" : "Activate"}
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleOpenPlanModal(service.id, plan)}
-                                className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary font-medium rounded hover:bg-brand-hover hover:text-on-brand transition-colors"
-                              >
-                                {isHindi ? "संपादित करें" : "Edit Plan"}
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleDeletePlan(service.id, plan)}
-                                className="min-h-[36px] text-xs px-2 py-1 border border-error text-on-error-container rounded hover:bg-error-container flex items-center gap-1"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                {isHindi ? "हटाएँ" : "Remove"}
-                              </button>
-                            </div>
+      {view === "packages" && (
+        <div className="space-y-5">
+          {services.length === 0 ? (
+            <div className="p-8 text-center bg-surface-container-low rounded border border-outline-variant/50 text-on-surface-variant text-sm">
+              {isHindi ? "पहले 'सेवाएँ' पेज पर एक सेवा बनाएँ।" : "Create a service first on the Services page."}
+            </div>
+          ) : (
+            services.map((service) => (
+              <section key={service.id} className="rounded-lg border border-outline-variant/60 bg-surface overflow-hidden">
+                <header className="flex items-center justify-between gap-2 bg-surface-container-low px-4 py-3">
+                  <h2 className="font-serif text-base font-bold text-secondary">{isHindi ? service.titleHi : service.titleEn}</h2>
+                  <button type="button" onClick={() => handleOpenPackageModal(service.id)} className="min-h-[36px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded flex items-center gap-1">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>{isHindi ? "पैकेज जोड़ें" : "Add package here"}</span>
+                  </button>
+                </header>
+                {service.packages.length === 0 ? (
+                  <p className="px-4 py-3 text-xs text-on-surface-variant">
+                    {isHindi ? "इस सेवा में अभी कोई पैकेज नहीं।" : "No packages under this service yet."}
+                  </p>
+                ) : (
+                  <ul className="divide-y divide-outline-variant/40">
+                    {service.packages.map((pkg) => (
+                      <li key={pkg.id} className={`px-4 py-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3 ${pkg.isActive ? "" : "opacity-60"}`}>
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold text-secondary">{isHindi ? pkg.titleHi : pkg.titleEn}</div>
+                          <div className="text-[11px] text-on-surface-variant">
+                            {service.plans.filter((p) => p.packageId === pkg.id).length} {isHindi ? "प्लान" : "plan(s)"}
+                            {pkg.numberOfDays ? ` · ${pkg.numberOfDays} ${isHindi ? "दिन" : "days"}` : ""}
+                            {pkg.startDate ? ` · ${pkg.startDate.slice(0, 10)}${pkg.endDate ? " → " + pkg.endDate.slice(0, 10) : ""}` : ""}
+                            {pkg.seats ? ` · ${pkg.booked ?? 0}/${pkg.seats} ${isHindi ? "सीट भरीं" : "seats taken"}` : pkg.booked ? ` · ${pkg.booked} ${isHindi ? "बुकिंग" : "booked"}` : ""}
+                            {!pkg.isActive ? (isHindi ? " · बंद" : " · switched off") : ""}
                           </div>
-                        ))}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          <label className="flex items-center gap-1 text-[11px] font-bold uppercase text-secondary">
+                            {isHindi ? "सेवा" : "Service"}
+                            <select
+                              aria-label={isHindi ? "पैकेज किस सेवा में है" : "Service this package belongs to"}
+                              value={service.id}
+                              onChange={(e) => handleMovePackage(pkg, e.target.value)}
+                              className="max-w-[180px] bg-surface-container-low border border-outline-variant/80 rounded px-2 py-1 text-xs font-normal normal-case min-h-[36px]"
+                            >
+                              {services.map((sv) => (
+                                <option key={sv.id} value={sv.id}>{isHindi ? sv.titleHi : sv.titleEn}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <button type="button" onClick={() => handleOpenPackageModal(service.id, pkg)} className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary rounded hover:bg-brand-hover hover:text-on-brand">
+                            {isHindi ? "संपादित करें" : "Edit"}
+                          </button>
+                          <button type="button" onClick={() => handleDeletePackage(service.id, pkg)} aria-label={isHindi ? "हटाएँ" : "Remove"} className="min-h-[36px] text-xs px-2 py-1 border border-error text-on-error-container rounded hover:bg-error-container">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            ))
+          )}
+        </div>
+      )}
+
+      {view === "plans" && (
+        <div className="space-y-6">
+          {services.every((s) => s.packages.length === 0) ? (
+            <div className="p-8 text-center bg-surface-container-low rounded border border-outline-variant/50 text-on-surface-variant text-sm">
+              {isHindi ? "प्लान जोड़ने से पहले 'पैकेज' पेज पर पैकेज बनाएँ।" : "Create a package on the Packages page before adding plans."}
+            </div>
+          ) : (
+            services.flatMap((service) =>
+              service.packages.map((pkg) => {
+                const plans = service.plans.filter((p) => p.packageId === pkg.id).sort((a, b) => a.orderIndex - b.orderIndex);
+                return (
+                  <section key={pkg.id} className="rounded-lg border border-outline-variant/60 bg-surface overflow-hidden">
+                    <header className="flex items-center justify-between gap-2 bg-surface-container-low px-4 py-3">
+                      <h2 className="font-serif text-base font-bold text-secondary">
+                        {isHindi ? service.titleHi : service.titleEn} <span className="text-primary">›</span> {isHindi ? pkg.titleHi : pkg.titleEn}
+                      </h2>
+                      <button type="button" onClick={() => handleOpenPlanModal(service.id, undefined, pkg.id)} className="min-h-[36px] px-3 py-1 text-xs bg-brand hover:bg-brand-hover text-on-brand font-semibold rounded flex items-center gap-1">
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>{isHindi ? "प्लान जोड़ें" : "Add plan here"}</span>
+                      </button>
+                    </header>
+                    {plans.length === 0 ? (
+                      <p className="px-4 py-3 text-xs text-on-surface-variant">{isHindi ? "इस पैकेज में अभी कोई प्लान नहीं।" : "No plans in this package yet."}</p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                        {plans.map((plan) => {
+                          const linked = offers.filter((o) => o.isActive && (o.planIds.includes(plan.id) || (o.planIds.length === 0 && (o.serviceSlugs.length === 0 || o.serviceSlugs.includes(service.slug)))));
+                          return (
+                            <div key={plan.id} className={`p-4 rounded-lg border flex flex-col justify-between ${plan.isActive ? "border-outline-variant/60 bg-surface" : "border-outline-variant/30 bg-surface-container-low opacity-60"}`}>
+                              <div>
+                                <div className="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+                                  <span className="text-xs font-serif font-bold text-secondary">{isHindi ? plan.titleHi : plan.titleEn}</span>
+                                  {plan.isPopular && (
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand text-on-brand">{isHindi ? "लोकप्रिय" : "Popular"}</span>
+                                  )}
+                                </div>
+                                <div className="mt-3 flex items-baseline gap-2">
+                                  <span className="font-serif text-2xl font-bold text-secondary">{formatPaiseToInr(plan.pricePaise)}</span>
+                                  {plan.originalPricePaise && <span className="text-xs line-through text-outline">{formatPaiseToInr(plan.originalPricePaise)}</span>}
+                                </div>
+                                <div className="mt-3 space-y-1.5 text-xs text-on-surface-variant">
+                                  <div className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-secondary" /><span>{plan.deliveryDays} {isHindi ? "कार्यदिवस" : "days delivery"}</span></div>
+                                  {plan.pages && <div className="flex items-center gap-1.5"><FileText className="w-3.5 h-3.5 text-secondary" /><span>{plan.pages} {isHindi ? "पृष्ठ" : "Pages"}</span></div>}
+                                  {plan.hasCall && <div className="flex items-center gap-1.5 text-primary font-medium"><PhoneCall className="w-3.5 h-3.5" /><span>{plan.callDurationMinutes} {isHindi ? "मिनट परामर्श" : "mins call"}</span></div>}
+                                </div>
+                                <div className="mt-3 text-[11px] text-on-surface-variant">
+                                  <span className="font-bold uppercase tracking-wider text-primary">{isHindi ? "ऑफ़र:" : "Offers:"}</span>{" "}
+                                  {linked.length === 0 ? (isHindi ? "कोई नहीं" : "none") : linked.map((o) => o.code).join(", ")}
+                                </div>
+                              </div>
+                              <div className="mt-4 pt-3 border-t border-outline-variant/30 space-y-2">
+                                <label className="flex items-center gap-1 text-[11px] font-bold uppercase text-secondary">
+                                  {isHindi ? "पैकेज" : "Package"}
+                                  <select
+                                    aria-label={isHindi ? "प्लान किस पैकेज में है" : "Package this plan belongs to"}
+                                    value={pkg.id}
+                                    onChange={(e) => handleMovePlan(plan, e.target.value)}
+                                    className="min-w-0 flex-1 bg-surface-container-low border border-outline-variant/80 rounded px-2 py-1 text-xs font-normal normal-case min-h-[36px]"
+                                  >
+                                    {services.map((sv) => (
+                                      <optgroup key={sv.id} label={isHindi ? sv.titleHi : sv.titleEn}>
+                                        {sv.packages.map((pk) => (
+                                          <option key={pk.id} value={pk.id}>{isHindi ? pk.titleHi : pk.titleEn}</option>
+                                        ))}
+                                      </optgroup>
+                                    ))}
+                                  </select>
+                                </label>
+                                <div className="flex items-center justify-between gap-2">
+                                  <button type="button" onClick={() => handleTogglePlanActive(service.id, plan)} className="min-h-[36px] text-xs px-2 py-1 border border-outline-variant rounded hover:bg-surface-container">
+                                    {plan.isActive ? (isHindi ? "अक्षम करें" : "Deactivate") : isHindi ? "सक्रिय करें" : "Activate"}
+                                  </button>
+                                  <button type="button" onClick={() => handleOpenPlanModal(service.id, plan)} className="min-h-[36px] text-xs px-3 py-1 bg-surface border border-secondary text-secondary font-medium rounded hover:bg-brand-hover hover:text-on-brand transition-colors">
+                                    {isHindi ? "संपादित करें" : "Edit Plan"}
+                                  </button>
+                                  <button type="button" onClick={() => handleDeletePlan(service.id, plan)} aria-label={isHindi ? "हटाएँ" : "Remove"} className="min-h-[36px] text-xs px-2 py-1 border border-error text-on-error-container rounded hover:bg-error-container flex items-center gap-1">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
+                  </section>
+                );
+              })
+            )
+          )}
+        </div>
+      )}
 
       {/* Modal: Service Form */}
       {serviceModalOpen && (
@@ -1092,17 +1167,17 @@ export function AdminServicesManager({
             </div>
 
             <div className="mt-4 rounded-lg border border-gold/60 bg-gold/15 p-3 text-xs text-secondary leading-relaxed">
-              <div className="font-bold mb-1">{isHindi ? "पैकेज और प्लान कहाँ जोड़ें" : "Where do packages and plans go?"}</div>
+              <div className="font-bold mb-1">{isHindi ? "पैकेज और प्लान कहाँ जोड़ें" : "Where do packages and plans go?"}{" "}<InfoTip text={isHindi ? "क्रम हमेशा: 1 सेवा, 2 पैकेज, 3 प्लान, 4 ऑफ़र।" : "The order is always: 1 Service, 2 Package, 3 Plan, 4 Offer."} /></div>
               {isHindi
-                ? "यह फ़ॉर्म केवल सेवा की जानकारी के लिए है। सेवा सहेजने के बाद, सूची में उस सेवा के कार्ड पर 'पैकेज जोड़ें' और 'संस्करण जोड़ें (Plan)' बटन दबाएँ। क्रम: सेवा → पैकेज → प्लान। पैकेज और प्लान की कोई सीमा नहीं है। ऑफ़र 'प्रोमो कोड' पेज से जोड़ें।"
-                : "This form is only for the service itself. Save it, then on that service's card in the list press 'Add Package' and 'Add Plan'. Order: Service → Package → Plan. There is no limit on the number of packages or plans. Offers are added from the 'Promo codes' page."}
+                ? "यह फ़ॉर्म केवल सेवा की जानकारी के लिए है। सेवा सहेजने के बाद 'पैकेज' पेज पर जाकर उसके पैकेज जोड़ें, फिर 'प्लान' पेज पर प्लान, और अंत में 'ऑफ़र' पेज पर ऑफ़र। सेवा, पैकेज, प्लान या ऑफ़र की कोई सीमा नहीं है।"
+                : "This form is only for the service itself. Save it, then add its packages on the Packages page, plans on the Plans page and offers on the Offers page. There is no limit on how many services, packages, plans or offers you add."}
             </div>
 
             <form onSubmit={handleSaveService} className="mt-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
-                    Slug (URL Key) *
+                    Slug (URL Key) * <InfoTip text={isHindi ? "वेबसाइट के पते में दिखने वाला छोटा नाम, अंग्रेज़ी अक्षरों और - में, जैसे kundli-basic। बाद में न बदलें।" : "The short name used in the web address, in English letters and dashes, like kundli-basic. Avoid changing it later."} />
                   </label>
                   <input
                     type="text"
@@ -1116,7 +1191,7 @@ export function AdminServicesManager({
 
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
-                    Order Index (क्रम)
+                    Order Index (क्रम) <InfoTip text={isHindi ? "सूची में स्थान। छोटी संख्या पहले दिखती है।" : "Position in the list. A smaller number shows first."} />
                   </label>
                   <input
                     type="number"
@@ -1230,6 +1305,10 @@ export function AdminServicesManager({
               </div>
 
               {/* Media: Image & YouTube URL (#17, #47) */}
+              <p className="text-xs text-on-surface-variant">
+                {isHindi ? "चित्र, वीडियो और लिंक" : "Picture, video and links"}{" "}
+                <InfoTip text={isHindi ? "चित्र अपलोड करें या लिंक डालें; YouTube का लिंक चिपकाएँ तो वीडियो पेज पर दिखेगा; अतिरिक्त लिंक में कोई भी पेज जोड़ें।" : "Upload a picture or paste its link. A YouTube link shows as a video on the page. Extra links can point to any page."} />
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
@@ -1357,6 +1436,23 @@ export function AdminServicesManager({
               </button>
             </div>
             <form onSubmit={handleSavePackage} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase text-secondary mb-1">
+                  {isHindi ? "किस सेवा के अंतर्गत *" : "Under which service *"}{" "}
+                  <InfoTip text={isHindi ? "यह पैकेज जिस सेवा में दिखना चाहिए उसे चुनें। बाद में यहीं से बदलकर इसे (अपने प्लान सहित) दूसरी सेवा में ले जा सकते हैं।" : "Choose the service this package should appear in. You can change it later to move the package, with its plans, to another service."} />
+                </label>
+                <select
+                  required
+                  value={packageModal.serviceId}
+                  onChange={(e) => setPackageModal({ ...packageModal, serviceId: e.target.value })}
+                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]"
+                >
+                  <option value="">{isHindi ? "— सेवा चुनें —" : "— Choose a service —"}</option>
+                  {services.map((sv) => (
+                    <option key={sv.id} value={sv.id}>{isHindi ? sv.titleHi : sv.titleEn}</option>
+                  ))}
+                </select>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">Package name (English) *</label>
@@ -1396,7 +1492,7 @@ export function AdminServicesManager({
                     <input type="date" value={packageForm.endDate} onChange={(e) => setPackageForm({ ...packageForm, endDate: e.target.value })} className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-secondary mb-1">Seats (empty = no limit)</label>
+                    <label className="block text-[11px] font-bold uppercase text-secondary mb-1">Seats (empty = no limit) <InfoTip text={isHindi ? "इस पैकेज में अधिकतम बुकिंग। भरने पर पैकेज अपने आप बंद हो जाता है। खाली छोड़ें तो कोई सीमा नहीं।" : "The most bookings this package takes. It closes by itself when full. Leave empty for no limit."} /></label>
                     <input type="number" min={1} value={packageForm.seats} onChange={(e) => setPackageForm({ ...packageForm, seats: e.target.value })} className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
                   </div>
                 </div>
@@ -1530,7 +1626,8 @@ export function AdminServicesManager({
             <form onSubmit={handleSavePlan} className="mt-4 space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase text-secondary mb-1">
-                  {isHindi ? "पैकेज *" : "Package *"}
+                  {isHindi ? "पैकेज *" : "Package *"}{" "}
+                  <InfoTip text={isHindi ? "इस प्लान को किस पैकेज में दिखाना है, वह चुनें। सेवा अपने आप पैकेज से तय हो जाती है। बाद में प्लान को दूसरे पैकेज में भी ले जा सकते हैं।" : "Pick the package this plan belongs to. The service follows from the package. You can move the plan to another package later."} />
                 </label>
                 <select
                   value={planForm.packageId}
@@ -1538,12 +1635,16 @@ export function AdminServicesManager({
                   className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]"
                 >
                   <option value="">{isHindi ? "— पैकेज चुनें —" : "— Choose a package —"}</option>
-                  {(services.find((sv) => sv.id === selectedServiceForPlan)?.packages ?? []).map((pk) => (
-                    <option key={pk.id} value={pk.id}>{isHindi ? pk.titleHi : pk.titleEn}</option>
+                  {services.map((sv) => (
+                    <optgroup key={sv.id} label={isHindi ? sv.titleHi : sv.titleEn}>
+                      {sv.packages.map((pk) => (
+                        <option key={pk.id} value={pk.id}>{isHindi ? pk.titleHi : pk.titleEn}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
                 <p className="mt-1 text-[11px] text-on-surface-variant">
-                  {isHindi ? "पैकेज न दिखे तो पहले सेवा में 'पैकेज जोड़ें' दबाएँ।" : "If no package is listed, first use 'Add Package' on the service."}
+                  {isHindi ? "पैकेज न दिखे तो पहले 'पैकेज' पेज पर पैकेज बनाएँ।" : "If the package you need is not listed, create it first on the Packages page."}
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1606,7 +1707,7 @@ export function AdminServicesManager({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-surface-container-low p-3 rounded border border-outline-variant/40">
                 <div>
                   <label className="block text-xs font-bold uppercase text-secondary mb-1">
-                    दक्षिणा दर (₹ Rupees) *
+                    दक्षिणा दर (₹ Rupees) * <InfoTip text={isHindi ? "ग्राहक यही कीमत चुकाता है, रुपये में लिखें। कटी हुई पुरानी कीमत अलग खाने में डालें।" : "The price the customer pays, typed in rupees. Put a crossed-out old price in the next box if you want to show a saving."} />
                   </label>
                   <input
                     type="number"

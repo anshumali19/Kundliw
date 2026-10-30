@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Role } from "@prisma/client";
 import { requireUser } from "@/lib/auth/guards";
 import { SITE_URL } from "@/lib/seo";
+import { ServiceExplorer } from "@/components/content/ServiceExplorer";
 import { AssociateDashboard } from "@/features/associate/AssociateDashboard";
 
 export const dynamic = "force-dynamic";
@@ -12,5 +13,5 @@ export default async function AssociatePage(props: { params: Promise<{ locale: s
   if (user.role !== Role.ASSOCIATE) {
     redirect(`/${locale}/account`);
   }
-  return <AssociateDashboard locale={locale} siteUrl={SITE_URL} />;
+  return <AssociateDashboard locale={locale} siteUrl={SITE_URL} explorer={<ServiceExplorer userId={user.id} locale={locale} />} />;
 }

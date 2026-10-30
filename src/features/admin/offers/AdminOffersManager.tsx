@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { InfoTip } from "@/components/admin/InfoTip";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { paiseToRupees } from "@/lib/billing/money";
 import {
@@ -44,7 +45,13 @@ export interface AdminOfferItem {
 
 interface AdminOffersManagerProps {
   initialOffers: AdminOfferItem[];
-  services: { slug: string; titleEn: string; titleHi: string; plans?: { id: string; titleEn: string; titleHi: string }[] }[];
+  services: {
+    slug: string;
+    titleEn: string;
+    titleHi: string;
+    packages?: { id: string; titleEn: string; titleHi: string }[];
+    plans?: { id: string; packageId?: string | null; titleEn: string; titleHi: string }[];
+  }[];
   locale: string;
 }
 
@@ -241,7 +248,8 @@ export function AdminOffersManager({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/40 pb-4">
         <div>
           <h1 className="font-serif text-2xl font-bold text-secondary">
-            {isHindi ? "विशेष छूट एवं कूपन प्रबंधन" : "Offers & Promo Codes"}
+            {isHindi ? "4. ऑफ़र एवं प्रोमो कोड" : "4. Offers & Promo Codes"}{" "}
+            <InfoTip text={isHindi ? "ऑफ़र एक छूट या कोड है। इसे किसी भी संख्या में बना सकते हैं और चुने हुए प्लान, पूरे पैकेज या पूरी सेवा से जोड़ सकते हैं। 'प्लान पर दिखाएँ' चुनें तो ऑफ़र प्लान के पास दिखता है, 'अपने आप लगे' चुनें तो कोड डालना नहीं पड़ता।" : "An offer is a discount or a code. Make as many as you like and attach each to chosen plans, a whole package or a whole service. 'Show on plan' lists it next to the plan; 'apply automatically' means no code is typed."} />
           </h1>
           <p className="text-xs text-on-surface-variant mt-1">
             {isHindi
@@ -602,7 +610,8 @@ export function AdminOffersManager({
                 </div>
                 <div className="sm:col-span-2">
                   <span className="block text-xs font-bold uppercase text-secondary mb-1">
-                    किन सेवाओं पर मान्य (Valid for)
+                    किन सेवाओं पर मान्य (Valid for){" "}
+                    <InfoTip text={isHindi ? "ऑफ़र किन सेवाओं पर चले। कुछ न चुनें तो सब पर।" : "Which services this offer works on. Choose none for all of them."} />
                   </span>
                   <p className="text-[11px] text-on-surface-variant mb-1">कुछ न चुनें तो सभी सेवाओं पर मान्य (none selected = all services)</p>
                   <div className="flex flex-wrap gap-2">
@@ -630,7 +639,8 @@ export function AdminOffersManager({
 
               <div>
                 <span className="block text-xs font-bold uppercase text-secondary mb-1">
-                  किन प्लान पर मान्य (Valid for these plans)
+                  किन प्लान पर मान्य (Valid for these plans){" "}
+                  <InfoTip text={isHindi ? "ऑफ़र को चुने हुए प्लान से जोड़ें। 'पूरा पैकेज' दबाएँ तो उस पैकेज के सभी प्लान एक साथ चुन लिए जाते हैं। कुछ न चुनें तो चुनी सेवाओं के सब प्लान पर चलेगा।" : "Attach the offer to chosen plans. Press 'Whole package' to pick every plan of that package at once. Choose none and it works on every plan of the chosen services."} />
                 </span>
                 <p className="text-[11px] text-on-surface-variant mb-2">
                   कुछ न चुनें तो चुनी हुई सेवाओं के सभी प्लान पर मान्य (none selected = every plan)
@@ -641,6 +651,28 @@ export function AdminOffersManager({
                     .map((sv) => (
                       <div key={sv.slug}>
                         <div className="text-[11px] font-bold text-secondary mb-1">{isHindi ? sv.titleHi : sv.titleEn}</div>
+                        {(sv.packages ?? []).length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {(sv.packages ?? []).map((pk) => {
+                              const ids = (sv.plans ?? []).filter((p) => p.packageId === pk.id).map((p) => p.id);
+                              if (ids.length === 0) return null;
+                              const all = ids.every((id) => form.planIds.includes(id));
+                              return (
+                                <button
+                                  key={pk.id}
+                                  type="button"
+                                  aria-pressed={all}
+                                  onClick={() =>
+                                    setForm({ ...form, planIds: all ? form.planIds.filter((x) => !ids.includes(x)) : Array.from(new Set([...form.planIds, ...ids])) })
+                                  }
+                                  className={`min-h-[36px] px-3 rounded-full border text-xs font-semibold ${all ? "border-primary bg-primary text-on-primary" : "border-primary text-primary hover:bg-primary/10"}`}
+                                >
+                                  {all ? "✓ " : ""}{isHindi ? "पूरा पैकेज: " : "Whole package: "}{isHindi ? pk.titleHi : pk.titleEn}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                         <div className="flex flex-wrap gap-2">
                           {(sv.plans ?? []).map((pl) => {
                             const on = form.planIds.includes(pl.id);

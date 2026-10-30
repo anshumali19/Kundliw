@@ -25,7 +25,7 @@ interface Summary {
   }>;
 }
 
-export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUrl: string }) {
+export function AssociateDashboard({ locale, siteUrl, explorer }: { locale: string; siteUrl: string; explorer?: React.ReactNode }) {
   const isHindi = locale === "hi";
   const t = (en: string, hi: string) => (isHindi ? hi : en);
 
@@ -409,6 +409,7 @@ export function AssociateDashboard({ locale, siteUrl }: { locale: string; siteUr
         <FileDown className="w-4 h-4" />
         {t("Download the Associate guide (PDF)", "एसोसिएट मार्गदर्शिका (PDF) डाउनलोड करें")}
       </a>
+      {explorer}
     </div>
   );
 }
