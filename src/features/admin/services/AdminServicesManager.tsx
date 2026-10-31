@@ -164,6 +164,12 @@ export function AdminServicesManager({
     services[0]?.id || null
   );
 
+  // Packages and Plans pages: the admin picks the parent first (Service, then Package) before adding a child
+  const [pickedServiceId, setPickedServiceId] = useState<string>(initialServices[0]?.id ?? "");
+  const [pickedPackageId, setPickedPackageId] = useState<string>("");
+  const pickedService = services.find((sv) => sv.id === pickedServiceId) ?? services[0];
+  const pickedPackage = pickedService?.packages.find((pk) => pk.id === pickedPackageId) ?? pickedService?.packages[0];
+
   // Service Modal state
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<AdminServiceItem | null>(null);
@@ -874,8 +880,15 @@ export function AdminServicesManager({
 
         <button
           type="button"
-          onClick={() => (view === "packages" ? handleOpenPackageModal("") : view === "plans" ? handleOpenPlanModal("") : handleOpenServiceModal())}
-          className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
+          onClick={() =>
+            view === "packages"
+              ? handleOpenPackageModal(pickedService?.id ?? "")
+              : view === "plans"
+              ? handleOpenPlanModal(pickedService?.id ?? "", undefined, pickedPackage?.id)
+              : handleOpenServiceModal()
+          }
+          disabled={(view === "packages" && !pickedService) || (view === "plans" && !pickedPackage)}
+          className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="w-4 h-4" />
           <span>
@@ -896,6 +909,50 @@ export function AdminServicesManager({
         <div className="p-3 bg-surface rounded border border-error text-xs text-on-error-container font-medium flex items-center gap-2">
           <AlertCircle className="w-4 h-4" />
           <span>{errorMsg}</span>
+        </div>
+      )}
+
+      {(view === "packages" || view === "plans") && services.length > 0 && (
+        <div className="rounded-lg border border-gold/60 bg-gold/15 p-4 space-y-3">
+          <div className="text-xs font-bold text-secondary">
+            {view === "packages"
+              ? isHindi ? "पहले सूची से एक सेवा चुनें, फिर उसका पैकेज जोड़ें।" : "First select one service from the list, then add its package."
+              : isHindi ? "पहले सेवा चुनें, फिर उसका पैकेज चुनें, फिर प्लान जोड़ें।" : "First select the service, then select its package, then add the plan."}{" "}
+            <InfoTip text={isHindi ? "एक सेवा में कई पैकेज और एक पैकेज में कई प्लान हो सकते हैं। नीचे चुनी हुई सेवा (और पैकेज) की ही सूची दिखती है।" : "A service can have many packages and a package can have many plans. The list below shows only the service (and package) you select."} />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="block text-[11px] font-bold uppercase text-secondary">
+              {isHindi ? "1. सेवा" : "1. Service"}
+              <select
+                value={pickedService?.id ?? ""}
+                onChange={(e) => {
+                  setPickedServiceId(e.target.value);
+                  setPickedPackageId("");
+                }}
+                className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px] mt-1 font-normal normal-case"
+              >
+                {services.map((sv) => (
+                  <option key={sv.id} value={sv.id}>{isHindi ? sv.titleHi : sv.titleEn}</option>
+                ))}
+              </select>
+            </label>
+            {view === "plans" && (
+              <label className="block text-[11px] font-bold uppercase text-secondary">
+                {isHindi ? "2. पैकेज" : "2. Package"}
+                <select
+                  value={pickedPackage?.id ?? ""}
+                  onChange={(e) => setPickedPackageId(e.target.value)}
+                  disabled={!pickedService || pickedService.packages.length === 0}
+                  className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px] mt-1 font-normal normal-case"
+                >
+                  {(pickedService?.packages ?? []).length === 0 && <option value="">{isHindi ? "इस सेवा में कोई पैकेज नहीं" : "No packages in this service"}</option>}
+                  {(pickedService?.packages ?? []).map((pk) => (
+                    <option key={pk.id} value={pk.id}>{isHindi ? pk.titleHi : pk.titleEn}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
         </div>
       )}
 
@@ -992,7 +1049,7 @@ export function AdminServicesManager({
               {isHindi ? "पहले 'सेवाएँ' पेज पर एक सेवा बनाएँ।" : "Create a service first on the Services page."}
             </div>
           ) : (
-            services.map((service) => (
+            services.filter((sv) => sv.id === pickedService?.id).map((service) => (
               <section key={service.id} className="rounded-lg border border-outline-variant/60 bg-surface overflow-hidden">
                 <header className="flex items-center justify-between gap-2 bg-surface-container-low px-4 py-3">
                   <h2 className="font-serif text-base font-bold text-secondary">{isHindi ? service.titleHi : service.titleEn}</h2>
@@ -1057,8 +1114,8 @@ export function AdminServicesManager({
               {isHindi ? "प्लान जोड़ने से पहले 'पैकेज' पेज पर पैकेज बनाएँ।" : "Create a package on the Packages page before adding plans."}
             </div>
           ) : (
-            services.flatMap((service) =>
-              service.packages.map((pkg) => {
+            services.filter((sv) => sv.id === pickedService?.id).flatMap((service) =>
+              service.packages.filter((pk) => pk.id === pickedPackage?.id).map((pkg) => {
                 const plans = service.plans.filter((p) => p.packageId === pkg.id).sort((a, b) => a.orderIndex - b.orderIndex);
                 return (
                   <section key={pkg.id} className="rounded-lg border border-outline-variant/60 bg-surface overflow-hidden">

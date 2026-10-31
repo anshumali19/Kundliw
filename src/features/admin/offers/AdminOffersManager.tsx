@@ -63,6 +63,16 @@ export function AdminOffersManager({
   const isHindi = locale === "hi";
   const [offers, setOffers] = useState<AdminOfferItem[]>(initialOffers);
 
+  // pick the parents first: Service, then Package, then Plan; offers are then created for that plan
+  const [pickSlug, setPickSlug] = useState<string>(services[0]?.slug ?? "");
+  const [pickPackageId, setPickPackageId] = useState<string>("");
+  const [pickPlanId, setPickPlanId] = useState<string>("");
+  const [showAll, setShowAll] = useState(false);
+  const pickService = services.find((sv) => sv.slug === pickSlug) ?? services[0];
+  const pickPackage = (pickService?.packages ?? []).find((pk) => pk.id === pickPackageId) ?? pickService?.packages?.[0];
+  const packagePlans = (pickService?.plans ?? []).filter((pl) => pl.packageId === pickPackage?.id);
+  const pickPlan = packagePlans.find((pl) => pl.id === pickPlanId) ?? packagePlans[0];
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingOffer, setEditingOffer] = useState<AdminOfferItem | null>(null);
 
@@ -90,7 +100,7 @@ export function AdminOffersManager({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const handleOpenModal = (offer?: AdminOfferItem) => {
+  const handleOpenModal = (offer?: AdminOfferItem, preset?: { serviceSlug: string; planId: string }) => {
     setErrorMsg(null);
     setSuccessMsg(null);
     if (offer) {
@@ -224,6 +234,13 @@ export function AdminOffersManager({
     }
   };
 
+  /** Which plan each offer is attached to, for the list under the pickers. */
+  const appliesToPick = (o: AdminOfferItem) =>
+    !!pickPlan &&
+    (o.planIds.includes(pickPlan.id) ||
+      (o.planIds.length === 0 && (o.serviceSlugs.length === 0 || o.serviceSlugs.includes(pickService?.slug ?? ""))));
+  const visibleOffers = showAll ? offers : offers.filter(appliesToPick);
+
   // Removes an offer. Offers already used on orders are switched off instead, so order records stay intact.
   const handleDeleteOffer = async (offer: AdminOfferItem) => {
     if (!window.confirm(isHindi ? `"${offer.code}" हटाएँ?` : `Remove the offer "${offer.code}"?`)) return;
@@ -260,11 +277,17 @@ export function AdminOffersManager({
 
         <button
           type="button"
-          onClick={() => handleOpenModal()}
-          className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto"
+          onClick={() => {
+            handleOpenModal(undefined);
+            if (pickService && pickPlan) {
+              setForm((f) => ({ ...f, serviceSlugs: [pickService.slug], planIds: [pickPlan.id] }));
+            }
+          }}
+          disabled={!pickPlan}
+          className="min-h-[44px] px-4 py-2 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded transition-colors flex items-center gap-2 self-start sm:self-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="w-4 h-4" />
-          <span>{isHindi ? "नया कूपन बनाएँ" : "Create Offer Code"}</span>
+          <span>{isHindi ? "इस प्लान के लिए ऑफ़र बनाएँ" : "Create offer for this plan"}</span>
         </button>
       </div>
 
@@ -283,6 +306,66 @@ export function AdminOffersManager({
         </div>
       )}
 
+      <div className="rounded-lg border border-gold/60 bg-gold/15 p-4 space-y-3">
+        <div className="text-xs font-bold text-secondary">
+          {isHindi ? "पहले सेवा, फिर पैकेज, फिर प्लान चुनें, उसके बाद ऑफ़र बनाएँ।" : "Select the service, then the package, then the plan, and then create the offer."}{" "}
+          <InfoTip text={isHindi ? "एक प्लान पर कई ऑफ़र हो सकते हैं। नीचे उसी प्लान पर चलने वाले ऑफ़र दिखते हैं। पूरे पैकेज पर ऑफ़र चाहिए तो फ़ॉर्म में 'पूरा पैकेज' दबाएँ।" : "A plan can have many offers. The list below shows the offers that work on the selected plan. For an offer on a whole package, press 'Whole package' inside the form."} />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label className="block text-[11px] font-bold uppercase text-secondary">
+            {isHindi ? "1. सेवा" : "1. Service"}
+            <select
+              value={pickService?.slug ?? ""}
+              onChange={(e) => {
+                setPickSlug(e.target.value);
+                setPickPackageId("");
+                setPickPlanId("");
+              }}
+              className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px] mt-1 font-normal normal-case"
+            >
+              {services.map((sv) => (
+                <option key={sv.slug} value={sv.slug}>{isHindi ? sv.titleHi : sv.titleEn}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-[11px] font-bold uppercase text-secondary">
+            {isHindi ? "2. पैकेज" : "2. Package"}
+            <select
+              value={pickPackage?.id ?? ""}
+              onChange={(e) => {
+                setPickPackageId(e.target.value);
+                setPickPlanId("");
+              }}
+              disabled={(pickService?.packages ?? []).length === 0}
+              className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px] mt-1 font-normal normal-case"
+            >
+              {(pickService?.packages ?? []).length === 0 && <option value="">{isHindi ? "कोई पैकेज नहीं" : "No packages"}</option>}
+              {(pickService?.packages ?? []).map((pk) => (
+                <option key={pk.id} value={pk.id}>{isHindi ? pk.titleHi : pk.titleEn}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-[11px] font-bold uppercase text-secondary">
+            {isHindi ? "3. प्लान" : "3. Plan"}
+            <select
+              value={pickPlan?.id ?? ""}
+              onChange={(e) => setPickPlanId(e.target.value)}
+              disabled={packagePlans.length === 0}
+              className="w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px] mt-1 font-normal normal-case"
+            >
+              {packagePlans.length === 0 && <option value="">{isHindi ? "कोई प्लान नहीं" : "No plans"}</option>}
+              {packagePlans.map((pl) => (
+                <option key={pl.id} value={pl.id}>{isHindi ? pl.titleHi : pl.titleEn}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <label className="inline-flex items-center gap-2 text-xs text-secondary cursor-pointer">
+          <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+          {isHindi ? "सभी ऑफ़र दिखाएँ (किसी भी प्लान के)" : "Show every offer, whatever plan it is on"}
+        </label>
+      </div>
+
       {/* Offers Table */}
       <div className="overflow-x-auto rounded-lg border border-outline-variant/60 bg-surface shadow-sm">
         <table className="w-full text-left border-collapse text-xs">
@@ -298,14 +381,14 @@ export function AdminOffersManager({
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/30 text-on-surface">
-            {offers.length === 0 ? (
+            {visibleOffers.length === 0 ? (
               <tr>
                 <td colSpan={7} className="p-8 text-center text-on-surface-variant">
-                  {isHindi ? "कोई कूपन उपलब्ध नहीं है।" : "No offers available."}
+                  {isHindi ? "इस प्लान पर अभी कोई ऑफ़र नहीं। ऊपर 'इस प्लान के लिए ऑफ़र बनाएँ' दबाएँ।" : "No offers on this plan yet. Press 'Create offer for this plan' above."}
                 </td>
               </tr>
             ) : (
-              offers.map((offer) => {
+              visibleOffers.map((offer) => {
                 const discountDisplay =
                   offer.discountType === "PERCENTAGE"
                     ? `${offer.discountValuePaise}% ${
