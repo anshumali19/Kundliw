@@ -840,3 +840,72 @@ model TeamMember {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+/// Sister services desk: Vindhya Vivah Sanskar (matrimony) profiles awaiting or holding approval
+model MatrimonyProfile {
+  id           String    @id @default(cuid())
+  name         String
+  phone        String
+  gender       String    @default("FEMALE") // MALE, FEMALE
+  dob          String?
+  city         String?
+  about        String?   @db.Text
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  isPaidMember Boolean   @default(false)
+  paidUntil    DateTime?
+  notes        String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([status])
+}
+
+/// Sister services desk: Bharat Darshan vehicles and their drivers
+model TravelVehicle {
+  id          String   @id @default(cuid())
+  name        String
+  number      String
+  seats       Int      @default(4)
+  driverName  String?
+  driverPhone String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  requests TravelRequest[]
+}
+
+/// Sister services desk: Bharat Darshan pilgrimage and tour requests
+model TravelRequest {
+  id          String         @id @default(cuid())
+  name        String
+  phone       String
+  destination String
+  travelDate  DateTime?
+  passengers  Int            @default(1)
+  vehicleId   String?
+  vehicle     TravelVehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  status      String         @default("NEW") // NEW, CONFIRMED, ONGOING, COMPLETED, CANCELLED
+  notes       String?        @db.Text
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([status])
+}
+
+/// Sister services desk: ITR help desk, one row per document set a client submits
+model TaxCase {
+  id             String   @id @default(cuid())
+  clientName     String
+  phone          String
+  assessmentYear String
+  docType        String
+  documentUrl    String?
+  filingStatus   String   @default("RECEIVED") // RECEIVED, IN_PROGRESS, FILED, ACKNOWLEDGED
+  ackNumber      String?
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([filingStatus])
+}
