@@ -198,9 +198,9 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
           />
 
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {tb("showSocial") && social.length > 0 && (
+            {tb("showSocial") && social.some((l) => l.id !== "whatsapp") && (
               <ul className="hidden lg:flex items-center gap-1.5 -mr-1" aria-label="Social media">
-                {social.map((l) => (
+                {social.filter((l) => l.id !== "whatsapp").map((l) => (
                   <li key={l.id}>
                     <a href={l.url} target="_blank" rel="noopener noreferrer" aria-label={l.name} title={l.name} style={{ background: socialBackground(l.id) }} className="inline-flex items-center justify-center w-6 h-6 rounded-full ring-1 ring-white/30 transition hover:scale-110 hover:brightness-110">
                       <SocialIcon id={l.id} className="w-3.5 h-3.5 text-white" />

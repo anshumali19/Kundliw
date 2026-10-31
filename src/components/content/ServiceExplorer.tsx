@@ -53,6 +53,23 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
         </p>
       </div>
 
+      <ol className="grid grid-cols-2 lg:grid-cols-4 gap-2" aria-label={t("Overview", "सारांश")}>
+        {[
+          { n: 1, en: "Services", hi: "सेवाएँ", count: services.length },
+          { n: 2, en: "Packages", hi: "पैकेज", count: services.reduce((x, sv) => x + sv.packages.length, 0) },
+          { n: 3, en: "Plans", hi: "प्लान", count: services.reduce((x, sv) => x + sv.plans.length, 0) },
+          { n: 4, en: "Offers", hi: "ऑफ़र", count: offers.length },
+        ].map((x) => (
+          <li key={x.n} className="flex items-center gap-3 rounded-lg border border-outline-variant bg-surface px-3 py-2 min-h-[56px]">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-on-brand">{x.n}</span>
+            <span>
+              <span className="block font-serif text-base font-bold text-secondary">{isHindi ? x.hi : x.en}</span>
+              <span className="block text-xs text-on-surface-variant">{x.count} {t("in total", "कुल")}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+
       {mine.length > 0 && (
         <p className="text-sm text-secondary">
           <span className="font-bold">{t("You have opted for:", "आपने चुनी हैं:")}</span> {mine.map((s) => name(s)).join(", ")}

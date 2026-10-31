@@ -186,9 +186,6 @@ export async function Footer() {
               )}
             </div>
             )}
-
-            {/* Social media pages managed from Admin → Website Settings */}
-            <SocialLinks tone="light" className="pt-2" />
           </div>
 
           {/* Col 2: Quick Links (Tools & Services) */}
@@ -268,6 +265,9 @@ export async function Footer() {
                 </li>
               )}
             </ul>
+
+            {/* Social media pages added in Admin → Website settings, shown right under Quick Links */}
+            <SocialLinks tone="light" className="pt-4" />
           </div>
 
           {/* Col 2b: Legal Pages, beside Quick Links, every legal page listed */}
