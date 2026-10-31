@@ -18,12 +18,16 @@ export type CredentialKey =
   | "ASTROSAGE_USER_ID"
   | "ASTROSAGE_API_KEY"
   | "GOOGLE_ANALYTICS_ID"
-  | "GOOGLE_MAP_EMBED_URL";
+  | "GOOGLE_MAP_EMBED_URL"
+  | "WHATSAPP_ACCESS_TOKEN"
+  | "WHATSAPP_PHONE_NUMBER_ID"
+  | "WHATSAPP_VERIFY_TOKEN"
+  | "WHATSAPP_APP_SECRET";
 
 interface CredentialMeta {
   key: CredentialKey;
   label: string;
-  category: "PAYMENTS" | "SMS" | "EMAIL" | "AUTH" | "ASTRO" | "ANALYTICS" | "MAPS";
+  category: "PAYMENTS" | "SMS" | "EMAIL" | "AUTH" | "ASTRO" | "ANALYTICS" | "MAPS" | "WHATSAPP";
   description: string;
   envVar: string;
   isSecret: boolean;
@@ -166,6 +170,38 @@ export const CREDENTIALS_METADATA: Record<CredentialKey, CredentialMeta> = {
     envVar: "GOOGLE_MAP_EMBED_URL",
     isSecret: false,
   },
+  WHATSAPP_ACCESS_TOKEN: {
+    key: "WHATSAPP_ACCESS_TOKEN",
+    label: "WhatsApp Access Token",
+    category: "WHATSAPP",
+    description: "Permanent access token of the WhatsApp Business (Cloud API) app. This is the main key that switches WhatsApp on.",
+    envVar: "WHATSAPP_ACCESS_TOKEN",
+    isSecret: true,
+  },
+  WHATSAPP_PHONE_NUMBER_ID: {
+    key: "WHATSAPP_PHONE_NUMBER_ID",
+    label: "WhatsApp Phone Number ID",
+    category: "WHATSAPP",
+    description: "Phone number ID shown next to the Kendra number in Meta WhatsApp Manager.",
+    envVar: "WHATSAPP_PHONE_NUMBER_ID",
+    isSecret: false,
+  },
+  WHATSAPP_VERIFY_TOKEN: {
+    key: "WHATSAPP_VERIFY_TOKEN",
+    label: "WhatsApp Webhook Verify Token",
+    category: "WHATSAPP",
+    description: "Any secret word you choose. Type the same word in Meta when you add the webhook.",
+    envVar: "WHATSAPP_VERIFY_TOKEN",
+    isSecret: true,
+  },
+  WHATSAPP_APP_SECRET: {
+    key: "WHATSAPP_APP_SECRET",
+    label: "WhatsApp App Secret",
+    category: "WHATSAPP",
+    description: "App secret of the Meta app (optional, makes incoming messages verified).",
+    envVar: "WHATSAPP_APP_SECRET",
+    isSecret: true,
+  },
 };
 
 /**
@@ -233,6 +269,18 @@ export async function getCredential(key: CredentialKey): Promise<string | null> 
         case "GOOGLE_MAP_EMBED_URL":
           dbValue = settings.googleMapEmbedUrl;
           break;
+        case "WHATSAPP_ACCESS_TOKEN":
+          dbValue = decryptSecret(settings.encWhatsappAccessToken);
+          break;
+        case "WHATSAPP_PHONE_NUMBER_ID":
+          dbValue = settings.encWhatsappPhoneNumberId;
+          break;
+        case "WHATSAPP_VERIFY_TOKEN":
+          dbValue = decryptSecret(settings.encWhatsappVerifyToken);
+          break;
+        case "WHATSAPP_APP_SECRET":
+          dbValue = decryptSecret(settings.encWhatsappAppSecret);
+          break;
       }
 
       if (dbValue && dbValue.trim()) {
@@ -252,7 +300,7 @@ export async function getCredential(key: CredentialKey): Promise<string | null> 
 export interface MaskedCredentialStatus {
   key: CredentialKey;
   label: string;
-  category: "PAYMENTS" | "SMS" | "EMAIL" | "AUTH" | "ASTRO" | "ANALYTICS" | "MAPS";
+  category: "PAYMENTS" | "SMS" | "EMAIL" | "AUTH" | "ASTRO" | "ANALYTICS" | "MAPS" | "WHATSAPP";
   description: string;
   envVar: string;
   source: "DATABASE" | "ENVIRONMENT" | "NOT_CONFIGURED";
@@ -329,6 +377,18 @@ export async function getMaskedCredentialsSummary(): Promise<MaskedCredentialSta
           break;
         case "GOOGLE_MAP_EMBED_URL":
           dbValue = settings.googleMapEmbedUrl;
+          break;
+        case "WHATSAPP_ACCESS_TOKEN":
+          dbValue = decryptSecret(settings.encWhatsappAccessToken);
+          break;
+        case "WHATSAPP_PHONE_NUMBER_ID":
+          dbValue = settings.encWhatsappPhoneNumberId;
+          break;
+        case "WHATSAPP_VERIFY_TOKEN":
+          dbValue = decryptSecret(settings.encWhatsappVerifyToken);
+          break;
+        case "WHATSAPP_APP_SECRET":
+          dbValue = decryptSecret(settings.encWhatsappAppSecret);
           break;
       }
     }

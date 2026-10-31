@@ -542,6 +542,10 @@ model AdminSettings {
   encFacebookAppSecret     String?
   encAstrosageUserId       String?
   encAstrosageApiKey       String?
+  encWhatsappAccessToken   String?
+  encWhatsappPhoneNumberId String?
+  encWhatsappVerifyToken   String?
+  encWhatsappAppSecret     String?
   astrosageEmbedUrl        String?  @default("https://www.astrosage.com/freekundli/")
   // Android app download section (website page and QR code)
   appDownloadUrl           String?
@@ -839,6 +843,20 @@ model TeamMember {
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+/// Chat log of the Kendra's WhatsApp Business number (filled by the webhook and by admin replies)
+model WhatsAppMessage {
+  id           String   @id @default(cuid())
+  waMessageId  String?  @unique
+  contactPhone String
+  contactName  String?
+  direction    String // IN, OUT
+  body         String   @db.Text
+  status       String   @default("RECEIVED") // RECEIVED, SENT, FAILED
+  createdAt    DateTime @default(now())
+
+  @@index([contactPhone, createdAt])
 }
 
 /// Sister services desk: Vindhya Vivah Sanskar (matrimony) profiles awaiting or holding approval

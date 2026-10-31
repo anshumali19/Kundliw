@@ -108,6 +108,18 @@ export async function POST(req: NextRequest) {
         case "GOOGLE_MAP_EMBED_URL":
           updateData.googleMapEmbedUrl = trimmed;
           break;
+        case "WHATSAPP_ACCESS_TOKEN":
+          updateData.encWhatsappAccessToken = encryptSecret(trimmed);
+          break;
+        case "WHATSAPP_PHONE_NUMBER_ID":
+          updateData.encWhatsappPhoneNumberId = trimmed;
+          break;
+        case "WHATSAPP_VERIFY_TOKEN":
+          updateData.encWhatsappVerifyToken = encryptSecret(trimmed);
+          break;
+        case "WHATSAPP_APP_SECRET":
+          updateData.encWhatsappAppSecret = encryptSecret(trimmed);
+          break;
       }
     }
 

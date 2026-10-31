@@ -18,7 +18,7 @@ import {
 interface CredentialSummary {
   key: string;
   label: string;
-  category: "PAYMENTS" | "SMS" | "EMAIL" | "AUTH" | "ASTRO" | "ANALYTICS" | "MAPS";
+  category: "PAYMENTS" | "SMS" | "EMAIL" | "AUTH" | "ASTRO" | "ANALYTICS" | "MAPS" | "WHATSAPP";
   description: string;
   envVar: string;
   isSecret: boolean;
@@ -65,6 +65,12 @@ const CATEGORY_HEADERS: Record<
     titleHi: "गूगल एनालिटिक्स ४",
     descriptionEn: "Web traffic measurement ID for visitor analytics and conversion tracking.",
     docUrl: "https://analytics.google.com/",
+  },
+  WHATSAPP: {
+    titleEn: "WhatsApp Business",
+    titleHi: "व्हाट्सएप बिज़नेस",
+    descriptionEn: "Paste the keys here to switch on WhatsApp chats. Until the Access Token is added, WhatsApp stays switched off and nothing else on the site changes.",
+    docUrl: "https://business.facebook.com/wa/manage/home/",
   },
   MAPS: {
     titleEn: "Google Maps Embed",
@@ -165,7 +171,7 @@ export function AdminKeysManager({ locale }: { locale: string }) {
   };
 
   // Group credentials by category
-  const categories = ["PAYMENTS", "SMS", "EMAIL", "AUTH", "ASTRO", "ANALYTICS", "MAPS"] as const;
+  const categories = ["PAYMENTS", "SMS", "EMAIL", "AUTH", "ASTRO", "ANALYTICS", "MAPS", "WHATSAPP"] as const;
 
   return (
     <div className="space-y-8 text-left">
