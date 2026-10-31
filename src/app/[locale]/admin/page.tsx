@@ -1,11 +1,14 @@
 import { Link } from "@/i18n/routing";
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
+import { loadRevenueSeries, loadTodaySummary, type RevenueRange } from "@/lib/admin/dashboardStats";
+import { RevenueChart } from "@/components/admin/dashboard/RevenueChart";
 
 export const dynamic = "force-dynamic";
 
 interface AdminDashboardPageProps {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ range?: string }>;
 }
 
 function rupees(paise: number): string {
@@ -34,9 +37,22 @@ const QUICK_LINKS = [
 
 export default async function AdminDashboardPage(props: AdminDashboardPageProps) {
   const { locale } = await props.params;
+  const { range: rawRange } = await props.searchParams;
+  const range: RevenueRange = rawRange === "weekly" || rawRange === "monthly" ? rawRange : "daily";
   await requireAdmin("/admin", locale);
   const isHindi = locale === "hi";
   const t = (en: string, hi: string) => (isHindi ? hi : en);
+
+  const [today, series] = await Promise.all([loadTodaySummary(), loadRevenueSeries(range)]);
+
+  const todayCards = [
+    { label: t("New orders today", "आज के नए ऑर्डर"), value: today.ordersToday, href: "/admin/orders" },
+    { label: t("Pending Kundli / Prashna", "लंबित कुंडली / प्रश्न"), value: today.pendingKundlis, href: "/admin/orders?queue=kundli", highlight: today.pendingKundlis > 0 },
+    { label: t("Calls scheduled today", "आज के निर्धारित कॉल"), value: today.callsToday, href: "/admin/calls" },
+    { label: t("New users today", "आज के नए उपयोगकर्ता"), value: today.newUsersToday, href: "/admin/users" },
+    { label: t("New users (7 days)", "नए उपयोगकर्ता (7 दिन)"), value: today.newUsersWeek, href: "/admin/users" },
+    { label: t("Active clients", "सक्रिय ग्राहक"), value: today.activeClients, href: "/admin/users" },
+  ];
 
   const [
     totalOrders,
@@ -108,6 +124,24 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
           {t("A summary of orders, payments and requests.", "ऑर्डर, भुगतान और अनुरोधों का सार।")}
         </p>
       </div>
+
+      <section aria-labelledby="today-title" className="space-y-3">
+        <h2 id="today-title" className="font-serif text-lg font-bold text-secondary">{t("Today", "आज")}</h2>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+          {todayCards.map((c) => (
+            <Link
+              key={c.label}
+              href={c.href}
+              className={`p-4 rounded border bg-surface hover:border-secondary transition-colors ${c.highlight ? "border-primary" : "border-outline-variant/60"}`}
+            >
+              <div className="text-xs uppercase tracking-wider text-on-surface-variant font-semibold">{c.label}</div>
+              <div className="font-serif text-2xl font-bold text-secondary mt-1">{c.value}</div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <RevenueChart points={series} range={range} isHindi={isHindi} />
 
       <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {cards.map((card) => (

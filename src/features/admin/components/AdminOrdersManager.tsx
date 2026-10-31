@@ -40,6 +40,12 @@ export interface SerializedOrder {
   jatakaPhone: string;
   /** Kundli family details (father, mother, grandfather, gotra, address), empty for other services */
   jatakaFamily?: Array<[string, string]>;
+  /** SERVICE_BOOKING, KUNDLI_REQUEST, KUNDLI_MATCHING or PRASHNA_KUNDLI */
+  requestType?: string;
+  /** Date, time and place of birth as submitted, empty when not asked */
+  birthDetails?: Array<[string, string]>;
+  /** The client's own questions, if any */
+  questions?: string | null;
   serviceTitle: string;
   planTitle: string;
   statusEvents: Array<{
@@ -55,6 +61,8 @@ interface AdminOrdersManagerProps {
   orders: SerializedOrder[];
   locale: string;
   associates?: Array<{ id: string; label: string }>;
+  /** Open on the Kundli & Prashna queue (used by the dashboard link) */
+  initialQueue?: boolean;
 }
 
 const ALL_STATUSES: CanonicalOrderStatus[] = [
@@ -70,11 +78,12 @@ export function AdminOrdersManager({
   orders: initialOrders,
   locale,
   associates = [],
+  initialQueue = false,
 }: AdminOrdersManagerProps) {
   const isHindi = locale === "hi";
   const [orders, setOrders] = useState<SerializedOrder[]>(initialOrders);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"ALL" | "AWAITING" | "PAID" | "PROGRESS" | "COMPLETE">("ALL");
+  const [filter, setFilter] = useState<"ALL" | "KUNDLI" | "AWAITING" | "PAID" | "PROGRESS" | "COMPLETE">(initialQueue ? "KUNDLI" : "ALL");
 
   const [selectedOrder, setSelectedOrder] = useState<SerializedOrder | null>(null);
   const [nextStatus, setNextStatus] = useState<CanonicalOrderStatus>("KUNDLI_IN_PROGRESS");
@@ -94,6 +103,7 @@ export function AdminOrdersManager({
 
     if (!matchesSearch) return false;
 
+    if (filter === "KUNDLI") return !!o.requestType && o.requestType !== "SERVICE_BOOKING";
     if (filter === "AWAITING") return o.paymentStatus === "AWAITING_VERIFICATION";
     if (filter === "PAID") return o.paymentStatus === "PAID";
     if (filter === "PROGRESS") return ["ORDER_RECEIVED", "KUNDLI_IN_PROGRESS", "KUNDLI_COMPLETE", "DISPATCHED"].includes(o.status);
@@ -299,6 +309,7 @@ export function AdminOrdersManager({
         <div className="flex flex-wrap gap-1.5">
           {[
             { id: "ALL", labelEn: "All Orders", labelHi: "सभी आदेश" },
+            { id: "KUNDLI", labelEn: "Kundli & Prashna queue", labelHi: "कुंडली व प्रश्न कतार" },
             { id: "AWAITING", labelEn: "Awaiting Verification", labelHi: "सत्यापन शेष" },
             { id: "PAID", labelEn: "Paid", labelHi: "भुगतान प्राप्त" },
             { id: "PROGRESS", labelEn: "In Progress", labelHi: "प्रगति में" },
@@ -391,6 +402,22 @@ export function AdminOrdersManager({
                       </span>
                     </div>
 
+                    {order.birthDetails && order.birthDetails.length > 0 && (
+                      <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-1">
+                        {order.birthDetails.map(([label, value]) => (
+                          <div key={label}>
+                            <span className="text-on-surface-variant">{label}: </span>
+                            <span className="font-semibold text-on-surface">{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {order.questions && (
+                      <div className="sm:col-span-2">
+                        <span className="text-on-surface-variant">{isHindi ? "प्रश्न: " : "Questions: "}</span>
+                        <span className="font-semibold text-on-surface whitespace-pre-line">{order.questions}</span>
+                      </div>
+                    )}
                     {order.jatakaFamily && order.jatakaFamily.length > 0 && (
                       <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
                         {order.jatakaFamily.map(([label, value]) => (

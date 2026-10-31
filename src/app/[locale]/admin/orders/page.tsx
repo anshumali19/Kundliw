@@ -11,6 +11,7 @@ interface AdminOrdersPageProps {
   params: Promise<{
     locale: string;
   }>;
+  searchParams: Promise<{ queue?: string }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
     locale
   } = params;
 
+  const { queue } = await props.searchParams;
   await requireAdmin("/admin/orders", locale);
   const isHindi = locale === "hi";
 
@@ -80,6 +82,17 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
       associateId: o.associateId,
       jatakaName: String(j.name || o.user?.name || "Customer"),
       jatakaPhone: String(j.phone || o.user?.phone || ""),
+      requestType: o.requestType,
+      birthDetails: (
+        [
+          ["dob", "जन्म तिथि", "Date of birth"],
+          ["tob", "जन्म समय", "Time of birth"],
+          ["pob", "जन्म स्थान", "Place of birth"],
+        ] as const
+      )
+        .filter(([key]) => j[key] && !(key === "tob" && j.isTimeUnknown))
+        .map(([key, hi, en]) => [isHindi ? hi : en, String(j[key])] as [string, string]),
+      questions: j.queries ? String(j.queries) : null,
       jatakaFamily: (
         [
           ["fatherName", "पिता", "Father"],
@@ -121,7 +134,7 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
         </p>
       </div>
 
-      <AdminOrdersManager orders={orders} locale={locale} associates={associateOptions} />
+      <AdminOrdersManager orders={orders} locale={locale} associates={associateOptions} initialQueue={queue === "kundli"} />
     </div>
   );
 }

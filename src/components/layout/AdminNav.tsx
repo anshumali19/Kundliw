@@ -4,6 +4,8 @@ import { Link, usePathname } from "@/i18n/routing";
 import {
   BadgeCheck,
   CalendarClock,
+  CalendarDays,
+  Receipt,
   Award,
   DatabaseBackup,
   FileText,
@@ -48,11 +50,13 @@ const GROUPS: Array<{ en: string; hi: string; items: Item[] }> = [
     hi: "बुकिंग व भुगतान",
     items: [
       { href: "/admin/orders", en: "Orders", hi: "ऑर्डर", icon: ShoppingBag },
+      { href: "/admin/payments", en: "Payments & invoices", hi: "भुगतान व इनवॉइस", icon: Receipt },
       { href: "/admin/services", en: "1. Services", hi: "1. सेवाएँ", icon: Layers },
       { href: "/admin/packages", en: "2. Packages", hi: "2. पैकेज", icon: Layers },
       { href: "/admin/plans", en: "3. Plans", hi: "3. प्लान", icon: Layers },
       { href: "/admin/offers", en: "4. Offers (promo codes)", hi: "4. ऑफ़र (प्रोमो कोड)", icon: Tag },
       { href: "/admin/other-services", en: "Other services", hi: "अन्य सेवाएँ", icon: Sparkles },
+      { href: "/admin/calls", en: "Call bookings", hi: "कॉल बुकिंग", icon: CalendarDays },
       { href: "/admin/slots", en: "Appointment slots", hi: "अपॉइंटमेंट स्लॉट", icon: CalendarClock },
       { href: "/admin/enquiries", en: "Enquiries", hi: "पूछताछ", icon: Inbox },
     ],
