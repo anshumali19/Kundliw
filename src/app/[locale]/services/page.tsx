@@ -57,7 +57,7 @@ export default async function ServicesListingPage(
       packages: {
         where: { isActive: true },
         orderBy: { orderIndex: "asc" },
-        select: { id: true, slug: true, titleEn: true, titleHi: true, descriptionEn: true, descriptionHi: true, imageUrl: true, numberOfDays: true, startDate: true, endDate: true, seats: true },
+        select: { id: true, slug: true, titleEn: true, titleHi: true, descriptionEn: true, descriptionHi: true, imageUrl: true, youtubeUrl: true, numberOfDays: true, startDate: true, endDate: true, seats: true },
       },
     },
     orderBy: { orderIndex: "asc" },
@@ -96,6 +96,7 @@ export default async function ServicesListingPage(
           descriptionEn: k.descriptionEn,
           descriptionHi: k.descriptionHi,
           imageUrl: k.imageUrl,
+          youtubeUrl: k.youtubeUrl,
           numberOfDays: k.numberOfDays,
           startDate: k.startDate ? k.startDate.toISOString().slice(0, 10) : null,
           endDate: k.endDate ? k.endDate.toISOString().slice(0, 10) : null,

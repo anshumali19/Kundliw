@@ -32,6 +32,7 @@ export interface SerializedPackage {
   descriptionEn?: string | null;
   descriptionHi?: string | null;
   imageUrl?: string | null;
+  youtubeUrl?: string | null;
   numberOfDays?: number | null;
   startDate?: string | null;
   endDate?: string | null;
@@ -584,6 +585,7 @@ export function ServicesListingClient({
                             <span className="absolute left-3 top-3 rounded-full bg-saffron px-3 py-1 text-[11px] font-bold text-on-saffron">
                               {isHindi ? svc.titleHi : svc.titleEn}
                             </span>
+                            {k.youtubeUrl && <WatchVideoBadge isHindi={isHindi} className="absolute right-3 top-3 !bg-white/95 shadow" />}
                             {seatText && (
                               <span className={`absolute right-3 bottom-3 rounded-full px-3 py-1 text-[11px] font-bold ${shut ? "bg-signal text-on-signal" : "bg-surface/95 text-secondary"}`}>
                                 {seatText}

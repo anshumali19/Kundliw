@@ -1,3 +1,4 @@
+import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
 import { activePlanWhere } from "@/lib/content/packages";
 import { kendraEmail } from "@/lib/content/contact";
 import type { Metadata } from "next";
@@ -378,9 +379,10 @@ export default async function HomePage(props: { params: Promise<{ locale: string
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {allServices.map((s, i) => (
               <article key={s.key} className={`${card} group overflow-hidden transition-all duration-300 hover:-translate-y-2 flex flex-col`}>
-                <div className="h-56 overflow-hidden bg-maroon">
+                <div className="relative h-56 overflow-hidden bg-maroon">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  {s.video && <WatchVideoBadge isHindi={isHindi} className="absolute left-3 top-3 !bg-white/95 shadow" />}
                 </div>
                 <div className="relative flex flex-1 flex-col p-6">
                   <span className="absolute -top-6 right-5 grid h-12 w-12 place-items-center border-4 border-white bg-maroon text-gold font-bold">
@@ -468,6 +470,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                       }`}
                     >
                       <h3 className={`font-serif text-[26px] font-bold ${featured || dark ? "text-white" : "text-secondary"}`}>{isHindi ? p.titleHi : p.titleEn}</h3>
+                      {p.youtubeUrl && <WatchVideoBadge isHindi={isHindi} className="mt-2 self-start !bg-white/95" />}
                       <div className={`font-serif text-5xl font-bold my-3 ${featured || dark ? "text-gold" : "text-primary"}`}>{rupees(p.pricePaise)}</div>
                       <ul className="mb-6 mt-2">
                         {feats.map((f) => (

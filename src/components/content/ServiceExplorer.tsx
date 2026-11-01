@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { Check } from "lucide-react";
+import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
 
 /**
  * For a signed-in customer or associate: what they have already opted for, and everything they can
@@ -89,6 +90,7 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 min-h-[56px]">
                   <span className="font-serif text-base font-bold text-secondary">{name(s)}</span>
                   <span className="flex items-center gap-2 text-xs">
+                    {s.youtubeUrl && <WatchVideoBadge isHindi={isHindi} />}
                     {bookedServices.has(s.id) && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 font-bold text-green-800">
                         <Check className="h-3 w-3" aria-hidden="true" />
@@ -100,9 +102,12 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
                   </span>
                 </summary>
                 <div className="space-y-4 border-t border-outline-variant/30 p-4">
-                  {[...s.packages.map((k) => ({ key: k.id, title: name(k), plans: s.plans.filter((p) => p.packageId === k.id) })), ...(loose.length ? [{ key: "loose", title: t("Other plans", "अन्य प्लान"), plans: loose }] : [])].map((pk) => (
+                  {[...s.packages.map((k) => ({ key: k.id, title: name(k), video: !!k.youtubeUrl, plans: s.plans.filter((p) => p.packageId === k.id) })), ...(loose.length ? [{ key: "loose", title: t("Other plans", "अन्य प्लान"), video: false, plans: loose }] : [])].map((pk) => (
                     <div key={pk.key}>
-                      <div className="mb-2 text-xs font-bold uppercase tracking-wider text-primary">{t("Package", "पैकेज")}: {pk.title}</div>
+                      <div className="mb-2 flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+                        <span>{t("Package", "पैकेज")}: {pk.title}</span>
+                        {pk.video && <WatchVideoBadge isHindi={isHindi} />}
+                      </div>
                       {pk.plans.length === 0 ? (
                         <p className="text-xs text-on-surface-variant">{t("No plans yet.", "अभी कोई प्लान नहीं।")}</p>
                       ) : (
@@ -114,6 +119,7 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
                                 <div>
                                   <div className="flex items-start justify-between gap-2">
                                     <span className="text-sm font-bold text-secondary">{name(p)}</span>
+                                    {p.youtubeUrl && <WatchVideoBadge isHindi={isHindi} />}
                                     {bookedPlans.has(p.id) && (
                                       <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-800">{t("Booked", "बुक किया")}</span>
                                     )}

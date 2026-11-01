@@ -6,6 +6,7 @@ import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
 import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import {
   Compass,
@@ -125,6 +126,7 @@ export default async function OtherServicesPage(
                     <h2 className="font-serif text-2xl sm:text-3xl font-bold text-secondary">
                       {title}
                     </h2>
+                    {item.youtubeUrl && <WatchVideoBadge isHindi={isHindi} href={`/${isHindi ? "" : "en/"}other-services/${item.slug}#video`} className="mt-1" />}
                   </div>
 
                   <div className="text-sm text-on-surface-variant leading-relaxed space-y-2">
