@@ -23,6 +23,7 @@ import {
   Printer,
   BookOpen,
   Eye,
+  LifeBuoy,
 } from "lucide-react";
 
 interface AccountPageProps {
@@ -124,6 +125,10 @@ export default async function AccountPage(props: AccountPageProps) {
         >
           <ShieldCheck className="w-4 h-4 text-primary" />
           {isHindi ? "प्रमाणपत्र एवं दस्तावेज़" : "Credentials and documents"}
+        </Link>
+        <Link href="/tickets" className="min-h-[44px] px-4 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-2 transition-colors">
+          <LifeBuoy className="w-4 h-4 text-primary" />
+          {isHindi ? "सहायता टिकट" : "Support tickets"}
         </Link>
         <SignOutButton label={isHindi ? "लॉग आउट" : "Log out"} className="ml-auto" />
       </div>

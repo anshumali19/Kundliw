@@ -89,7 +89,7 @@ export default async function ContactPage(
           email: on("showEmail"),
           labels: { navigation: lbl("navigationLabel"), enquiry: lbl("enquiryLabel"), support: lbl("supportLabel"), tickets: lbl("ticketsLabel") },
           supportLink: link("supportLink", "/help"),
-          ticketsLink: link("ticketsLink", "/account"),
+          ticketsLink: link("ticketsLink", "/tickets") === "/account" ? "/tickets" : link("ticketsLink", "/tickets"),
         },
       }}
     />

@@ -62,6 +62,7 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
     customers,
     associates,
     openEnquiries,
+    openTickets,
     activeServices,
     recentOrders,
   ] = await Promise.all([
@@ -72,6 +73,7 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
     prisma.user.count({ where: { role: "USER" } }),
     prisma.user.count({ where: { role: "ASSOCIATE" } }),
     prisma.contactEnquiry.count({ where: { isResolved: false } }),
+    prisma.supportTicket.count({ where: { status: { not: "RESOLVED" } } }),
     prisma.service.count({ where: { isActive: true } }),
     prisma.order.findMany({
       orderBy: { createdAt: "desc" },
@@ -108,6 +110,12 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
       value: openEnquiries.toString(),
       href: "/admin/enquiries",
       highlight: openEnquiries > 0,
+    },
+    {
+      label: t("Open support tickets", "खुले सहायता टिकट"),
+      value: openTickets.toString(),
+      href: "/admin/tickets",
+      highlight: openTickets > 0,
     },
     { label: t("Active services", "सक्रिय सेवाएँ"), value: activeServices.toString(), href: "/admin/services" },
   ];

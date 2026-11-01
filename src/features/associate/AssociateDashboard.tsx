@@ -404,6 +404,9 @@ export function AssociateDashboard({ locale, siteUrl, explorer }: { locale: stri
 
       <div className="rounded-lg border border-outline-variant bg-surface p-4 flex flex-wrap items-center gap-3">
         <span className="mr-auto font-serif text-lg font-bold text-secondary">{t("Associate Guide", "एसोसिएट मार्गदर्शिका")}</span>
+        <a href={`/${locale}/tickets`} className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-outline-variant text-sm font-bold text-secondary hover:bg-surface-container">
+          {t("Support tickets", "सहायता टिकट")}
+        </a>
         <a href={`/${locale}/guides/associate`} className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-outline-variant text-sm font-bold text-secondary hover:bg-surface-container">
           {t("View", "देखें")}
         </a>

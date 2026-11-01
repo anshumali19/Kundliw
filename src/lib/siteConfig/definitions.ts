@@ -600,7 +600,7 @@ export const SECTIONS: SectionDef[] = [
       ...bi("supportLabel", "Support label", "सहायता का नाम", "text", 40),
       ...bi("ticketsLabel", "Tickets label", "टिकट का नाम", "text", 40),
       { key: "supportLink", en: "Where Support opens (page, WhatsApp link or phone like tel:98xxxxxxxx)", hi: "सहायता कहाँ खुले (पेज, व्हाट्सऐप लिंक या tel:98xxxxxxxx)", type: "link", max: 300, def: "/help" },
-      { key: "ticketsLink", en: "Where Tickets opens", hi: "टिकट कहाँ खुले", type: "link", max: 300, def: "/account" },
+      { key: "ticketsLink", en: "Where Tickets opens", hi: "टिकट कहाँ खुले", type: "link", max: 300, def: "/tickets" },
       { key: "showAddress", en: "Show the full office address block", hi: "पूरा कार्यालय पता दिखाएँ", type: "toggle", def: true },
       { key: "showPhone", en: "Show mobile number", hi: "मोबाइल नंबर दिखाएँ", type: "toggle", def: true },
       { key: "showEmail", en: "Show email (only if filled in Settings)", hi: "ईमेल दिखाएँ (केवल यदि सेटिंग्स में भरा हो)", type: "toggle", def: true },

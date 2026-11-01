@@ -111,6 +111,7 @@ model User {
   orders        Order[]
   vaultFiles    VaultFile[]
   statusChanges OrderStatusEvent[]
+  supportTickets SupportTicket[]
 }
 
 model Account {
@@ -943,4 +944,33 @@ model TaxCase {
   updatedAt      DateTime @updatedAt
 
   @@index([filingStatus])
+}
+
+/// A help request raised by a signed-in customer or associate; the admin answers in Admin > Support tickets
+model SupportTicket {
+  id           String   @id @default(cuid())
+  ticketNumber String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject      String
+  orderNumber  String? // optional: the order the question is about
+  status       String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  messages SupportTicketMessage[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SupportTicketMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fromAdmin Boolean       @default(false)
+  body      String        @db.Text
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
 }

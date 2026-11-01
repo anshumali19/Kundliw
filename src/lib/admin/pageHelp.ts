@@ -49,6 +49,10 @@ export const PAGE_HELP: Record<string, PageHelp> = {
     what: ["Messages sent from the Contact form, the chatbot and the service enquiry pop-up.", "संपर्क फ़ॉर्म, चैटबॉट और सेवा पूछताछ से आए संदेश।"],
     why: ["To answer people who wrote to the Kendra, and mark them done.", "केंद्र को लिखने वालों को उत्तर देने और काम पूरा चिह्नित करने के लिए।"],
   },
+  "/admin/tickets": {
+    what: ["Help requests raised by customers and associates from their dashboard. Open a ticket, read the thread, reply and set its status.", "ग्राहकों और एसोसिएट द्वारा डैशबोर्ड से बनाए सहायता अनुरोध। टिकट खोलें, बातचीत पढ़ें, उत्तर दें और स्थिति तय करें।"],
+    why: ["Customers know where to ask for help, and nothing gets lost in phone calls.", "ग्राहक को पता रहता है कि मदद कहाँ माँगें, और फ़ोन कॉल में कुछ खोता नहीं।"],
+  },
   "/admin/whatsapp": {
     what: ["WhatsApp chats of clients who message the Kendra's business number, with replies from here. Works once the WhatsApp keys are saved.", "केंद्र के बिज़नेस नंबर पर संदेश भेजने वालों की व्हाट्सएप चैट, और यहीं से उत्तर। WhatsApp कुंजियाँ सहेजने के बाद चालू होती है।"],
     why: ["To keep every client conversation in one place.", "हर ग्राहक की बातचीत एक जगह रखने के लिए।"],
