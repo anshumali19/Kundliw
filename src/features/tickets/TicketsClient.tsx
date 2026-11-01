@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TICKET_TOPICS } from "@/lib/tickets/topics";
+import type { TicketTopic } from "@/lib/tickets/topics";
 
 export interface TicketView {
   id: string;
@@ -33,6 +33,7 @@ export function TicketsClient({
   mode,
   isHindi,
   defaults,
+  topics = [],
 }: {
   tickets: TicketView[];
   orderNumbers?: string[];
@@ -40,6 +41,8 @@ export function TicketsClient({
   isHindi: boolean;
   /** Details already known about the customer, to save typing */
   defaults?: { name?: string; email?: string; phone?: string };
+  /** Ready-made questions to pick from (set by the admin) */
+  topics?: TicketTopic[];
 }) {
   const router = useRouter();
   const t = (en: string, hi: string) => (isHindi ? hi : en);
@@ -108,10 +111,11 @@ export function TicketsClient({
       {mode === "user" && (
         <form onSubmit={raise} className="space-y-3 rounded-lg border border-outline-variant/60 bg-surface p-5">
           <h2 className="font-serif text-lg font-bold text-secondary">{t("Raise a new ticket", "नया टिकट बनाएँ")}</h2>
+          {topics.length > 0 && (
           <div>
             <span className="block text-xs font-bold uppercase text-secondary">{t("Pick a common question, or write your own below", "कोई आम प्रश्न चुनें, या नीचे अपना लिखें")}</span>
             <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("Common questions", "आम प्रश्न")}>
-              {TICKET_TOPICS.map((tp) => {
+              {topics.map((tp) => {
                 const label = isHindi ? tp.hi : tp.en;
                 const on = form.topic === tp.id;
                 return (
@@ -119,7 +123,7 @@ export function TicketsClient({
                     key={tp.id}
                     type="button"
                     aria-pressed={on}
-                    onClick={() => setForm({ ...form, topic: tp.id, subject: tp.id === "other" ? "" : label })}
+                    onClick={() => setForm({ ...form, topic: tp.id, subject: label })}
                     className={`min-h-[40px] rounded-full border px-3 text-xs font-semibold ${on ? "border-primary bg-brand text-on-brand" : "border-outline-variant bg-surface text-secondary hover:bg-surface-container-high"}`}
                   >
                     {label}
@@ -128,6 +132,7 @@ export function TicketsClient({
               })}
             </div>
           </div>
+          )}
           <label className="block text-xs font-bold uppercase text-secondary">
             {t("Subject", "विषय")} *
             <input type="text" required minLength={3} maxLength={150} value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />

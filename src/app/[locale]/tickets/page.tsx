@@ -2,6 +2,7 @@ import { BackBar } from "@/components/layout/BackBar";
 import { Link } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
+import { loadTicketTopics } from "@/lib/tickets/loadTopics";
 import { TicketsClient, type TicketView } from "@/features/tickets/TicketsClient";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +13,8 @@ export default async function TicketsPage(props: { params: Promise<{ locale: str
   const isHindi = locale === "hi";
   const t = (en: string, hi: string) => (isHindi ? hi : en);
 
-  const [rows, orders] = await Promise.all([
+  const [topics, rows, orders] = await Promise.all([
+    loadTicketTopics(),
     prisma.supportTicket.findMany({ where: { userId: user.id }, orderBy: { updatedAt: "desc" }, include: { messages: { orderBy: { createdAt: "asc" } } } }),
     prisma.order.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, take: 30, select: { orderNumber: true } }),
   ]);
@@ -37,7 +39,7 @@ export default async function TicketsPage(props: { params: Promise<{ locale: str
           <Link href={user.role === "ASSOCIATE" ? "/associate" : "/account"} className="font-bold text-primary hover:underline">{t("Back to dashboard", "डैशबोर्ड पर वापस")}</Link>
         </p>
       </div>
-      <TicketsClient tickets={tickets} orderNumbers={orders.map((o) => o.orderNumber)} mode="user" isHindi={isHindi} defaults={{ name: user.name ?? "", email: user.email ?? "", phone: user.phone ?? "" }} />
+      <TicketsClient tickets={tickets} orderNumbers={orders.map((o) => o.orderNumber)} mode="user" isHindi={isHindi} topics={topics} defaults={{ name: user.name ?? "", email: user.email ?? "", phone: user.phone ?? "" }} />
     </div>
   );
 }

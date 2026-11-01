@@ -1,5 +1,7 @@
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
+import { loadTicketTopics } from "@/lib/tickets/loadTopics";
+import { TicketTopicsEditor } from "@/features/tickets/TicketTopicsEditor";
 import { TicketsClient, type TicketView } from "@/features/tickets/TicketsClient";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +11,7 @@ export default async function AdminTicketsPage(props: { params: Promise<{ locale
   await requireAdmin("/admin/tickets", locale);
   const isHindi = locale === "hi";
 
+  const topics = await loadTicketTopics();
   const rows = await prisma.supportTicket.findMany({
     orderBy: { updatedAt: "desc" },
     take: 200,
@@ -35,6 +38,7 @@ export default async function AdminTicketsPage(props: { params: Promise<{ locale
           {isHindi ? "ग्राहकों और एसोसिएट के बनाए टिकट। खोलें, उत्तर दें और स्थिति बदलें।" : "Tickets raised by customers and associates. Open one, reply, and change its status."}
         </p>
       </div>
+      <TicketTopicsEditor initial={topics.map((x) => ({ en: x.en, hi: x.hi }))} isHindi={isHindi} />
       <TicketsClient tickets={tickets} mode="admin" isHindi={isHindi} />
     </div>
   );

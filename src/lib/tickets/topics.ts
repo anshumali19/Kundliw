@@ -1,4 +1,7 @@
-/** Ready-made questions a customer can pick when raising a ticket; they can also type their own. */
+/** SiteConfig key where the admin's own list is saved (Admin > Support tickets > Ready-made questions). */
+export const TICKET_TOPICS_KEY = "ticket-topics";
+
+/** The standard ready-made questions, used until the admin saves their own list. Customers can always type their own. */
 export interface TicketTopic {
   id: string;
   en: string;
@@ -16,5 +19,4 @@ export const TICKET_TOPICS: TicketTopic[] = [
   { id: "refund", en: "I want a refund or cancellation", hi: "मुझे रिफ़ंड या रद्द करना है" },
   { id: "login", en: "I cannot sign in to my account", hi: "मैं अपने खाते में लॉगिन नहीं कर पा रहा/रही" },
   { id: "commission", en: "Question about my commission or payout (associate)", hi: "मेरे कमीशन या भुगतान के बारे में प्रश्न (एसोसिएट)" },
-  { id: "other", en: "Something else (I will type it)", hi: "कुछ और (मैं स्वयं लिखूँगा/लिखूँगी)" },
 ];
