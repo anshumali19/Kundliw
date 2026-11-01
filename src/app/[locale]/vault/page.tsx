@@ -1,3 +1,4 @@
+import { BackBar } from "@/components/layout/BackBar";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
@@ -42,6 +43,7 @@ export default async function VaultPage(props: VaultPageProps) {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-10 text-left space-y-8">
+      <BackBar fallbackHref="/account" backLabel={isHindi ? "वापस जाएँ" : "Back"} />
       {/* Header Banner */}
       <div className="bg-surface-container rounded-lg p-6 sm:p-8 border-2 border-secondary/30 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-4">

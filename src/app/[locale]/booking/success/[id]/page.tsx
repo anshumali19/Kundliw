@@ -1,3 +1,4 @@
+import { BackBar } from "@/components/layout/BackBar";
 import { BookingSteps } from "@/components/booking/BookingSteps";
 import { HelpEmail } from "@/components/content/HelpEmail";
 import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
@@ -73,6 +74,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 text-left text-on-surface">
+      <BackBar fallbackHref="/account" backLabel={isHindi ? "वापस जाएँ" : "Back"} nextHref="/account" nextLabel={isHindi ? "मेरा खाता" : "My account"} />
       <BookingSteps from={isPaid ? 7 : 6} isHindi={isHindi} />
       {/* Dynamic Status Banner depending on paymentStatus */}
       {isPaid ? (

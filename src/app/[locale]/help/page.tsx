@@ -1,3 +1,4 @@
+import { BackBar } from "@/components/layout/BackBar";
 import { setRequestLocale } from "next-intl/server";
 import { kendraEmail } from "@/lib/content/contact";
 import { RichText } from "@/components/content/RichText";
@@ -63,6 +64,7 @@ export default async function HelpPage(props: HelpPageProps) {
 
   return (
     <div className="w-full max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8 text-left space-y-10">
+      <BackBar fallbackHref="/" backLabel={isHindi ? "वापस जाएँ" : "Back"} />
       {/* Header */}
       <div className="border-b border-outline-variant/30 pb-6 space-y-2">
         <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">

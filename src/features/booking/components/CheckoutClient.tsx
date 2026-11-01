@@ -1,5 +1,6 @@
 "use client";
 
+import { BackBar } from "@/components/layout/BackBar";
 import { BookingSteps } from "@/components/booking/BookingSteps";
 import { HelpEmail } from "@/components/content/HelpEmail";
 import React, { useState } from "react";
@@ -227,6 +228,7 @@ export function CheckoutClient({
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 text-left text-on-surface">
+      <BackBar fallbackHref="/booking" backLabel={isHindi ? "वापस जाएँ" : "Back"} />
       <BookingSteps from={6} isHindi={isHindi} />
       {/* Header Stepper Banner */}
       <div className="mb-8">

@@ -1,3 +1,4 @@
+import { BackBar } from "@/components/layout/BackBar";
 import { BookingSteps } from "@/components/booking/BookingSteps";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
@@ -131,6 +132,7 @@ export default async function BookingPage(props: BookingPageProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left">
+      <BackBar fallbackHref="/services" backLabel={locale === "hi" ? "वापस जाएँ" : "Back"} />
       <BookingSteps from={5} isHindi={locale === "hi"} />
       <BookingWizard
         services={servicesData}

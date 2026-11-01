@@ -1,3 +1,4 @@
+import { BackBar } from "@/components/layout/BackBar";
 import { Link } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
@@ -27,6 +28,7 @@ export default async function TicketsPage(props: { params: Promise<{ locale: str
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6 text-left">
+      <BackBar fallbackHref={user.role === "ASSOCIATE" ? "/associate" : "/account"} backLabel={t("Back", "वापस जाएँ")} />
       <div>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-secondary">{t("Support tickets", "सहायता टिकट")}</h1>
         <p className="text-sm text-on-surface-variant mt-1">
