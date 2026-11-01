@@ -8,9 +8,9 @@ export class RazorpayPaymentProvider implements PaymentProvider {
   private keySecret: string;
   private instance: Razorpay | null = null;
 
-  constructor() {
-    this.keyId = process.env.RAZORPAY_KEY_ID || "";
-    this.keySecret = process.env.RAZORPAY_KEY_SECRET || "";
+  constructor(keys?: { keyId: string; keySecret: string }) {
+    this.keyId = keys?.keyId ?? (process.env.RAZORPAY_KEY_ID || "");
+    this.keySecret = keys?.keySecret ?? (process.env.RAZORPAY_KEY_SECRET || "");
 
     if (!this.keyId || !this.keySecret || this.keyId === "rzp_test_placeholder") {
       // In production without real keys, this must fail loudly

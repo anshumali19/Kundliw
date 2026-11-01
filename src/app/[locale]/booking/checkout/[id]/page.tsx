@@ -94,7 +94,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
       adminSettings={adminSettings}
       locale={locale}
       initialMethod={query.pay === "GATEWAY" || query.pay === "UPI" || query.pay === "BANK" ? query.pay : undefined}
-      gatewayMode={razorpayConfigured() ? "razorpay" : isDemoMode() && process.env.NODE_ENV !== "production" ? "demo" : "off"}
+      gatewayMode={(await razorpayConfigured()) ? "razorpay" : isDemoMode() && process.env.NODE_ENV !== "production" ? "demo" : "off"}
     />
   );
 }

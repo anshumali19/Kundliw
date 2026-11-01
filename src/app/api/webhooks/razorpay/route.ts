@@ -1,3 +1,4 @@
+import { getCredential } from "@/lib/config/credentials";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRazorpayWebhookSignature } from "@/lib/payments/razorpay";
 import { prisma } from "@/lib/prisma";
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text();
     const signature = request.headers.get("x-razorpay-signature") || "";
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || "";
+    const webhookSecret = (await getCredential("RAZORPAY_WEBHOOK_SECRET")) || "";
 
     // Inactive without real webhook secret
     if (!webhookSecret || webhookSecret === "placeholder_webhook") {

@@ -513,7 +513,7 @@ export function CheckoutClient({
                       {isHindi ? "केंद्र यूपीआई आईडी" : "Kendra UPI VPA"}
                     </span>
                     <span className="font-mono font-bold text-sm text-primary select-all">
-                      {adminSettings.upiVpa || "kanadjyotish@sbi"}
+                      {adminSettings.upiVpa || (isHindi ? "UPI आईडी अभी नहीं जुड़ी है। QR कोड से भुगतान करें।" : "UPI ID not added yet. Please pay with the QR code.")}
                     </span>
                   </div>
                   <button

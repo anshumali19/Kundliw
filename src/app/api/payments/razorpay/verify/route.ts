@@ -6,7 +6,7 @@ import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { markOrderPaid, PaymentError } from "@/lib/payments/service";
 import { RazorpayPaymentProvider } from "@/lib/payments/razorpayProvider";
-import { razorpayConfigured } from "@/lib/payments/gateway";
+import { getRazorpayKeys } from "@/lib/payments/gateway";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +20,8 @@ const schema = z.object({
 /** Confirms a Razorpay payment by checking its signature, then marks the order paid. */
 export async function POST(request: NextRequest) {
   try {
-    if (!razorpayConfigured()) return NextResponse.json({ error: "Online payment is not switched on." }, { status: 503 });
+    const keys = await getRazorpayKeys();
+    if (!keys) return NextResponse.json({ error: "Online payment is not switched on." }, { status: 503 });
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     const csrf = validateCsrfOrigin(request);
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Payment does not match this order." }, { status: 400 });
     }
 
-    const valid = await new RazorpayPaymentProvider().verifyPayment({
+    const valid = await new RazorpayPaymentProvider(keys).verifyPayment({
       orderId: order.id,
       providerOrderId: p.razorpay_order_id,
       providerPaymentId: p.razorpay_payment_id,

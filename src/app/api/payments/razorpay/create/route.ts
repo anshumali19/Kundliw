@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
 import { RazorpayPaymentProvider } from "@/lib/payments/razorpayProvider";
-import { razorpayConfigured } from "@/lib/payments/gateway";
+import { getRazorpayKeys } from "@/lib/payments/gateway";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,8 @@ const schema = z.object({ orderId: z.string().min(1) });
 /** Starts an online (Razorpay) payment for the customer's own unpaid order. */
 export async function POST(request: NextRequest) {
   try {
-    if (!razorpayConfigured()) {
+    const keys = await getRazorpayKeys();
+    if (!keys) {
       return NextResponse.json({ error: "Online payment is not switched on yet. Please pay by UPI or bank transfer." }, { status: 503 });
     }
     const user = await getCurrentUser();
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "This booking has expired. Please book again." }, { status: 409 });
     }
 
-    const provider = new RazorpayPaymentProvider();
+    const provider = new RazorpayPaymentProvider(keys);
     const rzp = await provider.createPaymentOrder({
       orderId: order.id,
       orderNumber: order.orderNumber,

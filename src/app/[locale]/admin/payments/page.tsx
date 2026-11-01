@@ -1,6 +1,8 @@
 import { Link } from "@/i18n/routing";
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
+import { razorpayConfigured } from "@/lib/payments/gateway";
+import { PaymentSetup } from "@/features/admin/payments/PaymentSetup";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +31,7 @@ export default async function AdminPaymentsPage(props: Props) {
   const t = (en: string, hi: string) => (isHindi ? hi : en);
   const view = show === "verify" ? "verify" : "paid";
 
+  const [settings, razorpayReady] = await Promise.all([prisma.adminSettings.findUnique({ where: { id: "default" } }).catch(() => null), razorpayConfigured()]);
   const [paidCount, verifyCount, orders] = await Promise.all([
     prisma.order.count({ where: { paymentStatus: "PAID" } }),
     prisma.order.count({ where: { paymentStatus: "AWAITING_VERIFICATION" } }),
@@ -64,6 +67,14 @@ export default async function AdminPaymentsPage(props: Props) {
           {t("Gateway payments appear here once paid. Manual transfers are checked against the screenshot and reference number inside the order.", "गेटवे भुगतान पूर्ण होते ही यहाँ दिखते हैं। मैनुअल भुगतान ऑर्डर में स्क्रीनशॉट और संदर्भ संख्या से जाँचे जाते हैं।")}
         </p>
       </div>
+
+      <PaymentSetup
+        upiVpa={settings?.upiVpa ?? ""}
+        qrCodeUrl={settings?.qrCodeUrl ?? ""}
+        bankReady={!!(settings?.bankAccountNumber && settings?.bankIfsc)}
+        razorpayReady={razorpayReady}
+        isHindi={isHindi}
+      />
 
       <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (
