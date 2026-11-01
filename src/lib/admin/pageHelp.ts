@@ -17,6 +17,10 @@ export const PAGE_HELP: Record<string, PageHelp> = {
     what: ["Successful online payments and manual bank, UPI or QR payments waiting to be checked, with invoice links.", "सफल ऑनलाइन भुगतान और जाँच के लिए रुके बैंक, UPI या QR भुगतान, इनवॉइस लिंक सहित।"],
     why: ["To see money received and confirm transfers made outside the gateway.", "प्राप्त राशि देखने और गेटवे के बाहर किए गए भुगतान पक्के करने के लिए।"],
   },
+  "/admin/reports": {
+    what: ["The month's paid orders with taxable amount, CGST, SGST and total, grouped by service and plan. Download it as a file that opens in Excel.", "महीने के भुगतान हुए ऑर्डर: करयोग्य राशि, CGST, SGST और कुल, सेवा व प्लान अनुसार। Excel में खुलने वाली फ़ाइल डाउनलोड करें।"],
+    why: ["Your accountant needs this every month to file GST.", "GST भरने के लिए आपके अकाउंटेंट को यह हर महीने चाहिए।"],
+  },
   "/admin/services": {
     what: ["Step 1 of the catalogue: the list of services. Add a service, edit its picture, video, description and demos.", "सूची का चरण 1: सेवाओं की सूची। सेवा जोड़ें, उसका चित्र, वीडियो, विवरण और डेमो बदलें।"],
     why: ["Services are what visitors see on the website. Packages, plans and offers hang under them.", "वेबसाइट पर आगंतुक सेवाएँ ही देखते हैं। पैकेज, प्लान और ऑफ़र इनके नीचे जुड़ते हैं।"],

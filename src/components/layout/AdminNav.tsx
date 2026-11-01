@@ -12,6 +12,7 @@ import {
   Award,
   BookOpen,
   DatabaseBackup,
+  FileSpreadsheet,
   FileText,
   Globe,
   HelpCircle,
@@ -56,6 +57,7 @@ const GROUPS: Array<{ en: string; hi: string; items: Item[] }> = [
     hi: "बुकिंग व भुगतान",
     items: [
       { href: "/admin/orders", en: "Orders", hi: "ऑर्डर", icon: ShoppingBag },
+      { href: "/admin/reports", en: "GST & revenue report", hi: "GST व आय रिपोर्ट", icon: FileSpreadsheet },
       { href: "/admin/payments", en: "Payments & invoices", hi: "भुगतान व इनवॉइस", icon: Receipt },
       { href: "/admin/services", en: "1. Services", hi: "1. सेवाएँ", icon: Layers },
       { href: "/admin/packages", en: "2. Packages", hi: "2. पैकेज", icon: Layers },

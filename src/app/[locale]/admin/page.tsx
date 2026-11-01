@@ -28,6 +28,8 @@ const QUICK_LINKS = [
   { href: "/admin/services", en: "Services and plans", hi: "सेवाएँ और प्लान" },
   { href: "/admin/offers", en: "Offers", hi: "ऑफ़र" },
   { href: "/admin/orders", en: "Orders", hi: "ऑर्डर" },
+  { href: "/admin/reports", en: "GST & revenue report", hi: "GST व आय रिपोर्ट" },
+  { href: "/admin/guides", en: "Admin guide (view, download)", hi: "एडमिन गाइड (देखें, डाउनलोड)" },
   { href: "/admin/vault", en: "Upload a Kundli PDF", hi: "कुंडली PDF अपलोड" },
   { href: "/admin/banners", en: "Banners", hi: "बैनर" },
   { href: "/admin/gallery", en: "Gallery", hi: "गैलरी" },
@@ -65,6 +67,8 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
     openTickets,
     activeServices,
     recentOrders,
+    revenue30,
+    pendingPayouts,
   ] = await Promise.all([
     prisma.order.count(),
     prisma.order.count({ where: { paymentStatus: "AWAITING_VERIFICATION" } }),
@@ -88,6 +92,8 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
         service: { select: { titleEn: true, titleHi: true } },
       },
     }),
+    prisma.order.aggregate({ where: { paymentStatus: "PAID", createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } }, _sum: { netAmountPaise: true } }),
+    prisma.payoutRequest.aggregate({ where: { status: "REQUESTED" }, _count: { _all: true }, _sum: { amountPaise: true } }),
   ]);
 
   const cards = [
@@ -102,6 +108,17 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
       label: t("Revenue (paid)", "प्राप्त राशि"),
       value: rupees(revenue._sum.netAmountPaise ?? 0),
       href: "/admin/orders",
+    },
+    {
+      label: t("Revenue (last 30 days)", "आय (पिछले 30 दिन)"),
+      value: rupees(revenue30._sum.netAmountPaise ?? 0),
+      href: "/admin/reports",
+    },
+    {
+      label: t("Associate payouts waiting", "एसोसिएट भुगतान शेष"),
+      value: `${pendingPayouts._count._all} (${rupees(pendingPayouts._sum.amountPaise ?? 0)})`,
+      href: "/admin/associates",
+      highlight: pendingPayouts._count._all > 0,
     },
     { label: t("Customers", "ग्राहक"), value: customers.toString(), href: "/admin/users" },
     { label: t("Associates", "एसोसिएट"), value: associates.toString(), href: "/admin/users" },

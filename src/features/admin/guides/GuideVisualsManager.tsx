@@ -37,9 +37,11 @@ export function GuideVisualsManager({ guides, isHindi }: { guides: GuideBox[]; i
         <section key={g.slug} className="space-y-3 rounded-lg border border-outline-variant/60 bg-surface p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-serif text-lg font-bold text-secondary">{isHindi ? g.titleHi : g.titleEn}</h2>
-            <a href={`/guides/${g.slug}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-primary hover:underline">
-              {t("Open the guide", "गाइड खोलें")}
-            </a>
+            <span className="flex flex-wrap gap-3 text-xs font-bold text-primary">
+              <a href={`/guides/${g.slug}`} target="_blank" rel="noreferrer" className="hover:underline">{t("View", "देखें")}</a>
+              <a href={`/api/guides/${g.slug}?lang=${isHindi ? "hi" : "en"}&download=1`} className="hover:underline">{t("Download", "डाउनलोड")}</a>
+              <a href={`/api/guides/${g.slug}?lang=${isHindi ? "hi" : "en"}&print=1`} target="_blank" rel="noreferrer" className="hover:underline">{t("Print / PDF", "प्रिंट / PDF")}</a>
+            </span>
           </div>
           <DemosEditor
             demos={state[g.slug]}

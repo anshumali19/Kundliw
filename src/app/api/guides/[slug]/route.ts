@@ -42,23 +42,35 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
   const content = (hi ? stored?.contentHi || fallback.contentHi : stored?.contentEn || fallback.contentEn) || "";
   const siteName = hi ? "महर्षि कणाद ज्योतिष केंद्र" : "Maharshi Kanad Jyotish Kendra";
 
+  const renderLine = (line: ReturnType<typeof parseRich>[number][number]) =>
+    line
+      .map((part) => {
+        if (part.type === "bold") return `<strong>${escapeHtml(part.text)}</strong>`;
+        if (part.type === "link") {
+          // In-site links work only on the site, so they are shown as plain text in a saved copy
+          return part.external ? `<a href="${escapeHtml(part.href)}">${escapeHtml(part.text)}</a>` : escapeHtml(part.text);
+        }
+        return escapeHtml(part.text);
+      })
+      .join("");
+
+  // A paragraph whose first line starts "3. Title" becomes a numbered section heading and appears in the contents list
+  const toc: Array<{ id: string; title: string }> = [];
   const inline = parseRich(content)
     .map((paragraph) => {
-      const lines = paragraph.map((line) =>
-        line
-          .map((part) => {
-            if (part.type === "bold") return `<strong>${escapeHtml(part.text)}</strong>`;
-            if (part.type === "link") {
-              // In-site links work only on the site, so they are shown as plain text in a saved copy
-              return part.external ? `<a href="${escapeHtml(part.href)}">${escapeHtml(part.text)}</a>` : escapeHtml(part.text);
-            }
-            return escapeHtml(part.text);
-          })
-          .join("")
-      );
-      return `<p>${lines.join("<br>")}</p>`;
+      const first = paragraph[0]?.map((p) => p.text).join("") ?? "";
+      const heading = /^(\d{1,2})\.\s+(\S.*)$/.exec(first);
+      if (heading) {
+        const id = `s${heading[1]}`;
+        toc.push({ id, title: `${heading[1]}. ${heading[2]}` });
+        const rest = paragraph.slice(1).map(renderLine);
+        return `<h2 id="${id}">${escapeHtml(`${heading[1]}. ${heading[2]}`)}</h2>${rest.length ? `<p>${rest.join("<br>")}</p>` : ""}`;
+      }
+      return `<p>${paragraph.map(renderLine).join("<br>")}</p>`;
     })
     .join("\n");
+  const tocHtml = toc.length > 2 ? `<nav class="toc"><strong>${hi ? "विषय सूची" : "Contents"}</strong><ol>${toc.map((t) => `<li><a href="#${t.id}">${escapeHtml(t.title.replace(/^\d+\.\s*/, ""))}</a></li>`).join("")}</ol></nav>` : "";
+  const issued = new Date().toLocaleDateString(hi ? "hi-IN" : "en-IN", { day: "numeric", month: "long", year: "numeric" });
 
   const printScript = "document.getElementById('print-btn').addEventListener('click',function(){window.print()});if(location.search.indexOf('print=1')>-1){window.addEventListener('load',function(){setTimeout(function(){window.print()},400)})}";
   const html = `<!DOCTYPE html>
@@ -71,7 +83,13 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
   body { font-family: -apple-system, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif; margin: 0; padding: 24px; color: #241915; background: #fff; line-height: 1.7; }
   main { max-width: 760px; margin: 0 auto; }
   .brand { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #984700; font-weight: bold; }
-  h1 { font-size: 28px; color: #6b1d1d; margin: 6px 0 18px; border-bottom: 2px solid #6b1d1d; padding-bottom: 10px; }
+  h1 { font-size: 30px; color: #6b1d1d; margin: 6px 0 6px; }
+  .meta { font-size: 12px; color: #666; margin: 0 0 18px; padding-bottom: 12px; border-bottom: 3px solid #6b1d1d; }
+  h2 { font-size: 19px; color: #6b1d1d; margin: 26px 0 8px; padding: 6px 10px; background: #fbf1e8; border-left: 4px solid #984700; page-break-after: avoid; }
+  .toc { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px 18px; margin: 0 0 8px; }
+  .toc ol { margin: 8px 0 0; padding-left: 22px; columns: 2; font-size: 14px; }
+  .toc a { text-decoration: none; }
+  footer { margin-top: 36px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 11px; color: #777; }
   p { margin: 0 0 14px; font-size: 15px; }
   figure { margin: 18px 0; }
   figure img { max-width: 100%; border: 1px solid #ddd; border-radius: 8px; }
@@ -87,8 +105,11 @@ export async function GET(request: NextRequest, props: { params: Promise<{ slug:
   <div class="bar"><button id="print-btn" type="button">${hi ? "प्रिंट करें / PDF सहेजें" : "Print / Save as PDF"}</button></div>
   <div class="brand">${escapeHtml(siteName)}</div>
   <h1>${escapeHtml(title)}</h1>
+  <p class="meta">${escapeHtml(siteName)} · ${hi ? "जारी:" : "Issued:"} ${escapeHtml(issued)}</p>
+  ${tocHtml}
   ${inline}
   ${visualsHtml}
+  <footer>${escapeHtml(siteName)} · ${escapeHtml(title)}</footer>
 </main>
 <script>${printScript}</script>
 </body>

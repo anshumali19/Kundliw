@@ -149,6 +149,7 @@ Orders shows each booking with the client's birth details and questions. Use the
 
 5. Payments and invoices
 Payments & invoices has "How customers pay": set the UPI ID and QR code here. Bank details are in Business settings. Razorpay can be added later in API keys & Analytics and then appears at checkout by itself. Check manual payments by the screenshot and reference number.
+GST & revenue report shows each month's paid orders with taxable amount, CGST, SGST and total, by service and plan, with a download that opens in Excel for your accountant.
 
 6. Calls
 Appointment slots creates the times clients can pick. Call bookings shows the booked calls on a calendar. Approve or complete a call inside the order.
@@ -191,6 +192,7 @@ API keys & Analytics holds Razorpay, SMS, email, Google, AstroSage and WhatsApp 
 
 5. भुगतान और इनवॉइस
 भुगतान व इनवॉइस में "ग्राहक भुगतान कैसे करें" है: UPI आईडी और QR कोड यहीं लगाएँ। बैंक विवरण व्यवसाय सेटिंग में हैं। Razorpay बाद में API कीज़ व एनालिटिक्स में जोड़ें, फिर वह चेकआउट पर अपने आप दिखेगा। मैनुअल भुगतान स्क्रीनशॉट और संदर्भ संख्या से जाँचें।
+GST व आय रिपोर्ट में हर महीने के भुगतान हुए ऑर्डर करयोग्य राशि, CGST, SGST और कुल सहित, सेवा व प्लान अनुसार दिखते हैं, और अकाउंटेंट के लिए Excel में खुलने वाली फ़ाइल डाउनलोड होती है।
 
 6. कॉल
 अपॉइंटमेंट स्लॉट में वे समय बनाएँ जो ग्राहक चुन सकें। कॉल बुकिंग में बुक की गई कॉल कैलेंडर पर दिखती हैं। कॉल स्वीकृत या पूर्ण ऑर्डर के भीतर करें।
