@@ -115,9 +115,9 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
 
   // Secondary/lineage items accessible in dropdown & mobile
   const kendraLinks = hideTools([
-    { href: "/about", label: tNav("about"), icon: Compass },
+    { href: "/about", label: tNav("about"), icon: Compass },    { href: "/services#packages", label: isHindi ? "पैकेज" : "Packages", icon: Package },
+
     { href: "/services#plans", label: tNav("pricingPlansShort"), icon: Tag },
-    { href: "/services#packages", label: isHindi ? "पैकेज" : "Packages", icon: Package },
     { href: "/offers", label: tNav("offers"), icon: Percent },
     { href: "/founder", label: tNav("founder"), icon: Sparkles },
     { href: "/other-services", label: tNav("otherServices"), icon: Sparkles },
@@ -162,9 +162,9 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
 
   // Complete SRS 13-item navigation list for mobile drawer
   const srsMobileMenu = customMenu ? hideTools(customMenu) : hideTools([
-    { href: "/services", label: tNav("services") },
+    { href: "/services", label: tNav("services") },    { href: "/services#packages", label: isHindi ? "पैकेज" : "Packages" },
+
     { href: "/services#plans", label: tNav("pricingPlans") },
-    { href: "/services#packages", label: isHindi ? "पैकेज" : "Packages" },
     { href: "/offers", label: tNav("offers") },
     { href: ownKundliHref("/kundli"), label: tNav("kundli") },
     { href: ownKundliHref("/kundli/matching"), label: tNav("kundliMatching") },

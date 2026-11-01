@@ -200,13 +200,13 @@ export async function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/services#plans" className="hover:text-white hover:underline transition-colors block py-0.5">
-                  {tNav("pricingPlansShort")}
+                <Link href="/services#packages" className="hover:text-white hover:underline transition-colors block py-0.5">
+                  {locale === "hi" ? "पैकेज" : "Packages"}
                 </Link>
               </li>
               <li>
-                <Link href="/services#packages" className="hover:text-white hover:underline transition-colors block py-0.5">
-                  {locale === "hi" ? "पैकेज" : "Packages"}
+                <Link href="/services#plans" className="hover:text-white hover:underline transition-colors block py-0.5">
+                  {tNav("pricingPlansShort")}
                 </Link>
               </li>
               {(
