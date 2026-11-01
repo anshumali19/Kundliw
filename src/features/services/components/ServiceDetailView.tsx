@@ -239,7 +239,7 @@ export function ServiceDetailView({
 
             {/* YouTube Video Discourse Embed (#12, #47) */}
             {service.youtubeUrl && (
-              <div className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 shadow-xs">
+              <div id="video" className="scroll-mt-24 p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 shadow-xs">
                 <h2 className="font-serif text-base font-bold text-secondary flex items-center gap-2">
                   <Video className="w-4 h-4 text-primary" />
                   <span>{isHindi ? "सेवा संबंधी व्याख्यान / वीडियो" : "Video Discourse & Explanation"}</span>

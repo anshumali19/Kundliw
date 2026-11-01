@@ -19,6 +19,7 @@ import {
   Search,
 } from "lucide-react";
 import { SubPageNav } from "@/components/layout/SubPageNav";
+import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
 
 import { externalPayNotice, type ExternalPay } from "@/lib/content/externalPay";
@@ -54,6 +55,7 @@ export interface SerializedPlan {
   featuresEn: string[];
   featuresHi: string[];
   isPopular: boolean;
+  youtubeUrl?: string | null;
 }
 
 export interface SerializedService {
@@ -268,6 +270,7 @@ export function ServicesListingClient({
                         <h2 className="font-serif text-xl font-bold text-secondary mt-1 group-hover:text-primary transition-colors">
                           <Link href={`/services/${service.slug}`}>{title}</Link>
                         </h2>
+{service.youtubeUrl && <WatchVideoBadge isHindi={isHindi} href={`/services/${service.slug}#video`} className="mt-1" />}
                       </div>
 
                       <p className="text-xs text-on-surface-variant line-clamp-3 leading-relaxed">
@@ -368,6 +371,7 @@ export function ServicesListingClient({
                         <h2 className="font-serif text-xl font-bold text-secondary hover:text-primary transition-colors">
                           <Link href={`/services/${service.slug}`}>{title}</Link>
                         </h2>
+{service.youtubeUrl && <WatchVideoBadge isHindi={isHindi} href={`/services/${service.slug}#video`} className="mt-1" />}
                       </div>
 
                       <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed max-w-3xl">
@@ -458,6 +462,7 @@ export function ServicesListingClient({
                       <div className="min-w-0">
                         <div className="font-semibold text-on-surface text-sm">
                           {isHindi ? p.titleHi : p.titleEn}
+                          {p.youtubeUrl && <WatchVideoBadge isHindi={isHindi} className="ml-2" />}
                           {p.isPopular && (
                             <span className="ml-2 text-[10px] font-bold uppercase bg-brand text-on-brand rounded-full px-2 py-0.5">{isHindi ? "लोकप्रिय" : "Popular"}</span>
                           )}

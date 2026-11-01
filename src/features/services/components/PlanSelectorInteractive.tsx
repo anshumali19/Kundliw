@@ -1,6 +1,7 @@
 "use client";
 
 import { YouTubeEmbed } from "@/components/content/MediaView";
+import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
 import { PackageDetails, type PackageDetailDTO } from "./PackageDetails";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -324,6 +325,7 @@ export function PlanSelectorInteractive({
                         ? "डिजिटल फलित प्रतिवेदन"
                         : "Digital Report"}
                     </span>
+                    {plan.youtubeUrl && <WatchVideoBadge isHindi={isHindi} />}
                     {isSelected && (
                       <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand text-on-brand flex items-center gap-1">
                         <Check className="w-3 h-3" />

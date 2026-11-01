@@ -119,6 +119,7 @@ export default async function ServicesListingPage(
       featuresEn: p.featuresEn,
       featuresHi: p.featuresHi,
       isPopular: p.isPopular,
+      youtubeUrl: p.youtubeUrl,
     })),
   }));
 

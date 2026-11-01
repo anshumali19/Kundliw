@@ -14,6 +14,15 @@ interface Props {
   isHindi: boolean;
 }
 
+function Status({ on, label }: { on: boolean; label: string }) {
+  return (
+    <li className="flex items-center gap-2">
+      {on ? <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden="true" /> : <Circle className="h-4 w-4 text-outline" aria-hidden="true" />}
+      <span className={on ? "font-semibold text-secondary" : "text-on-surface-variant"}>{label}</span>
+    </li>
+  );
+}
+
 /** How customers pay: UPI ID and QR code are set here; bank details and Razorpay keys have their own pages. */
 export function PaymentSetup({ upiVpa, qrCodeUrl, bankReady, razorpayReady, isHindi }: Props) {
   const t = (en: string, hi: string) => (isHindi ? hi : en);
@@ -34,13 +43,6 @@ export function PaymentSetup({ upiVpa, qrCodeUrl, bankReady, razorpayReady, isHi
     setBusy(false);
     setMsg(res?.ok ? t("Saved. Customers now see this at checkout.", "सहेजा गया। ग्राहकों को अब चेकआउट पर यही दिखेगा।") : t("Could not save.", "सहेजा नहीं जा सका।"));
   }
-
-  const Status = ({ on, label }: { on: boolean; label: string }) => (
-    <li className="flex items-center gap-2">
-      {on ? <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden="true" /> : <Circle className="h-4 w-4 text-outline" aria-hidden="true" />}
-      <span className={on ? "font-semibold text-secondary" : "text-on-surface-variant"}>{label}</span>
-    </li>
-  );
 
   return (
     <section className="space-y-4 rounded-lg border border-gold/60 bg-gold/10 p-5" aria-labelledby="pay-setup-title">
