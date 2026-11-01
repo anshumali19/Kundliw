@@ -7,6 +7,8 @@ import { paiseToRupees } from "@/lib/billing/money";
 import { LinkItem, normalizeLinks } from "@/lib/content/media";
 import { ImageUrlField, LinksEditor, VideoField } from "@/components/admin/MediaFields";
 import { InfoTip } from "@/components/admin/InfoTip";
+import { DemosEditor } from "@/components/admin/DemosEditor";
+import { normalizeDemos, type DemoItem } from "@/lib/content/demos";
 import { Link } from "@/i18n/routing";
 import {
   Plus,
@@ -124,6 +126,10 @@ export interface AdminServiceItem {
   samagriHi?: string | null;
   youtubeUrl?: string | null;
   additionalLinks?: unknown;
+  demos?: unknown;
+  externalPayUrl?: string | null;
+  externalPayNoteEn?: string | null;
+  externalPayNoteHi?: string | null;
   orderIndex: number;
   isActive: boolean;
   plans: AdminPlanItem[];
@@ -193,6 +199,10 @@ export function AdminServicesManager({
     samagriHi: "",
     youtubeUrl: "",
     additionalLinks: [] as LinkItem[],
+    demos: [] as DemoItem[],
+    externalPayUrl: "",
+    externalPayNoteEn: "",
+    externalPayNoteHi: "",
     orderIndex: 0,
     isActive: true,
   });
@@ -282,6 +292,10 @@ export function AdminServicesManager({
         samagriHi: service.samagriHi || "",
         youtubeUrl: service.youtubeUrl || "",
         additionalLinks: normalizeLinks(service.additionalLinks),
+        demos: normalizeDemos(service.demos),
+        externalPayUrl: service.externalPayUrl || "",
+        externalPayNoteEn: service.externalPayNoteEn || "",
+        externalPayNoteHi: service.externalPayNoteHi || "",
         orderIndex: service.orderIndex,
         isActive: service.isActive,
       });
@@ -307,6 +321,10 @@ export function AdminServicesManager({
         samagriHi: "",
         youtubeUrl: "",
         additionalLinks: [],
+        demos: [],
+        externalPayUrl: "",
+        externalPayNoteEn: "",
+        externalPayNoteHi: "",
         orderIndex: services.length + 1,
         isActive: true,
       });
@@ -350,6 +368,10 @@ export function AdminServicesManager({
         samagriHi: serviceForm.samagriHi ? serviceForm.samagriHi.trim() : null,
         youtubeUrl: serviceForm.youtubeUrl ? serviceForm.youtubeUrl.trim() : null,
         additionalLinks: parsedLinks.length > 0 ? parsedLinks : null,
+        demos: serviceForm.demos.filter((d) => d.url.trim()),
+        externalPayUrl: serviceForm.externalPayUrl.trim() || null,
+        externalPayNoteEn: serviceForm.externalPayNoteEn.trim() || null,
+        externalPayNoteHi: serviceForm.externalPayNoteHi.trim() || null,
         orderIndex: Number(serviceForm.orderIndex),
         isActive: Boolean(serviceForm.isActive),
       };
@@ -1403,6 +1425,20 @@ export function AdminServicesManager({
                 </div>
 
                 <VideoField value={serviceForm.youtubeUrl} onChange={(v) => setServiceForm({ ...serviceForm, youtubeUrl: v })} />
+              </div>
+
+              <DemosEditor demos={serviceForm.demos} onChange={(demos) => setServiceForm({ ...serviceForm, demos })} />
+
+              <div className="space-y-3 rounded-lg border border-gold/60 bg-gold/10 p-4">
+                <label className="block text-xs font-bold uppercase text-secondary">
+                  Paid on another website (optional){" "}
+                  <InfoTip text="For services whose payment happens on a partner website (like Matrimonial or Bharat Darshan). Fill in that website's address. Visitors who choose a plan of this service are told they pay there, and are sent to that website instead of the booking form here." />
+                </label>
+                <input type="url" placeholder="https://partner-website.com" value={serviceForm.externalPayUrl} onChange={(e) => setServiceForm({ ...serviceForm, externalPayUrl: e.target.value })} className="w-full bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <input type="text" placeholder="Notice (English), optional" value={serviceForm.externalPayNoteEn} onChange={(e) => setServiceForm({ ...serviceForm, externalPayNoteEn: e.target.value })} className="bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                  <input type="text" placeholder="सूचना (हिन्दी), वैकल्पिक" value={serviceForm.externalPayNoteHi} onChange={(e) => setServiceForm({ ...serviceForm, externalPayNoteHi: e.target.value })} className="bg-surface border border-outline-variant/80 rounded px-3 py-2 text-xs min-h-[44px]" />
+                </div>
               </div>
 
               {/* Itinerary (#12) */}

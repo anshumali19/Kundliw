@@ -30,6 +30,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
       data: {
         ...parsed.data,
         ...(parsed.data.additionalLinks === null ? { additionalLinks: Prisma.JsonNull } : {}),
+        ...(parsed.data.demos === null ? { demos: Prisma.JsonNull } : {}),
       } as Prisma.ServiceUpdateInput,
     });
 

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { pageAlternates } from "@/lib/seo";
 import { RichText } from "@/components/content/RichText";
 import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
+import { DemoSection } from "@/components/content/DemoSection";
 import { PackageDetails } from "@/features/services/components/PackageDetails";
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
@@ -117,6 +118,10 @@ export default async function OtherServiceDetailPage(props: Props) {
             </div>
             <LinkList links={normalizeLinks(item.additionalLinks)} isHindi={isHindi} />
           </div>
+        </div>
+
+        <div className="mx-auto mt-8 max-w-6xl">
+          <DemoSection demos={item.demos} isHindi={isHindi} />
         </div>
 
         <div className="mx-auto max-w-6xl">

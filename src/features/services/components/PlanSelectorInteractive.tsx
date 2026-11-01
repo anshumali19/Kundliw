@@ -5,6 +5,7 @@ import { PackageDetails, type PackageDetailDTO } from "./PackageDetails";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatPaiseToInr } from "@/lib/billing/gst";
+import { externalPayNotice, type ExternalPay } from "@/lib/content/externalPay";
 import {
   Check,
   CheckCircle2,
@@ -51,6 +52,8 @@ interface PlanSelectorInteractiveProps {
   serviceSlug: string;
   serviceTitle: string;
   locale: string;
+  /** Set when this service is paid for on another website */
+  externalPay?: ExternalPay | null;
 }
 
 interface AppliedCoupon {
@@ -67,6 +70,7 @@ export function PlanSelectorInteractive({
   serviceSlug,
   serviceTitle,
   locale,
+  externalPay = null,
 }: PlanSelectorInteractiveProps) {
   const isHindi = locale === "hi";
 
@@ -656,7 +660,12 @@ export function PlanSelectorInteractive({
 
           {/* Proceed to Booking Details CTA */}
           <div className="w-full md:w-auto">
-            {plans.length > 1 && (
+            {externalPay && (
+              <p role="note" className="mb-2 rounded border border-gold bg-gold/15 px-3 py-2 text-[11px] font-semibold text-secondary md:max-w-sm md:text-right">
+                {externalPayNotice(externalPay, isHindi)}
+              </p>
+            )}
+            {!externalPay && plans.length > 1 && (
               <p className="text-[11px] text-on-surface-variant mb-2 md:text-right">
                 {isHindi ? "अगली स्क्रीन पर इसी सेवा के 2 या 3 प्लान एक साथ जोड़ सकते हैं।" : "On the next screen you can add 2 or 3 plans together in one booking."}
               </p>
@@ -670,6 +679,16 @@ export function PlanSelectorInteractive({
                     ? isHindi ? "सभी स्थान भर चुके हैं" : "Fully booked"
                     : isHindi ? "बुकिंग बंद है" : "Booking is closed"}
                 </span>
+              ) : externalPay ? (
+                <a
+                  href={externalPay.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full md:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-brand hover:bg-brand-hover text-on-brand font-bold text-xs uppercase tracking-wider rounded shadow-sm transition-colors border border-primary text-center"
+                >
+                  <span>{isHindi ? "सहयोगी वेबसाइट पर जाएँ और भुगतान करें" : "Continue and pay on the partner website"}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
               ) : (
                 <Link
                   href={bookingHref}

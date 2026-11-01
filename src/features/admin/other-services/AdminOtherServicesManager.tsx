@@ -5,6 +5,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { LinkItem, normalizeLinks } from "@/lib/content/media";
 import { ImageUrlField, LinksEditor, YouTubeUrlField } from "@/components/admin/MediaFields";
 import { InfoTip } from "@/components/admin/InfoTip";
+import { DemosEditor } from "@/components/admin/DemosEditor";
+import { normalizeDemos, type DemoItem } from "@/lib/content/demos";
 import { ItineraryDaysEditor, toItineraryDays, type ItineraryDay } from "@/components/admin/ItineraryDaysEditor";
 import {
   Sparkles,
@@ -44,6 +46,7 @@ export interface OtherServiceItem {
   itineraryDays?: unknown;
   facebookUrl?: string | null;
   whatsappGroupUrl?: string | null;
+  demos?: unknown;
   orderIndex: number;
   isActive: boolean;
 }
@@ -88,6 +91,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([]);
   const [facebookUrl, setFacebookUrl] = useState("");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
+  const [demos, setDemos] = useState<DemoItem[]>([]);
   const [orderIndex, setOrderIndex] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -140,6 +144,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setItinerary(toItineraryDays(item.itineraryDays));
       setFacebookUrl(item.facebookUrl || "");
       setWhatsappGroupUrl(item.whatsappGroupUrl || "");
+      setDemos(normalizeDemos(item.demos));
       setOrderIndex(item.orderIndex);
       setIsActive(item.isActive);
     } else {
@@ -166,6 +171,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setItinerary([]);
       setFacebookUrl("");
       setWhatsappGroupUrl("");
+      setDemos([]);
       setOrderIndex(items.length + 1);
       setIsActive(true);
     }
@@ -200,6 +206,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       itineraryDays: itinerary.filter((d) => d.titleEn.trim() || d.titleHi.trim() || d.detailsEn.trim() || d.detailsHi.trim()),
       facebookUrl: facebookUrl.trim() || null,
       whatsappGroupUrl: whatsappGroupUrl.trim() || null,
+      demos: demos.filter((d) => d.url.trim()),
       orderIndex: Number(orderIndex),
       isActive,
     };
@@ -546,6 +553,8 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
               </div>
 
               <ItineraryDaysEditor days={itinerary} onChange={setItinerary} />
+
+              <DemosEditor demos={demos} onChange={setDemos} />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

@@ -87,6 +87,9 @@ export async function createBookingOrder(
     if (!service) {
       throw new BookingError("Requested Vedic service is unavailable or inactive.");
     }
+    if (service.externalPayUrl) {
+      throw new BookingError("This service is booked and paid for on its partner website, not here.");
+    }
 
     // 2. Fetch active plan directly from DB — never trust client price
     const plan = await tx.plan.findUnique({

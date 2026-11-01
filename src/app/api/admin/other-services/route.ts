@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 import { linksInputSchema } from "@/lib/content/media";
+import { demosInputSchema } from "@/lib/content/demos";
 import { withJsonLinks, jsonOrNull } from "@/lib/content/json";
 
 const dayListSchema = z
@@ -41,6 +42,7 @@ const otherServiceInputSchema = z.object({
   startDate: z.preprocess((v) => (v === "" || v == null ? null : new Date(String(v))), z.date().nullable()).optional(),
   endDate: z.preprocess((v) => (v === "" || v == null ? null : new Date(String(v))), z.date().nullable()).optional(),
   itineraryDays: dayListSchema.optional().nullable(),
+  demos: demosInputSchema.optional().nullable(),
   facebookUrl: z.string().trim().url().optional().nullable(),
   whatsappGroupUrl: z.string().trim().url().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),
@@ -95,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     const item = await prisma.otherService.create({
-      data: withJsonLinks({ ...parsed.data, itineraryDays: jsonOrNull(parsed.data.itineraryDays) }),
+      data: withJsonLinks({ ...parsed.data, itineraryDays: jsonOrNull(parsed.data.itineraryDays), demos: jsonOrNull(parsed.data.demos) }),
     });
 
     return NextResponse.json({ success: true, item }, { status: 201 });

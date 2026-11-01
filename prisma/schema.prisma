@@ -173,6 +173,12 @@ model Service {
   samagriHi       String?  @db.Text
   youtubeUrl      String?
   additionalLinks Json? // Array of { labelEn: string, labelHi: string, url: string }
+  /// Demos shown on the service page: [{ kind: link|image|video|social, labelEn, labelHi, url }]
+  demos           Json?
+  /// When set, this service is paid for on that other website, not here
+  externalPayUrl  String?
+  externalPayNoteEn String?
+  externalPayNoteHi String?
   orderIndex      Int      @default(0)
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -683,6 +689,7 @@ model OtherService {
   itineraryDays   Json?
   facebookUrl     String?
   whatsappGroupUrl String?
+  demos           Json?
   youtubeUrl      String?
   additionalLinks Json?
   orderIndex      Int      @default(0)

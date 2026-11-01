@@ -21,6 +21,8 @@ import {
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
 
+import { externalPayNotice, type ExternalPay } from "@/lib/content/externalPay";
+
 export interface SerializedPackage {
   id: string;
   slug: string;
@@ -72,6 +74,8 @@ export interface SerializedService {
   samagriEn?: string | null;
   samagriHi?: string | null;
   youtubeUrl?: string | null;
+  /** Set when this service is paid for on another website */
+  externalPay?: ExternalPay | null;
   plans: SerializedPlan[];
   packages?: SerializedPackage[];
 }
@@ -465,12 +469,24 @@ export function ServicesListingClient({
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-serif text-lg font-bold text-secondary">{formatPaiseToInr(p.pricePaise)}</span>
-                        <Link
-                          href={`/booking?service=${encodeURIComponent(s.slug)}&plan=${encodeURIComponent(p.slug)}`}
-                          className="min-h-[40px] inline-flex items-center px-4 rounded bg-brand text-on-brand hover:bg-brand-hover text-xs font-bold"
-                        >
-                          {isHindi ? "बुक करें" : "Book"}
-                        </Link>
+                        {s.externalPay ? (
+                          <a
+                            href={s.externalPay.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={externalPayNotice(s.externalPay, isHindi)}
+                            className="min-h-[40px] inline-flex items-center px-4 rounded bg-brand text-on-brand hover:bg-brand-hover text-xs font-bold"
+                          >
+                            {isHindi ? "सहयोगी साइट पर भुगतान ↗" : "Pay on partner site ↗"}
+                          </a>
+                        ) : (
+                          <Link
+                            href={`/booking?service=${encodeURIComponent(s.slug)}&plan=${encodeURIComponent(p.slug)}`}
+                            className="min-h-[40px] inline-flex items-center px-4 rounded bg-brand text-on-brand hover:bg-brand-hover text-xs font-bold"
+                          >
+                            {isHindi ? "बुक करें" : "Book"}
+                          </Link>
+                        )}
                       </div>
                     </li>
                   ))}

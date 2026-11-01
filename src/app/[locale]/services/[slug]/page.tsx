@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
+import { externalPayOf } from "@/lib/content/externalPay";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -111,6 +112,8 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     samagriHi: service.samagriHi,
     youtubeUrl: service.youtubeUrl,
     additionalLinks: service.additionalLinks,
+    demos: service.demos,
+    externalPay: externalPayOf(service),
     packages: service.packages.map((k) => ({
       id: k.id,
       titleEn: k.titleEn,

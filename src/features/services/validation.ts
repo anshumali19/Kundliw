@@ -2,6 +2,7 @@ import { partialUpdate } from "@/lib/validation/partialUpdate";
 import { z } from "zod";
 import { DiscountType } from "@prisma/client";
 import { linksInputSchema } from "@/lib/content/media";
+import { demosInputSchema } from "@/lib/content/demos";
 
 
 export const serviceInputSchema = z.object({
@@ -28,6 +29,10 @@ export const serviceInputSchema = z.object({
   samagriHi: z.string().trim().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),
   additionalLinks: linksInputSchema.optional().nullable(),
+  demos: demosInputSchema.optional().nullable(),
+  externalPayUrl: z.string().trim().url().optional().nullable(),
+  externalPayNoteEn: z.string().trim().max(500).optional().nullable(),
+  externalPayNoteHi: z.string().trim().max(500).optional().nullable(),
   orderIndex: z.coerce.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
 });

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { pageAlternates } from "@/lib/seo";
+import { externalPayOf } from "@/lib/content/externalPay";
 import { ServicesListingClient } from "@/features/services/components/ServicesListingClient";
 
 
@@ -82,6 +83,7 @@ export default async function ServicesListingPage(
     samagriEn: s.samagriEn,
     samagriHi: s.samagriHi,
     youtubeUrl: s.youtubeUrl,
+    externalPay: externalPayOf(s),
     packages: s.packages
       .filter((k) => s.plans.some((p) => p.packageId === k.id))
       .map((k) => {

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 import { linksInputSchema } from "@/lib/content/media";
+import { demosInputSchema } from "@/lib/content/demos";
 import { withJsonLinks, jsonOrNull } from "@/lib/content/json";
 
 const dayListSchema = z
@@ -42,6 +43,7 @@ const updateOtherServiceSchema = z.object({
   startDate: z.preprocess((v) => (v === "" || v == null ? null : new Date(String(v))), z.date().nullable()).optional(),
   endDate: z.preprocess((v) => (v === "" || v == null ? null : new Date(String(v))), z.date().nullable()).optional(),
   itineraryDays: dayListSchema.optional().nullable(),
+  demos: demosInputSchema.optional().nullable(),
   facebookUrl: z.string().trim().url().optional().nullable(),
   whatsappGroupUrl: z.string().trim().url().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),
@@ -69,10 +71,10 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
       );
     }
 
-    const { itineraryDays, ...rest } = parsed.data;
+    const { itineraryDays, demos, ...rest } = parsed.data;
     const updated = await prisma.otherService.update({
       where: { id: params.id },
-      data: withJsonLinks({ ...rest, ...(itineraryDays !== undefined ? { itineraryDays: jsonOrNull(itineraryDays) } : {}) }),
+      data: withJsonLinks({ ...rest, ...(itineraryDays !== undefined ? { itineraryDays: jsonOrNull(itineraryDays) } : {}), ...(demos !== undefined ? { demos: jsonOrNull(demos) } : {}) }),
     });
 
     return NextResponse.json({ success: true, item: updated });

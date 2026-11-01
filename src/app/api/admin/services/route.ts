@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...parsed.data,
         additionalLinks: parsed.data.additionalLinks ?? Prisma.JsonNull,
+        demos: parsed.data.demos ?? Prisma.JsonNull,
       },
     });
 

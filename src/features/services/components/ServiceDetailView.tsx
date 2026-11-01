@@ -6,6 +6,8 @@ import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { PlanSelectorInteractive, PlanDTO } from "./PlanSelectorInteractive";
 import type { PackageDetailDTO } from "./PackageDetails";
+import { DemoSection } from "@/components/content/DemoSection";
+import type { ExternalPay } from "@/lib/content/externalPay";
 import { SubPageNav } from "@/components/layout/SubPageNav";
 import { ServiceEnquiryModal } from "./ServiceEnquiryModal";
 import { LinkList, YouTubeEmbed } from "@/components/content/MediaView";
@@ -47,6 +49,8 @@ export interface ServiceDetailDTO {
   samagriHi?: string | null;
   youtubeUrl?: string | null;
   additionalLinks?: unknown;
+  demos?: unknown;
+  externalPay?: ExternalPay | null;
   packages?: PackageDetailDTO[];
   plans: Array<{
     id: string;
@@ -244,6 +248,8 @@ export function ServiceDetailView({
               </div>
             )}
 
+            <DemoSection demos={service.demos} isHindi={isHindi} />
+
             {/* Additional Links & References (#12, #47) */}
             {normalizeLinks(service.additionalLinks).length > 0 && (
               <div className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 shadow-xs">
@@ -394,6 +400,7 @@ export function ServiceDetailView({
             serviceSlug={service.slug}
             serviceTitle={title}
             locale={locale}
+            externalPay={service.externalPay ?? null}
           />
         </div>
       </section>
