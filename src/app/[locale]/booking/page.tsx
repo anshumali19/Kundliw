@@ -1,3 +1,4 @@
+import { BookingSteps } from "@/components/booking/BookingSteps";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
 import { requireUser } from "@/lib/auth/guards";
@@ -130,6 +131,7 @@ export default async function BookingPage(props: BookingPageProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 text-left">
+      <BookingSteps from={5} isHindi={locale === "hi"} />
       <BookingWizard
         services={servicesData}
         initialServiceSlug={searchParams?.service || (servicesData[0]?.slug ?? "")}

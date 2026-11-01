@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/routing";
 import { ServiceExplorer } from "@/components/content/ServiceExplorer";
+import { HowItWorks } from "@/components/content/HowItWorks";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { OrderStatusStepper } from "@/features/orders/components/OrderStatusStepper";
@@ -132,6 +133,19 @@ export default async function AccountPage(props: AccountPageProps) {
         </Link>
         <SignOutButton label={isHindi ? "लॉग आउट" : "Log out"} className="ml-auto" />
       </div>
+
+      <HowItWorks
+        isHindi={isHindi}
+        title={isHindi ? "यह पेज कैसे काम करता है" : "How this page works"}
+        steps={[
+          { en: "Book a service", hi: "सेवा बुक करें", detailEn: "Open Services, then choose Service, Package, Plan and an Offer. The list at the bottom of this page shows everything you can book.", detailHi: "सेवाएँ खोलें, फिर सेवा, पैकेज, प्लान और ऑफ़र चुनें। इस पेज के नीचे की सूची में सब कुछ दिखता है।" },
+          { en: "Pay", hi: "भुगतान करें", detailEn: "Pay online, or by UPI, QR code or bank transfer and enter the reference number. The Kendra confirms manual payments.", detailHi: "ऑनलाइन, या UPI, QR कोड अथवा बैंक ट्रांसफर से भुगतान करें और संदर्भ संख्या भरें। मैनुअल भुगतान केंद्र पक्का करता है।" },
+          { en: "Follow your orders", hi: "ऑर्डर देखें", detailEn: "Each order below shows its stage: Received, In progress, Complete, Dispatched, Delivered.", detailHi: "नीचे हर ऑर्डर का चरण दिखता है: प्राप्त, कार्य जारी, तैयार, भेजा गया, वितरित।" },
+          { en: "Download bills", hi: "बिल डाउनलोड करें", detailEn: "On every paid order you can download the GST invoice and the confirmation ticket.", detailHi: "हर भुगतान हुए ऑर्डर पर GST इनवॉइस और कन्फर्मेशन टिकट डाउनलोड करें।" },
+          { en: "Get your reports", hi: "अपनी रिपोर्ट पाएँ", detailEn: "Finished Kundli PDFs appear in My documents (vault).", detailHi: "तैयार कुंडली PDF 'मेरे दस्तावेज़ (वॉल्ट)' में मिलती है।" },
+          { en: "Need help?", hi: "मदद चाहिए?", detailEn: "Read or download the User Guide, or raise a Support ticket and the Kendra will reply there.", detailHi: "उपयोगकर्ता गाइड पढ़ें या डाउनलोड करें, या सहायता टिकट बनाएँ, केंद्र वहीं उत्तर देगा।" },
+        ]}
+      />
 
       {/* User guide: the words are edited by the admin in Pages & legal */}
       <div className="rounded-lg border border-outline-variant bg-surface p-4 flex flex-wrap items-center gap-3">

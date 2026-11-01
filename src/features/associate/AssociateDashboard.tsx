@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatPaiseToInr } from "@/lib/billing/gst";
+import { HowItWorks } from "@/components/content/HowItWorks";
 import { Copy, Share2, Wallet, FileDown, Mail, RefreshCw } from "lucide-react";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 import { PayoutDetails } from "./PayoutDetails";
@@ -158,6 +159,18 @@ export function AssociateDashboard({ locale, siteUrl, explorer }: { locale: stri
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 text-left space-y-6">
+      <HowItWorks
+        isHindi={locale === "hi"}
+        title={t("How this dashboard works", "यह डैशबोर्ड कैसे काम करता है")}
+        steps={[
+          { en: "Share your link", hi: "अपना लिंक साझा करें", detailEn: "Copy your personal referral link and share it by WhatsApp or any other way.", detailHi: "अपना रेफ़रल लिंक कॉपी करें और व्हाट्सऐप या किसी भी तरह भेजें।" },
+          { en: "Clients book", hi: "ग्राहक बुक करते हैं", detailEn: "When someone opens your link and books within 30 days, the booking is credited to you.", detailHi: "आपके लिंक से आकर 30 दिन में बुकिंग करने पर वह आपके नाम जुड़ती है।" },
+          { en: "Earn commission", hi: "कमीशन पाएँ", detailEn: "The commission table shows each booking, its amount and whether it is pending, approved or paid.", detailHi: "कमीशन तालिका में हर बुकिंग, राशि और स्थिति (लंबित, स्वीकृत, भुगतान हुआ) दिखती है।" },
+          { en: "Ask for payout", hi: "भुगतान माँगें", detailEn: "Add your UPI or bank details, then request a payout of your approved balance.", detailHi: "अपना UPI या बैंक विवरण भरें, फिर स्वीकृत राशि का भुगतान माँगें।" },
+          { en: "See what you can offer", hi: "क्या दे सकते हैं देखें", detailEn: "The list at the bottom shows every Service, Package, Plan and Offer, so you know what to recommend.", detailHi: "नीचे की सूची में हर सेवा, पैकेज, प्लान और ऑफ़र दिखता है, ताकि आप सही सुझाव दे सकें।" },
+          { en: "Guide and help", hi: "गाइड और मदद", detailEn: "View, download or print the Associate Guide, or raise a Support ticket.", detailHi: "एसोसिएट गाइड देखें, डाउनलोड या प्रिंट करें, या सहायता टिकट बनाएँ।" },
+        ]}
+      />
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-secondary">

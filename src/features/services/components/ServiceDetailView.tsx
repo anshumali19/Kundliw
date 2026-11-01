@@ -6,6 +6,7 @@ import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { PlanSelectorInteractive, PlanDTO } from "./PlanSelectorInteractive";
 import type { PackageDetailDTO } from "./PackageDetails";
+import { BookingSteps } from "@/components/booking/BookingSteps";
 import { DemoSection } from "@/components/content/DemoSection";
 import type { ExternalPay } from "@/lib/content/externalPay";
 import { SubPageNav } from "@/components/layout/SubPageNav";
@@ -394,6 +395,7 @@ export function ServiceDetailView({
       {/* 3. Interactive Plan Selector & Sticky Bar */}
       <section className="w-full bg-surface-container-low/60 border-t border-secondary/20 py-12 text-left">
         <div className="w-full px-4 sm:px-8 lg:px-12">
+          <BookingSteps from={2} to={4} isHindi={isHindi} />
           <PlanSelectorInteractive
             plans={plansDto}
             packages={service.packages ?? []}

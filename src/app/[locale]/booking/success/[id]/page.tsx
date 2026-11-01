@@ -1,3 +1,4 @@
+import { BookingSteps } from "@/components/booking/BookingSteps";
 import { HelpEmail } from "@/components/content/HelpEmail";
 import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { notFound } from "next/navigation";
@@ -72,6 +73,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 text-left text-on-surface">
+      <BookingSteps from={isPaid ? 7 : 6} isHindi={isHindi} />
       {/* Dynamic Status Banner depending on paymentStatus */}
       {isPaid ? (
         <div className="bg-surface-container rounded-lg p-6 sm:p-8 border-2 border-secondary/30 shadow-sm space-y-4 text-left">

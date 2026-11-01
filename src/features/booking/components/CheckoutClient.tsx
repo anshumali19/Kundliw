@@ -1,5 +1,6 @@
 "use client";
 
+import { BookingSteps } from "@/components/booking/BookingSteps";
 import { HelpEmail } from "@/components/content/HelpEmail";
 import React, { useState } from "react";
 import { SelectedFilePreview } from "@/components/content/FileViewer";
@@ -226,6 +227,7 @@ export function CheckoutClient({
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 text-left text-on-surface">
+      <BookingSteps from={6} isHindi={isHindi} />
       {/* Header Stepper Banner */}
       <div className="mb-8">
         <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-secondary mb-2">
