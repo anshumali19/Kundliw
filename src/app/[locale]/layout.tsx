@@ -21,6 +21,8 @@ import { BannerSlot } from "@/components/banners/BannerSlot";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth/guards";
+import { MaintenanceGate } from "@/components/layout/MaintenanceGate";
 import { isCorePageSlug } from "@/lib/content/pages";
 import { sizedImage } from "@/lib/content/media";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -212,6 +214,9 @@ export default async function LocaleLayout(
             addressEn: true,
             city: true,
             whatsappNumber: true,
+            maintenanceMode: true,
+            maintenanceMessageEn: true,
+            maintenanceMessageHi: true,
             socialWhatsapp: true,
             socialFacebook: true,
             socialInstagram: true,
@@ -357,7 +362,15 @@ export default async function LocaleLayout(
             {topMarquee.length > 0 && <MarqueeStrip items={topMarquee} position="TOP" />}
             <main className="flex-1 w-full max-w-full overflow-x-clip pb-6 xl:pb-0">
               <PageNavButtons />
-              {children}
+              <MaintenanceGate
+                on={!!settings?.maintenanceMode}
+                isAdmin={settings?.maintenanceMode ? (await getCurrentUser())?.role === "ADMIN" : false}
+                isHindi={locale === "hi"}
+                messageEn={settings?.maintenanceMessageEn ?? ""}
+                messageHi={settings?.maintenanceMessageHi ?? ""}
+              >
+                {children}
+              </MaintenanceGate>
             </main>
             <BannerSlot position="BOTTOM" initialBanners={bottomBanners} />
             <MarqueeStrip items={bottomMarquee} position="BOTTOM" />

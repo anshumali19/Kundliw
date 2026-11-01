@@ -135,13 +135,13 @@ Raise a Support ticket from the dashboard for any problem; the Kendra replies in
 Use the Super Admin login. Admin accounts are never created from the website. On every admin page, open "What is this page? Why use it?" at the top to read what the page does, and add a short demo video for it.
 
 2. Dashboard
-Shows today's new orders, pending Kundli and Prashna, calls, new users and active clients, an earnings chart (daily, weekly, monthly) and recent orders.
+Shows today's new orders, pending Kundli and Prashna, calls, new users and active clients, an earnings chart (daily, weekly, monthly) and recent orders. The "Site status" strip turns Maintenance mode on or off: visitors then see a "back soon" page while you and the sign-in pages keep working.
 
 3. The catalogue in four steps
 Step 1 Services: add a service, its picture, video, description and demos.
 Step 2 Packages: choose a service, then add or move its packages.
 Step 3 Plans: choose a service and a package, then add or move its plans and prices.
-Step 4 Offers: promo codes tied to a plan or a whole package.
+Step 4 Offers: promo codes tied to a plan or a whole package. The offers page also shows the total discount given, how many times each code was used and how many of those reached payment.
 For a service paid on a partner website, fill "Paid on another website" in the service form.
 
 4. Orders, Kundli queue and delivery
@@ -155,7 +155,7 @@ GST & revenue report shows each month's paid orders with taxable amount, CGST, S
 Appointment slots creates the times clients can pick. Call bookings shows the booked calls on a calendar. Approve or complete a call inside the order.
 
 7. Support tickets and WhatsApp
-Support tickets lists the tickets customers and associates raise; open one, reply and set its status. WhatsApp chats show client messages and let you reply once the WhatsApp keys are saved in API keys & Analytics.
+Enquiries come from the Contact form and chatbot; set each lead to New, Contacted or Closed. Support tickets lists the tickets customers and associates raise; open one, reply and set its status. WhatsApp chats show client messages and let you reply once the WhatsApp keys are saved in API keys & Analytics.
 
 8. Sister services
 Matrimony (approve or reject profiles, paid members), Pilgrimage & tours (requests, vehicles and drivers) and Tax desk (documents and filing status).
@@ -178,13 +178,13 @@ API keys & Analytics holds Razorpay, SMS, email, Google, AstroSage and WhatsApp 
 सुपर एडमिन लॉगिन का उपयोग करें। एडमिन खाते वेबसाइट से कभी नहीं बनाए जाते। हर एडमिन पेज के ऊपर "यह पेज क्या है? इसका उपयोग क्यों?" खोलकर पढ़ें कि पेज क्या करता है, और उसके लिए छोटा डेमो वीडियो जोड़ें।
 
 2. डैशबोर्ड
-आज के नए ऑर्डर, लंबित कुंडली व प्रश्न, कॉल, नए उपयोगकर्ता और सक्रिय ग्राहक, आय का चार्ट (दैनिक, साप्ताहिक, मासिक) और हाल के ऑर्डर दिखाता है।
+आज के नए ऑर्डर, लंबित कुंडली व प्रश्न, कॉल, नए उपयोगकर्ता और सक्रिय ग्राहक, आय का चार्ट (दैनिक, साप्ताहिक, मासिक) और हाल के ऑर्डर दिखाता है। "साइट की स्थिति" पट्टी से रखरखाव मोड चालू या बंद करें: तब आगंतुकों को "जल्द वापसी" पेज दिखता है और आप तथा साइन-इन पेज चलते रहते हैं।
 
 3. सूची चार चरणों में
 चरण 1 सेवाएँ: सेवा, उसका चित्र, वीडियो, विवरण और डेमो जोड़ें।
 चरण 2 पैकेज: सेवा चुनें, फिर उसके पैकेज जोड़ें या दूसरी सेवा में ले जाएँ।
 चरण 3 प्लान: सेवा और पैकेज चुनें, फिर प्लान और कीमतें जोड़ें या ले जाएँ।
-चरण 4 ऑफ़र: प्रोमो कोड, किसी प्लान या पूरे पैकेज से जुड़े।
+चरण 4 ऑफ़र: प्रोमो कोड, किसी प्लान या पूरे पैकेज से जुड़े। ऑफ़र पेज पर कुल दी गई छूट, हर कोड का उपयोग और उनमें से कितने भुगतान तक पहुँचे, यह भी दिखता है।
 जिस सेवा का भुगतान सहयोगी वेबसाइट पर होता है, उसके फ़ॉर्म में "दूसरी वेबसाइट पर भुगतान" भरें।
 
 4. ऑर्डर, कुंडली कतार और डिलीवरी
@@ -198,7 +198,7 @@ GST व आय रिपोर्ट में हर महीने के भ
 अपॉइंटमेंट स्लॉट में वे समय बनाएँ जो ग्राहक चुन सकें। कॉल बुकिंग में बुक की गई कॉल कैलेंडर पर दिखती हैं। कॉल स्वीकृत या पूर्ण ऑर्डर के भीतर करें।
 
 7. सहायता टिकट और व्हाट्सएप
-सहायता टिकट में ग्राहकों और एसोसिएट के बनाए टिकट दिखते हैं; टिकट खोलें, उत्तर दें और स्थिति तय करें। व्हाट्सएप चैट में ग्राहकों के संदेश दिखते हैं और API कीज़ में WhatsApp कुंजियाँ सहेजने के बाद आप उत्तर दे सकते हैं।
+पूछताछ संपर्क फ़ॉर्म और चैटबॉट से आती हैं; हर लीड को नई, संपर्क किया या बंद करें। सहायता टिकट में ग्राहकों और एसोसिएट के बनाए टिकट दिखते हैं; टिकट खोलें, उत्तर दें और स्थिति तय करें। व्हाट्सएप चैट में ग्राहकों के संदेश दिखते हैं और API कीज़ में WhatsApp कुंजियाँ सहेजने के बाद आप उत्तर दे सकते हैं।
 
 8. सहयोगी सेवाएँ
 विवाह संस्कार (प्रोफ़ाइल स्वीकृत या अस्वीकृत, सशुल्क सदस्य), तीर्थ व यात्रा (अनुरोध, वाहन और चालक) और कर सहायता (दस्तावेज़ और फ़ाइलिंग स्थिति)।

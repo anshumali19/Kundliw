@@ -2,6 +2,7 @@ import { Link } from "@/i18n/routing";
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { loadRevenueSeries, loadTodaySummary, type RevenueRange } from "@/lib/admin/dashboardStats";
+import { MaintenanceSwitch } from "@/features/admin/site/MaintenanceSwitch";
 import { RevenueChart } from "@/components/admin/dashboard/RevenueChart";
 
 export const dynamic = "force-dynamic";
@@ -45,7 +46,11 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
   const isHindi = locale === "hi";
   const t = (en: string, hi: string) => (isHindi ? hi : en);
 
-  const [today, series] = await Promise.all([loadTodaySummary(), loadRevenueSeries(range)]);
+  const [today, series, siteSettings] = await Promise.all([
+    loadTodaySummary(),
+    loadRevenueSeries(range),
+    prisma.adminSettings.findUnique({ where: { id: "default" }, select: { maintenanceMode: true, maintenanceMessageEn: true, maintenanceMessageHi: true } }).catch(() => null),
+  ]);
 
   const todayCards = [
     { label: t("New orders today", "आज के नए ऑर्डर"), value: today.ordersToday, href: "/admin/orders" },
@@ -149,6 +154,13 @@ export default async function AdminDashboardPage(props: AdminDashboardPageProps)
           {t("A summary of orders, payments and requests.", "ऑर्डर, भुगतान और अनुरोधों का सार।")}
         </p>
       </div>
+
+      <MaintenanceSwitch
+        on={!!siteSettings?.maintenanceMode}
+        messageEn={siteSettings?.maintenanceMessageEn ?? ""}
+        messageHi={siteSettings?.maintenanceMessageHi ?? ""}
+        isHindi={isHindi}
+      />
 
       <section aria-labelledby="today-title" className="space-y-3">
         <h2 id="today-title" className="font-serif text-lg font-bold text-secondary">{t("Today", "आज")}</h2>

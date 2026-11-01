@@ -35,6 +35,9 @@ const settingsSchema = z.object({
     .or(z.literal("")),
   gstin: z.string().optional().nullable(),
   defaultGstRateBps: z.number().int().optional().nullable(),
+  maintenanceMode: z.boolean().optional(),
+  maintenanceMessageEn: z.string().trim().max(500).optional().nullable(),
+  maintenanceMessageHi: z.string().trim().max(500).optional().nullable(),
   // Location map
   mapEnabled: z.boolean().optional(),
   mapZoom: z.number().int().min(3).max(19).optional(),

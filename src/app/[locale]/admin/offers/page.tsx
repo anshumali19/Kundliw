@@ -30,6 +30,23 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
     },
   });
 
+  // How each code has done: orders that carried it, how many were paid, and the discount given on paid orders
+  const usage = await prisma.order.groupBy({
+    by: ["offerId", "paymentStatus"],
+    where: { offerId: { not: null } },
+    _count: { _all: true },
+    _sum: { discountAmountPaise: true },
+  });
+  const statsFor = (id: string) => {
+    const rows = usage.filter((u) => u.offerId === id);
+    const paid = rows.find((u) => u.paymentStatus === "PAID");
+    return {
+      totalOrders: rows.reduce((n, u) => n + u._count._all, 0),
+      paidOrders: paid?._count._all ?? 0,
+      savingsPaise: paid?._sum.discountAmountPaise ?? 0,
+    };
+  };
+
   const offersData: AdminOfferItem[] = offers.map((o) => ({
     id: o.id,
     code: o.code,
@@ -51,6 +68,7 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
     validUntil: o.validUntil ? o.validUntil.toISOString() : null,
     isActive: o.isActive,
     _count: o._count,
+    stats: statsFor(o.id),
   }));
 
   const services = await prisma.service.findMany({

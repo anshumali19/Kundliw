@@ -407,54 +407,115 @@ export default function AdminMarqueePage() {
         ) : (
           <div className="space-y-3">
             {items.map((item) => (
-              <div
+              <MarqueeRow
                 key={item.id}
-                className="p-4 rounded-lg bg-surface border border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-surface-container text-secondary">
-                      {item.position}
-                    </span>
-                    <span className="text-[10px] text-outline font-mono">
-                      {item.speedSec}s • {item.fontSize}px
-                    </span>
-                  </div>
-                  <p className="font-semibold text-xs text-secondary">{item.textEn}</p>
-                  <p className="text-xs text-on-surface-variant font-serif">{item.textHi}</p>
-                </div>
-
-                <div className="flex items-center gap-3 shrink-0">
-                  <button
-                    onClick={() => handleToggleActive(item)}
-                    className={`px-2.5 py-1 rounded text-[11px] font-bold uppercase ${
-                      item.isActive
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-surface-container text-outline"
-                    }`}
-                  >
-                    {item.isActive ? "Active" : "Inactive"}
-                  </button>
-
-                  <button
-                    onClick={() => startEdit(item)}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-gold text-secondary"
-                    aria-label="Edit announcement"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-error-container/20 text-on-error-container transition-colors"
-                    aria-label="Delete announcement"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                item={item}
+                onToggle={() => handleToggleActive(item)}
+                onEdit={() => startEdit(item)}
+                onDelete={() => handleDelete(item.id)}
+                onSaved={(msg) => {
+                  setError(null);
+                  setSuccess(msg);
+                  fetchItems();
+                }}
+                onError={(msg) => {
+                  setSuccess(null);
+                  setError(msg);
+                }}
+              />
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** One notice in the list. The words, speed and place can be changed and saved right here, without opening the big form. */
+function MarqueeRow({
+  item,
+  onToggle,
+  onEdit,
+  onDelete,
+  onSaved,
+  onError,
+}: {
+  item: MarqueeItem;
+  onToggle: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onSaved: (message: string) => void;
+  onError: (message: string) => void;
+}) {
+  const [textEn, setTextEn] = useState(item.textEn);
+  const [textHi, setTextHi] = useState(item.textHi);
+  const [speedSec, setSpeedSec] = useState(item.speedSec);
+  const [position, setPosition] = useState<"TOP" | "BOTTOM">(item.position);
+  const [saving, setSaving] = useState(false);
+  const changed = textEn !== item.textEn || textHi !== item.textHi || speedSec !== item.speedSec || position !== item.position;
+  const field = "w-full min-h-[40px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-xs focus:border-secondary focus:outline-none";
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/marquee/${item.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ textEn, textHi, speedSec, position }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) onSaved("Notice saved");
+      else onError(data.error || "Could not save the notice");
+    } catch {
+      onError("Could not save the notice");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="p-4 rounded-lg bg-surface border border-outline-variant/40 space-y-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <input type="text" value={textEn} onChange={(e) => setTextEn(e.target.value)} aria-label="Text (English)" className={field} />
+        <input type="text" value={textHi} onChange={(e) => setTextHi(e.target.value)} aria-label="Text (Hindi)" className={field} />
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase text-on-surface-variant">
+            Speed (s)
+            <input type="number" min={5} max={120} value={speedSec} onChange={(e) => setSpeedSec(Number(e.target.value))} className="w-20 min-h-[40px] px-2 py-1 bg-surface-container-low border border-outline-variant rounded text-xs font-normal" />
+          </label>
+          <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase text-on-surface-variant">
+            Place
+            <select value={position} onChange={(e) => setPosition(e.target.value as "TOP" | "BOTTOM")} className="min-h-[40px] px-2 py-1 bg-surface-container-low border border-outline-variant rounded text-xs font-normal">
+              <option value="TOP">TOP</option>
+              <option value="BOTTOM">BOTTOM</option>
+            </select>
+          </label>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving || !changed}
+            className="min-h-[44px] px-4 inline-flex items-center gap-1.5 rounded bg-brand text-on-brand text-xs font-bold uppercase tracking-wider hover:bg-brand-hover disabled:opacity-40"
+          >
+            <CheckCircle2 className="w-4 h-4" /> {saving ? "Saving..." : changed ? "Save" : "Saved"}
+          </button>
+          <button
+            type="button"
+            onClick={onToggle}
+            className={`px-2.5 py-1 min-h-[44px] rounded text-[11px] font-bold uppercase ${item.isActive ? "bg-emerald-100 text-emerald-800" : "bg-surface-container text-outline"}`}
+          >
+            {item.isActive ? "Active" : "Inactive"}
+          </button>
+          <button type="button" onClick={onEdit} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-gold text-secondary" aria-label="Open the full form (colours, font size, order)" title="Colours, font size and more">
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button type="button" onClick={onDelete} className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded hover:bg-error-container/20 text-on-error-container transition-colors" aria-label="Delete announcement">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

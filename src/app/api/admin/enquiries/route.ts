@@ -13,6 +13,8 @@ export async function GET(req: NextRequest) {
     const where: any = {};
     if (status === "pending") where.isResolved = false;
     else if (status === "resolved") where.isResolved = true;
+    else if (status === "new") where.leadStatus = "NEW";
+    else if (status === "contacted") where.leadStatus = "CONTACTED";
 
     const enquiries = await prisma.contactEnquiry.findMany({
       where,

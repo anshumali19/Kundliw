@@ -41,6 +41,8 @@ export interface AdminOfferItem {
   _count?: {
     orders: number;
   };
+  /** Orders that carried this code, how many were paid, and the discount given on those */
+  stats?: { totalOrders: number; paidOrders: number; savingsPaise: number };
 }
 
 interface AdminOffersManagerProps {
@@ -366,6 +368,21 @@ export function AdminOffersManager({
         </label>
       </div>
 
+      {/* How the codes have done */}
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label={isHindi ? "ऑफ़र के आँकड़े" : "Offer statistics"}>
+        {[
+          { label: isHindi ? "कुल छूट दी गई" : "Total discount given", value: formatPaiseToInr(offers.reduce((n, o) => n + (o.stats?.savingsPaise ?? 0), 0)) },
+          { label: isHindi ? "कोड का उपयोग (भुगतान हुए)" : "Code uses (paid)", value: String(offers.reduce((n, o) => n + (o.stats?.paidOrders ?? 0), 0)) },
+          { label: isHindi ? "सक्रिय ऑफ़र" : "Active offers", value: String(offers.filter((o) => o.isActive && (!o.validUntil || new Date(o.validUntil) >= new Date())).length) },
+          { label: isHindi ? "समाप्त ऑफ़र" : "Expired offers", value: String(offers.filter((o) => o.validUntil && new Date(o.validUntil) < new Date()).length) },
+        ].map((c) => (
+          <div key={c.label} className="rounded border border-outline-variant/60 bg-surface p-3">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">{c.label}</div>
+            <div className="mt-1 font-serif text-lg font-bold text-secondary">{c.value}</div>
+          </div>
+        ))}
+      </section>
+
       {/* Offers Table */}
       <div className="overflow-x-auto rounded-lg border border-outline-variant/60 bg-surface shadow-sm">
         <table className="w-full text-left border-collapse text-xs">
@@ -376,6 +393,7 @@ export function AdminOffersManager({
               <th className="py-3 px-4 font-bold">छूट प्रकार (Type & Value)</th>
               <th className="py-3 px-4 font-bold">न्यूनतम आदेश (Min Order)</th>
               <th className="py-3 px-4 font-bold">उपयोग सीमा (Usage)</th>
+              <th className="py-3 px-4 font-bold">बचत व रूपांतरण (Savings)</th>
               <th className="py-3 px-4 font-bold">स्थिति (Status)</th>
               <th className="py-3 px-4 font-bold text-right">क्रियाएँ (Actions)</th>
             </tr>
@@ -383,7 +401,7 @@ export function AdminOffersManager({
           <tbody className="divide-y divide-outline-variant/30 text-on-surface">
             {visibleOffers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-on-surface-variant">
+                <td colSpan={8} className="p-8 text-center text-on-surface-variant">
                   {isHindi ? "इस प्लान पर अभी कोई ऑफ़र नहीं। ऊपर 'इस प्लान के लिए ऑफ़र बनाएँ' दबाएँ।" : "No offers on this plan yet. Press 'Create offer for this plan' above."}
                 </td>
               </tr>
@@ -440,6 +458,14 @@ export function AdminOffersManager({
                         <span> (असीमित)</span>
                       )}
                     </td>
+                    <td className="py-3 px-4 text-on-surface-variant">
+                      <div className="font-bold text-secondary">{formatPaiseToInr(offer.stats?.savingsPaise ?? 0)}</div>
+                      <div className="text-[11px]">
+                        {offer.stats && offer.stats.totalOrders > 0
+                          ? `${Math.round((offer.stats.paidOrders / offer.stats.totalOrders) * 100)}% ${isHindi ? "भुगतान तक पहुँचे" : "reached payment"} (${offer.stats.paidOrders}/${offer.stats.totalOrders})`
+                          : isHindi ? "अभी उपयोग नहीं" : "not used yet"}
+                      </div>
+                    </td>
                     <td className="py-3 px-4">
                       <span
                         className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
@@ -448,7 +474,11 @@ export function AdminOffersManager({
                             : "bg-surface-container-high text-outline"
                         }`}
                       >
-                        {offer.isActive
+                        {offer.validUntil && new Date(offer.validUntil) < new Date()
+                          ? isHindi
+                            ? "समाप्त"
+                            : "Expired"
+                          : offer.isActive
                           ? isHindi
                             ? "सक्रिय"
                             : "Active"

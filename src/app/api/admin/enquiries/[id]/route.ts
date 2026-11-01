@@ -13,9 +13,10 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
   try {
     const body = await req.json();
+    const stage = ["NEW", "CONTACTED", "CLOSED"].includes(body.leadStatus) ? (body.leadStatus as string) : body.isResolved ? "CLOSED" : "NEW";
     const updated = await prisma.contactEnquiry.update({
       where: { id: params.id },
-      data: { isResolved: !!body.isResolved },
+      data: { leadStatus: stage, isResolved: stage === "CLOSED" },
     });
     return NextResponse.json({ success: true, enquiry: updated });
   } catch (error) {

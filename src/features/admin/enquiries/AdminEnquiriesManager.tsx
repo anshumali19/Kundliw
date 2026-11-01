@@ -23,6 +23,7 @@ interface EnquiryItem {
   message: string;
   source: string;
   isResolved: boolean;
+  leadStatus?: string;
   createdAt: string;
 }
 
@@ -30,7 +31,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
   const isHindi = locale === "hi";
   const [enquiries, setEnquiries] = useState<EnquiryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "pending" | "resolved">("all");
+  const [filter, setFilter] = useState<"all" | "new" | "contacted" | "pending" | "resolved">("all");
   const [sourceFilter, setSourceFilter] = useState<"ALL" | "CHATBOT_LEAD" | "CONTACT_PAGE">("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [status, setStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -57,16 +58,16 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
     fetchEnquiries();
   }, [fetchEnquiries]);
 
-  const toggleResolved = async (id: string, currentStatus: boolean) => {
+  const setLeadStatus = async (id: string, leadStatus: string) => {
     try {
       const res = await fetch(`/api/admin/enquiries/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isResolved: !currentStatus }),
+        body: JSON.stringify({ leadStatus }),
       });
       if (res.ok) {
         setEnquiries((prev) =>
-          prev.map((e) => (e.id === id ? { ...e, isResolved: !currentStatus } : e))
+          prev.map((e) => (e.id === id ? { ...e, leadStatus, isResolved: leadStatus === "CLOSED" } : e))
         );
       }
     } catch {
@@ -180,7 +181,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
 
         <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
           {/* Status Filter */}
-          {(["all", "pending", "resolved"] as const).map((mode) => (
+          {(["all", "new", "contacted", "resolved"] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => setFilter(mode)}
@@ -191,8 +192,9 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
               }`}
             >
               {mode === "all" && (isHindi ? "सभी स्थितियां" : "All Status")}
-              {mode === "pending" && (isHindi ? "लंबित" : "Pending")}
-              {mode === "resolved" && (isHindi ? "निस्तारित" : "Resolved")}
+              {mode === "new" && (isHindi ? "नई" : "New")}
+              {mode === "contacted" && (isHindi ? "संपर्क किया" : "Contacted")}
+              {mode === "resolved" && (isHindi ? "बंद" : "Closed")}
             </button>
           ))}
 
@@ -270,7 +272,7 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                           : "bg-brand/200/10 text-primary"
                       }`}
                     >
-                      {item.isResolved ? "Resolved" : "Pending"}
+                      {item.leadStatus === "CONTACTED" ? (isHindi ? "संपर्क किया" : "Contacted") : item.isResolved ? (isHindi ? "बंद" : "Closed") : isHindi ? "नई" : "New"}
                     </span>
                   </div>
 
@@ -299,26 +301,16 @@ export function AdminEnquiriesManager({ locale }: { locale: string }) {
                 </div>
 
                 <div className="flex items-center gap-2 self-end sm:self-start">
-                  <button
-                    onClick={() => toggleResolved(item.id, item.isResolved)}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                      item.isResolved
-                        ? "bg-surface-container text-on-surface-variant hover:text-on-surface"
-                        : "bg-brand text-on-brand hover:bg-brand-hover"
-                    }`}
+                  <select
+                    aria-label={isHindi ? "लीड की स्थिति" : "Lead stage"}
+                    value={item.leadStatus ?? (item.isResolved ? "CLOSED" : "NEW")}
+                    onChange={(e) => setLeadStatus(item.id, e.target.value)}
+                    className="min-h-[40px] rounded border border-outline-variant bg-surface px-2 text-xs font-semibold"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>
-                      {item.isResolved
-                        ? isHindi
-                          ? "लंबित करें"
-                          : "Mark Pending"
-                        : isHindi
-                        ? "निस्तारित करें"
-                        : "Mark Resolved"}
-                    </span>
-                  </button>
-
+                    <option value="NEW">{isHindi ? "नई" : "New"}</option>
+                    <option value="CONTACTED">{isHindi ? "संपर्क किया" : "Contacted"}</option>
+                    <option value="CLOSED">{isHindi ? "बंद" : "Closed"}</option>
+                  </select>
                   <button
                     onClick={() => handleDelete(item.id)}
                     className="p-1.5 rounded hover:bg-error-container/30 text-on-surface-variant hover:text-on-error-container"

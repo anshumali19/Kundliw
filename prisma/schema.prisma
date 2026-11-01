@@ -553,6 +553,10 @@ model AdminSettings {
   encWhatsappPhoneNumberId String?
   encWhatsappVerifyToken   String?
   encWhatsappAppSecret     String?
+  /// When on, visitors see a "back soon" page; the admin and the sign-in pages keep working
+  maintenanceMode          Boolean  @default(false)
+  maintenanceMessageEn     String?
+  maintenanceMessageHi     String?
   astrosageEmbedUrl        String?  @default("https://www.astrosage.com/freekundli/")
   // Android app download section (website page and QR code)
   appDownloadUrl           String?
@@ -610,6 +614,8 @@ model ContactEnquiry {
   message    String   @db.Text
   source     String   @default("CONTACT_PAGE") // CONTACT_PAGE, CHATBOT_TICKET, SERVICE_MODAL
   isResolved Boolean  @default(false)
+  /// Lead stage: NEW, CONTACTED or CLOSED (CLOSED also sets isResolved)
+  leadStatus String   @default("NEW")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
