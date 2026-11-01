@@ -15,17 +15,28 @@ const KIND_LABEL: Record<DemoKind, string> = {
 const field = "w-full rounded border border-outline-variant bg-surface px-3 py-2 text-xs text-on-surface min-h-[40px]";
 
 /** Add or remove demos of any kind. There is no limit on how many. */
-export function DemosEditor({ demos, onChange }: { demos: DemoItem[]; onChange: (demos: DemoItem[]) => void }) {
+export function DemosEditor({
+  demos,
+  onChange,
+  kinds = ["link", "image", "video", "social"],
+  title = "Demos",
+  help = "Show visitors what this service looks like: a link, a picture, a short video (a few seconds is fine for now, longer later) or a social media account. Add as many as you want and remove any time.",
+}: {
+  demos: DemoItem[];
+  onChange: (demos: DemoItem[]) => void;
+  kinds?: DemoKind[];
+  title?: string;
+  help?: string;
+}) {
   const set = (i: number, patch: Partial<DemoItem>) => onChange(demos.map((d, k) => (k === i ? { ...d, ...patch } : d)));
   return (
     <div className="space-y-3 rounded-lg border border-outline-variant/60 bg-surface-container-low p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-bold uppercase text-secondary">
-          Demos{" "}
-          <InfoTip text="Show visitors what this service looks like: a link, a picture, a short video (a few seconds is fine for now, longer later) or a social media account. Add as many as you want and remove any time." />
+          {title} <InfoTip text={help} />
         </span>
         <div className="flex flex-wrap gap-1.5">
-          {(Object.keys(KIND_LABEL) as DemoKind[]).map((k) => (
+          {kinds.map((k) => (
             <button
               key={k}
               type="button"

@@ -5,6 +5,9 @@ import { SignOutButton } from "@/components/ui/SignOutButton";
 import { ShieldAlert, ExternalLink } from "lucide-react";
 import { AdminIdleLogout } from "@/components/layout/AdminIdleLogout";
 import { AdminNav } from "@/components/layout/AdminNav";
+import { AdminPageHelp } from "@/components/admin/AdminPageHelp";
+import { PAGE_DEMOS_KEY } from "@/lib/admin/pageHelp";
+import { prisma } from "@/lib/prisma";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -27,6 +30,9 @@ export default async function AdminLayout(props: AdminLayoutProps) {
   // Enforce server-side DB-verified admin check
   const admin = await requireAdmin(`/admin/services`, locale);
   const isHindi = locale === "hi";
+  const demoRow = await prisma.siteConfig.findUnique({ where: { key: PAGE_DEMOS_KEY } }).catch(() => null);
+  const demos: Record<string, string> =
+    demoRow && typeof demoRow.value === "object" && demoRow.value && !Array.isArray(demoRow.value) ? (demoRow.value as Record<string, string>) : {};
 
   return (
     <div className="w-full min-h-[calc(100vh-120px)] bg-surface text-on-surface text-left">
@@ -65,7 +71,10 @@ export default async function AdminLayout(props: AdminLayoutProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6 items-start">
         <AdminIdleLogout />
         <AdminNav isHindi={isHindi} />
-        <main className="flex-1 min-w-0 w-full text-left">{children}</main>
+        <main className="flex-1 min-w-0 w-full text-left">
+          <AdminPageHelp isHindi={isHindi} demos={demos} />
+          {children}
+        </main>
       </div>
     </div>
   );

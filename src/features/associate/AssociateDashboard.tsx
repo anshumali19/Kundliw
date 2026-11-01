@@ -402,13 +402,19 @@ export function AssociateDashboard({ locale, siteUrl, explorer }: { locale: stri
         </div>
       </div>
 
-      <a
-        href={`/${locale}/guides/associate`}
-        className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-maroon text-sm font-bold text-secondary hover:bg-gold"
-      >
-        <FileDown className="w-4 h-4" />
-        {t("Download the Associate guide (PDF)", "एसोसिएट मार्गदर्शिका (PDF) डाउनलोड करें")}
-      </a>
+      <div className="rounded-lg border border-outline-variant bg-surface p-4 flex flex-wrap items-center gap-3">
+        <span className="mr-auto font-serif text-lg font-bold text-secondary">{t("Associate Guide", "एसोसिएट मार्गदर्शिका")}</span>
+        <a href={`/${locale}/guides/associate`} className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-outline-variant text-sm font-bold text-secondary hover:bg-surface-container">
+          {t("View", "देखें")}
+        </a>
+        <a href={`/api/guides/associate?lang=${locale === "hi" ? "hi" : "en"}&download=1`} className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-outline-variant text-sm font-bold text-secondary hover:bg-surface-container">
+          <FileDown className="w-4 h-4" />
+          {t("Download", "डाउनलोड")}
+        </a>
+        <a href={`/api/guides/associate?lang=${locale === "hi" ? "hi" : "en"}&print=1`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 min-h-[44px] px-4 rounded border border-outline-variant text-sm font-bold text-secondary hover:bg-surface-container">
+          {t("Print / Save as PDF", "प्रिंट / PDF")}
+        </a>
+      </div>
       {explorer}
     </div>
   );

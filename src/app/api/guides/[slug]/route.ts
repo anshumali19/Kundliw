@@ -1,22 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { DEFAULT_GUIDES, guidePageSlug } from "@/lib/guides/defaults";
+import { Role } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth/guards";
+import { DEFAULT_GUIDES, GUIDE_SLUGS, guidePageSlug, type GuideSlug } from "@/lib/guides/defaults";
+import { loadGuideVisuals } from "@/lib/guides/visuals";
 import { parseRich } from "@/lib/content/richText";
 import { escapeHtml } from "@/lib/billing/html";
 
 export const dynamic = "force-dynamic";
 
 /**
- * The User Guide as one self-contained page the customer can save (?download=1) or print (?print=1).
- * The words come from Admin > Pages & legal > "Guide: User", so the admin edits them there.
+ * A guide (user, associate or admin) as one self-contained page that can be saved (?download=1) or printed (?print=1).
+ * The words come from Admin > Pages & legal > "Guide: ...", the pictures and videos from Admin > Guides & visuals.
  */
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, props: { params: Promise<{ slug: string }> }) {
+  const { slug } = await props.params;
+  if (!GUIDE_SLUGS.includes(slug as GuideSlug)) return new NextResponse("Not found", { status: 404 });
+  const guideSlug = slug as GuideSlug;
+  if (guideSlug !== "user") {
+    // The associate guide is for associates and admins, the admin guide for admins only
+    const user = await getCurrentUser();
+    const allowed = guideSlug === "admin" ? user?.role === Role.ADMIN : user?.role === Role.ASSOCIATE || user?.role === Role.ADMIN;
+    if (!allowed) return new NextResponse("Not found", { status: 404 });
+  }
   const q = request.nextUrl.searchParams;
   const hi = q.get("lang") !== "en";
   const download = q.get("download") === "1";
 
-  const stored = await prisma.staticPage.findUnique({ where: { slug: guidePageSlug("user") } }).catch(() => null);
-  const fallback = DEFAULT_GUIDES.user;
+  const stored = await prisma.staticPage.findUnique({ where: { slug: guidePageSlug(guideSlug) } }).catch(() => null);
+  const fallback = DEFAULT_GUIDES[guideSlug];
+  const visuals = await loadGuideVisuals(guideSlug);
+  const visualsHtml = visuals
+    .map((v) => {
+      const caption = escapeHtml((hi ? v.labelHi || v.labelEn : v.labelEn || v.labelHi) || "");
+      return v.kind === "image"
+        ? `<figure><img src="${escapeHtml(v.url)}" alt="${caption}">${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`
+        : `<p class="video">${hi ? "वीडियो देखें:" : "Watch the video:"} <a href="${escapeHtml(v.url)}">${caption || escapeHtml(v.url)}</a></p>`;
+    })
+    .join("\n");
   const title = (hi ? stored?.titleHi || fallback.titleHi : stored?.titleEn || fallback.titleEn) || "User Guide";
   const content = (hi ? stored?.contentHi || fallback.contentHi : stored?.contentEn || fallback.contentEn) || "";
   const siteName = hi ? "महर्षि कणाद ज्योतिष केंद्र" : "Maharshi Kanad Jyotish Kendra";
@@ -52,6 +73,9 @@ export async function GET(request: NextRequest) {
   .brand { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #984700; font-weight: bold; }
   h1 { font-size: 28px; color: #6b1d1d; margin: 6px 0 18px; border-bottom: 2px solid #6b1d1d; padding-bottom: 10px; }
   p { margin: 0 0 14px; font-size: 15px; }
+  figure { margin: 18px 0; }
+  figure img { max-width: 100%; border: 1px solid #ddd; border-radius: 8px; }
+  figcaption { font-size: 13px; color: #555; margin-top: 4px; }
   a { color: #6b1d1d; }
   .bar { text-align: right; margin-bottom: 12px; }
   button { min-height: 44px; padding: 0 20px; border: 0; border-radius: 8px; background: #6b1d1d; color: #fff; font-weight: bold; cursor: pointer; }
@@ -64,6 +88,7 @@ export async function GET(request: NextRequest) {
   <div class="brand">${escapeHtml(siteName)}</div>
   <h1>${escapeHtml(title)}</h1>
   ${inline}
+  ${visualsHtml}
 </main>
 <script>${printScript}</script>
 </body>
@@ -75,8 +100,8 @@ export async function GET(request: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      ...(download ? { "Content-Disposition": `attachment; filename="User-Guide-${hi ? "hi" : "en"}.html"` } : {}),
-      "Content-Security-Policy": `default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-${hash}'; img-src data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`,
+      ...(download ? { "Content-Disposition": `attachment; filename="${guideSlug}-guide-${hi ? "hi" : "en"}.html"` } : {}),
+      "Content-Security-Policy": `default-src 'none'; style-src 'unsafe-inline'; script-src 'sha256-${hash}'; img-src https: data:; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`,
       "X-Content-Type-Options": "nosniff",
       "Cache-Control": "no-store",
     },

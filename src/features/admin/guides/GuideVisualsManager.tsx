@@ -1,0 +1,61 @@
+"use client";
+
+import { useState } from "react";
+import { DemosEditor } from "@/components/admin/DemosEditor";
+import type { DemoItem } from "@/lib/content/demos";
+
+interface GuideBox {
+  slug: "user" | "associate" | "admin";
+  titleEn: string;
+  titleHi: string;
+  visuals: DemoItem[];
+}
+
+/** One box per guide: add or remove the pictures and videos shown with its text. */
+export function GuideVisualsManager({ guides, isHindi }: { guides: GuideBox[]; isHindi: boolean }) {
+  const t = (en: string, hi: string) => (isHindi ? hi : en);
+  const [state, setState] = useState<Record<string, DemoItem[]>>(Object.fromEntries(guides.map((g) => [g.slug, g.visuals])));
+  const [busy, setBusy] = useState<string | null>(null);
+  const [msg, setMsg] = useState<Record<string, string>>({});
+
+  async function save(slug: string) {
+    setBusy(slug);
+    setMsg((m) => ({ ...m, [slug]: "" }));
+    const res = await fetch("/api/admin/guide-visuals", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, visuals: state[slug].filter((d) => d.url.trim()) }),
+    }).catch(() => null);
+    const data = res ? await res.json().catch(() => ({})) : {};
+    setBusy(null);
+    setMsg((m) => ({ ...m, [slug]: res?.ok ? t("Saved.", "सहेजा गया।") : data.error || t("Could not save.", "सहेजा नहीं जा सका।") }));
+  }
+
+  return (
+    <div className="space-y-6">
+      {guides.map((g) => (
+        <section key={g.slug} className="space-y-3 rounded-lg border border-outline-variant/60 bg-surface p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-serif text-lg font-bold text-secondary">{isHindi ? g.titleHi : g.titleEn}</h2>
+            <a href={`/guides/${g.slug}`} target="_blank" rel="noreferrer" className="text-xs font-bold text-primary hover:underline">
+              {t("Open the guide", "गाइड खोलें")}
+            </a>
+          </div>
+          <DemosEditor
+            demos={state[g.slug]}
+            onChange={(list) => setState((s) => ({ ...s, [g.slug]: list }))}
+            kinds={["image", "video"]}
+            title={t("Pictures and videos", "चित्र और वीडियो")}
+            help="Screenshots or a short screen recording that show how the dashboard, orders and invoices work. They appear under the guide text, and in the downloaded copy (videos as a link)."
+          />
+          <div className="flex items-center gap-3">
+            <button type="button" disabled={busy === g.slug} onClick={() => save(g.slug)} className="min-h-[44px] rounded bg-brand px-5 text-sm font-bold text-on-brand hover:bg-brand-hover disabled:opacity-50">
+              {busy === g.slug ? t("Saving…", "सहेज रहे हैं…") : t("Save", "सहेजें")}
+            </button>
+            {msg[g.slug] && <span role="status" className="text-xs text-on-surface-variant">{msg[g.slug]}</span>}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
