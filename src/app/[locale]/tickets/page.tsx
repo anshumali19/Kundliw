@@ -21,6 +21,7 @@ export default async function TicketsPage(props: { params: Promise<{ locale: str
     ticketNumber: r.ticketNumber,
     subject: r.subject,
     orderNumber: r.orderNumber,
+    topic: r.topic,
     status: r.status,
     createdAt: r.createdAt.toISOString(),
     messages: r.messages.map((m) => ({ id: m.id, fromAdmin: m.fromAdmin, body: m.body, createdAt: m.createdAt.toISOString() })),
@@ -36,7 +37,7 @@ export default async function TicketsPage(props: { params: Promise<{ locale: str
           <Link href={user.role === "ASSOCIATE" ? "/associate" : "/account"} className="font-bold text-primary hover:underline">{t("Back to dashboard", "डैशबोर्ड पर वापस")}</Link>
         </p>
       </div>
-      <TicketsClient tickets={tickets} orderNumbers={orders.map((o) => o.orderNumber)} mode="user" isHindi={isHindi} />
+      <TicketsClient tickets={tickets} orderNumbers={orders.map((o) => o.orderNumber)} mode="user" isHindi={isHindi} defaults={{ name: user.name ?? "", email: user.email ?? "", phone: user.phone ?? "" }} />
     </div>
   );
 }

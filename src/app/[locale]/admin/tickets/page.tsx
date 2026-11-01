@@ -19,6 +19,8 @@ export default async function AdminTicketsPage(props: { params: Promise<{ locale
     ticketNumber: r.ticketNumber,
     subject: r.subject,
     orderNumber: r.orderNumber,
+    topic: r.topic,
+    contact: { name: r.contactName, email: r.contactEmail, phone: r.contactPhone, address: r.contactAddress },
     status: r.status,
     createdAt: r.createdAt.toISOString(),
     who: r.user.name || r.user.phone || r.user.email || "",

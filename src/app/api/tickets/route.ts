@@ -8,6 +8,11 @@ const schema = z.object({
   subject: z.string().trim().min(3, "Write a short subject.").max(150),
   message: z.string().trim().min(5, "Describe your problem in a few words.").max(3000),
   orderNumber: z.string().trim().max(40).optional().nullable(),
+  topic: z.string().trim().max(60).optional().nullable(),
+  contactName: z.string().trim().min(2, "Please enter your name.").max(100),
+  contactEmail: z.string().trim().email("Please enter a valid email.").max(150),
+  contactPhone: z.string().trim().regex(/^[+\d][\d\s-]{6,17}$/, "Please enter a valid phone number."),
+  contactAddress: z.string().trim().min(5, "Please enter your address.").max(300),
 });
 
 function newTicketNumber(): string {
@@ -39,6 +44,11 @@ export async function POST(req: NextRequest) {
           userId: user.id,
           subject: parsed.data.subject,
           orderNumber,
+          topic: parsed.data.topic || null,
+          contactName: parsed.data.contactName,
+          contactEmail: parsed.data.contactEmail,
+          contactPhone: parsed.data.contactPhone,
+          contactAddress: parsed.data.contactAddress,
           messages: { create: { fromAdmin: false, body: parsed.data.message } },
         },
         select: { id: true, ticketNumber: true },

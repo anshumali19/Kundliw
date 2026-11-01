@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { TICKET_TOPICS } from "@/lib/tickets/topics";
 
 export interface TicketView {
   id: string;
@@ -12,6 +13,8 @@ export interface TicketView {
   createdAt: string;
   /** Who raised it (shown to the admin) */
   who?: string;
+  topic?: string | null;
+  contact?: { name: string | null; email: string | null; phone: string | null; address: string | null };
   messages: Array<{ id: string; fromAdmin: boolean; body: string; createdAt: string }>;
 }
 
@@ -24,13 +27,35 @@ const STATUS: Record<string, { en: string; hi: string; cls: string }> = {
 const input = "w-full min-h-[44px] rounded border border-outline-variant bg-surface px-3 py-2 text-sm focus:border-secondary focus:outline-none";
 
 /** Tickets list with a thread and reply box. The customer also gets a form to raise a ticket; the admin gets a status select. */
-export function TicketsClient({ tickets, orderNumbers = [], mode, isHindi }: { tickets: TicketView[]; orderNumbers?: string[]; mode: "user" | "admin"; isHindi: boolean }) {
+export function TicketsClient({
+  tickets,
+  orderNumbers = [],
+  mode,
+  isHindi,
+  defaults,
+}: {
+  tickets: TicketView[];
+  orderNumbers?: string[];
+  mode: "user" | "admin";
+  isHindi: boolean;
+  /** Details already known about the customer, to save typing */
+  defaults?: { name?: string; email?: string; phone?: string };
+}) {
   const router = useRouter();
   const t = (en: string, hi: string) => (isHindi ? hi : en);
   const [openId, setOpenId] = useState<string | null>(tickets[0]?.id ?? null);
   const [filter, setFilter] = useState("ALL");
   const [reply, setReply] = useState("");
-  const [form, setForm] = useState({ subject: "", message: "", orderNumber: "" });
+  const [form, setForm] = useState({
+    topic: "",
+    subject: "",
+    message: "",
+    orderNumber: "",
+    name: defaults?.name ?? "",
+    email: defaults?.email ?? "",
+    phone: defaults?.phone ?? "",
+    address: "",
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
@@ -47,11 +72,20 @@ export function TicketsClient({ tickets, orderNumbers = [], mode, isHindi }: { t
 
   async function raise(e: React.FormEvent) {
     e.preventDefault();
-    const r = await send("/api/tickets", "POST", { subject: form.subject, message: form.message, orderNumber: form.orderNumber || null });
+    const r = await send("/api/tickets", "POST", {
+      subject: form.subject,
+      message: form.message,
+      orderNumber: form.orderNumber || null,
+      topic: form.topic || null,
+      contactName: form.name,
+      contactEmail: form.email,
+      contactPhone: form.phone,
+      contactAddress: form.address,
+    });
     if (r.ok) {
       const num = (r.data.ticket as { ticketNumber?: string } | undefined)?.ticketNumber;
       setDone(num ? t(`Ticket ${num} raised. We will reply here.`, `टिकट ${num} बन गया। उत्तर यहीं मिलेगा।`) : t("Ticket raised.", "टिकट बन गया।"));
-      setForm({ subject: "", message: "", orderNumber: "" });
+      setForm({ ...form, topic: "", subject: "", message: "", orderNumber: "" });
       router.refresh();
     }
   }
@@ -74,6 +108,26 @@ export function TicketsClient({ tickets, orderNumbers = [], mode, isHindi }: { t
       {mode === "user" && (
         <form onSubmit={raise} className="space-y-3 rounded-lg border border-outline-variant/60 bg-surface p-5">
           <h2 className="font-serif text-lg font-bold text-secondary">{t("Raise a new ticket", "नया टिकट बनाएँ")}</h2>
+          <div>
+            <span className="block text-xs font-bold uppercase text-secondary">{t("Pick a common question, or write your own below", "कोई आम प्रश्न चुनें, या नीचे अपना लिखें")}</span>
+            <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("Common questions", "आम प्रश्न")}>
+              {TICKET_TOPICS.map((tp) => {
+                const label = isHindi ? tp.hi : tp.en;
+                const on = form.topic === tp.id;
+                return (
+                  <button
+                    key={tp.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setForm({ ...form, topic: tp.id, subject: tp.id === "other" ? "" : label })}
+                    className={`min-h-[40px] rounded-full border px-3 text-xs font-semibold ${on ? "border-primary bg-brand text-on-brand" : "border-outline-variant bg-surface text-secondary hover:bg-surface-container-high"}`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <label className="block text-xs font-bold uppercase text-secondary">
             {t("Subject", "विषय")} *
             <input type="text" required minLength={3} maxLength={150} value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
@@ -93,6 +147,25 @@ export function TicketsClient({ tickets, orderNumbers = [], mode, isHindi }: { t
             {t("Your problem", "आपकी समस्या")} *
             <textarea required minLength={5} maxLength={3000} rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
           </label>
+          <fieldset className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <legend className="mb-1 text-xs font-bold uppercase text-secondary">{t("Your contact details", "आपके संपर्क विवरण")}</legend>
+            <label className="block text-xs font-bold uppercase text-secondary">
+              {t("Name", "नाम")} *
+              <input type="text" required minLength={2} maxLength={100} autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
+            </label>
+            <label className="block text-xs font-bold uppercase text-secondary">
+              {t("Phone number", "फ़ोन नंबर")} *
+              <input type="tel" required autoComplete="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
+            </label>
+            <label className="block text-xs font-bold uppercase text-secondary">
+              {t("Email", "ईमेल")} *
+              <input type="email" required autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
+            </label>
+            <label className="block text-xs font-bold uppercase text-secondary">
+              {t("Address", "पता")} *
+              <input type="text" required minLength={5} maxLength={300} autoComplete="street-address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className={`${input} mt-1 normal-case font-normal`} />
+            </label>
+          </fieldset>
           {error && !open && <p role="alert" className="text-xs text-on-error-container">{error}</p>}
           {done && <p role="status" className="text-xs font-semibold text-emerald-800">{done}</p>}
           <button type="submit" disabled={busy} className="min-h-[44px] rounded bg-brand px-5 text-sm font-bold text-on-brand hover:bg-brand-hover disabled:opacity-50">
@@ -135,6 +208,11 @@ export function TicketsClient({ tickets, orderNumbers = [], mode, isHindi }: { t
                   <div>
                     <div className="font-serif font-bold text-secondary">{open.subject}</div>
                     <div className="text-[11px] text-on-surface-variant">{open.ticketNumber}{open.orderNumber ? ` · ${t("Order", "ऑर्डर")} ${open.orderNumber}` : ""}{open.who ? ` · ${open.who}` : ""}</div>
+                    {mode === "admin" && open.contact && (
+                      <div className="mt-1 text-[11px] text-on-surface-variant">
+                        {[open.contact.name, open.contact.phone, open.contact.email, open.contact.address].filter(Boolean).join(" · ")}
+                      </div>
+                    )}
                   </div>
                   {mode === "admin" && (
                     <select
