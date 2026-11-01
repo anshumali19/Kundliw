@@ -4,6 +4,8 @@ import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect, useCallback } from "react";
 import { LinkItem, normalizeLinks } from "@/lib/content/media";
 import { ImageUrlField, LinksEditor, YouTubeUrlField } from "@/components/admin/MediaFields";
+import { InfoTip } from "@/components/admin/InfoTip";
+import { ItineraryDaysEditor, toItineraryDays, type ItineraryDay } from "@/components/admin/ItineraryDaysEditor";
 import {
   Sparkles,
   Plus,
@@ -34,6 +36,14 @@ export interface OtherServiceItem {
   actionTextHi?: string | null;
   youtubeUrl?: string | null;
   additionalLinks?: unknown;
+  natureEn?: string | null;
+  natureHi?: string | null;
+  numberOfDays?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  itineraryDays?: unknown;
+  facebookUrl?: string | null;
+  whatsappGroupUrl?: string | null;
   orderIndex: number;
   isActive: boolean;
 }
@@ -70,6 +80,14 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
   const [actionTextHi, setActionTextHi] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [links, setLinks] = useState<LinkItem[]>([]);
+  const [natureEn, setNatureEn] = useState("");
+  const [natureHi, setNatureHi] = useState("");
+  const [numberOfDays, setNumberOfDays] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [itinerary, setItinerary] = useState<ItineraryDay[]>([]);
+  const [facebookUrl, setFacebookUrl] = useState("");
+  const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
   const [orderIndex, setOrderIndex] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -110,10 +128,18 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setImageUrl(item.imageUrl || "");
       setActionUrl(item.actionUrl || "");
       setServiceSlug(item.serviceSlug || "");
-      setActionTextEn(item.actionTextEn || "Visit Portal / Learn More");
-      setActionTextHi(item.actionTextHi || "पोर्टल पर जाएं / विवरण देखें");
+      setActionTextEn(item.actionTextEn || "Book Now");
+      setActionTextHi(item.actionTextHi || "अभी बुक करें");
       setYoutubeUrl(item.youtubeUrl || "");
       setLinks(normalizeLinks(item.additionalLinks));
+      setNatureEn(item.natureEn || "");
+      setNatureHi(item.natureHi || "");
+      setNumberOfDays(item.numberOfDays ? String(item.numberOfDays) : "");
+      setStartDate(item.startDate ? item.startDate.slice(0, 10) : "");
+      setEndDate(item.endDate ? item.endDate.slice(0, 10) : "");
+      setItinerary(toItineraryDays(item.itineraryDays));
+      setFacebookUrl(item.facebookUrl || "");
+      setWhatsappGroupUrl(item.whatsappGroupUrl || "");
       setOrderIndex(item.orderIndex);
       setIsActive(item.isActive);
     } else {
@@ -128,10 +154,18 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       setImageUrl("");
       setActionUrl("");
       setServiceSlug("");
-      setActionTextEn("Visit Portal / Learn More");
-      setActionTextHi("पोर्टल पर जाएं / विवरण देखें");
+      setActionTextEn("Book Now");
+      setActionTextHi("अभी बुक करें");
       setYoutubeUrl("");
       setLinks([]);
+      setNatureEn("");
+      setNatureHi("");
+      setNumberOfDays("");
+      setStartDate("");
+      setEndDate("");
+      setItinerary([]);
+      setFacebookUrl("");
+      setWhatsappGroupUrl("");
       setOrderIndex(items.length + 1);
       setIsActive(true);
     }
@@ -158,6 +192,14 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
       actionTextHi: actionTextHi.trim() || null,
       youtubeUrl: youtubeUrl.trim() || null,
       additionalLinks: links.filter((l) => l.url.trim()),
+      natureEn: natureEn.trim() || null,
+      natureHi: natureHi.trim() || null,
+      numberOfDays: numberOfDays.trim() ? Number(numberOfDays) : null,
+      startDate: startDate || null,
+      endDate: endDate || null,
+      itineraryDays: itinerary.filter((d) => d.titleEn.trim() || d.titleHi.trim() || d.detailsEn.trim() || d.detailsHi.trim()),
+      facebookUrl: facebookUrl.trim() || null,
+      whatsappGroupUrl: whatsappGroupUrl.trim() || null,
       orderIndex: Number(orderIndex),
       isActive,
     };
@@ -446,7 +488,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-semibold block mb-1">Tagline (English)</label>
+                  <label className="font-semibold block mb-1">Heading (English) <InfoTip text="The short line shown above the title on the website." /></label>
                   <input
                     type="text"
                     value={taglineEn}
@@ -456,7 +498,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                   />
                 </div>
                 <div>
-                  <label className="font-semibold block mb-1">टैगलाइन (हिन्दी)</label>
+                  <label className="font-semibold block mb-1">शीर्षक के ऊपर की पंक्ति (हिन्दी)</label>
                   <input
                     type="text"
                     value={taglineHi}
@@ -480,7 +522,45 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-semibold block mb-1">Action Outbound URL</label>
+                  <label className="font-semibold block mb-1">Nature of service (English) <InfoTip text="What kind of service this is, for example Pilgrimage tour or Matrimonial platform." /></label>
+                  <input type="text" value={natureEn} onChange={(e) => setNatureEn(e.target.value)} placeholder="Pilgrimage tour" className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" />
+                </div>
+                <div>
+                  <label className="font-semibold block mb-1">सेवा का स्वरूप (हिन्दी)</label>
+                  <input type="text" value={natureHi} onChange={(e) => setNatureHi(e.target.value)} placeholder="तीर्थ यात्रा" className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" />
+                </div>
+                <div>
+                  <label className="font-semibold block mb-1">Number of days</label>
+                  <input type="number" min={1} value={numberOfDays} onChange={(e) => setNumberOfDays(e.target.value)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="font-semibold block mb-1">From date</label>
+                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" />
+                  </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Till date</label>
+                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" />
+                  </div>
+                </div>
+              </div>
+
+              <ItineraryDaysEditor days={itinerary} onChange={setItinerary} />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-semibold block mb-1">Facebook / social media link</label>
+                  <input type="url" value={facebookUrl} onChange={(e) => setFacebookUrl(e.target.value)} placeholder="https://facebook.com/..." className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" />
+                </div>
+                <div>
+                  <label className="font-semibold block mb-1">WhatsApp group link</label>
+                  <input type="url" value={whatsappGroupUrl} onChange={(e) => setWhatsappGroupUrl(e.target.value)} placeholder="https://chat.whatsapp.com/..." className="w-full p-2.5 rounded-xl border border-outline-variant bg-surface text-on-surface" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-semibold block mb-1">Official Website URL <InfoTip text="The Book Now button on the website sends the visitor to this address to finish the booking." /></label>
                   <input
                     type="url"
                     value={actionUrl}
@@ -500,7 +580,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
                   <p className="text-xs text-on-surface-variant mt-1">To sell this service with packages, plans and offers, first add it in Services, packages &amp; plans (and its offers in Offers), then choose it here. The card then shows a booking button.</p>
                 </div>
                 <div>
-                  <label className="font-semibold block mb-1">Action Button Text (English)</label>
+                  <label className="font-semibold block mb-1">Button text (English) <InfoTip text="Shown on the booking button. Keep Book Now unless you want other words." /></label>
                   <input
                     type="text"
                     value={actionTextEn}
@@ -513,7 +593,7 @@ export function AdminOtherServicesManager({ locale }: { locale: string }) {
 
               <ImageUrlField label="Image (link or upload)" value={imageUrl} onChange={setImageUrl} folder="other-services" />
               <YouTubeUrlField label="YouTube video link" value={youtubeUrl} onChange={setYoutubeUrl} />
-              <LinksEditor links={links} onChange={setLinks} label="Additional links (besides the main button above)" />
+              <LinksEditor links={links} onChange={setLinks} label="Additional links: resource links, other links (add as many as you need)" />
 
               <div className="flex items-center gap-2 pt-2">
                 <input

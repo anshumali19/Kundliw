@@ -142,6 +142,15 @@ export default async function OtherServicesPage(
                     </div>
                   )}
 
+                  <div className="pt-2">
+                    <Link
+                      href={`/other-services/${item.slug}` as never}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant text-secondary hover:bg-surface-container transition-colors font-semibold text-xs"
+                    >
+                      {isHindi ? "विवरण देखें" : "View Details"}
+                    </Link>
+                  </div>
+
                   {item.actionUrl && (
                     <div className="pt-2">
                       <a
@@ -150,7 +159,7 @@ export default async function OtherServicesPage(
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-on-brand hover:bg-brand-hover transition-colors font-semibold text-xs shadow-sm"
                       >
-                        <span>{actionText || (isHindi ? "पोर्टल पर जाएं" : "Visit Portal")}</span>
+                        <span>{actionText && !actionText.startsWith("Visit Portal") && !actionText.startsWith("पोर्टल पर जाएं") ? actionText : isHindi ? "अभी बुक करें" : "Book Now"}</span>
                         <ExternalLink className="w-4 h-4" />
                       </a>
                     </div>

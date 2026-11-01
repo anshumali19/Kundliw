@@ -673,6 +673,16 @@ model OtherService {
   serviceSlug     String?
   actionTextEn    String?  @default("Visit Portal / Learn More")
   actionTextHi    String?  @default("पोर्टल पर जाएं / विवरण देखें")
+  /// Nature of the service, for example "Pilgrimage tour" or "Matrimonial platform"
+  natureEn        String?
+  natureHi        String?
+  numberOfDays    Int?
+  startDate       DateTime?
+  endDate         DateTime?
+  /// Day by day programme: [{ titleEn, titleHi, detailsEn, detailsHi }]
+  itineraryDays   Json?
+  facebookUrl     String?
+  whatsappGroupUrl String?
   youtubeUrl      String?
   additionalLinks Json?
   orderIndex      Int      @default(0)

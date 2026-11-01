@@ -106,6 +106,9 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     image: s.imageUrl || (s.slug === "prashna-kundli" ? "/ref/hero-1.webp" : s.slug === "kundli-matching" ? "/ref/hero-2.webp" : "/ref/astrology.webp"),
     href: `/services/${s.slug}`,
     external: null as string | null,
+    externalLabel: "",
+    detail: `/services/${s.slug}` as string | null,
+    video: s.youtubeUrl || null,
   }));
   const FALLBACK_IMAGES = ["/ref/astrology.webp", "/ref/hero-1.webp", "/ref/vastu.webp", "/ref/hero-2.webp"];
   const otherCards = others.map((o, idx) => ({
@@ -115,6 +118,9 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     image: o.imageUrl || FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length],
     href: (o.serviceSlug && bookableSlugs.has(o.serviceSlug) ? `/services/${o.serviceSlug}` : null) as string | null,
     external: o.actionUrl,
+    externalLabel: ((isHindi ? o.actionTextHi : o.actionTextEn) || "").startsWith("Visit Portal") || ((isHindi ? o.actionTextHi : o.actionTextEn) || "").startsWith("पोर्टल पर जाएं") ? "" : (isHindi ? o.actionTextHi : o.actionTextEn) || "",
+    detail: `/other-services/${o.slug}` as string | null,
+    video: o.youtubeUrl || null,
   }));
   const allServices = [...coreServices, ...otherCards];
 
@@ -382,7 +388,22 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                   </span>
                   <h3 className="font-serif text-[26px] font-bold leading-[1.1] text-secondary mb-3 pr-14">{s.title}</h3>
                   <p className="text-xs leading-[1.75] text-on-surface-variant mb-5">{s.desc}</p>
-                  <div className="mt-auto flex flex-wrap items-center gap-4">
+                  <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2">
+                    {s.detail && (
+                      <Link href={s.detail as never} className="text-xs font-bold text-secondary hover:underline inline-flex items-center gap-1">
+                        {tr("View Details", "विवरण देखें")}
+                      </Link>
+                    )}
+                    {s.video &&
+                      (s.detail && s.detail.startsWith("/other-services") ? (
+                        <Link href={`${s.detail}#video` as never} className="text-xs font-bold text-secondary hover:underline inline-flex items-center gap-1">
+                          {tr("Watch Video", "वीडियो देखें")}
+                        </Link>
+                      ) : (
+                        <a href={s.video} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-secondary hover:underline inline-flex items-center gap-1">
+                          {tr("Watch Video", "वीडियो देखें")}
+                        </a>
+                      ))}
                     {s.href ? (
                       <Link href={s.href as never} className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1">
                         {tr("View plans", "योजनाएँ देखें")} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -394,7 +415,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                     )}
                     {s.external && (
                       <a href={s.external} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-secondary hover:underline inline-flex items-center gap-1">
-                        {tr("Visit Website", "वेबसाइट देखें")} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                        {s.externalLabel || tr("Book Now", "अभी बुक करें")} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                       </a>
                     )}
                   </div>

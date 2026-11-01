@@ -5,7 +5,18 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 import { linksInputSchema } from "@/lib/content/media";
-import { withJsonLinks } from "@/lib/content/json";
+import { withJsonLinks, jsonOrNull } from "@/lib/content/json";
+
+const dayListSchema = z
+  .array(
+    z.object({
+      titleEn: z.string().trim().max(200).default(""),
+      titleHi: z.string().trim().max(200).default(""),
+      detailsEn: z.string().trim().max(4000).default(""),
+      detailsHi: z.string().trim().max(4000).default(""),
+    })
+  )
+  .max(60);
 
 const otherServiceInputSchema = z.object({
   slug: z
@@ -24,6 +35,14 @@ const otherServiceInputSchema = z.object({
   serviceSlug: z.string().trim().max(120).optional().nullable(),
   actionTextEn: z.string().trim().optional().nullable(),
   actionTextHi: z.string().trim().optional().nullable(),
+  natureEn: z.string().trim().max(200).optional().nullable(),
+  natureHi: z.string().trim().max(200).optional().nullable(),
+  numberOfDays: z.coerce.number().int().min(1).max(365).optional().nullable(),
+  startDate: z.preprocess((v) => (v === "" || v == null ? null : new Date(String(v))), z.date().nullable()).optional(),
+  endDate: z.preprocess((v) => (v === "" || v == null ? null : new Date(String(v))), z.date().nullable()).optional(),
+  itineraryDays: dayListSchema.optional().nullable(),
+  facebookUrl: z.string().trim().url().optional().nullable(),
+  whatsappGroupUrl: z.string().trim().url().optional().nullable(),
   youtubeUrl: z.string().trim().optional().nullable(),
   additionalLinks: linksInputSchema.optional().nullable(),
   orderIndex: z.coerce.number().int().min(0).default(0),
@@ -76,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     const item = await prisma.otherService.create({
-      data: withJsonLinks(parsed.data),
+      data: withJsonLinks({ ...parsed.data, itineraryDays: jsonOrNull(parsed.data.itineraryDays) }),
     });
 
     return NextResponse.json({ success: true, item }, { status: 201 });
