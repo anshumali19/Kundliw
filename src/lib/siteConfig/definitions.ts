@@ -202,10 +202,21 @@ export const SECTIONS: SectionDef[] = [
     hi: "मोबाइल ऐप",
     fields: [
       { key: "enabled", en: "Show app download section", hi: "ऐप डाउनलोड सेक्शन दिखाएँ", type: "toggle", def: true },
-      { key: "playStoreUrl", en: "Google Play link", hi: "गूगल प्ले लिंक", type: "url" },
-      { key: "appStoreUrl", en: "App Store link", hi: "ऐप स्टोर लिंक", type: "url" },
-      { key: "apkUrl", en: "Direct APK link", hi: "सीधा APK लिंक", type: "url" },
       ...bi("appText", "Text shown with the download", "डाउनलोड के साथ का संदेश", "text", 200),
+      // 1. Android app (Google Play)
+      { key: "androidEnabled", en: "1. Android app: show it", hi: "1. एंड्रॉइड ऐप: दिखाएँ", type: "toggle", def: true },
+      ...bi("androidName", "1. Android app: name", "1. एंड्रॉइड ऐप: नाम", "text", 80, "Android App (Google Play)"),
+      { key: "androidIcon", en: "1. Android app: icon (for example the Play Store icon)", hi: "1. एंड्रॉइड ऐप: आइकन (जैसे प्ले स्टोर का आइकन)", type: "image" },
+      { key: "playStoreUrl", en: "1. Android app: Google Play link", hi: "1. एंड्रॉइड ऐप: गूगल प्ले लिंक", type: "url" },
+      { key: "androidQrImage", en: "1. Android app: QR code picture (leave empty to make it from the link)", hi: "1. एंड्रॉइड ऐप: QR कोड की तस्वीर (खाली छोड़ें तो लिंक से बनेगा)", type: "image" },
+      // 2. APK file app
+      { key: "apkEnabled", en: "2. APK file app: show it", hi: "2. APK फ़ाइल ऐप: दिखाएँ", type: "toggle", def: true },
+      ...bi("apkName", "2. APK file app: name", "2. APK फ़ाइल ऐप: नाम", "text", 80, "APK file app"),
+      { key: "apkIcon", en: "2. APK file app: icon", hi: "2. APK फ़ाइल ऐप: आइकन", type: "image" },
+      { key: "apkUrl", en: "2. APK file app: direct download link", hi: "2. APK फ़ाइल ऐप: सीधा डाउनलोड लिंक", type: "url" },
+      { key: "apkQrImage", en: "2. APK file app: QR code picture (leave empty to make it from the link)", hi: "2. APK फ़ाइल ऐप: QR कोड की तस्वीर (खाली छोड़ें तो लिंक से बनेगा)", type: "image" },
+      // iPhone
+      { key: "appStoreUrl", en: "App Store link (iPhone, optional)", hi: "ऐप स्टोर लिंक (आईफ़ोन, वैकल्पिक)", type: "url" },
     ],
   },
   {

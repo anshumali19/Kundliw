@@ -32,12 +32,23 @@ export default async function AppDownloadPage(props: AppPageProps) {
     .findUnique({ where: { id: "default" }, select: { appDownloadUrl: true } })
     .catch(() => null);
   const appCfg = await getSection("mobileApp");
-  const url = settings?.appDownloadUrl?.trim() || String(appCfg.apkUrl || "").trim();
+  const str = (k: string) => String(appCfg[k] ?? "").trim();
+  const pick = (en: string, hi: string, fallback: string) => (isHindi ? str(hi) || str(en) : str(en)) || fallback;
 
-  // The QR is generated on the server from the link the admin saved.
-  const qr = url
-    ? await QRCode.toDataURL(url, { margin: 1, width: 280, color: { dark: "#641E2B", light: "#FFFFFF" } })
-    : null;
+  // Two apps, each with a name, icon, link and QR code the admin sets (Admin > Website settings > Mobile app)
+  const defs = [
+    { key: "android", enabled: appCfg.androidEnabled !== false, name: pick("androidNameEn", "androidNameHi", isHindi ? "एंड्रॉइड ऐप (गूगल प्ले)" : "Android App (Google Play)"), icon: str("androidIcon"), url: str("playStoreUrl"), qrImage: str("androidQrImage"), button: "Google Play" },
+    { key: "apk", enabled: appCfg.apkEnabled !== false, name: pick("apkNameEn", "apkNameHi", isHindi ? "APK फ़ाइल ऐप" : "APK file app"), icon: str("apkIcon"), url: settings?.appDownloadUrl?.trim() || str("apkUrl"), qrImage: str("apkQrImage"), button: isHindi ? "APK डाउनलोड करें" : "Download APK" },
+  ];
+  const apps = await Promise.all(
+    defs
+      .filter((d) => d.enabled && d.url)
+      .map(async (d) => ({
+        ...d,
+        // An uploaded QR picture wins; otherwise the QR is made on the server from the link
+        qr: d.qrImage || (await QRCode.toDataURL(d.url, { margin: 1, width: 280, color: { dark: "#641E2B", light: "#FFFFFF" } })),
+      }))
+  );
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-10 text-left space-y-6">
@@ -55,49 +66,30 @@ export default async function AppDownloadPage(props: AppPageProps) {
         <p className="text-base text-on-surface-variant">{String(appCfg[isHindi ? "appTextHi" : "appTextEn"])}</p>
       )}
 
-      {(String(appCfg.playStoreUrl || "").trim() || String(appCfg.appStoreUrl || "").trim()) && (
-        <div className="flex flex-wrap gap-3">
-          {String(appCfg.playStoreUrl || "").trim() && (
-            <a href={String(appCfg.playStoreUrl)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-lg bg-brand hover:bg-brand-hover text-on-brand font-bold">
-              <Download className="w-5 h-5" />
-              Google Play
-            </a>
-          )}
-          {String(appCfg.appStoreUrl || "").trim() && (
-            <a href={String(appCfg.appStoreUrl)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-lg border-2 border-maroon text-secondary font-bold hover:bg-surface-container-high">
-              <Download className="w-5 h-5" />
-              App Store
-            </a>
-          )}
-        </div>
-      )}
-
-      {url && qr ? (
-        <div className="bg-surface border-2 border-maroon rounded-lg p-6 flex flex-col sm:flex-row items-center gap-6">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={qr}
-            alt={isHindi ? "ऐप डाउनलोड के लिए QR कोड" : "QR code to download the app"}
-            width={200}
-            height={200}
-            className="w-48 h-48 shrink-0"
-          />
-          <div className="space-y-3 text-center sm:text-left">
-            <p className="text-base">
-              {isHindi
-                ? "अपने फ़ोन के कैमरे से QR कोड स्कैन करें, या नीचे दिए बटन से सीधे डाउनलोड करें।"
-                : "Scan the QR code with your phone camera, or use the button below to download directly."}
-            </p>
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 min-h-[48px] px-6 rounded border-2 border-maroon bg-brand hover:bg-brand-hover text-on-brand font-bold"
-            >
-              <Download className="w-5 h-5" />
-              {isHindi ? "ऐप डाउनलोड करें" : "Download app"}
-            </a>
-          </div>
+      {apps.length > 0 ? (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {apps.map((d) => (
+            <article key={d.key} className="flex flex-col items-center gap-4 rounded-lg border-2 border-maroon bg-surface p-6 text-center">
+              <div className="flex items-center gap-3">
+                {d.icon ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={d.icon} alt="" width={48} height={48} className="h-12 w-12 rounded-xl object-contain" />
+                ) : (
+                  <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand text-on-brand"><Smartphone className="h-6 w-6" aria-hidden="true" /></span>
+                )}
+                <h2 className="font-serif text-xl font-bold text-secondary">{d.name}</h2>
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={d.qr} alt={isHindi ? `${d.name} के लिए QR कोड` : `QR code for ${d.name}`} width={200} height={200} className="h-48 w-48" />
+              <p className="text-sm text-on-surface-variant">
+                {isHindi ? "फ़ोन के कैमरे से QR कोड स्कैन करें, या नीचे के बटन से सीधे डाउनलोड करें।" : "Scan the QR code with your phone camera, or use the button below."}
+              </p>
+              <a href={d.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[48px] items-center gap-2 rounded border-2 border-maroon bg-brand px-6 font-bold text-on-brand hover:bg-brand-hover">
+                <Download className="h-5 w-5" aria-hidden="true" />
+                {d.button}
+              </a>
+            </article>
+          ))}
         </div>
       ) : (
         <div className="bg-surface-container border border-outline-variant/60 rounded-lg p-6">
@@ -107,6 +99,13 @@ export default async function AppDownloadPage(props: AppPageProps) {
               : "The Android app will be available soon. Until then you can use this website fully in your phone browser."}
           </p>
         </div>
+      )}
+
+      {str("appStoreUrl") && (
+        <a href={str("appStoreUrl")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 min-h-[48px] px-5 rounded-lg border-2 border-maroon text-secondary font-bold hover:bg-surface-container-high">
+          <Download className="w-5 h-5" />
+          App Store (iPhone)
+        </a>
       )}
     </div>
   );
