@@ -374,6 +374,24 @@ export default function AdminBannersPage() {
             </div>
           </div>
 
+          <div>
+            <div className="mb-1 text-xs font-bold uppercase tracking-wider text-secondary">Preview: how this banner looks</div>
+            <div className="relative flex h-40 items-end overflow-hidden rounded-lg border border-outline-variant/60 bg-surface-container">
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              ) : (
+                <span className="absolute inset-0 grid place-items-center text-xs text-on-surface-variant">Add a banner image to see it here</span>
+              )}
+              {(titleEn || subtitleEn) && (
+                <div className="relative w-full bg-gradient-to-t from-black/70 to-transparent p-3 text-white">
+                  <div className="font-serif text-base font-bold">{titleEn}</div>
+                  {subtitleEn && <div className="text-xs">{subtitleEn}</div>}
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="sticky bottom-[calc(6.75rem+env(safe-area-inset-bottom,0px))] xl:bottom-12 z-30 bg-surface/95 backdrop-blur border-t border-outline-variant/40 -mx-2 px-2 py-3">
           <button
             type="submit"

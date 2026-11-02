@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, CheckCircle2, AlertCircle, Eye, EyeOff, Loader2, Plus, Trash2 } from "lucide-react";
-import { ImageUrlField } from "@/components/admin/MediaFields";
+import { ImageUrlField, VideoPreview } from "@/components/admin/MediaFields";
 import { HeroSlide, HeroAnimation, MAX_HERO_SLIDES } from "@/lib/content/heroSlides";
 
 interface ServiceOption {
@@ -131,6 +131,30 @@ export function AdminHeroSlidesManager({ locale, services }: { locale: string; s
               </div>
             </div>
 
+            <div>
+              <div className="mb-1 text-xs font-bold uppercase tracking-wider text-secondary">{tr("Preview: how this slide looks on the home page", "पूर्वावलोकन: होम पेज पर यह स्लाइड ऐसी दिखेगी")}</div>
+              <div className="relative flex min-h-[200px] items-end overflow-hidden rounded-lg border border-outline-variant/60 bg-maroon">
+                {shownImg && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={shownImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" aria-hidden="true" />
+                <div className="relative w-full space-y-1 p-4">
+                  <div className="font-serif text-xl font-bold sm:text-2xl" style={{ color: s.titleColor || "#D8A341" }}>
+                    {(isHindi ? s.titleHi || s.titleEn : s.titleEn || s.titleHi) || tr("Heading appears here", "शीर्षक यहाँ दिखेगा")}
+                  </div>
+                  <p className="max-w-xl text-sm" style={{ color: s.descColor || "#FFFFFF" }}>
+                    {(isHindi ? s.descHi || s.descEn : s.descEn || s.descHi) || tr("The description appears here.", "विवरण यहाँ दिखेगा।")}
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-1 text-[11px] font-bold">
+                    {s.serviceSlug && <span className="rounded bg-brand px-2 py-1 text-on-brand">{tr("View service", "सेवा देखें")}</span>}
+                    {s.youtubeUrl && <span className="rounded bg-white/90 px-2 py-1 text-secondary">▶ {tr("Watch video", "वीडियो देखें")}</span>}
+                  </div>
+                </div>
+                {!shownImg && <div className="absolute inset-0 grid place-items-center text-xs text-white/70">{tr("No picture yet", "अभी तस्वीर नहीं")}</div>}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div>
@@ -156,13 +180,10 @@ export function AdminHeroSlidesManager({ locale, services }: { locale: string; s
                 {s.imageUrl === "" && svcImg && (
                   <p className="text-xs text-on-surface-variant">{tr("Using the service picture shown below.", "सेवा की तस्वीर नीचे दिख रही है।")}</p>
                 )}
-                {shownImg && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={shownImg} alt="" className="h-28 w-auto rounded border border-outline-variant/60 object-cover" />
-                )}
                 <div>
                   <label className={label}>{tr("YouTube link", "YouTube लिंक")}</label>
                   <input type="url" className={input} value={s.youtubeUrl} onChange={(e) => update(i, { youtubeUrl: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." />
+                  <VideoPreview url={s.youtubeUrl} />
                 </div>
               </div>
 

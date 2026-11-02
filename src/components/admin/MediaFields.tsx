@@ -4,7 +4,7 @@ import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import { useEffect, useRef, useState } from "react";
 import { upload as uploadToBlob } from "@vercel/blob/client";
 import { ArrowDown, ArrowUp, Plus, Trash2, Eye, EyeOff } from "lucide-react";
-import { BLOCK_TYPES, BlockType, ContentBlock, LinkItem } from "@/lib/content/media";
+import { BLOCK_TYPES, BlockType, ContentBlock, LinkItem, videoSource } from "@/lib/content/media";
 
 const inputCls =
   "w-full bg-surface-container-low border border-outline-variant/80 rounded px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px]";
@@ -89,6 +89,27 @@ export function ImageUrlField({
   );
 }
 
+/** Shows the video the admin pasted or uploaded, as visitors will see it, or says the link cannot be played. */
+export function VideoPreview({ url }: { url: string }) {
+  const v = url.trim() ? videoSource(url) : null;
+  if (!url.trim()) return null;
+  if (!v) {
+    return <p className="mt-2 text-xs text-on-error-container">This link is not a video that can be played here. Use a YouTube, Vimeo or Google Drive link, or a direct .mp4 file.</p>;
+  }
+  return (
+    <div className="mt-2 max-w-sm" aria-label="Video preview">
+      <div className="mb-1 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">Preview</div>
+      <div className="aspect-video overflow-hidden rounded border border-outline-variant/60 bg-black">
+        {v.kind === "file" ? (
+          <video src={v.src} controls preload="metadata" className="h-full w-full" />
+        ) : (
+          <iframe src={v.src} title="Video preview" loading="lazy" allow="encrypted-media; picture-in-picture" allowFullScreen className="h-full w-full" />
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function YouTubeUrlField({
   value,
   onChange,
@@ -108,6 +129,7 @@ export function YouTubeUrlField({
         placeholder="https://www.youtube.com/watch?v=..."
         className={inputCls}
       />
+      <VideoPreview url={value} />
     </div>
   );
 }
@@ -212,6 +234,7 @@ export function VideoField({
       )}
       {enabled && <p className="mt-1 text-[11px] text-on-surface-variant">MP4, WebM or MOV, up to {maxMb} MB.</p>}
       {error && <p className="mt-1 text-xs text-on-error-container">{error}</p>}
+      <VideoPreview url={value} />
     </div>
   );
 }

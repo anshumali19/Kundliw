@@ -475,10 +475,18 @@ function MarqueeRow({
 
   return (
     <div className="p-4 rounded-lg bg-surface border border-outline-variant/40 space-y-3">
+      <div
+        className="rounded px-3 py-2 font-semibold overflow-hidden whitespace-nowrap text-ellipsis"
+        style={{ background: toHex(item.bgColor, "#F4C65D"), color: toHex(item.textColor, "#FFFFFF"), fontSize: `${item.fontSize}px` }}
+        aria-label="Preview"
+      >
+        {textEn || textHi || "Preview of the announcement text"}
+      </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <input type="text" value={textEn} onChange={(e) => setTextEn(e.target.value)} aria-label="Text (English)" className={field} />
         <input type="text" value={textHi} onChange={(e) => setTextHi(e.target.value)} aria-label="Text (Hindi)" className={field} />
       </div>
+      {textHi && <div className="rounded px-3 py-2 font-semibold overflow-hidden whitespace-nowrap text-ellipsis" style={{ background: toHex(item.bgColor, "#F4C65D"), color: toHex(item.textColor, "#FFFFFF"), fontSize: `${item.fontSize}px` }} aria-label="Hindi preview">{textHi}</div>}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase text-on-surface-variant">
