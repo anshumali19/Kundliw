@@ -22,6 +22,7 @@ import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth/guards";
+import { BackCornerButton } from "@/components/layout/BackCornerButton";
 import { MaintenanceGate } from "@/components/layout/MaintenanceGate";
 import { isCorePageSlug } from "@/lib/content/pages";
 import { sizedImage } from "@/lib/content/media";
@@ -360,6 +361,7 @@ export default async function LocaleLayout(
               <BannerSlot position="TOP" initialBanners={topBanners} />
             </div>
             {topMarquee.length > 0 && <MarqueeStrip items={topMarquee} position="TOP" />}
+            <BackCornerButton />
             <main className="flex-1 w-full max-w-full overflow-x-clip pb-6 xl:pb-0">
               <PageNavButtons />
               <MaintenanceGate
