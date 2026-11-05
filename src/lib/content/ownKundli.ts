@@ -15,6 +15,13 @@ export function ownKundliHref(href: string): string {
 /** The Kendra's own Kundli services. Their booking order is: select Kundli, fill the form, choose a plan, pay. */
 export const KUNDLI_SERVICE_SLUGS = ["janam-kundli", "prashna-kundli", "kundli-matching"];
 
+/** Where a main-menu Kundli item goes when its service is switched off in the admin, instead of a "page not found". */
+export const KUNDLI_FALLBACK_PAGES: Record<string, string> = {
+  "janam-kundli": "/kundli",
+  "prashna-kundli": "/kundli/prashna",
+  "kundli-matching": "/kundli/matching",
+};
+
 export function isKundliService(slug: string | undefined | null): boolean {
   return !!slug && KUNDLI_SERVICE_SLUGS.includes(slug);
 }

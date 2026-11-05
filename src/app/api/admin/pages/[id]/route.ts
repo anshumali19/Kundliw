@@ -71,9 +71,10 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
     if (!existing) {
       return NextResponse.json({ error: "Page not found" }, { status: 404 });
     }
-    if (isCorePageSlug(existing.slug)) {
+    // A built-in page cannot disappear from the site, but its saved edits can be deleted (?reset=1) so the standard text returns
+    if (isCorePageSlug(existing.slug) && request.nextUrl.searchParams.get("reset") !== "1") {
       return NextResponse.json(
-        { error: "Built-in pages cannot be removed. Edit their text and blocks instead." },
+        { error: "Built-in pages cannot be removed. Edit their text and blocks instead, or reset them to the standard text." },
         { status: 409 }
       );
     }

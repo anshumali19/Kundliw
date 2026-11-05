@@ -2,7 +2,7 @@
 
 import { LinkTextarea } from "@/components/admin/LinkTextarea";
 import React, { useState, useEffect, useRef } from "react";
-import { Save, CheckCircle2, AlertCircle, Plus, Trash2, ExternalLink } from "lucide-react";
+import { Save, CheckCircle2, AlertCircle, Plus, Trash2, ExternalLink, ArrowLeft, ArrowRight, Pencil, RotateCcw } from "lucide-react";
 import { DEFAULT_GUIDES, GUIDE_SLUGS, guidePageSlug } from "@/lib/guides/defaults";
 import { ContentBlock, normalizeBlocks } from "@/lib/content/media";
 import { isCorePageSlug } from "@/lib/content/pages";
@@ -42,6 +42,7 @@ const label = "block text-xs font-bold uppercase text-on-surface-variant mb-1";
 
 export default function AdminPagesPage() {
   const startedFromLink = useRef(false);
+  const titleRef = useRef<HTMLInputElement>(null);
   const [pages, setPages] = useState<StaticPageItem[]>([]);
   const [selectedSlug, setSelectedSlug] = useState("about");
   const [creating, setCreating] = useState(false);
@@ -221,6 +222,33 @@ export default function AdminPagesPage() {
     }
   };
 
+  // Every page in tab order, for Previous / Next
+  const tabs = [...PRESET_PAGES, ...customPages.map((p) => ({ slug: p.slug, name: `${p.titleEn} (custom)`, path: `/pages/${p.slug}` }))];
+  const tabIndex = creating ? -1 : tabs.findIndex((t) => t.slug === selectedSlug);
+  const step = (dir: -1 | 1) => {
+    const next = tabs[tabIndex + dir];
+    if (next) handleSelectSlug(next.slug);
+  };
+  const startEdit = () => {
+    titleRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    titleRef.current?.focus();
+  };
+
+  // Built-in pages (legal, about, guides) cannot be removed from the site: "delete" returns them to the standard text
+  const handleReset = async () => {
+    if (!selectedPage || !isCore) return;
+    if (!window.confirm(`Delete your saved changes to "${selectedPage.titleEn}" and go back to the standard text? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/admin/pages/${selectedPage.id}?reset=1`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not reset the page");
+      setSuccess("Your changes were deleted. The standard text is shown again.");
+      await fetchPages(selectedSlug);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not reset the page");
+    }
+  };
+
   const publicPath = isCore
     ? PRESET_PAGES.find((p) => p.slug === selectedSlug)?.path
     : selectedSlug
@@ -278,6 +306,32 @@ export default function AdminPagesPage() {
         </button>
       </div>
 
+      {!creating && (
+        <div className="flex flex-wrap items-center gap-2" role="toolbar" aria-label="Page actions">
+          <button type="button" onClick={() => step(-1)} disabled={tabIndex <= 0} className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-outline-variant bg-surface text-xs font-bold text-secondary hover:bg-surface-container-high disabled:opacity-40">
+            <ArrowLeft className="w-4 h-4" /> Previous
+          </button>
+          <span className="text-xs font-semibold text-on-surface-variant">{tabIndex >= 0 ? `${tabIndex + 1} of ${tabs.length}` : ""}</span>
+          <button type="button" onClick={() => step(1)} disabled={tabIndex < 0 || tabIndex >= tabs.length - 1} className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-outline-variant bg-surface text-xs font-bold text-secondary hover:bg-surface-container-high disabled:opacity-40">
+            Next <ArrowRight className="w-4 h-4" />
+          </button>
+          <span className="mx-1 hidden h-6 w-px bg-outline-variant sm:block" aria-hidden="true" />
+          <button type="button" onClick={startEdit} className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-outline-variant bg-surface text-xs font-bold text-secondary hover:bg-surface-container-high">
+            <Pencil className="w-4 h-4" /> Edit this page
+          </button>
+          {isCore && selectedPage && (
+            <button type="button" onClick={handleReset} className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-error text-xs font-bold text-on-error-container hover:bg-error-container">
+              <RotateCcw className="w-4 h-4" /> Delete my changes (standard text)
+            </button>
+          )}
+          {!isCore && selectedPage && (
+            <button type="button" onClick={handleDelete} className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-error text-xs font-bold text-on-error-container hover:bg-error-container">
+              <Trash2 className="w-4 h-4" /> Delete page
+            </button>
+          )}
+        </div>
+      )}
+
       <form onSubmit={handleSave} className="bg-surface rounded-lg p-6 border-2 border-secondary/20 shadow-sm space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-outline-variant/30">
           <div>
@@ -291,11 +345,6 @@ export default function AdminPagesPage() {
               <a href={publicPath} target="_blank" rel="noreferrer" className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-maroon text-xs font-bold text-secondary hover:bg-gold">
                 <ExternalLink className="w-4 h-4" /> View page
               </a>
-            )}
-            {!creating && !isCore && selectedPage && (
-              <button type="button" onClick={handleDelete} className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded border border-error text-xs font-bold text-on-error-container hover:bg-error-container">
-                <Trash2 className="w-4 h-4" /> Remove page
-              </button>
             )}
             <button
               type="submit"
@@ -322,7 +371,7 @@ export default function AdminPagesPage() {
           <div className="space-y-3">
             <div>
               <label className={label}>Title (English) *</label>
-              <input type="text" required value={titleEn} onChange={(e) => { setTitleEn(e.target.value); if (creating && !slugTouched) setNewSlug(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60)); }} className={field} />
+              <input ref={titleRef} type="text" required value={titleEn} onChange={(e) => { setTitleEn(e.target.value); if (creating && !slugTouched) setNewSlug(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60)); }} className={field} />
             </div>
             <div>
               <label className={label}>Page text (English) *</label>

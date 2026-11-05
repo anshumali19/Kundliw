@@ -3,7 +3,8 @@ import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/package
 import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
 import { externalPayOf } from "@/lib/content/externalPay";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { KUNDLI_FALLBACK_PAGES } from "@/lib/content/ownKundli";
 import { prisma } from "@/lib/prisma";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE_URL, absoluteUrl, localizedPath, pageAlternates } from "@/lib/seo";
@@ -74,6 +75,9 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
   }
 
   if (!service || !service.isActive) {
+    // A main-menu Kundli service that is switched off opens the Kendra's request form instead of a dead page
+    const fallback = KUNDLI_FALLBACK_PAGES[slug];
+    if (fallback) redirect(`/${locale}${fallback}`);
     notFound();
   }
 
