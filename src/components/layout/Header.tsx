@@ -274,7 +274,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 2xl:gap-3 h-20 ml-2 xl:ml-3">
+          <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 2xl:gap-2 h-20 ml-2 xl:ml-3 min-w-0">
             {primaryLinks.map((link) => {
               const isActive = checkIsActive(link.href);
               if (link.href === "/services") {
@@ -387,7 +387,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 ml-auto">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 ml-auto pr-0.5">
             {/* Booking drop-down list: Service, Plan, Offer, Referral code, then Payment */}
             <div
               className="relative hidden sm:block"
@@ -407,7 +407,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
                 className="inline-flex items-center justify-center gap-1 px-3 py-2 bg-[rgb(var(--btn-book-rgb,var(--brand-rgb)))] hover:brightness-90 text-[rgb(var(--on-btn-book-rgb,var(--on-brand-rgb)))] text-xs uppercase tracking-wide font-bold rounded transition-colors border border-primary min-h-[38px] whitespace-nowrap shrink-0 shadow-sm"
               >
                 <Calendar className="w-4 h-4 shrink-0" />
-                <span className="hidden 2xl:inline">{tCommon("bookConsultation")}</span>
+                <span className="hidden min-[1800px]:inline">{tCommon("bookConsultation")}</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${bookOpen ? "rotate-180" : ""}`} />
               </button>
               {bookOpen && (
