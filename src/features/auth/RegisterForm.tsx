@@ -23,6 +23,7 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [adult, setAdult] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -31,6 +32,10 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    if (password !== confirmPassword) {
+      setErrorMsg(locale === "hi" ? "दोनों पासवर्ड एक जैसे नहीं हैं। कृपया दोबारा जाँचें।" : "The two passwords do not match. Please check them again.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -190,6 +195,30 @@ export function RegisterForm({ accountType }: { accountType: AccountType }) {
                   : "You can always sign in instantly via Mobile OTP without a password."}
               </span>
             </div>
+
+            {(isAssociate || password) && (
+              <div>
+                <label className="block text-xs uppercase tracking-wider font-bold text-secondary mb-1" htmlFor="reg-confirm-password">
+                  {locale === "hi" ? "पासवर्ड दोबारा लिखें" : "Confirm password"} *
+                </label>
+                <PasswordInput
+                  id="reg-confirm-password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={locale === "hi" ? "वही पासवर्ड फिर से लिखें" : "Type the same password again"}
+                  minLength={8}
+                  required
+                  aria-invalid={confirmPassword.length > 0 && confirmPassword !== password}
+                  className="w-full bg-surface-container-lowest text-on-surface px-3 py-2.5 rounded border border-outline-variant focus:border-secondary focus:outline-none text-sm min-h-[44px]"
+                />
+                {confirmPassword.length > 0 && confirmPassword !== password && (
+                  <span role="alert" className="block text-[11px] text-on-error-container mt-0.5">
+                    {locale === "hi" ? "पासवर्ड मेल नहीं खा रहे।" : "The passwords do not match yet."}
+                  </span>
+                )}
+              </div>
+            )}
 
             <label className="flex items-start gap-3 text-xs text-on-surface cursor-pointer">
               <input
