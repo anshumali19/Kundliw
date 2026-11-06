@@ -63,6 +63,9 @@ export function upgradeBlockReason(order: Rulable & { extraPlanIds: string[] }):
   return null;
 }
 
+/** The database is remote, so give these multi-step changes more than the 5 second default. */
+export const TX_OPTIONS = { maxWait: 10000, timeout: 30000 };
+
 export type RefundMode = "REQUEST" | "SENT";
 
 /**
@@ -94,7 +97,7 @@ export async function cancelOrderTx(
       cancelledAt: now,
       cancelReason: opts.reason,
       cancelledBy: opts.by,
-      refundStatus: paid ? opts.refundMode : null,
+      refundStatus: paid ? (opts.refundMode === "SENT" ? "SENT" : "REQUESTED") : null,
       refundAmountPaise: paid ? order.netAmountPaise : null,
       refundedAt: paid && opts.refundMode === "SENT" ? now : null,
     },
@@ -131,20 +134,20 @@ export async function cancelOrderTx(
 }
 
 export async function cancelOrderByUser(orderId: string, userId: string, reason: string) {
-  return prisma.$transaction((tx) => cancelOrderTx(tx, orderId, { by: "USER", actorId: userId, userId, reason, refundMode: "REQUEST" }));
+  return prisma.$transaction((tx) => cancelOrderTx(tx, orderId, { by: "USER", actorId: userId, userId, reason, refundMode: "REQUEST" }), TX_OPTIONS);
 }
 
 /** Higher plans of the same package that this paid order can be upgraded to. */
-export async function upgradeChoices(order: { id: string; serviceId: string | null; planId: string | null }) {
+export async function upgradeChoices(order: { id: string; serviceId: string | null; planId: string | null }, db: Prisma.TransactionClient | typeof prisma = prisma) {
   if (!order.planId || !order.serviceId) return [];
-  const current = await prisma.plan.findUnique({ where: { id: order.planId }, select: { pricePaise: true, packageId: true } });
+  const current = await db.plan.findUnique({ where: { id: order.planId }, select: { pricePaise: true, packageId: true } });
   if (!current) return [];
-  const pending = await prisma.order.findFirst({
+  const pending = await db.order.findFirst({
     where: { upgradeFromOrderId: order.id, paymentStatus: { in: [PaymentStatus.PENDING, PaymentStatus.AWAITING_VERIFICATION] }, OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
     select: { id: true },
   });
   if (pending) return [];
-  return prisma.plan.findMany({
+  return db.plan.findMany({
     where: { serviceId: order.serviceId, packageId: current.packageId, isActive: true, pricePaise: { gt: current.pricePaise } },
     orderBy: { pricePaise: "asc" },
   });
@@ -155,13 +158,17 @@ export async function upgradeChoices(order: { id: string; serviceId: string | nu
  * paid taken off. The old order is cancelled only when the new one is paid (see settleUpgrade).
  */
 export async function startUpgrade(orderId: string, userId: string, newPlanId: string): Promise<{ orderId: string; netAmountPaise: number }> {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction((tx) => startUpgradeTx(tx, orderId, userId, newPlanId), TX_OPTIONS);
+}
+
+export async function startUpgradeTx(tx: Prisma.TransactionClient, orderId: string, userId: string, newPlanId: string): Promise<{ orderId: string; netAmountPaise: number }> {
+  {
     const old = await tx.order.findUnique({ where: { id: orderId } });
     if (!old || old.userId !== userId) throw new SelfServiceError("Order not found.", 404);
     const block = upgradeBlockReason(old);
     if (block) throw new SelfServiceError(block.en, 409);
 
-    const choices = await upgradeChoices(old);
+    const choices = await upgradeChoices(old, tx);
     const target = choices.find((p) => p.id === newPlanId);
     if (!target) throw new SelfServiceError("This plan is not available as an upgrade for your order.", 409);
 
@@ -203,7 +210,7 @@ export async function startUpgrade(orderId: string, userId: string, newPlanId: s
       await attachReferralToOrder(tx, created, old.associateId).catch(() => undefined);
     }
     return { orderId: created.id, netAmountPaise: created.netAmountPaise };
-  });
+  }
 }
 
 /**

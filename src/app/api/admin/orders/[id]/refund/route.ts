@@ -3,7 +3,7 @@ import { z } from "zod";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { validateCsrfOrigin } from "@/lib/auth/csrf";
 import { prisma } from "@/lib/prisma";
-import { cancelOrderTx, SelfServiceError } from "@/lib/orders/selfService";
+import { cancelOrderTx, SelfServiceError, TX_OPTIONS } from "@/lib/orders/selfService";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest, props: { params: Promise<{ id: 
         return;
       }
       await cancelOrderTx(tx, id, { by: "ADMIN", actorId: guard.user.id, reason: parsed.data.reason, refundMode: "SENT" });
-    });
+    }, TX_OPTIONS);
     return NextResponse.json({ success: true, paymentStatus: "REFUNDED" });
   } catch (e) {
     if (e instanceof SelfServiceError) return NextResponse.json({ error: e.message }, { status: e.status });
