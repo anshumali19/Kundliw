@@ -97,6 +97,14 @@ export const SECTIONS: SectionDef[] = [
     fields: [],
   },
   {
+    id: "usefulLinks",
+    en: "Useful links (home page)",
+    hi: "उपयोगी लिंक (होम पेज)",
+    noteEn: "Name and web address of each useful link. The ones switched on appear in a 'Useful links' block on the home page. Leave the list empty to hide the block.",
+    noteHi: "हर उपयोगी लिंक का नाम और वेब पता। चालू लिंक होम पेज पर 'उपयोगी लिंक' में दिखेंगे। सूची खाली हो तो ब्लॉक नहीं दिखेगा।",
+    fields: [],
+  },
+  {
     id: "seo",
     en: "SEO",
     hi: "एसईओ (खोज में दिखना)",
@@ -781,7 +789,7 @@ export interface LinkRow {
   show: boolean;
 }
 
-export const LINK_LIST_IDS = ["menu", "footerLinks"] as const;
+export const LINK_LIST_IDS = ["menu", "footerLinks", "usefulLinks"] as const;
 
 export function normalizeLinkList(input: unknown): { ok: true; items: LinkRow[] } | { ok: false; error: string } {
   const list = Array.isArray((input as { items?: unknown })?.items) ? (input as { items: unknown[] }).items : null;

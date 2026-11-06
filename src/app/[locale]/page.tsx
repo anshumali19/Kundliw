@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
-import { getSection } from "@/lib/siteConfig/service";
+import { getLinkList, getSection } from "@/lib/siteConfig/service";
 import { SocialLinks } from "@/components/content/SocialLinks";
 import { RichText } from "@/components/content/RichText";
 import { BannerSlot } from "@/components/banners/BannerSlot";
@@ -44,7 +44,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const isHindi = locale === "hi";
   const tr = (en: string, hi: string) => (isHindi ? hi : en);
 
-  const [homeCfg, heroCfg, animCfg, toolsCfg, secCfg, heroBox, cardsCfg, servCfg, procCfg, contCfg, floatCfg] = await Promise.all([
+  const [homeCfg, heroCfg, animCfg, toolsCfg, secCfg, heroBox, cardsCfg, servCfg, procCfg, contCfg, floatCfg, usefulLinks] = await Promise.all([
     getSection("home"),
     getSection("hero"),
     getSection("heroAnimation"),
@@ -56,6 +56,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     getSection("homeProcess"),
     getSection("homeContact"),
     getSection("floating"),
+    getLinkList("usefulLinks").catch(() => []),
   ]);
   const pick = (cfg: Cfg, k: string, fallback: string) => String(cfg[k + (isHindi ? "Hi" : "En")] || "").trim() || fallback;
   // The admin's own wording when set, the standard wording otherwise
@@ -680,6 +681,30 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       )}
 
       <HomeMoreBands locale={locale} />
+
+      {usefulLinks.length > 0 && (
+        <Band id="useful-links">
+          <SectionHead label={isHindi ? "लिंक" : "Links"} title={isHindi ? "उपयोगी लिंक" : "Useful links"} />
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {usefulLinks.map((l, i) => {
+              const external = /^https?:\/\//i.test(l.href);
+              const label = (isHindi ? l.labelHi || l.labelEn : l.labelEn || l.labelHi) || l.href;
+              return (
+                <li key={i}>
+                  <a
+                    href={l.href}
+                    {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="flex min-h-[52px] items-center justify-between gap-3 rounded border border-outline-variant bg-surface px-4 py-3 font-semibold text-secondary hover:border-primary hover:text-primary"
+                  >
+                    <span>{label}</span>
+                    <ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </Band>
+      )}
 
       {/* FAQ */}
       {on("showFaq") && faqList.length > 0 && (

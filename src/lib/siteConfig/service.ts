@@ -22,7 +22,7 @@ const loadRows = cache(async (): Promise<Row[]> => {
 });
 
 /** Every section with saved values laid over the defaults. */
-export async function getSiteConfig(): Promise<{ sections: Record<string, SectionValues>; social: SocialLink[]; menu: LinkRow[]; footerLinks: LinkRow[] }> {
+export async function getSiteConfig(): Promise<{ sections: Record<string, SectionValues>; social: SocialLink[]; menu: LinkRow[]; footerLinks: LinkRow[]; usefulLinks: LinkRow[] }> {
   const rows = await loadRows();
   const byKey = new Map(rows.map((r) => [r.key, r.value as Record<string, unknown>]));
   const sections: Record<string, SectionValues> = {};
@@ -61,7 +61,7 @@ export async function getSiteConfig(): Promise<{ sections: Record<string, Sectio
     });
   }
   const listOf = (key: string): LinkRow[] => ((byKey.get(key) as { items?: LinkRow[] } | undefined)?.items ?? []);
-  return { sections, social: completeSocial(items), menu: listOf("menu"), footerLinks: listOf("footerLinks") };
+  return { sections, social: completeSocial(items), menu: listOf("menu"), footerLinks: listOf("footerLinks"), usefulLinks: listOf("usefulLinks") };
 }
 
 /** Links that are switched on and have an address – what visitors see. */
@@ -76,7 +76,7 @@ export async function getSection(id: string): Promise<SectionValues> {
 }
 
 /** Links the admin has set up, only the ones switched on. */
-export async function getLinkList(key: "menu" | "footerLinks"): Promise<LinkRow[]> {
+export async function getLinkList(key: "menu" | "footerLinks" | "usefulLinks"): Promise<LinkRow[]> {
   const cfg = await getSiteConfig();
   return cfg[key].filter((l) => l.show);
 }

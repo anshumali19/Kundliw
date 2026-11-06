@@ -8,7 +8,7 @@ import { LinkTextarea } from "@/components/admin/LinkTextarea";
 
 const NAV_GROUPS: Array<{ en: string; hi: string; ids: string[] }> = [
   { en: "Home page", hi: "होम पेज", ids: ["homeHero", "homeSections", "homeCards", "homeServices", "homeProcess", "homeContact", "home", "hero", "heroAnimation"] },
-  { en: "Menus, links and buttons", hi: "मेन्यू, लिंक और बटन", ids: ["menu", "footerLinks", "social", "topbar", "floating", "offerPopup"] },
+  { en: "Menus, links and buttons", hi: "मेन्यू, लिंक और बटन", ids: ["menu", "footerLinks", "usefulLinks", "social", "topbar", "floating", "offerPopup"] },
   { en: "Look of the site", hi: "साइट का रूप", ids: ["theme", "logo", "intro", "general"] },
   { en: "Pages and content", hi: "पेज और कंटेंट", ids: ["contact", "mapPage", "content", "features", "tools", "technology", "mobileApp", "legal"] },
   { en: "Business, Google and notes", hi: "व्यवसाय, गूगल और नोट", ids: ["business", "invoice", "ticket", "seo", "analytics", "admin"] },
@@ -25,7 +25,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
   const [active, setActive] = useState("social");
   const [sections, setSections] = useState<Record<string, SectionValues>>({});
   const [social, setSocial] = useState<SocialLink[]>([]);
-  const [lists, setLists] = useState<Record<string, LinkRow[]>>({ menu: [], footerLinks: [] });
+  const [lists, setLists] = useState<Record<string, LinkRow[]>>({ menu: [], footerLinks: [], usefulLinks: [] });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
@@ -37,7 +37,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
       if (!res.ok) throw new Error(data.error || "Failed");
       setSections(data.sections);
       setSocial(data.social);
-      setLists({ menu: data.menu ?? [], footerLinks: data.footerLinks ?? [] });
+      setLists({ menu: data.menu ?? [], footerLinks: data.footerLinks ?? [], usefulLinks: data.usefulLinks ?? [] });
     } catch (e) {
       setMsg({ type: "err", text: e instanceof Error ? e.message : "Failed to load." });
     } finally {
@@ -228,7 +228,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
 
           {def && (def.noteEn || def.noteHi) && <p className="text-sm text-on-surface-variant">{tr(def.noteEn || "", def.noteHi || "")}</p>}
 
-          {active === "menu" || active === "footerLinks" ? (
+          {active === "menu" || active === "footerLinks" || active === "usefulLinks" ? (
             <LinkListEditor
               rows={lists[active] ?? []}
               onChange={(rows) => setLists((l) => ({ ...l, [active]: rows }))}
