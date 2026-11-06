@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Lock, ShieldCheck, ArrowRight, AlertCircle } from "lucide-react";
 
-export default function DemoGatePage() {
+function DemoGateForm() {
   const t = useTranslations("demoGate");
   const locale = useLocale();
   const router = useRouter();
@@ -115,5 +115,13 @@ export default function DemoGatePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DemoGatePage() {
+  return (
+    <Suspense fallback={null}>
+      <DemoGateForm />
+    </Suspense>
   );
 }
