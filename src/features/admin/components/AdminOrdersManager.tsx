@@ -162,6 +162,32 @@ export function AdminOrdersManager({
     }
   };
 
+  const handleRefund = async (orderId: string) => {
+    const reason = window.prompt(
+      isHindi
+        ? "ऑर्डर रद्द करके धनवापसी दर्ज करनी है। कारण लिखें (भुगतान वापस आपको अपने भुगतान खाते से भेजना होगा):"
+        : "This cancels the order and marks it refunded. Write the reason (you still send the money back from your payment account):",
+    );
+    if (!reason) return;
+    setSubmitting(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/refund`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not mark refunded");
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, paymentStatus: "REFUNDED" } : o)));
+      setSelectedOrder((prev) => (prev && prev.id === orderId ? { ...prev, paymentStatus: "REFUNDED" } : prev));
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : "Could not mark refunded");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleAppointment = async (orderId: string, status: "APPROVED" | "REJECTED" | "COMPLETED") => {
     let note = "";
     if (status === "REJECTED") {
@@ -557,6 +583,18 @@ export function AdminOrdersManager({
                     </button>
                   </div>
                 </div>
+              )}
+
+              {(selectedOrder.paymentStatus === "PAID" || selectedOrder.paymentStatus === "AWAITING_VERIFICATION" || selectedOrder.paymentStatus === "PENDING") && (
+                <button
+                  type="button"
+                  disabled={submitting}
+                  onClick={() => handleRefund(selectedOrder.id)}
+                  className="w-full min-h-[44px] px-3 py-2 bg-surface hover:bg-surface-container border border-error text-on-error-container text-xs font-bold uppercase rounded flex items-center justify-center gap-1 disabled:opacity-50"
+                >
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>{isHindi ? "रद्द करें और धनवापसी दर्ज करें" : "Cancel order & mark refunded"}</span>
+                </button>
               )}
 
               {/* Appointment approval (orders with a booked slot) */}
