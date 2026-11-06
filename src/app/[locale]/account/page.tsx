@@ -352,6 +352,23 @@ export default async function AccountPage(props: AccountPageProps) {
                         </>
                       )}
 
+                      {(isPaid || isAwaiting) && (
+                        <>
+                          <Link
+                            href={`/tickets?topic=upgrade&order=${encodeURIComponent(order.orderNumber)}`}
+                            className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-1.5 transition-colors"
+                          >
+                            <span>{isHindi ? "प्लान अपग्रेड करें" : "Upgrade plan"}</span>
+                          </Link>
+                          <Link
+                            href={`/tickets?topic=refund&order=${encodeURIComponent(order.orderNumber)}`}
+                            className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-error text-on-error-container font-semibold rounded flex items-center gap-1.5 transition-colors"
+                          >
+                            <span>{isHindi ? "रद्द / धनवापसी का अनुरोध" : "Cancel / refund request"}</span>
+                          </Link>
+                        </>
+                      )}
+
                       {isPending && (
                         <Link
                           href={`/booking/checkout/${order.id}`}

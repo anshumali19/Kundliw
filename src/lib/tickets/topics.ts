@@ -17,6 +17,7 @@ export const TICKET_TOPICS: TicketTopic[] = [
   { id: "call-time", en: "I want to change my call time", hi: "मैं अपनी कॉल का समय बदलना चाहता/चाहती हूँ" },
   { id: "offer-code", en: "My offer code is not working", hi: "मेरा ऑफ़र कोड काम नहीं कर रहा" },
   { id: "refund", en: "I want a refund or cancellation", hi: "मुझे रिफ़ंड या रद्द करना है" },
+  { id: "upgrade", en: "I want to upgrade my plan", hi: "मैं अपना प्लान अपग्रेड करना चाहता/चाहती हूँ" },
   { id: "login", en: "I cannot sign in to my account", hi: "मैं अपने खाते में लॉगिन नहीं कर पा रहा/रही" },
   { id: "commission", en: "Question about my commission or payout (associate)", hi: "मेरे कमीशन या भुगतान के बारे में प्रश्न (एसोसिएट)" },
 ];

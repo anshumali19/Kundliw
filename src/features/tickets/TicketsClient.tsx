@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TicketTopic } from "@/lib/tickets/topics";
 
@@ -59,6 +59,23 @@ export function TicketsClient({
     phone: defaults?.phone ?? "",
     address: "",
   });
+  // Links from the account page (?topic=refund&order=MKJK-...) open the form already filled in
+  useEffect(() => {
+    if (mode !== "user") return;
+    const q = new URLSearchParams(window.location.search);
+    const topicId = q.get("topic");
+    const order = q.get("order");
+    if (!topicId && !order) return;
+    const tp = topics.find((x) => x.id === topicId);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setForm((f) => ({
+      ...f,
+      topic: tp ? tp.id : f.topic,
+      subject: tp ? (isHindi ? tp.hi : tp.en) : f.subject,
+      orderNumber: order && orderNumbers.includes(order) ? order : f.orderNumber,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
