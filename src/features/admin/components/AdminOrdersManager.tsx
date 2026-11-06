@@ -25,6 +25,10 @@ export interface SerializedOrder {
   paymentMode: string;
   paymentStatus: string;
   manualPaymentRef?: string | null;
+  refundStatus?: string | null;
+  refundAmountPaise?: number | null;
+  cancelReason?: string | null;
+  cancelledBy?: string | null;
   manualPaymentProof?: string | null;
   baseAmountPaise: number;
   discountAmountPaise: number;
@@ -164,9 +168,13 @@ export function AdminOrdersManager({
 
   const handleRefund = async (orderId: string) => {
     const reason = window.prompt(
-      isHindi
-        ? "ऑर्डर रद्द करके धनवापसी दर्ज करनी है। कारण लिखें (भुगतान वापस आपको अपने भुगतान खाते से भेजना होगा):"
-        : "This cancels the order and marks it refunded. Write the reason (you still send the money back from your payment account):",
+      selectedOrder?.refundStatus === "REQUESTED"
+        ? isHindi
+          ? "पैसे वापस भेज दिए? रिफ़ंड का रेफरेंस/UTR लिखें:"
+          : "Money sent back? Write the refund reference / UTR:"
+        : isHindi
+          ? "ऑर्डर रद्द करके धनवापसी दर्ज करनी है। कारण लिखें (भुगतान वापस आपको अपने भुगतान खाते से भेजना होगा):"
+          : "This cancels the order and marks it refunded. Write the reason (you still send the money back from your payment account):",
     );
     if (!reason) return;
     setSubmitting(true);
@@ -179,8 +187,8 @@ export function AdminOrdersManager({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not mark refunded");
-      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, paymentStatus: "REFUNDED" } : o)));
-      setSelectedOrder((prev) => (prev && prev.id === orderId ? { ...prev, paymentStatus: "REFUNDED" } : prev));
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, paymentStatus: "REFUNDED", refundStatus: "SENT" } : o)));
+      setSelectedOrder((prev) => (prev && prev.id === orderId ? { ...prev, paymentStatus: "REFUNDED", refundStatus: "SENT" } : prev));
     } catch (err: unknown) {
       setActionError(err instanceof Error ? err.message : "Could not mark refunded");
     } finally {
@@ -582,6 +590,24 @@ export function AdminOrdersManager({
                       <span>{isHindi ? "अस्वीकृत (Reject)" : "Reject"}</span>
                     </button>
                   </div>
+                </div>
+              )}
+
+              {selectedOrder.refundStatus === "REQUESTED" && (
+                <div className="p-4 rounded-lg border border-error/50 bg-surface-container-low space-y-2 text-xs">
+                  <div className="font-bold text-on-error-container">
+                    {isHindi ? "ग्राहक ने ऑर्डर रद्द किया — धनवापसी बाकी है" : "Customer cancelled — refund is waiting"}
+                  </div>
+                  {selectedOrder.cancelReason && <div>{isHindi ? "कारण: " : "Reason: "}{selectedOrder.cancelReason}</div>}
+                  <div>{isHindi ? "भेजनी है: " : "To send: "}{formatPaiseToInr(selectedOrder.refundAmountPaise ?? 0)}</div>
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleRefund(selectedOrder.id)}
+                    className="w-full min-h-[44px] px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase rounded disabled:opacity-50"
+                  >
+                    {isHindi ? "रिफ़ंड भेज दिया — दर्ज करें" : "Refund sent — record it"}
+                  </button>
                 </div>
               )}
 

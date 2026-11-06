@@ -346,6 +346,18 @@ model Order {
   appointmentStatus AppointmentStatus?
   appointmentNote   String?            @db.Text
 
+  /// Cancellation and refund (the money itself is sent by the Kendra from its payment account)
+  cancelledAt        DateTime?
+  cancelReason       String?   @db.Text
+  /// USER, ADMIN or UPGRADE
+  cancelledBy        String?
+  /// REQUESTED (waiting for the Kendra), SENT, or CREDITED (moved to an upgraded order)
+  refundStatus       String?
+  refundAmountPaise  Int?
+  refundedAt         DateTime?
+  /// Set on an order that upgrades an earlier order to a higher plan
+  upgradeFromOrderId String?
+
   courierName    String?
   trackingNumber String?
   adminNotes     String?  @db.Text
@@ -357,6 +369,7 @@ model Order {
   @@index([userId])
   @@index([status])
   @@index([associateId])
+  @@index([upgradeFromOrderId])
 }
 
 model OrderStatusEvent {

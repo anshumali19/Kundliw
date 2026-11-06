@@ -8,6 +8,8 @@ import { ServiceExplorer } from "@/components/content/ServiceExplorer";
 import { HowItWorks } from "@/components/content/HowItWorks";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 import { formatPaiseToInr } from "@/lib/billing/gst";
+import { OrderSelfService } from "@/features/orders/components/OrderSelfService";
+import { cancelBlockReason, upgradeBlockReason, upgradeChoices } from "@/lib/orders/selfService";
 import { OrderStatusStepper } from "@/features/orders/components/OrderStatusStepper";
 import { CanonicalOrderStatus } from "@/lib/orders/status";
 import {
@@ -53,7 +55,7 @@ export default async function AccountPage(props: AccountPageProps) {
     orderBy: { createdAt: "desc" },
     include: {
       service: true,
-      plan: true,
+      plan: { include: { package: true } },
       slot: true,
       statusEvents: {
         orderBy: { createdAt: "desc" },
@@ -66,6 +68,21 @@ export default async function AccountPage(props: AccountPageProps) {
     },
   });
   const planMap = await loadPlanTitleMap(orders.flatMap((o) => o.extraPlanIds));
+  // What each order may do by itself: cancel, or upgrade to a higher plan
+  const selfService = new Map<string, { canCancel: boolean; cancelBlocked: string | null; choices: Array<{ id: string; title: string; pricePaise: number }>; upgradeBlocked: string | null }>();
+  await Promise.all(
+    orders.map(async (o) => {
+      const cb = cancelBlockReason(o, o.plan?.package?.startDate ?? null);
+      const ub = upgradeBlockReason(o);
+      const plans = ub ? [] : await upgradeChoices(o);
+      selfService.set(o.id, {
+        canCancel: !cb,
+        cancelBlocked: cb ? (isHindi ? cb.hi : cb.en) : null,
+        choices: plans.map((p) => ({ id: p.id, title: isHindi ? p.titleHi : p.titleEn, pricePaise: p.pricePaise })),
+        upgradeBlocked: ub ? (isHindi ? ub.hi : ub.en) : null,
+      });
+    }),
+  );
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-10 text-left space-y-8">
@@ -204,7 +221,9 @@ export default async function AccountPage(props: AccountPageProps) {
             {orders.map((order) => {
               const isPaid = order.paymentStatus === "PAID";
               const isAwaiting = order.paymentStatus === "AWAITING_VERIFICATION";
-              const isPending = order.paymentStatus === "PENDING" || order.paymentStatus === "FAILED";
+              const isCancelled = !!order.cancelledAt || order.paymentStatus === "REFUNDED";
+              const isPending = !isCancelled && (order.paymentStatus === "PENDING" || order.paymentStatus === "FAILED");
+              const ss = selfService.get(order.id);
 
               return (
                 <div
@@ -352,23 +371,6 @@ export default async function AccountPage(props: AccountPageProps) {
                         </>
                       )}
 
-                      {(isPaid || isAwaiting) && (
-                        <>
-                          <Link
-                            href={`/tickets?topic=upgrade&order=${encodeURIComponent(order.orderNumber)}`}
-                            className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-outline-variant text-on-surface font-semibold rounded flex items-center gap-1.5 transition-colors"
-                          >
-                            <span>{isHindi ? "प्लान अपग्रेड करें" : "Upgrade plan"}</span>
-                          </Link>
-                          <Link
-                            href={`/tickets?topic=refund&order=${encodeURIComponent(order.orderNumber)}`}
-                            className="min-h-[44px] px-3.5 py-2 bg-surface hover:bg-surface-container border border-error text-on-error-container font-semibold rounded flex items-center gap-1.5 transition-colors"
-                          >
-                            <span>{isHindi ? "रद्द / धनवापसी का अनुरोध" : "Cancel / refund request"}</span>
-                          </Link>
-                        </>
-                      )}
-
                       {isPending && (
                         <Link
                           href={`/booking/checkout/${order.id}`}
@@ -380,6 +382,37 @@ export default async function AccountPage(props: AccountPageProps) {
                       )}
                     </div>
                   </div>
+
+                  {isCancelled ? (
+                    <div className="rounded border border-outline-variant bg-surface-container-low p-3 text-xs space-y-1">
+                      <div className="font-bold text-on-error-container">
+                        {order.cancelledBy === "UPGRADE" ? (isHindi ? "अपग्रेड हो गया" : "Upgraded") : isHindi ? "ऑर्डर रद्द" : "Order cancelled"}
+                      </div>
+                      {order.refundStatus === "REQUESTED" && (
+                        <div>{isHindi ? `धनवापसी ${formatPaiseToInr(order.refundAmountPaise ?? 0)} — केंद्र की प्रक्रिया में (7 कार्यदिवस तक)।` : `Refund of ${formatPaiseToInr(order.refundAmountPaise ?? 0)} — being processed by the Kendra (up to 7 working days).`}</div>
+                      )}
+                      {order.refundStatus === "SENT" && (
+                        <div>{isHindi ? `${formatPaiseToInr(order.refundAmountPaise ?? 0)} वापस भेज दिए गए हैं।` : `${formatPaiseToInr(order.refundAmountPaise ?? 0)} has been refunded.`}</div>
+                      )}
+                      {order.refundStatus === "CREDITED" && (
+                        <div>{isHindi ? "भुगतान की गई राशि नए (अपग्रेड) ऑर्डर में जोड़ दी गई है।" : "The amount you paid was credited to your upgraded order."}</div>
+                      )}
+                    </div>
+                  ) : (
+                    ss &&
+                    (isPaid || isAwaiting || order.paymentStatus === "PENDING") && (
+                      <OrderSelfService
+                        orderId={order.id}
+                        isHindi={isHindi}
+                        canCancel={ss.canCancel}
+                        cancelBlocked={ss.cancelBlocked}
+                        upgradeChoices={ss.choices}
+                        upgradeBlocked={isPaid ? ss.upgradeBlocked : null}
+                        paidPaise={order.netAmountPaise}
+                        hasPaid={isPaid || isAwaiting}
+                      />
+                    )
+                  )}
                 </div>
               );
             })}

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Order, PaymentMode, PaymentStatus, Role } from "@prisma/client";
 import { isServerGeneratedPaymentProofUrl } from "./proof";
 import { settleCommission } from "@/lib/associates/service";
+import { settleUpgrade } from "@/lib/orders/selfService";
 import { sendNotification } from "@/lib/notifications";
 
 /** Best-effort payment confirmation email. Never throws. */
@@ -135,6 +136,7 @@ export async function markOrderPaid(
       },
     });
     await settleCommission(tx, orderId);
+    await settleUpgrade(tx, orderId);
     newlyPaid = true;
 
     await tx.orderStatusEvent.create({
@@ -289,6 +291,7 @@ export async function approveManualPayment(
       },
     });
     await settleCommission(tx, orderId);
+    await settleUpgrade(tx, orderId);
     newlyPaid = true;
 
     await tx.orderStatusEvent.create({
