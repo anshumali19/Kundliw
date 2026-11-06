@@ -218,6 +218,21 @@ export const SECTIONS: SectionDef[] = [
     ],
   },
   {
+    id: "packagePolicy",
+    en: "Package cancellation, refund & upgrade",
+    hi: "पैकेज रद्दीकरण, धनवापसी और अपग्रेड",
+    noteEn: "Shown under every package and plan, and printed in the package download. Change the wording to match your real policy.",
+    noteHi: "हर पैकेज और प्लान के नीचे और डाउनलोड में दिखता है। अपनी असली नीति के अनुसार शब्द बदलें।",
+    fields: [
+      { key: "cancelEn", en: "Service / package cancellation (English)", hi: "सेवा / पैकेज रद्दीकरण (अंग्रेज़ी)", type: "textarea", max: 1200, def: "Cancel before the consultation, report or ritual work has started and you can cancel from your dashboard or by raising a support ticket. Once work has started (kundli prepared, call scheduled or ritual begun) the booking cannot be cancelled. Packages with a fixed start date can be cancelled up to 48 hours before the start date." },
+      { key: "cancelHi", en: "Service / package cancellation (Hindi)", hi: "सेवा / पैकेज रद्दीकरण (हिंदी)", type: "textarea", max: 1200, def: "परामर्श, रिपोर्ट या अनुष्ठान का कार्य शुरू होने से पहले आप अपने डैशबोर्ड से या सपोर्ट टिकट बनाकर बुकिंग रद्द कर सकते हैं। कार्य शुरू हो जाने (कुंडली बन जाने, कॉल तय हो जाने या अनुष्ठान आरंभ होने) के बाद बुकिंग रद्द नहीं होगी। निश्चित प्रारंभ तिथि वाले पैकेज प्रारंभ तिथि से 48 घंटे पहले तक रद्द किए जा सकते हैं।" },
+      { key: "refundEn", en: "Refund (English)", hi: "धनवापसी (अंग्रेज़ी)", type: "textarea", max: 1200, def: "If you cancel in time, the amount you paid is refunded to the original payment method within 7 working days. If we cannot deliver the service, you get a full refund. Once a report or consultation has been delivered, the dakshina is not refundable. Details are in the Refund Policy page." },
+      { key: "refundHi", en: "Refund (Hindi)", hi: "धनवापसी (हिंदी)", type: "textarea", max: 1200, def: "समय पर रद्द करने पर भुगतान की गई राशि 7 कार्यदिवस के भीतर मूल भुगतान माध्यम में वापस की जाएगी। यदि हम सेवा उपलब्ध नहीं करा पाते, तो पूरी राशि वापस होगी। रिपोर्ट या परामर्श मिल जाने के बाद दक्षिणा वापस नहीं होगी। विस्तृत जानकारी धनवापसी नीति पेज पर है।" },
+      { key: "upgradeEn", en: "Plan upgrade (English)", hi: "प्लान अपग्रेड (अंग्रेज़ी)", type: "textarea", max: 1200, def: "You can upgrade to a higher plan of the same package at any time before the work is delivered. Raise a support ticket or call the Kendra, and you pay only the difference between the two plans. Downgrading to a cheaper plan is treated as a cancellation and refund under the policy above." },
+      { key: "upgradeHi", en: "Plan upgrade (Hindi)", hi: "प्लान अपग्रेड (हिंदी)", type: "textarea", max: 1200, def: "काम मिलने से पहले आप कभी भी उसी पैकेज के ऊँचे प्लान में अपग्रेड कर सकते हैं। सपोर्ट टिकट बनाएँ या केंद्र को कॉल करें; आपको केवल दोनों प्लान के बीच का अंतर देना होगा। सस्ते प्लान में जाना रद्दीकरण माना जाएगा और ऊपर की नीति के अनुसार धनवापसी होगी।" },
+    ],
+  },
+  {
     id: "mobileApp",
     en: "Mobile app",
     hi: "मोबाइल ऐप",

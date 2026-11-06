@@ -52,6 +52,7 @@ export interface ServiceDetailDTO {
   additionalLinks?: unknown;
   demos?: unknown;
   externalPay?: ExternalPay | null;
+  policy?: import("./PackageActions").PackagePolicy | null;
   packages?: PackageDetailDTO[];
   plans: Array<{
     id: string;
@@ -403,6 +404,7 @@ export function ServiceDetailView({
             serviceTitle={title}
             locale={locale}
             externalPay={service.externalPay ?? null}
+            policy={service.policy ?? null}
           />
         </div>
       </section>

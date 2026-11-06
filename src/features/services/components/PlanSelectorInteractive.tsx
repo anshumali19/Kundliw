@@ -3,6 +3,7 @@
 import { YouTubeEmbed } from "@/components/content/MediaView";
 import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
 import { PackageDetails, type PackageDetailDTO } from "./PackageDetails";
+import { PackageActions, PolicyBlock, type PackagePolicy } from "./PackageActions";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatPaiseToInr } from "@/lib/billing/gst";
@@ -55,6 +56,7 @@ interface PlanSelectorInteractiveProps {
   locale: string;
   /** Set when this service is paid for on another website */
   externalPay?: ExternalPay | null;
+  policy?: PackagePolicy | null;
 }
 
 interface AppliedCoupon {
@@ -72,6 +74,7 @@ export function PlanSelectorInteractive({
   serviceTitle,
   locale,
   externalPay = null,
+  policy = null,
 }: PlanSelectorInteractiveProps) {
   const isHindi = locale === "hi";
 
@@ -428,6 +431,16 @@ export function PlanSelectorInteractive({
           })}
         </div>
 
+        {selectedPlan && (
+          <PackageActions
+            pkg={packageList.find((k) => k.id === selectedPackageId && k.id !== "__none") ?? null}
+            plan={selectedPlan}
+            serviceTitle={serviceTitle}
+            isHindi={isHindi}
+            policy={policy}
+          />
+        )}
+
         {selectedPlan?.youtubeUrl && (
           <div className="mt-6 max-w-3xl text-left space-y-2">
             <h3 className="font-serif text-base font-bold text-secondary flex items-center gap-2">
@@ -556,6 +569,8 @@ export function PlanSelectorInteractive({
           </table>
         </div>
       </div>
+
+      <PolicyBlock policy={policy} isHindi={isHindi} />
 
       {/* 3. Server-Verified Coupon Promotion Section */}
       <div className="bg-surface-container p-6 rounded-lg border border-outline-variant/40 shadow-sm text-left">

@@ -3,6 +3,7 @@ import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/package
 import { activePlanWhere } from "@/lib/content/packages";
 import type { Metadata } from "next";
 import { externalPayOf } from "@/lib/content/externalPay";
+import { getSection } from "@/lib/siteConfig/service";
 import { notFound, redirect } from "next/navigation";
 import { KUNDLI_FALLBACK_PAGES } from "@/lib/content/ownKundli";
 import { prisma } from "@/lib/prisma";
@@ -118,6 +119,14 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     additionalLinks: service.additionalLinks,
     demos: service.demos,
     externalPay: externalPayOf(service),
+    policy: await getSection("packagePolicy").then((s) => ({
+      cancelEn: String(s.cancelEn ?? ""),
+      cancelHi: String(s.cancelHi ?? ""),
+      refundEn: String(s.refundEn ?? ""),
+      refundHi: String(s.refundHi ?? ""),
+      upgradeEn: String(s.upgradeEn ?? ""),
+      upgradeHi: String(s.upgradeHi ?? ""),
+    })).catch(() => null),
     packages: service.packages.map((k) => ({
       id: k.id,
       titleEn: k.titleEn,
