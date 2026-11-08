@@ -374,7 +374,7 @@ export async function Footer() {
           </div>
 
           {/* Col 5: Helpline & Support Contact */}
-          <div>
+          <div className="min-w-0">
             <div className="font-serif text-base lg:text-lg font-bold text-white mb-3 uppercase tracking-wider">
               {t("contactTitle")}
             </div>
@@ -395,7 +395,7 @@ export async function Footer() {
               )}
               {email && (
                 <li>
-                  <a href={`mailto:${email}`} className="hover:text-white hover:underline block">
+                  <a href={`mailto:${email}`} className="hover:text-white hover:underline block break-all">
                     {email}
                   </a>
                 </li>
