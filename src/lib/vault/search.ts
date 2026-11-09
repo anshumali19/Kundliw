@@ -10,9 +10,9 @@ export function userWhere(q: string, field: VaultSearchField): Prisma.UserWhereI
   const text = q.trim();
   if (!text) return {};
   const digits = text.replace(/\D/g, "");
-  const byId: Prisma.UserWhereInput = { id: { contains: text, mode: "insensitive" } };
-  const byName: Prisma.UserWhereInput = { name: { contains: text, mode: "insensitive" } };
-  const byEmail: Prisma.UserWhereInput = { email: { contains: text, mode: "insensitive" } };
+  const byId: Prisma.UserWhereInput = { id: { contains: text } };
+  const byName: Prisma.UserWhereInput = { name: { contains: text } };
+  const byEmail: Prisma.UserWhereInput = { email: { contains: text } };
   const byMobile: Prisma.UserWhereInput = digits.length >= 3 ? { phone: { contains: digits } } : { id: "__none__" };
   if (field === "id") return byId;
   if (field === "name") return byName;
@@ -28,7 +28,7 @@ export async function searchVault(q: string, field: VaultSearchField): Promise<{
     ? {
         OR: [
           { user: uw },
-          ...(field === "all" ? [{ titleEn: { contains: text, mode: "insensitive" as const } }, { titleHi: { contains: text, mode: "insensitive" as const } }, { fileName: { contains: text, mode: "insensitive" as const } }, { order: { orderNumber: { contains: text, mode: "insensitive" as const } } }] : []),
+          ...(field === "all" ? [{ titleEn: { contains: text } }, { titleHi: { contains: text } }, { fileName: { contains: text } }, { order: { orderNumber: { contains: text } } }] : []),
         ],
       }
     : {};

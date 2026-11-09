@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TX_OPTIONS } from "@/lib/db/tx";
 import { z } from "zod";
 import { AppointmentStatus } from "@prisma/client";
 import { guardApiAdmin } from "@/lib/auth/guards";
@@ -68,7 +69,7 @@ export async function PATCH(
         },
       });
       return { order: updated, previous: order };
-    });
+    }, TX_OPTIONS);
 
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: result.code });

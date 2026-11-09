@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { TX_OPTIONS } from "@/lib/db/tx";
+import { nextSequence } from "@/lib/db/counter";
 import { Order, PaymentMode, PaymentStatus, Role } from "@prisma/client";
 import { isServerGeneratedPaymentProofUrl } from "./proof";
 import { settleCommission } from "@/lib/associates/service";
@@ -117,12 +119,8 @@ export async function markOrderPaid(
     if (!invoiceNumber) {
       const year = new Date().getFullYear();
       const counterId = `INVOICE_${year}`;
-      const counter = await tx.counter.upsert({
-        where: { id: counterId },
-        update: { seq: { increment: 1 } },
-        create: { id: counterId, seq: 1 },
-      });
-      invoiceNumber = `INV-${year}-${String(counter.seq).padStart(4, "0")}`;
+      const seq = await nextSequence(tx, counterId);
+      invoiceNumber = `INV-${year}-${String(seq).padStart(4, "0")}`;
     }
 
     const updatedOrder = await tx.order.update({
@@ -149,7 +147,7 @@ export async function markOrderPaid(
     });
 
     return updatedOrder;
-  });
+  }, TX_OPTIONS);
   if (newlyPaid) await notifyPaymentConfirmed(orderId);
   return result;
 }
@@ -231,7 +229,7 @@ export async function submitManualPayment(
     });
 
     return updatedOrder;
-  });
+  }, TX_OPTIONS);
 }
 
 /**
@@ -275,12 +273,8 @@ export async function approveManualPayment(
     if (!invoiceNumber) {
       const year = new Date().getFullYear();
       const counterId = `INVOICE_${year}`;
-      const counter = await tx.counter.upsert({
-        where: { id: counterId },
-        update: { seq: { increment: 1 } },
-        create: { id: counterId, seq: 1 },
-      });
-      invoiceNumber = `INV-${year}-${String(counter.seq).padStart(4, "0")}`;
+      const seq = await nextSequence(tx, counterId);
+      invoiceNumber = `INV-${year}-${String(seq).padStart(4, "0")}`;
     }
 
     const updatedOrder = await tx.order.update({
@@ -304,7 +298,7 @@ export async function approveManualPayment(
     });
 
     return updatedOrder;
-  });
+  }, TX_OPTIONS);
   if (newlyPaid) await notifyPaymentConfirmed(orderId);
   return result;
 }
@@ -359,5 +353,5 @@ export async function rejectManualPayment(
     });
 
     return updatedOrder;
-  });
+  }, TX_OPTIONS);
 }

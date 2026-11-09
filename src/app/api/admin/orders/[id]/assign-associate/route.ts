@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TX_OPTIONS } from "@/lib/db/tx";
 import { z } from "zod";
 import { CommissionStatus, PaymentStatus } from "@prisma/client";
 import { guardApiAdmin } from "@/lib/auth/guards";
@@ -57,7 +58,7 @@ export async function POST(
           await cancelCommission(tx, id);
         }
       }
-    });
+    }, TX_OPTIONS);
 
     return NextResponse.json({ success: true });
   } catch (error) {

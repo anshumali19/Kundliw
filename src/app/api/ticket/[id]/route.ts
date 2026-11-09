@@ -8,6 +8,7 @@ import { escapeHtml } from "@/lib/billing/html";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { getSection } from "@/lib/siteConfig/service";
 import { loadInvoiceLogo } from "@/lib/billing/logo";
+import { toList } from "@/lib/db/lists";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       [hi ? "बुकिंग नंबर" : "Booking number", order.orderNumber],
       [hi ? "ग्राहक" : "Customer", customer],
       [hi ? "सेवा" : "Service", (hi ? order.service?.titleHi : order.service?.titleEn) || ""],
-      [hi ? "प्लान" : "Plan", bundleTitle(order, await loadPlanTitleMap(order.extraPlanIds), hi)],
+      [hi ? "प्लान" : "Plan", bundleTitle(order, await loadPlanTitleMap(toList(order.extraPlanIds)), hi)],
       [hi ? "भुगतान" : "Payment", String(order.paymentStatus).replace(/_/g, " ")],
     ];
     if (cfg.showAmount !== false) rows.push([hi ? "राशि" : "Amount", formatPaiseToInr(order.netAmountPaise)]);

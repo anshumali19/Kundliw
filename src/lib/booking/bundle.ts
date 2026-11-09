@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { toList } from "@/lib/db/lists";
 
 export interface PlanTitles {
   titleEn: string;
@@ -15,12 +16,12 @@ export async function loadPlanTitleMap(ids: string[] | null | undefined): Promis
 
 /** "Audio Basic + Video Premium": the first plan followed by any plans booked with it. */
 export function bundleTitle(
-  order: { plan?: PlanTitles | null; extraPlanIds?: string[] | null },
+  order: { plan?: PlanTitles | null; extraPlanIds?: unknown },
   map: Map<string, PlanTitles>,
   hindi: boolean,
   fallback = ""
 ): string {
   const pick = (t?: PlanTitles | null) => (t ? (hindi ? t.titleHi : t.titleEn) : "");
-  const names = [pick(order.plan), ...(order.extraPlanIds ?? []).map((id) => pick(map.get(id)))].filter(Boolean);
+  const names = [pick(order.plan), ...toList(order.extraPlanIds).map((id) => pick(map.get(id)))].filter(Boolean);
   return names.length ? names.join(" + ") : fallback;
 }

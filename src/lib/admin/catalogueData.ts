@@ -1,3 +1,4 @@
+import { toList } from "@/lib/db/lists";
 import { prisma } from "@/lib/prisma";
 import { bookedSeatsByPackage } from "@/lib/booking/packageAvailability";
 import type { AdminServiceItem, AdminOfferRef } from "@/features/admin/services/AdminServicesManager";
@@ -31,8 +32,8 @@ export async function loadAdminCatalogue(): Promise<{ servicesData: AdminService
     taglineHi: s.taglineHi,
     descriptionEn: s.descriptionEn,
     descriptionHi: s.descriptionHi,
-    highlightsEn: s.highlightsEn || [],
-    highlightsHi: s.highlightsHi || [],
+    highlightsEn: toList(s.highlightsEn),
+    highlightsHi: toList(s.highlightsHi),
     notesEn: s.notesEn,
     notesHi: s.notesHi,
     icon: s.icon,
@@ -62,12 +63,12 @@ export async function loadAdminCatalogue(): Promise<{ servicesData: AdminService
       seats: k.seats,
       booked: booked[k.id] ?? 0,
       itineraryDays: k.itineraryDays,
-      inclusionsEn: k.inclusionsEn,
-      inclusionsHi: k.inclusionsHi,
-      exclusionsEn: k.exclusionsEn,
-      exclusionsHi: k.exclusionsHi,
-      materialsEn: k.materialsEn,
-      materialsHi: k.materialsHi,
+      inclusionsEn: toList(k.inclusionsEn),
+      inclusionsHi: toList(k.inclusionsHi),
+      exclusionsEn: toList(k.exclusionsEn),
+      exclusionsHi: toList(k.exclusionsHi),
+      materialsEn: toList(k.materialsEn),
+      materialsHi: toList(k.materialsHi),
       youtubeUrl: k.youtubeUrl,
       imageUrl: k.imageUrl,
       additionalLinks: k.additionalLinks,
@@ -88,8 +89,8 @@ export async function loadAdminCatalogue(): Promise<{ servicesData: AdminService
       pages: p.pages,
       hasCall: p.hasCall,
       callDurationMinutes: p.callDurationMinutes,
-      featuresEn: p.featuresEn,
-      featuresHi: p.featuresHi,
+      featuresEn: toList(p.featuresEn),
+      featuresHi: toList(p.featuresHi),
       isPopular: p.isPopular,
       orderIndex: p.orderIndex,
       isActive: p.isActive,
@@ -99,5 +100,5 @@ export async function loadAdminCatalogue(): Promise<{ servicesData: AdminService
 
 
   const offers = await prisma.offer.findMany({ orderBy: { createdAt: "desc" }, select: { id: true, code: true, titleEn: true, titleHi: true, serviceSlugs: true, planIds: true, isActive: true } });
-  return { servicesData, offerRefs: offers };
+  return { servicesData, offerRefs: offers.map((o) => ({ ...o, serviceSlugs: toList(o.serviceSlugs), planIds: toList(o.planIds) })) };
 }

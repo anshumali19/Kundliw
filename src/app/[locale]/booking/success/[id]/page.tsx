@@ -1,3 +1,4 @@
+import { toList } from "@/lib/db/lists";
 import { BackBar } from "@/components/layout/BackBar";
 import { BookingSteps } from "@/components/booking/BookingSteps";
 import { HelpEmail } from "@/components/content/HelpEmail";
@@ -65,7 +66,7 @@ export default async function BookingSuccessPage(props: BookingSuccessPageProps)
     notFound();
   }
 
-  const planMap = await loadPlanTitleMap(order.extraPlanIds);
+  const planMap = await loadPlanTitleMap(toList(order.extraPlanIds));
   const jataka = (order.jatakaDetails as Record<string, unknown>) || {};
   const partner = jataka.partnerDetails as Record<string, unknown> | undefined;
 

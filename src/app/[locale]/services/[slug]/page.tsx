@@ -12,6 +12,7 @@ import { SITE_URL, absoluteUrl, localizedPath, pageAlternates } from "@/lib/seo"
 import { applyOffer } from "@/lib/offers/apply";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { ServiceDetailView, ServiceDetailDTO } from "@/features/services/components/ServiceDetailView";
+import { toList } from "@/lib/db/lists";
 
 
 interface ServiceDetailPageProps {
@@ -105,8 +106,8 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     taglineHi: service.taglineHi,
     descriptionEn: service.descriptionEn,
     descriptionHi: service.descriptionHi,
-    highlightsEn: service.highlightsEn,
-    highlightsHi: service.highlightsHi,
+    highlightsEn: toList(service.highlightsEn),
+    highlightsHi: toList(service.highlightsHi),
     notesEn: service.notesEn,
     notesHi: service.notesHi,
     icon: service.icon,
@@ -137,12 +138,12 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
       startDate: k.startDate ? k.startDate.toISOString() : null,
       endDate: k.endDate ? k.endDate.toISOString() : null,
       itineraryDays: k.itineraryDays,
-      inclusionsEn: k.inclusionsEn,
-      inclusionsHi: k.inclusionsHi,
-      exclusionsEn: k.exclusionsEn,
-      exclusionsHi: k.exclusionsHi,
-      materialsEn: k.materialsEn,
-      materialsHi: k.materialsHi,
+      inclusionsEn: toList(k.inclusionsEn),
+      inclusionsHi: toList(k.inclusionsHi),
+      exclusionsEn: toList(k.exclusionsEn),
+      exclusionsHi: toList(k.exclusionsHi),
+      materialsEn: toList(k.materialsEn),
+      materialsHi: toList(k.materialsHi),
       youtubeUrl: k.youtubeUrl,
       imageUrl: k.imageUrl,
       additionalLinks: k.additionalLinks,
@@ -162,8 +163,8 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
       pages: p.pages,
       hasCall: p.hasCall,
       callDurationMinutes: p.callDurationMinutes,
-      featuresEn: p.featuresEn,
-      featuresHi: p.featuresHi,
+      featuresEn: toList(p.featuresEn),
+      featuresHi: toList(p.featuresHi),
       programEn: p.programEn,
       programHi: p.programHi,
       preparationEn: p.preparationEn,

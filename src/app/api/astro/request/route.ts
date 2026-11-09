@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TX_OPTIONS } from "@/lib/db/tx";
 import { getCurrentUser } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { getNextOrderNumber } from "@/lib/booking/service";
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
       });
 
       return order;
-    });
+    }, TX_OPTIONS);
 
     return NextResponse.json({
       success: true,

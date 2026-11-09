@@ -11,6 +11,7 @@ import { getSection } from "@/lib/siteConfig/service";
 import { loadInvoiceLogo } from "@/lib/billing/logo";
 import { createHash } from "node:crypto";
 import { DEFAULT_INVOICE_TERMS, DEFAULT_INVOICE_FOOTER, type InvoiceOptions } from "@/lib/billing/invoicePdf";
+import { toList } from "@/lib/db/lists";
 
 export const dynamic = "force-dynamic";
 
@@ -95,7 +96,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
       customerPhone,
       customerEmail,
       serviceTitle: order.service?.titleEn || "Astrological Consultation",
-      planTitle: bundleTitle(order, await loadPlanTitleMap(order.extraPlanIds), false, "Standard Tier"),
+      planTitle: bundleTitle(order, await loadPlanTitleMap(toList(order.extraPlanIds)), false, "Standard Tier"),
       baseAmountPaise: order.baseAmountPaise,
       discountAmountPaise: order.discountAmountPaise,
       taxableAmountPaise: order.taxableAmountPaise,

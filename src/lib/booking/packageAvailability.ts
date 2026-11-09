@@ -43,7 +43,7 @@ export async function bookedSeatsByPackage(packageIds: string[]): Promise<Record
       const planIds = (await prisma.plan.findMany({ where: { packageId: id }, select: { id: true } })).map((x) => x.id);
       out[id] = await prisma.order.count({
         where: {
-          OR: [{ plan: { packageId: id } }, { extraPlanIds: { hasSome: planIds } }],
+          OR: [{ plan: { packageId: id } }, { extraPlans: { some: { planId: { in: planIds } } } }],
           paymentStatus: { notIn: ["FAILED", "REFUNDED"] },
         },
       });

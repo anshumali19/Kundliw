@@ -1,7 +1,6 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -96,12 +95,12 @@ enum MarqueePosition {
 
 model User {
   id            String    @id @default(cuid())
-  name          String?
+  name          String? @db.Text
   email         String?   @unique
   phone         String?   @unique
-  passwordHash  String?
+  passwordHash  String? @db.Text
   emailVerified DateTime?
-  image         String?
+  image         String? @db.Text
   role          Role      @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -117,16 +116,16 @@ model User {
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  type              String
+  type              String @db.Text
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String? @db.MediumText
+  access_token      String? @db.MediumText
   expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  token_type        String? @db.Text
+  scope             String? @db.Text
+  id_token          String? @db.MediumText
+  session_state     String? @db.Text
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -144,7 +143,7 @@ model VerificationToken {
 model OtpVerification {
   id         String    @id @default(cuid())
   phone      String
-  otpHash    String
+  otpHash    String @db.Text
   attempts   Int       @default(0)
   consumedAt DateTime?
   expiresAt  DateTime
@@ -156,30 +155,30 @@ model OtpVerification {
 model Service {
   id              String   @id @default(cuid())
   slug            String   @unique
-  titleEn         String
-  titleHi         String
-  taglineEn       String?
-  taglineHi       String?
-  descriptionEn   String   @db.Text
-  descriptionHi   String   @db.Text
-  highlightsEn    String[]
-  highlightsHi    String[]
-  notesEn         String?  @db.Text
-  notesHi         String?  @db.Text
-  icon            String?
-  imageUrl        String?
-  itineraryEn     String?  @db.Text
-  itineraryHi     String?  @db.Text
-  samagriEn       String?  @db.Text
-  samagriHi       String?  @db.Text
-  youtubeUrl      String?
+  titleEn         String @db.Text
+  titleHi         String @db.Text
+  taglineEn       String? @db.Text
+  taglineHi       String? @db.Text
+  descriptionEn   String   @db.MediumText
+  descriptionHi   String   @db.MediumText
+  highlightsEn    Json?
+  highlightsHi    Json?
+  notesEn         String?  @db.MediumText
+  notesHi         String?  @db.MediumText
+  icon            String? @db.Text
+  imageUrl        String? @db.Text
+  itineraryEn     String?  @db.MediumText
+  itineraryHi     String?  @db.MediumText
+  samagriEn       String?  @db.MediumText
+  samagriHi       String?  @db.MediumText
+  youtubeUrl      String? @db.Text
   additionalLinks Json? // Array of { labelEn: string, labelHi: string, url: string }
   /// Demos shown on the service page: [{ kind: link|image|video|social, labelEn, labelHi, url }]
   demos           Json?
   /// When set, this service is paid for on that other website, not here
-  externalPayUrl  String?
-  externalPayNoteEn String?
-  externalPayNoteHi String?
+  externalPayUrl  String? @db.Text
+  externalPayNoteEn String? @db.Text
+  externalPayNoteHi String? @db.Text
   orderIndex      Int      @default(0)
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -197,10 +196,10 @@ model ServicePackage {
   serviceId     String
   service       Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   slug          String
-  titleEn       String
-  titleHi       String
-  descriptionEn String?  @db.Text
-  descriptionHi String?  @db.Text
+  titleEn       String @db.Text
+  titleHi       String @db.Text
+  descriptionEn String?  @db.MediumText
+  descriptionHi String?  @db.MediumText
   numberOfDays  Int?
   startDate     DateTime?
   endDate       DateTime?
@@ -208,14 +207,14 @@ model ServicePackage {
   seats         Int?
   /// Day by day programme: [{ titleEn, titleHi, detailsEn, detailsHi }]
   itineraryDays Json?
-  inclusionsEn  String[] @default([])
-  inclusionsHi  String[] @default([])
-  exclusionsEn  String[] @default([])
-  exclusionsHi  String[] @default([])
-  materialsEn   String[] @default([])
-  materialsHi   String[] @default([])
-  youtubeUrl    String?
-  imageUrl      String?
+  inclusionsEn  Json?
+  inclusionsHi  Json?
+  exclusionsEn  Json?
+  exclusionsHi  Json?
+  materialsEn   Json?
+  materialsHi   Json?
+  youtubeUrl    String? @db.Text
+  imageUrl      String? @db.Text
   additionalLinks Json?
   orderIndex    Int      @default(0)
   isActive      Boolean  @default(true)
@@ -234,28 +233,28 @@ model Plan {
   packageId           String?
   package             ServicePackage? @relation(fields: [packageId], references: [id], onDelete: SetNull)
   slug                String
-  titleEn             String
-  titleHi             String
-  descriptionEn       String   @db.Text
-  descriptionHi       String   @db.Text
+  titleEn             String @db.Text
+  titleHi             String @db.Text
+  descriptionEn       String   @db.MediumText
+  descriptionHi       String   @db.MediumText
   pricePaise          Int // Price in paise (e.g. 110000 = Rs 1100.00)
   originalPricePaise  Int? // Strike-through original price in paise
   deliveryDays        Int      @default(3)
   pages               Int?
   hasCall             Boolean  @default(false)
   callDurationMinutes Int?
-  featuresEn          String[]
-  featuresHi          String[]
-  programEn           String?  @db.Text
-  programHi           String?  @db.Text
-  preparationEn       String?  @db.Text
-  preparationHi       String?  @db.Text
-  samagriEn           String?  @db.Text
-  samagriHi           String?  @db.Text
-  itineraryEn         String?  @db.Text
-  itineraryHi         String?  @db.Text
-  imageUrl            String?
-  youtubeUrl          String?
+  featuresEn          Json?
+  featuresHi          Json?
+  programEn           String?  @db.MediumText
+  programHi           String?  @db.MediumText
+  preparationEn       String?  @db.MediumText
+  preparationHi       String?  @db.MediumText
+  samagriEn           String?  @db.MediumText
+  samagriHi           String?  @db.MediumText
+  itineraryEn         String?  @db.MediumText
+  itineraryHi         String?  @db.MediumText
+  imageUrl            String? @db.Text
+  youtubeUrl          String? @db.Text
   additionalLinks     Json?
   isPopular           Boolean  @default(false)
   orderIndex          Int      @default(0)
@@ -271,8 +270,8 @@ model Plan {
 model Offer {
   id                 String       @id @default(cuid())
   code               String       @unique
-  titleEn            String
-  titleHi            String
+  titleEn            String @db.Text
+  titleHi            String @db.Text
   discountType       DiscountType @default(FLAT)
   discountValuePaise Int // Amount in paise for FLAT (e.g. 50000 for Rs 500) or integer percent for PERCENTAGE (e.g. 25)
   maxDiscountPaise   Int? // Max discount ceiling in paise
@@ -280,8 +279,8 @@ model Offer {
   usageLimit         Int?
   usedCount          Int          @default(0)
   perUserLimit       Int          @default(1) // 0 = unlimited uses per customer
-  serviceSlugs       String[]     @default([]) // empty = valid for every service
-  planIds            String[]     @default([]) // empty = valid for every plan of the chosen services
+  serviceSlugs       Json? // empty = valid for every service
+  planIds            Json? // empty = valid for every plan of the chosen services
   showOnPlan         Boolean      @default(false) // list this offer next to its plans so customers can tap to apply
   autoApply          Boolean      @default(false) // applied automatically at booking, no code needed
   showInPopup        Boolean      @default(true) // listed in the offers pop-up shown to visitors
@@ -303,10 +302,10 @@ model Order {
   planId      String?
   plan        Plan?       @relation(fields: [planId], references: [id])
   /// Further plans booked together with the first (same service, at most 2). Empty for a single-plan order.
-  extraPlanIds String[]   @default([])
+  extraPlanIds Json?
   offerId     String?
   offer       Offer?      @relation(fields: [offerId], references: [id])
-  offerCode   String? // Snapshot of coupon used
+  offerCode   String? @db.Text // Snapshot of coupon used
   slotId      String?
   slot        Slot?       @relation(fields: [slotId], references: [id])
   requestType RequestType @default(SERVICE_BOOKING)
@@ -325,46 +324,49 @@ model Order {
   gstAmountPaise      Int
   netAmountPaise      Int
   invoiceNumber       String? @unique // Sequential e.g. "INV-2026-0001"
-  gstin               String? // Snapshot of Kendra GSTIN at order time
+  gstin               String? @db.Text // Snapshot of Kendra GSTIN at order time
 
   // Payment
   paymentMode        PaymentMode   @default(RAZORPAY)
   paymentStatus      PaymentStatus @default(PENDING)
   idempotencyKey     String?       @unique
   expiresAt          DateTime?
-  rejectionReason    String?       @db.Text
-  razorpayOrderId    String?
-  razorpayPaymentId  String?
-  razorpaySignature  String?
-  manualPaymentProof String?
-  manualPaymentRef   String?
+  rejectionReason    String?       @db.MediumText
+  razorpayOrderId    String? @db.Text
+  razorpayPaymentId  String? @db.Text
+  razorpaySignature  String? @db.Text
+  manualPaymentProof String? @db.Text
+  manualPaymentRef   String? @db.Text
 
   // Associate referral attribution and appointment approval
   associateId       String?
   associate         AssociateProfile?  @relation(fields: [associateId], references: [id], onDelete: SetNull)
   commission        Commission?
   appointmentStatus AppointmentStatus?
-  appointmentNote   String?            @db.Text
+  appointmentNote   String?            @db.MediumText
 
   /// Cancellation and refund (the money itself is sent by the Kendra from its payment account)
   cancelledAt        DateTime?
-  cancelReason       String?   @db.Text
+  cancelReason       String?   @db.MediumText
   /// USER, ADMIN or UPGRADE
-  cancelledBy        String?
+  cancelledBy        String? @db.Text
   /// REQUESTED (waiting for the Kendra), SENT, or CREDITED (moved to an upgraded order)
-  refundStatus       String?
+  refundStatus       String? @db.Text
   refundAmountPaise  Int?
   refundedAt         DateTime?
   /// Set on an order that upgrades an earlier order to a higher plan
   upgradeFromOrderId String?
 
-  courierName    String?
-  trackingNumber String?
-  adminNotes     String?  @db.Text
+  courierName    String? @db.Text
+  trackingNumber String? @db.Text
+  adminNotes     String?  @db.MediumText
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   vaultFiles VaultFile[]
+  /// One row per extra plan bought together with the first. Lets the package seat count use an index
+  /// (MySQL cannot search inside a list column). Kept in step with extraPlanIds by createBookingOrder.
+  extraPlans OrderExtraPlan[]
 
   @@index([userId])
   @@index([status])
@@ -372,12 +374,21 @@ model Order {
   @@index([upgradeFromOrderId])
 }
 
+model OrderExtraPlan {
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  planId  String
+
+  @@id([orderId, planId])
+  @@index([planId])
+}
+
 model OrderStatusEvent {
   id          String      @id @default(cuid())
   orderId     String
   order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
   status      OrderStatus
-  note        String?
+  note        String? @db.Text
   changedById String?
   changedBy   User?       @relation(fields: [changedById], references: [id], onDelete: SetNull)
   createdAt   DateTime    @default(now())
@@ -388,8 +399,8 @@ model OrderStatusEvent {
 model Slot {
   id          String   @id @default(cuid())
   date        DateTime // Slot calendar date
-  startTime   String // e.g. "10:00"
-  endTime     String // e.g. "10:30"
+  startTime   String @db.Text // e.g. "10:00"
+  endTime     String @db.Text // e.g. "10:30"
   capacity    Int      @default(1)
   bookedCount Int      @default(0)
   isActive    Boolean  @default(true)
@@ -407,15 +418,15 @@ model AssociateProfile {
   user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   referralCode          String          @unique
   status                AssociateStatus @default(PENDING)
-  rejectionReason       String?         @db.Text
+  rejectionReason       String?         @db.MediumText
   reviewedAt            DateTime?
-  notes                 String?         @db.Text
+  notes                 String?         @db.MediumText
   customCommissionType  DiscountType?
   customCommissionValue Int?
-  payoutUpi             String?
-  payoutAccountHolder   String?
-  payoutAccountNumber   String?
-  payoutIfsc            String?
+  payoutUpi             String? @db.Text
+  payoutAccountHolder   String? @db.Text
+  payoutAccountNumber   String? @db.Text
+  payoutIfsc            String? @db.Text
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @updatedAt
 
@@ -463,8 +474,8 @@ model PayoutRequest {
   associate        AssociateProfile @relation(fields: [associateId], references: [id], onDelete: Cascade)
   amountPaise      Int
   status           PayoutStatus     @default(REQUESTED)
-  note             String?          @db.Text
-  paymentReference String?
+  note             String?          @db.MediumText
+  paymentReference String? @db.Text
   createdAt        DateTime         @default(now())
   processedAt      DateTime?
   commissions      Commission[]
@@ -480,7 +491,7 @@ model Counter {
 model ProcessedWebhookEvent {
   id          String   @id @default(cuid())
   eventId     String   @unique
-  eventType   String
+  eventType   String @db.Text
   processedAt DateTime @default(now())
 }
 
@@ -490,10 +501,10 @@ model VaultFile {
   order          Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  titleEn        String
-  titleHi        String
-  fileName       String
-  storageKey     String // Internal private storage path
+  titleEn        String @db.Text
+  titleHi        String @db.Text
+  fileName       String @db.Text
+  storageKey     String @db.Text // Internal private storage path
   fileSize       Int
   mimeType       String   @default("application/pdf")
   uploadedByRole String   @default("ADMIN") // ADMIN, USER or ASSOCIATE
@@ -517,76 +528,76 @@ model RateLimit {
 
 model AdminSettings {
   id                       String   @id @default("default")
-  siteNameEn               String?
-  siteNameHi               String?
-  phone1                   String?
-  phone2                   String?
-  email                    String?
-  addressEn                String?  @db.Text
-  addressHi                String?  @db.Text
-  city                     String?
+  siteNameEn               String? @db.Text
+  siteNameHi               String? @db.Text
+  phone1                   String? @db.Text
+  phone2                   String? @db.Text
+  email                    String? @db.Text
+  addressEn                String?  @db.MediumText
+  addressHi                String?  @db.MediumText
+  city                     String? @db.Text
   latitude                 Float?
   longitude                Float?
-  timezone                 String?
-  upiVpa                   String?
-  bankAccountName          String?
-  bankAccountNumber        String?
-  bankIfsc                 String?
-  bankName                 String?
-  qrCodeUrl                String?
-  gstin                    String?
+  timezone                 String? @db.Text
+  upiVpa                   String? @db.Text
+  bankAccountName          String? @db.Text
+  bankAccountNumber        String? @db.Text
+  bankIfsc                 String? @db.Text
+  bankName                 String? @db.Text
+  qrCodeUrl                String? @db.Text
+  gstin                    String? @db.Text
   defaultGstRateBps        Int?     @default(1800)
-  socialFacebook           String?
-  socialTwitter            String?
-  socialInstagram          String?
-  socialYoutube            String?
-  socialWhatsapp           String?
-  socialTelegram           String?
-  googleMapEmbedUrl        String?  @db.Text
-  googleAnalyticsId        String?
+  socialFacebook           String? @db.Text
+  socialTwitter            String? @db.Text
+  socialInstagram          String? @db.Text
+  socialYoutube            String? @db.Text
+  socialWhatsapp           String? @db.Text
+  socialTelegram           String? @db.Text
+  googleMapEmbedUrl        String?  @db.MediumText
+  googleAnalyticsId        String? @db.Text
   // Encrypted Third-Party Credentials (Encrypted at rest with AES-256-GCM)
-  encRazorpayKeyId         String?
-  encRazorpayKeySecret     String?
-  encRazorpayWebhookSecret String?
-  encMsg91AuthKey          String?
-  encMsg91SenderId         String?
-  encMsg91OtpTemplateId    String?
-  encSmtpHost              String?
+  encRazorpayKeyId         String? @db.Text
+  encRazorpayKeySecret     String? @db.Text
+  encRazorpayWebhookSecret String? @db.Text
+  encMsg91AuthKey          String? @db.Text
+  encMsg91SenderId         String? @db.Text
+  encMsg91OtpTemplateId    String? @db.Text
+  encSmtpHost              String? @db.Text
   encSmtpPort              Int?
-  encSmtpUser              String?
-  encSmtpPass              String?
-  encSmtpFrom              String?
-  encGoogleClientId        String?
-  encGoogleClientSecret    String?
-  encFacebookAppId         String?
-  encFacebookAppSecret     String?
-  encAstrosageUserId       String?
-  encAstrosageApiKey       String?
-  encWhatsappAccessToken   String?
-  encWhatsappPhoneNumberId String?
-  encWhatsappVerifyToken   String?
-  encWhatsappAppSecret     String?
+  encSmtpUser              String? @db.Text
+  encSmtpPass              String? @db.Text
+  encSmtpFrom              String? @db.Text
+  encGoogleClientId        String? @db.Text
+  encGoogleClientSecret    String? @db.Text
+  encFacebookAppId         String? @db.Text
+  encFacebookAppSecret     String? @db.Text
+  encAstrosageUserId       String? @db.Text
+  encAstrosageApiKey       String? @db.Text
+  encWhatsappAccessToken   String? @db.Text
+  encWhatsappPhoneNumberId String? @db.Text
+  encWhatsappVerifyToken   String? @db.Text
+  encWhatsappAppSecret     String? @db.Text
   /// When on, visitors see a "back soon" page; the admin and the sign-in pages keep working
   maintenanceMode          Boolean  @default(false)
-  maintenanceMessageEn     String?
-  maintenanceMessageHi     String?
-  astrosageEmbedUrl        String?  @default("https://www.astrosage.com/freekundli/")
+  maintenanceMessageEn     String? @db.Text
+  maintenanceMessageHi     String? @db.Text
+  astrosageEmbedUrl        String? @db.VarChar(1000)  @default("https://www.astrosage.com/freekundli/")
   // Android app download section (website page and QR code)
-  appDownloadUrl           String?
+  appDownloadUrl           String? @db.Text
   // Map shown on the Contact page and footer (admin chooses the place)
   mapEnabled               Boolean  @default(true)
   mapZoom                  Int      @default(15)
   mapLatitude              Float?
   mapLongitude             Float?
-  mapLabelEn               String?
-  mapLabelHi               String?
+  mapLabelEn               String? @db.Text
+  mapLabelHi               String? @db.Text
   // Associate programme rules
   associatesEnabled        Boolean  @default(true)
   associateAutoApprove     Boolean  @default(false)
   associateMinPayoutPaise  Int      @default(50000)
   associateReferralDays    Int      @default(30)
-  associateTermsEn         String?  @db.Text
-  associateTermsHi         String?  @db.Text
+  associateTermsEn         String?  @db.MediumText
+  associateTermsHi         String?  @db.MediumText
   // Backups
   backupAutoEnabled        Boolean  @default(true)
   backupKeepDaily          Int      @default(7)
@@ -594,21 +605,21 @@ model AdminSettings {
   backupKeepMonthly        Int      @default(12)
   // Chatbot Settings
   chatbotEnabled           Boolean  @default(true)
-  chatbotWelcomeEn         String?  @db.Text
-  chatbotWelcomeHi         String?  @db.Text
-  whatsappNumber           String?
+  chatbotWelcomeEn         String?  @db.MediumText
+  chatbotWelcomeHi         String?  @db.MediumText
+  whatsappNumber           String? @db.Text
   updatedAt                DateTime @updatedAt
 }
 
 model ChatbotQA {
   id           String   @id @default(cuid())
-  questionEn   String   @db.Text
-  questionHi   String   @db.Text
-  answerEn     String   @db.Text
-  answerHi     String   @db.Text
-  keywords     String[] // Search tokens, e.g. ["pricing", "fees", "dakshina"]
-  quickReplyEn String? // Chip button text
-  quickReplyHi String?
+  questionEn   String   @db.MediumText
+  questionHi   String   @db.MediumText
+  answerEn     String   @db.MediumText
+  answerHi     String   @db.MediumText
+  keywords     Json? // Search tokens, e.g. ["pricing", "fees", "dakshina"]
+  quickReplyEn String? @db.Text // Chip button text
+  quickReplyHi String? @db.Text
   category     String   @default("GENERAL") // GENERAL, SERVICES, MUHURTA, KUNDLI, CONTACT
   orderIndex   Int      @default(0)
   isActive     Boolean  @default(true)
@@ -620,11 +631,11 @@ model ChatbotQA {
 
 model ContactEnquiry {
   id         String   @id @default(cuid())
-  name       String
-  email      String?
-  phone      String
-  subject    String?
-  message    String   @db.Text
+  name       String @db.Text
+  email      String? @db.Text
+  phone      String @db.Text
+  subject    String? @db.Text
+  message    String   @db.MediumText
   source     String   @default("CONTACT_PAGE") // CONTACT_PAGE, CHATBOT_TICKET, SERVICE_MODAL
   isResolved Boolean  @default(false)
   /// Lead stage: NEW, CONTACTED or CLOSED (CLOSED also sets isResolved)
@@ -637,12 +648,12 @@ model ContactEnquiry {
 
 model MarqueeItem {
   id           String          @id @default(cuid())
-  textEn       String
-  textHi       String
+  textEn       String @db.Text
+  textHi       String @db.Text
   speedSec     Int             @default(30)
   fontSize     Int             @default(13) // px
-  bgColor      String          @default("var(--secondary)")
-  textColor    String          @default("var(--on-secondary)")
+  bgColor      String @db.VarChar(100)          @default("var(--secondary)")
+  textColor    String @db.VarChar(100)          @default("var(--on-secondary)")
   position     MarqueePosition @default(BOTTOM)
   isActive     Boolean         @default(true)
   pauseOnHover Boolean         @default(true)
@@ -653,12 +664,12 @@ model MarqueeItem {
 
 model Banner {
   id         String         @id @default(cuid())
-  titleEn    String
-  titleHi    String
-  subtitleEn String?
-  subtitleHi String?
-  imageUrl   String
-  linkUrl    String?
+  titleEn    String @db.Text
+  titleHi    String @db.Text
+  subtitleEn String? @db.Text
+  subtitleHi String? @db.Text
+  imageUrl   String @db.Text
+  linkUrl    String? @db.Text
   position   BannerPosition @default(RIGHT)
   type       BannerType     @default(STATIC)
   isActive   Boolean        @default(true)
@@ -669,14 +680,14 @@ model Banner {
 model BlogPost {
   id              String    @id @default(cuid())
   slug            String    @unique
-  titleEn         String
-  titleHi         String
-  excerptEn       String?   @db.Text
-  excerptHi       String?   @db.Text
-  contentEn       String    @db.Text
-  contentHi       String    @db.Text
-  coverImage      String?
-  youtubeUrl      String?
+  titleEn         String @db.Text
+  titleHi         String @db.Text
+  excerptEn       String?   @db.MediumText
+  excerptHi       String?   @db.MediumText
+  contentEn       String    @db.MediumText
+  contentHi       String    @db.MediumText
+  coverImage      String? @db.Text
+  youtubeUrl      String? @db.Text
   additionalLinks Json? // Array of { labelEn: string, labelHi: string, url: string }
   isPublished     Boolean   @default(false)
   publishedAt     DateTime?
@@ -687,30 +698,30 @@ model BlogPost {
 model OtherService {
   id              String   @id @default(cuid())
   slug            String   @unique
-  titleEn         String
-  titleHi         String
-  taglineEn       String?
-  taglineHi       String?
-  descriptionEn   String   @db.Text
-  descriptionHi   String   @db.Text
-  imageUrl        String?
-  actionUrl       String?
+  titleEn         String @db.Text
+  titleHi         String @db.Text
+  taglineEn       String? @db.Text
+  taglineHi       String? @db.Text
+  descriptionEn   String   @db.MediumText
+  descriptionHi   String   @db.MediumText
+  imageUrl        String? @db.Text
+  actionUrl       String? @db.Text
   /// Slug of a bookable Service whose packages, plans and offers this card uses (empty = plain link card)
-  serviceSlug     String?
-  actionTextEn    String?  @default("Visit Portal / Learn More")
-  actionTextHi    String?  @default("पोर्टल पर जाएं / विवरण देखें")
+  serviceSlug     String? @db.Text
+  actionTextEn    String? @db.VarChar(500)  @default("Visit Portal / Learn More")
+  actionTextHi    String? @db.VarChar(500)  @default("पोर्टल पर जाएं / विवरण देखें")
   /// Nature of the service, for example "Pilgrimage tour" or "Matrimonial platform"
-  natureEn        String?
-  natureHi        String?
+  natureEn        String? @db.Text
+  natureHi        String? @db.Text
   numberOfDays    Int?
   startDate       DateTime?
   endDate         DateTime?
   /// Day by day programme: [{ titleEn, titleHi, detailsEn, detailsHi }]
   itineraryDays   Json?
-  facebookUrl     String?
-  whatsappGroupUrl String?
+  facebookUrl     String? @db.Text
+  whatsappGroupUrl String? @db.Text
   demos           Json?
-  youtubeUrl      String?
+  youtubeUrl      String? @db.Text
   additionalLinks Json?
   orderIndex      Int      @default(0)
   isActive        Boolean  @default(true)
@@ -720,18 +731,18 @@ model OtherService {
 
 model Testimonial {
   id              String   @id @default(cuid())
-  authorNameEn    String
-  authorNameHi    String
-  authorTitleEn   String
-  authorTitleHi   String
-  cityEn          String
-  cityHi          String
-  quoteEn         String   @db.Text
-  quoteHi         String   @db.Text
+  authorNameEn    String @db.Text
+  authorNameHi    String @db.Text
+  authorTitleEn   String @db.Text
+  authorTitleHi   String @db.Text
+  cityEn          String @db.Text
+  cityHi          String @db.Text
+  quoteEn         String   @db.MediumText
+  quoteHi         String   @db.MediumText
   rating          Int      @default(5)
   isVerified      Boolean  @default(true)
-  photoUrl        String?
-  youtubeUrl      String?
+  photoUrl        String? @db.Text
+  youtubeUrl      String? @db.Text
   additionalLinks Json?
   isActive        Boolean  @default(true)
   orderIndex      Int      @default(0)
@@ -740,14 +751,14 @@ model Testimonial {
 
 model MediaGalleryItem {
   id              String   @id @default(cuid())
-  titleEn         String
-  titleHi         String
-  captionEn       String?
-  captionHi       String?
-  imageUrl        String
-  videoUrl        String?
+  titleEn         String @db.Text
+  titleHi         String @db.Text
+  captionEn       String? @db.Text
+  captionHi       String? @db.Text
+  imageUrl        String @db.Text
+  videoUrl        String? @db.Text
   mediaType       String   @default("IMAGE") // IMAGE, VIDEO, YOUTUBE
-  externalLink    String?
+  externalLink    String? @db.Text
   additionalLinks Json?
   isActive        Boolean  @default(true)
   orderIndex      Int      @default(0)
@@ -756,30 +767,30 @@ model MediaGalleryItem {
 
 model FounderProfile {
   id              String   @id @default("default")
-  nameEn          String   @default("Founder Name")
-  nameHi          String   @default("संस्थापक का नाम")
-  designationEn   String   @default("Founder & Chief Astrologer")
-  designationHi   String   @default("संस्थापक एवं मुख्य ज्योतिषाचार्य")
-  roleEn          String   @default("Vedic Astrological Guidance & Direction")
-  roleHi          String   @default("वैदिक ज्योतिष मार्गदर्शन एवं दिशा-निर्देशन")
-  photoUrl        String?
-  bioEn           String   @db.Text
-  bioHi           String   @db.Text
-  youtubeUrl      String?
+  nameEn          String @db.VarChar(500)   @default("Founder Name")
+  nameHi          String @db.VarChar(500)   @default("संस्थापक का नाम")
+  designationEn   String @db.VarChar(500)   @default("Founder & Chief Astrologer")
+  designationHi   String @db.VarChar(500)   @default("संस्थापक एवं मुख्य ज्योतिषाचार्य")
+  roleEn          String @db.VarChar(500)   @default("Vedic Astrological Guidance & Direction")
+  roleHi          String @db.VarChar(500)   @default("वैदिक ज्योतिष मार्गदर्शन एवं दिशा-निर्देशन")
+  photoUrl        String? @db.Text
+  bioEn           String   @db.MediumText
+  bioHi           String   @db.MediumText
+  youtubeUrl      String? @db.Text
   additionalLinks Json? // Array of { labelEn: string, labelHi: string, url: string }
   blocks          Json?
-  footerNoteEn    String?  @db.Text
-  footerNoteHi    String?  @db.Text
+  footerNoteEn    String?  @db.MediumText
+  footerNoteHi    String?  @db.MediumText
   isActive        Boolean  @default(true)
   updatedAt       DateTime @updatedAt
 }
 
 model FaqItem {
   id         String   @id @default(cuid())
-  questionEn String
-  questionHi String
-  answerEn   String   @db.Text
-  answerHi   String   @db.Text
+  questionEn String @db.Text
+  questionHi String @db.Text
+  answerEn   String   @db.MediumText
+  answerHi   String   @db.MediumText
   category   String   @default("GENERAL") // GENERAL, KUNDLI, PUJA, PAYMENT
   orderIndex Int      @default(0)
   isActive   Boolean  @default(true)
@@ -792,16 +803,16 @@ model FaqItem {
 model StaticPage {
   id           String   @id @default(cuid())
   slug         String   @unique
-  titleEn      String
-  titleHi      String
-  contentEn    String   @db.Text
-  contentHi    String   @db.Text
+  titleEn      String @db.Text
+  titleHi      String @db.Text
+  contentEn    String   @db.MediumText
+  contentHi    String   @db.MediumText
   blocks       Json?
   isActive     Boolean  @default(true)
   showInFooter Boolean  @default(false)
   showInMenu   Boolean  @default(false)
-  metaDescEn   String?  @db.Text
-  metaDescHi   String?  @db.Text
+  metaDescEn   String?  @db.MediumText
+  metaDescHi   String?  @db.MediumText
   updatedAt    DateTime @updatedAt
 }
 
@@ -820,7 +831,7 @@ model TranslationOverride {
   locale    String // "hi" or "en"
   namespace String // e.g. "nav", "common", "footer", "home", "services", "booking", etc.
   key       String // e.g. "book_consultation" or deep dot path "steps.step1"
-  value     String   @db.Text
+  value     String   @db.MediumText
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -832,14 +843,14 @@ model TranslationOverride {
 model Credential {
   id             String   @id @default(cuid())
   kind           String   @default("OTHER") // GST, MSME, TRADEMARK, ISO, OTHER
-  titleEn        String
-  titleHi        String
-  descriptionEn  String?  @db.Text
-  descriptionHi  String?  @db.Text
-  documentNumber String?
-  fileUrl        String
-  fileName       String
-  mimeType       String
+  titleEn        String @db.Text
+  titleHi        String @db.Text
+  descriptionEn  String?  @db.MediumText
+  descriptionHi  String?  @db.MediumText
+  documentNumber String? @db.Text
+  fileUrl        String @db.Text
+  fileName       String @db.Text
+  mimeType       String @db.Text
   isActive       Boolean  @default(true)
   orderIndex     Int      @default(0)
   createdAt      DateTime @default(now())
@@ -854,7 +865,7 @@ model BackupRecord {
   tables    Int      @default(0)
   rows      Int      @default(0)
   data      Bytes
-  createdBy String?
+  createdBy String? @db.Text
   createdAt DateTime @default(now())
 
   @@index([kind, createdAt])
@@ -869,13 +880,13 @@ model SiteConfig {
 
 model TeamMember {
   id         String   @id @default(cuid())
-  nameEn     String
-  nameHi     String
-  roleEn     String
-  roleHi     String
-  bioEn      String?  @db.Text
-  bioHi      String?  @db.Text
-  photoUrl   String?
+  nameEn     String @db.Text
+  nameHi     String @db.Text
+  roleEn     String @db.Text
+  roleHi     String @db.Text
+  bioEn      String?  @db.MediumText
+  bioHi      String?  @db.MediumText
+  photoUrl   String? @db.Text
   orderIndex Int      @default(0)
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
@@ -887,9 +898,9 @@ model WhatsAppMessage {
   id           String   @id @default(cuid())
   waMessageId  String?  @unique
   contactPhone String
-  contactName  String?
-  direction    String // IN, OUT
-  body         String   @db.Text
+  contactName  String? @db.Text
+  direction    String @db.Text // IN, OUT
+  body         String   @db.MediumText
   status       String   @default("RECEIVED") // RECEIVED, SENT, FAILED
   createdAt    DateTime @default(now())
 
@@ -899,16 +910,16 @@ model WhatsAppMessage {
 /// Sister services desk: Vindhya Vivah Sanskar (matrimony) profiles awaiting or holding approval
 model MatrimonyProfile {
   id           String    @id @default(cuid())
-  name         String
-  phone        String
+  name         String @db.Text
+  phone        String @db.Text
   gender       String    @default("FEMALE") // MALE, FEMALE
-  dob          String?
-  city         String?
-  about        String?   @db.Text
+  dob          String? @db.Text
+  city         String? @db.Text
+  about        String?   @db.MediumText
   status       String    @default("PENDING") // PENDING, APPROVED, REJECTED
   isPaidMember Boolean   @default(false)
   paidUntil    DateTime?
-  notes        String?   @db.Text
+  notes        String?   @db.MediumText
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -918,11 +929,11 @@ model MatrimonyProfile {
 /// Sister services desk: Bharat Darshan vehicles and their drivers
 model TravelVehicle {
   id          String   @id @default(cuid())
-  name        String
-  number      String
+  name        String @db.Text
+  number      String @db.Text
   seats       Int      @default(4)
-  driverName  String?
-  driverPhone String?
+  driverName  String? @db.Text
+  driverPhone String? @db.Text
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -933,15 +944,15 @@ model TravelVehicle {
 /// Sister services desk: Bharat Darshan pilgrimage and tour requests
 model TravelRequest {
   id          String         @id @default(cuid())
-  name        String
-  phone       String
-  destination String
+  name        String @db.Text
+  phone       String @db.Text
+  destination String @db.Text
   travelDate  DateTime?
   passengers  Int            @default(1)
   vehicleId   String?
   vehicle     TravelVehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   status      String         @default("NEW") // NEW, CONFIRMED, ONGOING, COMPLETED, CANCELLED
-  notes       String?        @db.Text
+  notes       String?        @db.MediumText
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
@@ -951,14 +962,14 @@ model TravelRequest {
 /// Sister services desk: ITR help desk, one row per document set a client submits
 model TaxCase {
   id             String   @id @default(cuid())
-  clientName     String
-  phone          String
-  assessmentYear String
-  docType        String
-  documentUrl    String?
+  clientName     String @db.Text
+  phone          String @db.Text
+  assessmentYear String @db.Text
+  docType        String @db.Text
+  documentUrl    String? @db.Text
   filingStatus   String   @default("RECEIVED") // RECEIVED, IN_PROGRESS, FILED, ACKNOWLEDGED
-  ackNumber      String?
-  notes          String?  @db.Text
+  ackNumber      String? @db.Text
+  notes          String?  @db.MediumText
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -971,13 +982,13 @@ model SupportTicket {
   ticketNumber String   @unique
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject      String
-  orderNumber  String? // optional: the order the question is about
-  topic        String? // the ready-made question the customer picked, if any
-  contactName    String?
-  contactEmail   String?
-  contactPhone   String?
-  contactAddress String?
+  subject      String @db.Text
+  orderNumber  String? @db.Text // optional: the order the question is about
+  topic        String? @db.Text // the ready-made question the customer picked, if any
+  contactName    String? @db.Text
+  contactEmail   String? @db.Text
+  contactPhone   String? @db.Text
+  contactAddress String? @db.Text
   status       String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -993,7 +1004,7 @@ model SupportTicketMessage {
   ticketId  String
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   fromAdmin Boolean       @default(false)
-  body      String        @db.Text
+  body      String        @db.MediumText
   createdAt DateTime      @default(now())
 
   @@index([ticketId, createdAt])

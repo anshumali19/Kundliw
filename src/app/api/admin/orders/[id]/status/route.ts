@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TX_OPTIONS } from "@/lib/db/tx";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { isValidStatusTransition } from "@/lib/orders/status";
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest, props: { params: Promise<{ id: 
       });
 
       return u;
-    });
+    }, TX_OPTIONS);
 
     return NextResponse.json({
       success: true,

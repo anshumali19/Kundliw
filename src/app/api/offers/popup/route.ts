@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSection } from "@/lib/siteConfig/service";
 import { formatPaiseToInr } from "@/lib/billing/gst";
+import { toList } from "@/lib/db/lists";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,7 @@ export async function GET() {
     });
     const live = rows.filter((o) => o.usageLimit == null || o.usedCount < o.usageLimit).slice(0, max);
 
-    const slugs = Array.from(new Set(live.flatMap((o) => o.serviceSlugs)));
+    const slugs = Array.from(new Set(live.flatMap((o) => toList(o.serviceSlugs))));
     const services = slugs.length
       ? await prisma.service.findMany({ where: { slug: { in: slugs } }, select: { slug: true, titleEn: true, titleHi: true } })
       : [];
@@ -46,8 +47,8 @@ export async function GET() {
       minOrder: o.minOrderValuePaise > 0 ? formatPaiseToInr(o.minOrderValuePaise) : "",
       validUntil: o.validUntil ? o.validUntil.toISOString().slice(0, 10) : "",
       auto: o.autoApply,
-      appliesToEn: o.serviceSlugs.map((s) => byslug.get(s)?.titleEn).filter(Boolean).join(", "),
-      appliesToHi: o.serviceSlugs.map((s) => byslug.get(s)?.titleHi).filter(Boolean).join(", "),
+      appliesToEn: toList(o.serviceSlugs).map((s) => byslug.get(s)?.titleEn).filter(Boolean).join(", "),
+      appliesToHi: toList(o.serviceSlugs).map((s) => byslug.get(s)?.titleHi).filter(Boolean).join(", "),
     }));
 
     return NextResponse.json({

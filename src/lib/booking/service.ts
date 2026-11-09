@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { TX_OPTIONS } from "@/lib/db/tx";
+import { nextSequence } from "@/lib/db/counter";
 import { CreateBookingOrderInput } from "@/features/booking/validation";
 import { calculateGst } from "@/lib/billing/gst";
 import { getGstSettings } from "@/lib/billing/gstSettings";
@@ -33,15 +35,9 @@ export async function getNextOrderNumber(
   tx: Prisma.TransactionClient
 ): Promise<string> {
   const currentYear = new Date().getFullYear();
-  const counterId = `ORDER_${currentYear}`;
+  const seq = await nextSequence(tx, `ORDER_${currentYear}`);
 
-  const counter = await tx.counter.upsert({
-    where: { id: counterId },
-    update: { seq: { increment: 1 } },
-    create: { id: counterId, seq: 1 },
-  });
-
-  const paddedSeq = counter.seq.toString().padStart(4, "0");
+  const paddedSeq = seq.toString().padStart(4, "0");
   return `MKJK-${currentYear}-${paddedSeq}`;
 }
 
@@ -134,11 +130,11 @@ export async function createBookingOrder(
     for (const pl of allPlans) {
       if (!pl.package || checkedPackages.has(pl.package.id)) continue;
       checkedPackages.add(pl.package.id);
-      await tx.$queryRaw`SELECT "id" FROM "ServicePackage" WHERE "id" = ${pl.package.id} FOR UPDATE`;
+      await tx.$queryRaw`SELECT \`id\` FROM \`ServicePackage\` WHERE \`id\` = ${pl.package.id} FOR UPDATE`;
       const planIdsInPackage = (await tx.plan.findMany({ where: { packageId: pl.package.id }, select: { id: true } })).map((x) => x.id);
       const held = await tx.order.count({
         where: {
-          OR: [{ plan: { packageId: pl.package.id } }, { extraPlanIds: { hasSome: planIdsInPackage } }],
+          OR: [{ plan: { packageId: pl.package.id } }, { extraPlans: { some: { planId: { in: planIdsInPackage } } } }],
           paymentStatus: { notIn: [PaymentStatus.FAILED, PaymentStatus.REFUNDED] },
         },
       });
@@ -265,6 +261,7 @@ export async function createBookingOrder(
         serviceId: service.id,
         planId: plan.id,
         extraPlanIds: extraPlans.map((x) => x.id),
+        extraPlans: { create: extraPlans.map((x) => ({ planId: x.id })) },
         slotId: reservedSlotId,
         appointmentStatus: reservedSlotId ? AppointmentStatus.PENDING : null,
         offerId: claimedOfferId,
@@ -309,7 +306,7 @@ export async function createBookingOrder(
       orderNumber: order.orderNumber,
       netAmountPaise: order.netAmountPaise,
     };
-  });
+  }, TX_OPTIONS);
 }
 
 /**
@@ -375,7 +372,7 @@ export async function expireUnpaidOrder(
     });
 
     return true;
-  });
+  }, TX_OPTIONS);
 }
 
 export interface ExpireOverdueResult {

@@ -1,6 +1,7 @@
 import { kendraEmail } from "@/lib/content/contact";
 import { prisma } from "@/lib/prisma";
 import { getCredential } from "@/lib/config/credentials";
+import { toList } from "@/lib/db/lists";
 
 export interface ChatbotResponse {
   matched: boolean;
@@ -95,7 +96,7 @@ export async function matchChatbotQuery(
     }
 
     // 2. Keyword exact matches (+6 points each)
-    const qaKeywords = (qa.keywords || []).map((k) => k.toLowerCase().trim());
+    const qaKeywords = toList(qa.keywords).map((k) => k.toLowerCase().trim());
     for (const token of tokens) {
       if (qaKeywords.includes(token)) {
         score += 6;

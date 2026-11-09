@@ -1,4 +1,5 @@
 import { randomInt } from "crypto";
+import { TX_OPTIONS } from "@/lib/db/tx";
 import { prisma } from "@/lib/prisma";
 import {
   AssociateStatus,
@@ -290,7 +291,7 @@ export async function requestPayout(associateId: string, note?: string) {
       data: { payoutId: payout.id },
     });
     return payout;
-  });
+  }, TX_OPTIONS);
 }
 
 /** Admin decision on a payout request. The money itself is paid by the client outside the system. */
@@ -328,5 +329,5 @@ export async function resolvePayout(
         processedAt: new Date(),
       },
     });
-  });
+  }, TX_OPTIONS);
 }

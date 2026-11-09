@@ -12,7 +12,10 @@ declare global {
 function databaseUrl(): string | undefined {
   const url = process.env.DATABASE_URL;
   if (!url || process.env.NODE_ENV !== "production" || /[?&]connection_limit=/.test(url)) return url;
-  return url + (url.includes("?") ? "&" : "?") + "connection_limit=1&pool_timeout=20&connect_timeout=15";
+  // Serverless (Vercel): one connection per instance. A normal server (Hostinger): a small shared pool,
+  // because shared MySQL allows only a few connections per user.
+  const pool = process.env.VERCEL ? "connection_limit=1&pool_timeout=20&connect_timeout=15" : "connection_limit=5&pool_timeout=20&connect_timeout=15";
+  return url + (url.includes("?") ? "&" : "?") + pool;
 }
 
 export const prisma =

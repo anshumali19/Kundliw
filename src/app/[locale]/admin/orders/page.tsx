@@ -1,3 +1,4 @@
+import { toList } from "@/lib/db/lists";
 import { requireAdmin } from "@/lib/auth/guards";
 import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { prisma } from "@/lib/prisma";
@@ -45,7 +46,7 @@ export default async function AdminOrdersPage(props: AdminOrdersPageProps) {
     },
     take: 100,
   });
-  const planMap = await loadPlanTitleMap(rawOrders.flatMap((o) => o.extraPlanIds));
+  const planMap = await loadPlanTitleMap(rawOrders.flatMap((o) => toList(o.extraPlanIds)));
 
   const approvedAssociates = await prisma.associateProfile.findMany({
     where: { status: "APPROVED" },

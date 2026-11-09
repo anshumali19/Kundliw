@@ -6,6 +6,7 @@ import { razorpayConfigured } from "@/lib/payments/gateway";
 import { prisma } from "@/lib/prisma";
 import { PaymentStatus, Role } from "@prisma/client";
 import { CheckoutClient } from "@/features/booking/components/CheckoutClient";
+import { toList } from "@/lib/db/lists";
 
 interface CheckoutPageProps {
   params: Promise<{
@@ -82,7 +83,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
     netAmountPaise: order.netAmountPaise,
     offerCode: order.offerCode,
     serviceTitle: isHindi ? order.service?.titleHi || "" : order.service?.titleEn || "",
-    planTitle: bundleTitle(order, await loadPlanTitleMap(order.extraPlanIds), isHindi),
+    planTitle: bundleTitle(order, await loadPlanTitleMap(toList(order.extraPlanIds)), isHindi),
     jatakaName,
     rejectionReason: order.rejectionReason,
     slotTime,

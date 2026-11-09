@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { normalizePhoneNumber } from "@/lib/auth/validation";
 import { checkDbRateLimit, getClientIp } from "@/lib/rateLimit";
+import { toList } from "@/lib/db/lists";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +64,6 @@ export async function POST(request: NextRequest) {
       where: {
         orderNumber: {
           equals: cleanSearchOrder,
-          mode: "insensitive",
         },
       },
       include: {
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: GENERIC_ERROR }, { status: 404 });
     }
 
-    const trackMap = await loadPlanTitleMap(order.extraPlanIds);
+    const trackMap = await loadPlanTitleMap(toList(order.extraPlanIds));
     // Return sanitized tracking payload
     return NextResponse.json({
       success: true,

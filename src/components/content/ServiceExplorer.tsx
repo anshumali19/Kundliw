@@ -3,6 +3,7 @@ import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { Check } from "lucide-react";
 import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
+import { toList } from "@/lib/db/lists";
 
 /**
  * For a signed-in customer or associate: what they have already opted for, and everything they can
@@ -34,10 +35,14 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
   ]);
 
   const bookedServices = new Set(orders.map((o) => o.serviceId).filter(Boolean) as string[]);
-  const bookedPlans = new Set(orders.flatMap((o) => [o.planId, ...o.extraPlanIds]).filter(Boolean) as string[]);
+  const bookedPlans = new Set(orders.flatMap((o) => [o.planId, ...toList(o.extraPlanIds)]).filter(Boolean) as string[]);
 
   const offersFor = (serviceSlug: string, planId: string) =>
-    offers.filter((o) => (o.serviceSlugs.length === 0 || o.serviceSlugs.includes(serviceSlug)) && (o.planIds.length === 0 || o.planIds.includes(planId)));
+    offers.filter((o) => {
+      const slugs = toList(o.serviceSlugs);
+      const planIds = toList(o.planIds);
+      return (slugs.length === 0 || slugs.includes(serviceSlug)) && (planIds.length === 0 || planIds.includes(planId));
+    });
   const offerText = (o: (typeof offers)[number]) =>
     o.discountType === "PERCENTAGE" ? `${o.discountValuePaise}% ${t("off", "छूट")}` : `${formatPaiseToInr(o.discountValuePaise)} ${t("off", "छूट")}`;
 

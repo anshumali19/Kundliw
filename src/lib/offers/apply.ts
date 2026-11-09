@@ -1,3 +1,4 @@
+import { toList } from "@/lib/db/lists";
 export interface OfferDefinition {
   code: string;
   discountType: "FLAT" | "PERCENTAGE";
@@ -10,8 +11,9 @@ export interface OfferDefinition {
   usageLimit?: number | null;
   usedCount?: number;
   perUserLimit?: number;
-  serviceSlugs?: string[];
-  planIds?: string[];
+  /** Saved as JSON; read through toList */
+  serviceSlugs?: unknown;
+  planIds?: unknown;
 }
 
 /** What we know about this particular booking, so the rules can be checked fairly. */
@@ -59,13 +61,15 @@ export function applyOffer(
     return { isValid: false, discountPaise: 0, reason: "Offer usage limit exceeded" };
   }
 
-  if (offer.serviceSlugs && offer.serviceSlugs.length > 0 && ctx.serviceSlug && !offer.serviceSlugs.includes(ctx.serviceSlug)) {
+  const offerSlugs = toList(offer.serviceSlugs);
+  const offerPlanIds = toList(offer.planIds);
+  if (offerSlugs.length > 0 && ctx.serviceSlug && !offerSlugs.includes(ctx.serviceSlug)) {
     return { isValid: false, discountPaise: 0, reason: "This code is not valid for the selected service" };
   }
 
-  if (offer.planIds && offer.planIds.length > 0) {
+  if (offerPlanIds.length > 0) {
     const chosen = ctx.planIds && ctx.planIds.length > 0 ? ctx.planIds : ctx.planId ? [ctx.planId] : [];
-    if (chosen.some((id) => !offer.planIds!.includes(id))) {
+    if (chosen.some((id) => !offerPlanIds.includes(id))) {
       return {
         isValid: false,
         discountPaise: 0,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TX_OPTIONS } from "@/lib/db/tx";
 import { guardApiAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { getStorageProvider } from "@/lib/storage";
@@ -178,7 +179,7 @@ export async function POST(request: NextRequest) {
           uploadedByRole: "ADMIN",
         },
       });
-    });
+    }, TX_OPTIONS);
 
     return NextResponse.json({
       success: true,

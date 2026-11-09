@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { pageAlternates } from "@/lib/seo";
 import { externalPayOf } from "@/lib/content/externalPay";
 import { ServicesListingClient } from "@/features/services/components/ServicesListingClient";
+import { toList } from "@/lib/db/lists";
 
 
 export async function generateMetadata(
@@ -74,8 +75,8 @@ export default async function ServicesListingPage(
     taglineHi: s.taglineHi,
     descriptionEn: s.descriptionEn,
     descriptionHi: s.descriptionHi,
-    highlightsEn: s.highlightsEn,
-    highlightsHi: s.highlightsHi,
+    highlightsEn: toList(s.highlightsEn),
+    highlightsHi: toList(s.highlightsHi),
     icon: s.icon,
     imageUrl: s.imageUrl,
     itineraryEn: s.itineraryEn,
@@ -117,8 +118,8 @@ export default async function ServicesListingPage(
       pages: p.pages,
       hasCall: p.hasCall,
       callDurationMinutes: p.callDurationMinutes,
-      featuresEn: p.featuresEn,
-      featuresHi: p.featuresHi,
+      featuresEn: toList(p.featuresEn),
+      featuresHi: toList(p.featuresHi),
       isPopular: p.isPopular,
       youtubeUrl: p.youtubeUrl,
     })),

@@ -1,3 +1,6 @@
+import { TX_OPTIONS } from "@/lib/db/tx";
+export { TX_OPTIONS };
+import { toList } from "@/lib/db/lists";
 import { AppointmentStatus, OrderStatus, PaymentStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { attachReferralToOrder, cancelCommission } from "@/lib/associates/service";
@@ -50,21 +53,19 @@ export function cancelBlockReason(order: Rulable, packageStart: Date | null, now
 }
 
 /** Why a customer cannot upgrade this order, or null when they can. */
-export function upgradeBlockReason(order: Rulable & { extraPlanIds: string[] }): { en: string; hi: string } | null {
+export function upgradeBlockReason(order: Rulable & { extraPlanIds: unknown }): { en: string; hi: string } | null {
   if (order.paymentStatus !== PaymentStatus.PAID) {
     return { en: "Only a paid order can be upgraded.", hi: "केवल भुगतान हो चुका ऑर्डर अपग्रेड हो सकता है।" };
   }
   if (order.status !== OrderStatus.ORDER_RECEIVED || order.appointmentStatus === AppointmentStatus.COMPLETED) {
     return { en: "Work on this order has started, so it cannot be upgraded here. Please raise a support ticket.", hi: "इस ऑर्डर पर काम शुरू हो चुका है, इसलिए यहाँ अपग्रेड नहीं हो सकता। कृपया सपोर्ट टिकट बनाएँ।" };
   }
-  if (order.extraPlanIds.length > 0) {
+  if (toList(order.extraPlanIds).length > 0) {
     return { en: "An order with several plans cannot be upgraded here. Please raise a support ticket.", hi: "एक से अधिक प्लान वाला ऑर्डर यहाँ अपग्रेड नहीं हो सकता। कृपया सपोर्ट टिकट बनाएँ।" };
   }
   return null;
 }
 
-/** The database is remote, so give these multi-step changes more than the 5 second default. */
-export const TX_OPTIONS = { maxWait: 10000, timeout: 30000 };
 
 export type RefundMode = "REQUEST" | "SENT";
 

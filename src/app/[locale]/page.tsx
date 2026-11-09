@@ -19,6 +19,7 @@ import { safeHref, stripRich } from "@/lib/content/richText";
 import { pageAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ArrowUpRight, Check, Phone, Plus } from "lucide-react";
+import { toList } from "@/lib/db/lists";
 
 
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -462,7 +463,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
                 {g.plans.map((p) => {
                   const featured = p.isPopular;
-                  const feats = (isHindi ? p.featuresHi : p.featuresEn) ?? [];
+                  const feats = toList(isHindi ? p.featuresHi : p.featuresEn);
                   return (
                     <article
                       key={p.id}

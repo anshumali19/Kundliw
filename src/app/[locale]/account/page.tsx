@@ -1,3 +1,4 @@
+import { toList } from "@/lib/db/lists";
 import { redirect } from "next/navigation";
 import { loadPlanTitleMap, bundleTitle } from "@/lib/booking/bundle";
 import { Role } from "@prisma/client";
@@ -67,7 +68,7 @@ export default async function AccountPage(props: AccountPageProps) {
       },
     },
   });
-  const planMap = await loadPlanTitleMap(orders.flatMap((o) => o.extraPlanIds));
+  const planMap = await loadPlanTitleMap(orders.flatMap((o) => toList(o.extraPlanIds)));
   // What each order may do by itself: cancel, or upgrade to a higher plan
   const selfService = new Map<string, { canCancel: boolean; cancelBlocked: string | null; choices: Array<{ id: string; title: string; pricePaise: number }>; upgradeBlocked: string | null }>();
   await Promise.all(

@@ -1,3 +1,4 @@
+import { toList } from "@/lib/db/lists";
 import { requireAdmin } from "@/lib/auth/guards";
 import { prisma } from "@/lib/prisma";
 import { CatalogueSteps } from "@/components/admin/CatalogueSteps";
@@ -58,8 +59,8 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
     minOrderValuePaise: o.minOrderValuePaise,
     usageLimit: o.usageLimit,
     perUserLimit: o.perUserLimit,
-    serviceSlugs: o.serviceSlugs,
-    planIds: o.planIds,
+    serviceSlugs: toList(o.serviceSlugs),
+    planIds: toList(o.planIds),
     showOnPlan: o.showOnPlan,
     autoApply: o.autoApply,
     showInPopup: o.showInPopup,

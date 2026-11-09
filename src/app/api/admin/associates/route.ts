@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
     if (q) {
       where.OR = [
         { referralCode: { contains: q.toUpperCase() } },
-        { user: { name: { contains: q, mode: "insensitive" } } },
-        { user: { email: { contains: q, mode: "insensitive" } } },
+        { user: { name: { contains: q } } },
+        { user: { email: { contains: q } } },
         { user: { phone: { contains: q } } },
       ];
     }
