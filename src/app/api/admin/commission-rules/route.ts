@@ -29,12 +29,12 @@ export async function GET() {
     const [rules, services] = await Promise.all([
       prisma.commissionRule.findMany({ orderBy: { createdAt: "asc" } }),
       prisma.service.findMany({
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
         select: {
           id: true,
           titleEn: true,
           titleHi: true,
-          plans: { select: { id: true, titleEn: true, titleHi: true }, orderBy: { orderIndex: "asc" } },
+          plans: { select: { id: true, titleEn: true, titleHi: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] },
         },
       }),
     ]);

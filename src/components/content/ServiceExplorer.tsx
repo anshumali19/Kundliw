@@ -18,10 +18,10 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
   const [services, offers, orders] = await Promise.all([
     prisma.service.findMany({
       where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       include: {
-        packages: { where: { isActive: true }, orderBy: { orderIndex: "asc" } },
-        plans: { where: { isActive: true }, orderBy: { orderIndex: "asc" } },
+        packages: { where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] },
+        plans: { where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] },
       },
     }),
     prisma.offer.findMany({

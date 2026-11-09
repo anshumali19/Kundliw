@@ -10,7 +10,7 @@ export async function GET() {
   const services = await prisma.service
     .findMany({
       where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       select: { slug: true, titleEn: true, taglineEn: true },
     })
     .catch(() => []);

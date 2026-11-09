@@ -82,6 +82,7 @@ export default async function CheckoutPage(props: CheckoutPageProps) {
     gstRateBasisPoints: order.gstRateBasisPoints,
     netAmountPaise: order.netAmountPaise,
     offerCode: order.offerCode,
+    isUpgrade: !!order.upgradeFromOrderId,
     serviceTitle: isHindi ? order.service?.titleHi || "" : order.service?.titleEn || "",
     planTitle: bundleTitle(order, await loadPlanTitleMap(toList(order.extraPlanIds)), isHindi),
     jatakaName,

@@ -61,7 +61,7 @@ export default async function OtherServicesPage(
   const dbItems = await prisma.otherService
     .findMany({
       where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     })
     .catch(() => []);
 

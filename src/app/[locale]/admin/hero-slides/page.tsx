@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminHeroSlidesPage(props: { params: Promise<{ locale: string }> }) {
   const { locale } = await props.params;
   const services = await prisma.service
-    .findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, select: { slug: true, titleEn: true, titleHi: true, imageUrl: true } })
+    .findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], select: { slug: true, titleEn: true, titleHi: true, imageUrl: true } })
     .catch(() => []);
   return <AdminHeroSlidesManager locale={locale} services={services} />;
 }

@@ -9,16 +9,16 @@ export async function loadAdminCatalogue(): Promise<{ servicesData: AdminService
   const services = await prisma.service.findMany({
     include: {
       plans: {
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       },
       packages: {
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       },
       _count: {
         select: { orders: true },
       },
     },
-    orderBy: { orderIndex: "asc" },
+    orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
   });
 
   const booked = await bookedSeatsByPackage(services.flatMap((s) => s.packages.map((k) => k.id)));

@@ -28,11 +28,14 @@ export async function generateMetadata(props: LegalPageProps): Promise<Metadata>
   const isHindi = locale === "hi";
   const fullSlug = `legal/${slug}`;
   const page = await prisma.staticPage
-    .findFirst({
+    .findMany({
       where: {
         OR: [{ slug: fullSlug }, { slug }],
       },
     })
+    // Both "privacy" and "legal/privacy" can exist. Always show the plain one first (what the site showed before),
+    // never leave the choice to the database.
+    .then((rows) => rows.find((r) => r.slug === slug) ?? rows[0] ?? null)
     .catch(() => null);
 
   const title = isHindi ? page?.titleHi : page?.titleEn;
@@ -60,11 +63,14 @@ export default async function LegalPage(props: LegalPageProps) {
   );
 
   const page = await prisma.staticPage
-    .findFirst({
+    .findMany({
       where: {
         OR: [{ slug: fullSlug }, { slug }],
       },
     })
+    // Both "privacy" and "legal/privacy" can exist. Always show the plain one first (what the site showed before),
+    // never leave the choice to the database.
+    .then((rows) => rows.find((r) => r.slug === slug) ?? rows[0] ?? null)
     .catch(() => null);
 
   if (!page) {

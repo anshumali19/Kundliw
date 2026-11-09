@@ -43,7 +43,7 @@ export default async function GalleryPage(props: GalleryPageProps) {
   const isHindi = locale === "hi";
   const items = await prisma.mediaGalleryItem.findMany({
     where: { isActive: true },
-    orderBy: { orderIndex: "asc" },
+    orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
   });
 
   return (

@@ -62,11 +62,11 @@ export default async function BookingPage(props: BookingPageProps) {
     include: {
       plans: {
         where: activePlanWhere,
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       },
-      packages: { where: { isActive: true }, orderBy: { orderIndex: "asc" } },
+      packages: { where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] },
     },
-    orderBy: { orderIndex: "asc" },
+    orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
   });
 
   const booked = await bookedSeatsByPackage(services.flatMap((s) => s.packages.map((k) => k.id)));

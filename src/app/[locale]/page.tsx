@@ -76,16 +76,16 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     prisma.service
       .findMany({
         where: { isActive: true, slug: { in: ["janam-kundli", "prashna-kundli", "kundli-matching"] } },
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
         include: { plans: { where: activePlanWhere, orderBy: { pricePaise: "asc" } } },
       })
       .catch(() => []),
-    prisma.otherService.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" } }).catch(() => []),
-    prisma.mediaGalleryItem.findMany({ where: { isActive: true, mediaType: "IMAGE" }, orderBy: { orderIndex: "asc" }, take: 5 }).catch(() => []),
-    prisma.faqItem.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, take: 8 }).catch(() => []),
-    prisma.testimonial.findMany({ where: { isActive: true, isVerified: true }, orderBy: { orderIndex: "asc" }, take: 3 }).catch(() => []),
-    prisma.banner.findMany({ where: { isActive: true, position: "LEFT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
-    prisma.banner.findMany({ where: { isActive: true, position: "RIGHT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.otherService.findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] }).catch(() => []),
+    prisma.mediaGalleryItem.findMany({ where: { isActive: true, mediaType: "IMAGE" }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], take: 5 }).catch(() => []),
+    prisma.faqItem.findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], take: 8 }).catch(() => []),
+    prisma.testimonial.findMany({ where: { isActive: true, isVerified: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], take: 3 }).catch(() => []),
+    prisma.banner.findMany({ where: { isActive: true, position: "LEFT" }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] }).catch(() => []),
+    prisma.banner.findMany({ where: { isActive: true, position: "RIGHT" }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] }).catch(() => []),
     prisma.service.findMany({ where: { isActive: true }, select: { slug: true } }).catch(() => []),
     prisma.siteConfig
       .findUnique({ where: { key: HERO_SLIDES_KEY } })

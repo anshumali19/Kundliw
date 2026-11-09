@@ -33,7 +33,7 @@ export async function GET() {
     if (!guard.ok) return guard.errorResponse;
 
     const testimonials = await prisma.testimonial.findMany({
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     });
     return NextResponse.json({ success: true, testimonials });
   } catch (error) {

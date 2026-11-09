@@ -174,19 +174,19 @@ export default async function LocaleLayout(
     prisma.banner
         .findMany({
           where: { isActive: true, position: "TOP" },
-          orderBy: { orderIndex: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
         })
         .catch(() => []),
     prisma.banner
         .findMany({
           where: { isActive: true, position: "BOTTOM" },
-          orderBy: { orderIndex: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
         })
         .catch(() => []),
     prisma.marqueeItem
         .findMany({
           where: { isActive: true },
-          orderBy: { orderIndex: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
           select: {
             id: true,
             textEn: true,
@@ -229,7 +229,7 @@ export default async function LocaleLayout(
     prisma.service
         .findMany({
           where: { isActive: true },
-          orderBy: { orderIndex: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
           select: { slug: true, titleEn: true, plans: { where: activePlanWhere, select: { titleEn: true, pricePaise: true } } },
         })
         .catch(() => []),

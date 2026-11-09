@@ -43,6 +43,8 @@ vi.mock("@/lib/prisma", () => {
         );
       }
       if (prop === "then") return undefined;
+      if (prop === "$executeRaw") return vi.fn(async () => 1);
+      if (prop === "$queryRaw") return vi.fn(async () => [{ seq: 1 }]);
       if (!obj[prop]) obj[prop] = makeModel();
       return obj[prop];
     },

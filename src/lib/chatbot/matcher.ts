@@ -36,7 +36,7 @@ export async function matchChatbotQuery(
   const allQA = await prisma.chatbotQA
     .findMany({
       where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     })
     .catch(() => []);
 

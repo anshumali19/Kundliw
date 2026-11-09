@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const items = await prisma.otherService.findMany({
       where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     });
     return NextResponse.json({ success: true, items });
   } catch (error) {

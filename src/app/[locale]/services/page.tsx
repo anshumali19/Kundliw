@@ -53,15 +53,15 @@ export default async function ServicesListingPage(
     include: {
       plans: {
         where: activePlanWhere,
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       },
       packages: {
         where: { isActive: true },
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
         select: { id: true, slug: true, titleEn: true, titleHi: true, descriptionEn: true, descriptionHi: true, imageUrl: true, youtubeUrl: true, numberOfDays: true, startDate: true, endDate: true, seats: true },
       },
     },
-    orderBy: { orderIndex: "asc" },
+    orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
   });
 
   const seatsHeld = await bookedSeatsByPackage(services.flatMap((s) => s.packages.map((k) => k.id))).catch(() => ({} as Record<string, number>));

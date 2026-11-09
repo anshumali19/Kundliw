@@ -15,8 +15,8 @@ Complete system and operational documentation is organized in the [`docs/`](file
 | :--- | :--- | :--- |
 | **System Architecture** | High-level architecture, design system, Lenis scroll engine, state machine, and provider patterns | [docs/ARCHITECTURE.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/ARCHITECTURE.md) |
 | **REST API Reference** | Complete endpoint documentation, request/response payloads, and authentication guards | [docs/API_DOCUMENTATION.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/API_DOCUMENTATION.md) |
-| **Database Schema** | Complete Prisma PostgreSQL models, relations, field dictionaries, and Mermaid ER diagram | [docs/DATABASE_SCHEMA.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/DATABASE_SCHEMA.md) |
-| **Deployment Guide** | Vercel production deployment, PostgreSQL setup, environment variables, and custom domains | [docs/DEPLOYMENT_GUIDE.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/DEPLOYMENT_GUIDE.md) |
+| **Database Schema** | Complete Prisma MySQL models, relations, field dictionaries, and Mermaid ER diagram | [docs/DATABASE_SCHEMA.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/DATABASE_SCHEMA.md) |
+| **Deployment Guide** | Vercel production deployment, MySQL setup, environment variables, and custom domains | [docs/DEPLOYMENT_GUIDE.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/DEPLOYMENT_GUIDE.md) |
 | **Administrator Manual** | Operating manual for Kendra staff managing services, orders, vault, coupons, and content | [docs/ADMIN_MANUAL.md](file:///C:/Users/anshu/Desktop/ClientWork/docs/ADMIN_MANUAL.md) |
 | **Engineering Handoff** | Production integration instructions for SMS, Razorpay, Swiss Ephemeris, and AWS S3 | [HANDOFF.md](file:///C:/Users/anshu/Desktop/ClientWork/HANDOFF.md) |
 
@@ -28,7 +28,7 @@ Complete system and operational documentation is organized in the [`docs/`](file
 - **Smooth Scrolling**: Lenis (`lenis/react`) configured at root layout (`lerp: 0.1`, `duration: 1.2`)
 - **Styling**: Tailwind CSS with custom Vedic Broadsheet design system (editorial serifs, saffron/maroon accents, 44px min touch targets, left-aligned full-width layouts)
 - **Internationalization**: `next-intl` (all copy in `messages/hi.json` and `messages/en.json`, zero hardcoded UI strings)
-- **Database & ORM**: PostgreSQL + Prisma ORM
+- **Database & ORM**: MySQL 8 / MariaDB 10.6+ + Prisma ORM
 - **Authentication**: NextAuth.js / Auth.js (Credentials OTP with rate-limiting, Admin Email/Password with lockout, Google OAuth ready)
 - **Billing & Tax**: Sequential GST Invoice numbering (`INV-YYYY-XXXX`), PDFKit invoice generation with "DEMO INVOICE" watermark
 - **Astro Subsystems**: Vedic ephemeris calculations, 8-Pillar Ashtakoot Gun Milan, Prashna horary form, daily Panchang with database caching
@@ -41,7 +41,7 @@ Complete system and operational documentation is organized in the [`docs/`](file
 
 ### 1. Prerequisites
 - **Node.js**: v18.18.0 or later
-- **PostgreSQL**: Local or hosted database instance running at port 5432
+- **MySQL**: Local or hosted MySQL 8 / MariaDB database (port 3306)
 
 ### 2. Environment Configuration
 Copy `.env.example` to `.env`:
@@ -50,7 +50,7 @@ cp .env.example .env
 ```
 Ensure the demo flags are set:
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/kanad_jyotish_dev?schema=public"
+DATABASE_URL="mysql://user:password@localhost:3306/kanad_jyotish_dev"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="dev_secret_key_at_least_32_characters_long_for_kanad_demo"
 DEMO_MODE="true"
@@ -63,8 +63,8 @@ INITIAL_ADMIN_PASSWORD="ChangeMeInAdminSettings@2026"
 # 1. Install dependencies
 npm install
 
-# 2. Push schema to PostgreSQL
-npx prisma db push
+# 2. Apply the migrations to MySQL
+npx prisma migrate deploy
 
 # 3. Generate Prisma client
 npx prisma generate

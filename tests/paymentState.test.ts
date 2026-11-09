@@ -44,9 +44,9 @@ vi.mock("@/lib/prisma", () => {
         return data;
       }),
     },
-    counter: {
-      upsert: vi.fn(async () => ({ id: "INVOICE_2026", seq: 7 })),
-    },
+    // invoice numbers come from one INSERT ... ON DUPLICATE KEY UPDATE and a read of the counter
+    $executeRaw: vi.fn(async () => 1),
+    $queryRaw: vi.fn(async () => [{ seq: 7 }]),
     commission: {
       updateMany: vi.fn(async () => ({ count: 0 })),
     },

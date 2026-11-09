@@ -80,7 +80,7 @@ export default async function FounderPage(props: FounderPageProps) {
   const additionalLinks = normalizeLinks(founder.additionalLinks);
   const blocks = normalizeBlocks(founder.blocks);
   const team = await prisma.teamMember
-    .findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }] })
+    .findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] })
     .catch(() => []);
 
   return (

@@ -61,11 +61,11 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
     include: {
       plans: {
         where: activePlanWhere,
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       },
       packages: {
         where: { isActive: true },
-        orderBy: { orderIndex: "asc" },
+        orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       },
     },
   });
@@ -91,7 +91,7 @@ export default async function ServiceDetailPage(props: ServiceDetailPageProps) {
       isActive: true,
       orderIndex: { gt: service.orderIndex },
     },
-    orderBy: { orderIndex: "asc" },
+    orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     select: { slug: true, titleEn: true, titleHi: true },
   });
 

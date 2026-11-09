@@ -32,6 +32,8 @@ interface CheckoutClientProps {
     gstRateBasisPoints?: number;
     netAmountPaise: number;
     offerCode?: string | null;
+    /** The order upgrades an earlier paid order; its discount is the amount already paid */
+    isUpgrade?: boolean;
     serviceTitle: string;
     planTitle: string;
     jatakaName: string;
@@ -310,7 +312,11 @@ export function CheckoutClient({
               {order.discountAmountPaise > 0 && (
                 <div className="flex justify-between text-secondary font-medium">
                   <span>
-                    {isHindi ? "अनुदान छूट" : "Offer Discount"} ({order.offerCode}):
+                    {order.isUpgrade
+                      ? isHindi
+                        ? "पहले दी गई राशि का समायोजन:"
+                        : "Credit for what you already paid:"
+                      : `${isHindi ? "अनुदान छूट" : "Offer Discount"} (${order.offerCode ?? ""}):`}
                   </span>
                   <span>- {formatPaiseToInr(order.discountAmountPaise)}</span>
                 </div>

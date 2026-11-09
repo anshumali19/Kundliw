@@ -19,13 +19,13 @@ export async function GET(request: NextRequest) {
     prisma.service.findMany({
       include: {
         plans: {
-          orderBy: { orderIndex: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
         },
         _count: {
           select: { orders: true },
         },
       },
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       skip,
       take: limit,
     }),

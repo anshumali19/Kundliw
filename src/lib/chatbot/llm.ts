@@ -18,7 +18,7 @@ export async function askLlm(query: string, locale: "hi" | "en"): Promise<string
   if (!apiKey) return null;
 
   const [qa, settings] = await Promise.all([
-    prisma.chatbotQA.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, take: 60 }).catch(() => []),
+    prisma.chatbotQA.findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], take: 60 }).catch(() => []),
     prisma.adminSettings
       .findUnique({ where: { id: "default" }, select: { phone1: true, whatsappNumber: true, email: true } })
       .catch(() => null),

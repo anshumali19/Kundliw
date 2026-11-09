@@ -10,19 +10,19 @@ export async function GET() {
   try {
     const services = await prisma.service.findMany({
       where: { isActive: true },
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
       select: {
         slug: true,
         titleEn: true,
         titleHi: true,
         plans: {
           where: activePlanWhere,
-          orderBy: { orderIndex: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
           select: { id: true, slug: true, titleEn: true, titleHi: true, pricePaise: true, packageId: true },
         },
         packages: {
           where: { isActive: true },
-          orderBy: { orderIndex: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
           select: { id: true, titleEn: true, titleHi: true, seats: true, startDate: true, endDate: true },
         },
       },

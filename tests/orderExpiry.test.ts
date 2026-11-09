@@ -165,7 +165,8 @@ vi.mock("@/lib/prisma", () => {
       updateMany: vi.fn(async () => ({ count: 0 })),
       create: vi.fn(async () => ({})),
     },
-    counter: { upsert: vi.fn(async () => ({ seq: 1 })) },
+    $executeRaw: vi.fn(async () => 1),
+    $queryRaw: vi.fn(async () => [{ seq: 1 }]),
   };
 
   const client = new Proxy(proxy, {

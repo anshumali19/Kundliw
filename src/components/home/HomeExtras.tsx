@@ -117,7 +117,7 @@ export async function HomeMoreBands({ locale }: { locale: string }) {
   const showInstall = cfg.showInstall !== false;
 
   const [creds, posts, founder] = await Promise.all([
-    showCred ? prisma.credential.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, take: 8 }).catch(() => []) : Promise.resolve([]),
+    showCred ? prisma.credential.findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], take: 8 }).catch(() => []) : Promise.resolve([]),
     showBlog ? prisma.blogPost.findMany({ where: { isPublished: true }, orderBy: { publishedAt: "desc" }, take: 3 }).catch(() => []) : Promise.resolve([]),
     showFounder ? prisma.founderProfile.findUnique({ where: { id: "default" } }).catch(() => null) : Promise.resolve(null),
   ]);

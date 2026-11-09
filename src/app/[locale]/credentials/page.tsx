@@ -29,7 +29,7 @@ export default async function CredentialsPage(props: CredentialsPageProps) {
   const isHindi = locale === "hi";
 
   const rows = await prisma.credential
-    .findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }] })
+    .findMany({ where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] })
     .catch(() => []);
 
   const items = rows.map((r) => {

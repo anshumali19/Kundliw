@@ -22,7 +22,7 @@ export async function GET() {
   const guard = await guardApiAdmin();
   if (!guard.ok) return guard.errorResponse;
   try {
-    const members = await prisma.teamMember.findMany({ orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }] });
+    const members = await prisma.teamMember.findMany({ orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }] });
     return NextResponse.json({ success: true, members });
   } catch (error) {
     console.error("Failed to fetch team:", error);

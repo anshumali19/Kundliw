@@ -74,8 +74,8 @@ export default async function AdminOffersPage(props: AdminOffersPageProps) {
 
   const services = await prisma.service.findMany({
     where: { isActive: true },
-    orderBy: { orderIndex: "asc" },
-    select: { slug: true, titleEn: true, titleHi: true, packages: { where: { isActive: true }, orderBy: { orderIndex: "asc" }, select: { id: true, titleEn: true, titleHi: true } }, plans: { where: { isActive: true }, orderBy: { orderIndex: "asc" }, select: { id: true, packageId: true, titleEn: true, titleHi: true } } },
+    orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+    select: { slug: true, titleEn: true, titleHi: true, packages: { where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], select: { id: true, titleEn: true, titleHi: true } }, plans: { where: { isActive: true }, orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }], select: { id: true, packageId: true, titleEn: true, titleHi: true } } },
   });
 
   return (

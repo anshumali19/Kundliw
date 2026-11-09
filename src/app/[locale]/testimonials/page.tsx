@@ -44,7 +44,7 @@ export default async function TestimonialsPage(props: TestimonialsPageProps) {
   const isHindi = locale === "hi";
   const testimonials = await prisma.testimonial.findMany({
     where: { isActive: true, isVerified: true },
-    orderBy: { orderIndex: "asc" },
+    orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
   });
 
   return (

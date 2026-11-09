@@ -29,7 +29,7 @@ export async function GET() {
     if (!guard.ok) return guard.errorResponse;
 
     const items = await prisma.mediaGalleryItem.findMany({
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     });
     return NextResponse.json({ success: true, items });
   } catch (error) {

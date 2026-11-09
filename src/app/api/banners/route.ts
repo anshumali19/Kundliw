@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     const banners = await prisma.banner.findMany({
       where,
-      orderBy: { orderIndex: "asc" },
+      orderBy: [{ orderIndex: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     });
 
     return NextResponse.json({ success: true, banners });
