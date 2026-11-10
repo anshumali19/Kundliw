@@ -72,11 +72,13 @@ export default async function GuidePage(props: GuidePageProps) {
           <a href={GUIDE_PDFS[guideSlug].hi} target="_blank" rel="noreferrer" className="min-h-[44px] inline-flex items-center rounded border border-maroon px-3 font-bold text-primary hover:bg-brand/20">
             {isHindi ? "PDF डाउनलोड (हिन्दी)" : "Download illustrated PDF (हिन्दी)"}
           </a>
-          <span className="w-full text-xs text-on-surface-variant">
-            {isHindi
-              ? `नीचे का पाठ एडमिन पेज व कानूनी → Guide: ${guideName} में बदल सकता है; \"प्रिंट / PDF सहेजें\" हमेशा ताज़ा पाठ छापता है।`
-              : `The Kendra can edit the text below under Pages & legal → Guide: ${guideName}; \"Print / Save as PDF\" always prints the latest text.`}
-          </span>
+          {guideSlug === "admin" && (
+            <span className="w-full text-xs text-on-surface-variant">
+              {isHindi
+                ? `नीचे का पाठ एडमिन पेज व कानूनी → Guide: ${guideName} में बदल सकता है; \"प्रिंट / PDF सहेजें\" हमेशा ताज़ा पाठ छापता है।`
+                : `The Kendra can edit the text below under Pages & legal → Guide: ${guideName}; \"Print / Save as PDF\" always prints the latest text.`}
+            </span>
+          )}
         </div>
       )}
       <div className="leading-relaxed text-base text-on-surface space-y-3"><RichText text={content} /></div>
