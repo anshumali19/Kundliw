@@ -3,7 +3,7 @@
 
 A high-precision, bilingual (Hindi & English) Vedic astrology and consultation web portal built to canonical specifications from Dashashwamedh Ghat, Varanasi.
 
-🌐 **Live Production URL**: [https://kanad-jyotish-kendra.vercel.app](https://kanad-jyotish-kendra.vercel.app)
+🌐 **Live Production URL**: [https://maharshikanadjyotishkendra.com/](https://maharshikanadjyotishkendra.com/)
 
 ---
 
