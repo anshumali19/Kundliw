@@ -1,3 +1,5 @@
+import { ADMIN_GUIDE_EN, ADMIN_GUIDE_HI } from "./adminGuideText";
+
 export type GuideSlug = "user" | "associate" | "admin";
 
 export const GUIDE_SLUGS: GuideSlug[] = ["user", "associate", "admin"];
@@ -131,91 +133,8 @@ Raise a Support ticket from the dashboard for any problem; the Kendra replies in
   admin: {
     titleEn: "Admin Guide",
     titleHi: "एडमिन मार्गदर्शिका",
-    contentEn: `1. Sign in
-Use the Super Admin login. Admin accounts are never created from the website. On every admin page, open "What is this page? Why use it?" at the top to read what the page does, and add a short demo video for it.
-
-2. Dashboard
-Shows today's new orders, pending Kundli and Prashna, calls, new users and active clients, an earnings chart (daily, weekly, monthly) and recent orders. The "Site status" strip turns Maintenance mode on or off: visitors then see a "back soon" page while you and the sign-in pages keep working.
-
-3. The catalogue in four steps
-Step 1 Services: add a service, its picture, video, description and demos.
-Step 2 Packages: choose a service, then add or move its packages.
-Step 3 Plans: choose a service and a package, then add or move its plans and prices.
-Step 4 Offers: promo codes tied to a plan or a whole package. The offers page also shows the total discount given, how many times each code was used and how many of those reached payment.
-For a service paid on a partner website, fill "Paid on another website" in the service form.
-
-4. Orders, Kundli queue and delivery
-Orders shows each booking with the client's birth details and questions. Use the Kundli & Prashna queue filter, move each order through its stages, add the courier tracking number for printed copies, and open the invoice or ticket. Upload the finished Kundli PDF in Customer files; the client downloads it from their account.
-
-5. Payments and invoices
-Payments & invoices has "How customers pay": set the UPI ID and QR code here. Bank details are in Business settings. Razorpay can be added later in API keys & Analytics and then appears at checkout by itself. Check manual payments by the screenshot and reference number.
-GST & revenue report shows each month's paid orders with taxable amount, CGST, SGST and total, by service and plan, with a download that opens in Excel for your accountant.
-
-6. Calls
-Appointment slots creates the times clients can pick. Call bookings shows the booked calls on a calendar. Approve or complete a call inside the order.
-
-7. Support tickets and WhatsApp
-Enquiries come from the Contact form and chatbot; set each lead to New, Contacted or Closed. Support tickets lists the tickets customers and associates raise; open one, reply and set its status. WhatsApp chats show client messages and let you reply once the WhatsApp keys are saved in API keys & Analytics.
-
-8. Sister services
-Matrimony (approve or reject profiles, paid members), Pilgrimage & tours (requests, vehicles and drivers) and Tax desk (documents and filing status).
-
-9. Other Services
-Cards for partner services: heading, nature of service, days, dates, day-wise schedule, video, demos, links and the Book Now website.
-
-10. Associates
-Approve or reject applications, set commission rules and review payout requests. Mark a payout as Paid only after you have paid the associate yourself.
-
-11. Website content
-Website settings, hero slides, banners, scrolling notice, pages, articles, gallery, reviews, FAQ, founder, team, certificates, translations and chatbot are edited from the Website group. Changes show on the website immediately.
-
-12. Guides
-Edit the guide words in Pages & legal. Add pictures and videos to the User, Associate and Admin guides in Guides & visuals.
-
-13. Keys and backups
-API keys & Analytics holds Razorpay, SMS, email, Google, AstroSage and WhatsApp keys, stored encrypted. Open Backups and download a copy regularly; keep it safe.`,
-    contentHi: `1. लॉगिन
-सुपर एडमिन लॉगिन का उपयोग करें। एडमिन खाते वेबसाइट से कभी नहीं बनाए जाते। हर एडमिन पेज के ऊपर "यह पेज क्या है? इसका उपयोग क्यों?" खोलकर पढ़ें कि पेज क्या करता है, और उसके लिए छोटा डेमो वीडियो जोड़ें।
-
-2. डैशबोर्ड
-आज के नए ऑर्डर, लंबित कुंडली व प्रश्न, कॉल, नए उपयोगकर्ता और सक्रिय ग्राहक, आय का चार्ट (दैनिक, साप्ताहिक, मासिक) और हाल के ऑर्डर दिखाता है। "साइट की स्थिति" पट्टी से रखरखाव मोड चालू या बंद करें: तब आगंतुकों को "जल्द वापसी" पेज दिखता है और आप तथा साइन-इन पेज चलते रहते हैं।
-
-3. सूची चार चरणों में
-चरण 1 सेवाएँ: सेवा, उसका चित्र, वीडियो, विवरण और डेमो जोड़ें।
-चरण 2 पैकेज: सेवा चुनें, फिर उसके पैकेज जोड़ें या दूसरी सेवा में ले जाएँ।
-चरण 3 प्लान: सेवा और पैकेज चुनें, फिर प्लान और कीमतें जोड़ें या ले जाएँ।
-चरण 4 ऑफ़र: प्रोमो कोड, किसी प्लान या पूरे पैकेज से जुड़े। ऑफ़र पेज पर कुल दी गई छूट, हर कोड का उपयोग और उनमें से कितने भुगतान तक पहुँचे, यह भी दिखता है।
-जिस सेवा का भुगतान सहयोगी वेबसाइट पर होता है, उसके फ़ॉर्म में "दूसरी वेबसाइट पर भुगतान" भरें।
-
-4. ऑर्डर, कुंडली कतार और डिलीवरी
-ऑर्डर में हर बुकिंग ग्राहक के जन्म विवरण और प्रश्नों सहित दिखती है। कुंडली व प्रश्न कतार फ़िल्टर का उपयोग करें, ऑर्डर को चरणों में आगे बढ़ाएँ, प्रिंटेड प्रति के लिए कूरियर ट्रैकिंग नंबर डालें, और इनवॉइस या टिकट खोलें। तैयार कुंडली PDF ग्राहक फ़ाइलें में अपलोड करें; ग्राहक उसे अपने खाते से डाउनलोड करता है।
-
-5. भुगतान और इनवॉइस
-भुगतान व इनवॉइस में "ग्राहक भुगतान कैसे करें" है: UPI आईडी और QR कोड यहीं लगाएँ। बैंक विवरण व्यवसाय सेटिंग में हैं। Razorpay बाद में API कीज़ व एनालिटिक्स में जोड़ें, फिर वह चेकआउट पर अपने आप दिखेगा। मैनुअल भुगतान स्क्रीनशॉट और संदर्भ संख्या से जाँचें।
-GST व आय रिपोर्ट में हर महीने के भुगतान हुए ऑर्डर करयोग्य राशि, CGST, SGST और कुल सहित, सेवा व प्लान अनुसार दिखते हैं, और अकाउंटेंट के लिए Excel में खुलने वाली फ़ाइल डाउनलोड होती है।
-
-6. कॉल
-अपॉइंटमेंट स्लॉट में वे समय बनाएँ जो ग्राहक चुन सकें। कॉल बुकिंग में बुक की गई कॉल कैलेंडर पर दिखती हैं। कॉल स्वीकृत या पूर्ण ऑर्डर के भीतर करें।
-
-7. सहायता टिकट और व्हाट्सएप
-पूछताछ संपर्क फ़ॉर्म और चैटबॉट से आती हैं; हर लीड को नई, संपर्क किया या बंद करें। सहायता टिकट में ग्राहकों और एसोसिएट के बनाए टिकट दिखते हैं; टिकट खोलें, उत्तर दें और स्थिति तय करें। व्हाट्सएप चैट में ग्राहकों के संदेश दिखते हैं और API कीज़ में WhatsApp कुंजियाँ सहेजने के बाद आप उत्तर दे सकते हैं।
-
-8. सहयोगी सेवाएँ
-विवाह संस्कार (प्रोफ़ाइल स्वीकृत या अस्वीकृत, सशुल्क सदस्य), तीर्थ व यात्रा (अनुरोध, वाहन और चालक) और कर सहायता (दस्तावेज़ और फ़ाइलिंग स्थिति)।
-
-9. अन्य सेवाएँ
-सहयोगी सेवाओं के कार्ड: शीर्षक, सेवा का स्वरूप, दिन, तिथियाँ, दिन-वार कार्यक्रम, वीडियो, डेमो, लिंक और Book Now वेबसाइट।
-
-10. एसोसिएट
-आवेदन स्वीकृत या अस्वीकृत करें, कमीशन नियम तय करें और भुगतान अनुरोध देखें। एसोसिएट को स्वयं भुगतान करने के बाद ही भुगतान को "भुगतान किया गया" चिह्नित करें।
-
-11. वेबसाइट सामग्री
-वेबसाइट सेटिंग, हीरो स्लाइड, बैनर, स्क्रॉलिंग सूचना, पेज, लेख, गैलरी, समीक्षाएँ, FAQ, संस्थापक, टीम, प्रमाणपत्र, अनुवाद और चैटबॉट "वेबसाइट" समूह से बदले जाते हैं। बदलाव वेबसाइट पर तुरंत दिखते हैं।
-
-12. गाइड
-गाइड के शब्द पेज व कानूनी में बदलें। उपयोगकर्ता, एसोसिएट और एडमिन गाइड के चित्र और वीडियो गाइड व चित्र में जोड़ें।
-
-13. कुंजियाँ और बैकअप
-API कीज़ व एनालिटिक्स में Razorpay, SMS, ईमेल, Google, AstroSage और WhatsApp की कुंजियाँ एन्क्रिप्टेड रहती हैं। बैकअप खोलकर नियमित रूप से प्रति डाउनलोड करें और सुरक्षित रखें।`,
+    // The full illustrated guide as editable text (Admin > Pages & legal > Guide: Admin). Screens are in the PDFs.
+    contentEn: ADMIN_GUIDE_EN,
+    contentHi: ADMIN_GUIDE_HI,
   },
 };
