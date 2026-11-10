@@ -261,10 +261,10 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
               alt={tCommon("siteNameHi")}
               width={64}
               height={48}
-              className="h-12 sm:h-[62px] w-auto shrink-0 rounded"
+              className="h-12 sm:h-[62px] xl:h-[52px] 2xl:h-[62px] w-auto shrink-0 rounded"
             />
             <div className="flex flex-col text-left min-w-0">
-              <span className="font-serif text-lg sm:text-[22px] font-bold tracking-tight text-secondary leading-[1.05] whitespace-nowrap truncate">
+              <span className="font-serif text-lg sm:text-[22px] xl:text-[18px] 2xl:text-[22px] font-bold tracking-tight text-secondary leading-[1.05] whitespace-nowrap truncate">
                 Maharshi Kanad Jyotish Kendra
               </span>
               <span className="text-[10px] sm:text-xs font-medium text-primary mt-1 whitespace-nowrap truncate">
@@ -274,7 +274,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 2xl:gap-2 h-20 ml-2 xl:ml-3 min-w-0">
+          <nav className="hidden xl:flex items-center gap-1 xl:gap-0.5 2xl:gap-2 h-20 ml-2 xl:ml-2 min-w-0">
             {primaryLinks.map((link) => {
               const isActive = checkIsActive(link.href);
               if (link.href === "/services") {
@@ -295,7 +295,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
                       type="button"
                       onClick={() => setNavBookOpen(!navBookOpen)}
                       aria-expanded={navBookOpen}
-                      className={`h-full flex items-center gap-1 px-1.5 2xl:px-2.5 text-[13px] font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
+                      className={`h-full flex items-center gap-1 px-1 2xl:px-2.5 text-[13px] font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
                         isActive || navBookOpen
                           ? "text-primary border-saffron font-bold"
                           : "text-secondary hover:text-primary border-transparent hover:border-saffron/50"
@@ -325,7 +325,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
                       setCurrentHash("");
                     }
                   }}
-                  className={`h-full flex items-center px-1.5 2xl:px-2.5 text-[13px] font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
+                  className={`h-full flex items-center px-1 2xl:px-2.5 text-[13px] font-semibold transition-all duration-200 border-b-2 whitespace-nowrap ${
                     isActive
                       ? "text-primary border-saffron font-bold"
                       : "text-secondary hover:text-primary border-transparent hover:border-saffron/50"
@@ -346,7 +346,7 @@ export function Header({ phone, panchang, social = [], logoUrl, topbar = {}, men
               <button
                 type="button"
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
-                className={`h-full flex items-center gap-1 px-1.5 xl:px-1.5 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 min-h-[44px] whitespace-nowrap ${
+                className={`h-full flex items-center gap-1 px-1 xl:px-1 2xl:px-2.5 text-xs uppercase xl:tracking-normal 2xl:tracking-wide font-semibold transition-all duration-200 border-b-2 min-h-[44px] whitespace-nowrap ${
                   isAnyKendraActive
                     ? "text-secondary border-signal font-bold"
                     : "text-on-surface-variant hover:text-secondary border-transparent hover:border-outline-variant/60"
