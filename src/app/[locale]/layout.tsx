@@ -68,7 +68,8 @@ const baseMetadata: Metadata = {
   description:
     "Vedic astrology consultations, Kundli preparation, Kundli matching and Prashna Kundli from Maharshi Kanad Jyotish Kendra, with online booking and order tracking in Hindi and English.",
   applicationName: SITE_NAME,
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  // The tab icon: /icon.png is the default; an icon uploaded in Admin > Website settings > Logo replaces it (see generateMetadata).
+  icons: { icon: "/icon.png", apple: "/icons/apple-touch-icon.png" },
   keywords: [
     "Vedic astrology",
     "Janam Kundli",
