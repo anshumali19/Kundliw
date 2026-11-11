@@ -114,7 +114,7 @@ We use reasonable security measures: encrypted connections (HTTPS), protected pa
 We keep your information while your account is active and for as long as needed to provide the service, keep accounting and tax records, resolve disputes and meet legal duties. After that it is deleted or made anonymous.
 
 **8. Your rights and account deletion**
-You can see and correct your details in your account, ask for a copy of your data, withdraw consent, or ask us to delete your account and personal data by writing to us from your registered email or phone number or by raising a Support ticket. We will act within a reasonable time. Some records (such as invoices) must be kept by law and cannot be deleted until the legal period ends.
+You can see and correct your details in your account, ask for a copy of your data, withdraw consent, or ask us to delete your account and personal data by writing to us from your registered email or phone number or by raising a Support ticket. You can also delete your account yourself, on the website or in the mobile app, from the [Delete your account](/delete-account) page. We will act within a reasonable time. Some records (such as invoices) must be kept by law and cannot be deleted until the legal period ends.
 
 **9. Children**
 Our services are not meant for persons under 18. A parent or guardian may use them on a child's behalf. We do not knowingly collect information from children without a guardian's involvement.
