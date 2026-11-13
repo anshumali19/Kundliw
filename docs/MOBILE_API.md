@@ -55,6 +55,10 @@ Removes the sign-in details, Vault files, ticket contact details and Associate p
 - `GET /api/mobile/v1/payment-info` (signed in) → the UPI ID, QR code and bank details the admin has set.
 - `GET /api/mobile/v1/orders` and `GET /api/mobile/v1/orders/{id}` (signed in) → the customer's own orders. Another customer's order answers `404`. Birth details and payment proof are not included.
 
+- `GET /api/mobile/v1/vault` (signed in) → `{ files: [{ id, titleEn, titleHi, fileName, fileSize, mimeType, uploadedByRole, uploadedAt }] }`, the person's own files (no storage path). Open one with `GET /api/vault/{id}?download=1` and the Bearer token; upload with `POST /api/vault/upload` (multipart `file`, `title`; 4 MB limit).
+- `GET /api/mobile/v1/tickets` and `GET /api/mobile/v1/tickets/{id}` (signed in) → the person's own support tickets, and one with its messages. Raise one with `POST /api/tickets`, reply with `POST /api/tickets/{id}` `{ message }`.
+- Associates use the existing `GET /api/associate/summary`, `POST /api/associate/payout` and `POST /api/associate/referral-code` with the Bearer token.
+
 Booking itself uses the existing routes with the same Bearer token: `POST /api/booking` (send an `idempotencyKey` so a retry never creates a second order), `POST /api/offers/validate`, and `POST /api/payments/manual/submit` `{ orderId, paymentMode: "MANUAL_UPI" | "MANUAL_BANK", manualPaymentRef }`.
 
 ## Existing routes the app uses unchanged

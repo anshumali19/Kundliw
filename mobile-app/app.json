@@ -32,7 +32,9 @@
           "resizeMode": "contain",
           "backgroundColor": "#FFFAF3"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-sharing"
     ],
     "scheme": "kanadjyotish",
     "experiments": {

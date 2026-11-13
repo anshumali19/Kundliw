@@ -27,7 +27,10 @@ export type Portal = "user" | "associate";
 
 interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  /** JSON by default; pass a FormData to upload a file */
   body?: unknown;
+  /** a longer time allowance for uploads */
+  timeoutMs?: number;
   /** false for sign-in and other calls made before the person is signed in */
   auth?: boolean;
 }
@@ -64,16 +67,17 @@ export function createApiClient(opts: ApiClientOptions) {
 
   async function raw(path: string, o: RequestOptions, accessToken: string | null): Promise<Response> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const timer = setTimeout(() => controller.abort(), o.timeoutMs ?? timeoutMs);
+    const isForm = typeof FormData !== "undefined" && o.body instanceof FormData;
     try {
       return await doFetch(`${opts.baseUrl}${path}`, {
         method: o.method ?? "GET",
         headers: {
           Accept: "application/json",
-          ...(o.body !== undefined ? { "Content-Type": "application/json" } : {}),
+          ...(o.body !== undefined && !isForm ? { "Content-Type": "application/json" } : {}),
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
-        body: o.body !== undefined ? JSON.stringify(o.body) : undefined,
+        body: o.body === undefined ? undefined : isForm ? (o.body as FormData) : JSON.stringify(o.body),
         signal: controller.signal,
       });
     } catch {
@@ -169,6 +173,11 @@ export function createApiClient(opts: ApiClientOptions) {
     },
     async me() {
       return (await request<{ user: ApiUser }>("/api/mobile/v1/me")).user;
+    },
+    /** The current access token, for downloads that cannot go through `request`. Call `me()` first to refresh an expired one. */
+    async accessToken(): Promise<string | null> {
+      await ensureLoaded();
+      return tokens?.accessToken ?? null;
     },
     /** Signing out only removes the tokens from this phone. */
     async signOut() {

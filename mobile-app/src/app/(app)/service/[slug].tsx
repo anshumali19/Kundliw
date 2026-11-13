@@ -1,4 +1,5 @@
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { Text } from "@/components/Text";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Button, Card, ErrorText } from "@/components/ui";
 import { useLanguage } from "@/lib/i18n";
