@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "org.kanadjyotish.app"
+      "bundleIdentifier": "org.maharshikanadjyotishkendra.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +17,7 @@
         "backgroundImage": "./assets/android-icon-background.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "org.kanadjyotish.app",
+      "package": "org.maharshikanadjyotishkendra.app",
       "versionCode": 1
     },
     "plugins": [
