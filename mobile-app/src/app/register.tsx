@@ -136,6 +136,14 @@ export default function RegisterScreen() {
                       <Text style={styles.consentText}>{t("adultConfirm")}</Text>
                     </Pressable>
                   </View>
+                  <View style={{ flexDirection: "row", gap: space.lg }}>
+                    <Pressable onPress={() => Linking.openURL(siteUrl("/legal/terms", lang))} accessibilityRole="link">
+                      <Text style={styles.link}>{t("terms")}</Text>
+                    </Pressable>
+                    <Pressable onPress={() => Linking.openURL(siteUrl("/legal/privacy", lang))} accessibilityRole="link">
+                      <Text style={styles.link}>{t("privacy")}</Text>
+                    </Pressable>
+                  </View>
                   {err("adult")}
                   <ErrorText>{formError}</ErrorText>
                   <Button label={t("createAccount")} onPress={submit} busy={busy} />
@@ -154,5 +162,6 @@ const styles = StyleSheet.create({
   body: { padding: space.lg, gap: space.lg },
   hint: { fontSize: 14, color: colors.text, lineHeight: 20 },
   consent: { flexDirection: "row", alignItems: "center", gap: space.md },
+  link: { fontSize: 13, fontWeight: "600", color: colors.brand, textDecorationLine: "underline" },
   consentText: { fontSize: 13, color: colors.text, lineHeight: 19 },
 });
