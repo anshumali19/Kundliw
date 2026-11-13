@@ -1,3 +1,4 @@
+import { validateRegister } from "../validation";
 import { canRequestPayout, commissionTone, isValidReferralCode, referralLink, type AssociateSummary } from "../associate";
 import { ticketTone, validateTicket, type TicketForm } from "../tickets";
 import { MAX_UPLOAD_BYTES, formatSize, iconFor, safeFileName } from "../vault";
@@ -95,5 +96,18 @@ describe("font weights", () => {
     expect(familyFor("500")).toBe("Poppins_500Medium");
     expect(familyFor(undefined)).toBe("Poppins_400Regular");
     expect(familyFor("700", true)).toBe("CormorantGaramond_700Bold");
+  });
+});
+
+describe("validateRegister", () => {
+  const ok = { name: "Ram Kumar", phone: "9876543210", email: "ram@example.com", password: "", adult: true, associate: false };
+  it("accepts a user without a password", () => expect(validateRegister(ok)).toEqual({}));
+  it("needs 8 characters for an associate, or when a password is typed", () => {
+    expect(validateRegister({ ...ok, associate: true }).password).toBe("errPasswordShort");
+    expect(validateRegister({ ...ok, password: "short" }).password).toBe("errPasswordShort");
+    expect(validateRegister({ ...ok, associate: true, password: "longenough" })).toEqual({});
+  });
+  it("lists every faulty field", () => {
+    expect(Object.keys(validateRegister({ name: "a", phone: "12", email: "x", password: "", adult: false, associate: false })).sort()).toEqual(["adult", "email", "name", "phone"]);
   });
 });

@@ -87,6 +87,12 @@ export default function BookScreen() {
 
   const submit = async () => {
     if (!service || !plan) return;
+    // Browsing is open to all; signing in is needed only now, before the order is made. This form stays open underneath.
+    if (!user) {
+      setFormError(t("loginToBook"));
+      router.push("/sign-in");
+      return;
+    }
     const found = validateBooking(form, service.slug, plan);
     setErrors(found);
     if (Object.keys(found).length > 0) {

@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { router } from "expo-router";
 import { Hero } from "@/components/Hero";
 import { LangChip } from "@/components/LangChip";
+import { SignInPrompt } from "@/components/SignInPrompt";
 import { Text } from "@/components/Text";
 import { Button, EmptyState, ErrorText, Pill, SkeletonList, TapCard } from "@/components/ui";
 import { ApiError } from "@/lib/api";
@@ -20,7 +21,13 @@ export function paymentTone(status: string): "success" | "warning" | "error" | "
 }
 
 /** The customer's own orders, newest first. */
-export default function OrdersScreen() {
+export default function OrdersGate() {
+  const { user } = useSession();
+  const { t } = useLanguage();
+  return user ? <OrdersScreen /> : <SignInPrompt title={t("guestOrdersTitle")} />;
+}
+
+function OrdersScreen() {
   const { api } = useSession();
   const { t, lang, pick } = useLanguage();
   const [orders, setOrders] = useState<MobileOrder[] | null>(null);

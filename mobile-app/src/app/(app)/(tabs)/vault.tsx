@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { Hero } from "@/components/Hero";
 import { LangChip } from "@/components/LangChip";
+import { SignInPrompt } from "@/components/SignInPrompt";
 import { Text } from "@/components/Text";
 import { Button, EmptyState, ErrorText, Pill, SkeletonList, TapCard } from "@/components/ui";
 import { ApiError } from "@/lib/api";
@@ -14,7 +15,13 @@ import { MAX_UPLOAD_BYTES, formatSize, iconFor, openVaultFile, type VaultFile } 
 import { colors, radius, space } from "@/theme";
 
 /** The person's private documents: reports sent by the Kendra and files they uploaded. */
-export default function VaultScreen() {
+export default function VaultGate() {
+  const { user } = useSession();
+  const { t } = useLanguage();
+  return user ? <VaultScreen /> : <SignInPrompt title={t("guestVaultTitle")} />;
+}
+
+function VaultScreen() {
   const { api } = useSession();
   const { t, lang, pick } = useLanguage();
   const [files, setFiles] = useState<VaultFile[] | null>(null);

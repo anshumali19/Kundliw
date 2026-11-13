@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { router } from "expo-router";
 import { Image, KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,7 +18,8 @@ type Method = "otp" | "password";
 export default function SignInScreen() {
   const { t, lang } = useLanguage();
   const insets = useSafeAreaInsets();
-  const { api, signInWithOtp, signInWithPassword } = useSession();
+  const { api, user, signInWithOtp, signInWithPassword } = useSession();
+  const leave = () => (router.canGoBack() ? router.back() : router.replace("/"));
 
   const [portal, setPortal] = useState<Portal>("user");
   const [method, setMethod] = useState<Method>("otp");
@@ -64,6 +66,11 @@ export default function SignInScreen() {
   };
 
   const resetError = () => setError("");
+
+  // Opened over the app for guests: once signed in, go back to where they were (the booking form keeps its entries)
+  useEffect(() => {
+    if (user) leave();
+  }, [user]);
 
   return (
     <View style={styles.safe}>
@@ -181,7 +188,8 @@ export default function SignInScreen() {
             )}
           </Card>
 
-          <Button label={t("register")} variant="outline" onPress={() => Linking.openURL(siteUrl("/auth/register", lang))} />
+          <Button label={t("register")} variant="outline" onPress={() => router.push("/register")} />
+          <Button label={t("continueBrowsing")} variant="text" onPress={leave} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

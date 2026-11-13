@@ -14,7 +14,7 @@ import { colors } from "@/theme";
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
-  const { user, isLoading, isOffline } = useSession();
+  const { isLoading, isOffline } = useSession();
 
   useEffect(() => {
     if (!isLoading && fontsReady) SplashScreen.hideAsync().catch(() => undefined);
@@ -25,11 +25,11 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
       <Stack.Protected guard={isOffline}>
         <Stack.Screen name="offline" />
       </Stack.Protected>
-      <Stack.Protected guard={!isOffline && !!user}>
+      {/* Browsing is open to everyone; sign-in and register open on top only when a person chooses them */}
+      <Stack.Protected guard={!isOffline}>
         <Stack.Screen name="(app)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!isOffline && !user}>
-        <Stack.Screen name="sign-in" />
+        <Stack.Screen name="sign-in" options={{ animation: "slide_from_bottom" }} />
+        <Stack.Screen name="register" options={{ animation: "slide_from_right" }} />
       </Stack.Protected>
     </Stack>
   );

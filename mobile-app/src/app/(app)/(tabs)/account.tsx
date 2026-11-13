@@ -32,7 +32,34 @@ export default function AccountScreen() {
   const { t, lang, setLang } = useLanguage();
   const [busy, setBusy] = useState(false);
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: space.xxl }}>
+        <Hero title={t("guestName")} subtitle={t("guestNote")} />
+        <View style={styles.body}>
+          <Button label={t("signIn")} onPress={() => router.push("/sign-in")} />
+          <Button label={t("createAccount")} variant="outline" onPress={() => router.push("/register")} />
+          <Card>
+            <Text style={styles.section}>{t("language")}</Text>
+            <Segmented
+              options={[
+                { value: "hi", label: "हिन्दी" },
+                { value: "en", label: "English" },
+              ]}
+              value={lang}
+              onChange={setLang}
+            />
+          </Card>
+          <SectionTitle>{t("legal")}</SectionTitle>
+          <Card style={{ gap: 0, paddingVertical: space.xs }}>
+            {LEGAL.map((l, i) => (
+              <Link key={l.key} icon="document-text-outline" label={t(l.key)} onPress={() => Linking.openURL(siteUrl(l.path, lang))} last={i === LEGAL.length - 1} />
+            ))}
+          </Card>
+        </View>
+      </ScrollView>
+    );
+  }
   const isAssociate = user.role === "ASSOCIATE";
   const initial = (user.name || user.email || user.phone || "?").trim().charAt(0).toUpperCase();
 

@@ -95,10 +95,16 @@ export function createApiClient(opts: ApiClientOptions) {
       data = null;
     }
     if (!res.ok) {
-      const message =
+      let message =
         data && typeof data === "object" && typeof (data as { error?: unknown }).error === "string"
           ? (data as { error: string }).error
           : "Something went wrong. Please try again.";
+      // The website's validation answer lists the faulty fields; show the first reason instead of "Validation failed"
+      const details = data && typeof data === "object" ? (data as { details?: unknown }).details : null;
+      if (details && typeof details === "object") {
+        const first = Object.values(details as Record<string, unknown>).flat().find((v) => typeof v === "string");
+        if (typeof first === "string") message = first;
+      }
       throw new ApiError(message, res.status);
     }
     return data as T;
