@@ -1,53 +1,29 @@
-import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { Button, ErrorText } from "@/components/ui";
-import { ApiError } from "@/lib/api";
-import { siteUrl } from "@/lib/config";
 import { useLanguage } from "@/lib/i18n";
 import { useSession } from "@/lib/session";
+import { useCatalog } from "@/lib/useCatalog";
 import { formatPaise } from "@/lib/validation";
 import { colors, radius, space, TOUCH } from "@/theme";
 
-interface CatalogService {
-  slug: string;
-  titleEn: string;
-  titleHi: string;
-  plans: { id: string; pricePaise: number }[];
-}
-
 export default function HomeScreen() {
-  const { user, api } = useSession();
+  const { user } = useSession();
   const { t, lang, pick } = useLanguage();
-  const [services, setServices] = useState<CatalogService[] | null>(null);
-  const [error, setError] = useState("");
+  const { catalog, error, reload, loading } = useCatalog();
   const [refreshing, setRefreshing] = useState(false);
-
-  const load = useCallback(async () => {
-    setError("");
-    try {
-      const data = await api.request<{ services: CatalogService[] }>("/api/booking/catalog", { auth: false });
-      setServices(data.services);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : String(e));
-      setServices((s) => s ?? []);
-    }
-  }, [api]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await load();
+    await reload();
     setRefreshing(false);
   };
 
   return (
     <FlatList
       contentContainerStyle={styles.content}
-      data={services ?? []}
+      data={catalog?.services ?? []}
       keyExtractor={(s) => s.slug}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.brand} />}
       ListHeaderComponent={
@@ -59,27 +35,29 @@ export default function HomeScreen() {
             </View>
             <Button label={t("account")} variant="outline" onPress={() => router.push("/account")} />
           </View>
+          <Button label={t("myOrders")} variant="outline" onPress={() => router.push("/orders")} />
           <Text style={styles.heading}>{t("services")}</Text>
-          <Text style={styles.note}>{t("bookOnWebsite")}</Text>
+          <Text style={styles.note}>{t("tapToBook")}</Text>
           <ErrorText>{error}</ErrorText>
-          {error ? <Button label={t("retry")} variant="outline" onPress={load} /> : null}
+          {error ? <Button label={t("retry")} variant="outline" onPress={reload} /> : null}
         </View>
       }
       ListEmptyComponent={
-        services === null ? <ActivityIndicator color={colors.brand} style={{ marginTop: space.xl }} /> : error ? undefined : <Text style={styles.note}>{t("noServices")}</Text>
+        loading ? <ActivityIndicator color={colors.brand} style={{ marginTop: space.xl }} /> : error ? undefined : <Text style={styles.note}>{t("noServices")}</Text>
       }
       renderItem={({ item }) => {
         const min = item.plans.length ? Math.min(...item.plans.map((p) => p.pricePaise)) : null;
+        const count = item.plans.length;
         return (
           <Pressable
-            accessibilityRole="link"
-            onPress={() => Linking.openURL(siteUrl(`/services/${item.slug}`, lang))}
+            accessibilityRole="button"
+            onPress={() => router.push({ pathname: "/service/[slug]", params: { slug: item.slug } })}
             style={({ pressed }) => [styles.service, pressed && { backgroundColor: colors.surfaceContainer }]}
           >
             <Text style={styles.serviceTitle}>{pick(item.titleEn, item.titleHi)}</Text>
             <Text style={styles.serviceMeta}>
               {min !== null ? `${t("from")} ${formatPaise(min)} · ` : ""}
-              {item.plans.length} {t("plans")}
+              {count} {lang === "en" && count === 1 ? t("plan") : t("plans")}
             </Text>
           </Pressable>
         );

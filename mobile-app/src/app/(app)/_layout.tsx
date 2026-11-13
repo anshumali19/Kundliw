@@ -15,6 +15,11 @@ export default function AppLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: t("home") }} />
+      <Stack.Screen name="service/[slug]" options={{ title: t("services") }} />
+      <Stack.Screen name="book" options={{ title: t("bookingTitle") }} />
+      <Stack.Screen name="pay/[id]" options={{ title: t("payTitle") }} />
+      <Stack.Screen name="orders" options={{ title: t("myOrders") }} />
+      <Stack.Screen name="orders/[id]" options={{ title: t("orderNo") }} />
       <Stack.Screen name="account" options={{ title: t("account") }} />
       <Stack.Screen name="delete-account" options={{ title: t("deleteTitle") }} />
     </Stack>
