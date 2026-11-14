@@ -6,6 +6,7 @@ import { Hero } from "@/components/Hero";
 import { LangChip } from "@/components/LangChip";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Text } from "@/components/Text";
+import { FadeIn, TileLink } from "@/components/ContentKit";
 import { Button, ErrorText, SectionTitle, SkeletonList } from "@/components/ui";
 import { useLanguage } from "@/lib/i18n";
 import { useSession } from "@/lib/session";
@@ -28,6 +29,17 @@ export default function HomeScreen() {
       : { icon: "receipt", label: t("tabOrders"), go: () => router.push("/orders") },
     { icon: "folder-open", label: t("tabVault"), go: () => router.push("/vault") },
     { icon: "chatbubbles", label: t("support"), go: () => router.push("/tickets") },
+  ];
+
+  const explore: { icon: IconName; label: string; path: string }[] = [
+    { icon: "information-circle", label: t("aboutUs"), path: "/explore/about" },
+    { icon: "person-circle", label: t("founderTitle"), path: "/explore/founder" },
+    { icon: "pricetags", label: t("offersTitle"), path: "/explore/offers" },
+    { icon: "images", label: t("galleryTitle"), path: "/explore/gallery" },
+    { icon: "book", label: t("blogsTitle"), path: "/explore/blogs" },
+    { icon: "heart", label: t("testimonialsTitle"), path: "/explore/testimonials" },
+    { icon: "help-circle", label: t("faqTitle"), path: "/explore/faq" },
+    { icon: "call", label: t("contactTitle"), path: "/explore/contact" },
   ];
 
   const onRefresh = async () => {
@@ -83,6 +95,15 @@ export default function HomeScreen() {
         {loading ? <SkeletonList count={3} /> : null}
         {catalog?.services.slice(0, 3).map((s) => <ServiceCard key={s.slug} service={s} />)}
         {catalog && catalog.services.length === 0 ? <Text style={styles.note}>{t("noServices")}</Text> : null}
+
+        <SectionTitle>{t("explore")}</SectionTitle>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingVertical: space.xs, paddingRight: space.lg }}>
+          {explore.map((e, i) => (
+            <FadeIn key={e.path} index={i}>
+              <TileLink icon={<Ionicons name={e.icon} size={22} color={colors.maroon} />} title={e.label} onPress={() => router.push(e.path as never)} />
+            </FadeIn>
+          ))}
+        </ScrollView>
 
         <Button label={t("contactUs")} variant="outline" onPress={() => Linking.openURL("tel:+919827991224")} />
       </View>
