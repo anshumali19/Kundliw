@@ -1,3 +1,4 @@
+import { setApiLanguage } from "./api";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import * as SecureStore from "expo-secure-store";
 
@@ -295,6 +296,7 @@ export function translate(lang: Lang, key: StringKey): string {
 export function LanguageProvider({ children }: { children: ReactNode }) {
   // Hindi first, like the website
   const [lang, setLangState] = useState<Lang>("hi");
+  setApiLanguage(lang);
 
   useEffect(() => {
     SecureStore.getItemAsync(LANG_KEY)

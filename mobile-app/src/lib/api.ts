@@ -44,7 +44,35 @@ export interface ApiClientOptions {
   timeoutMs?: number;
 }
 
-const NETWORK_MESSAGE = "Could not reach the server. Please check your internet connection.";
+let apiLanguage: "hi" | "en" = "hi";
+/** The screen language, so messages the server does not supply are shown in it */
+export function setApiLanguage(lang: "hi" | "en") {
+  apiLanguage = lang;
+}
+
+const MESSAGES = {
+  network: {
+    en: "Could not reach the server. Please check your internet connection.",
+    hi: "सर्वर से संपर्क नहीं हो पाया। कृपया अपना इंटरनेट जाँचें।",
+  },
+  unavailable: {
+    en: "This feature is not available right now. Please try again later or update the app.",
+    hi: "यह सुविधा अभी उपलब्ध नहीं है। कृपया बाद में प्रयास करें या ऐप अपडेट करें।",
+  },
+  server: {
+    en: "The server had a problem. Please try again in a little while.",
+    hi: "सर्वर में समस्या आई। कृपया थोड़ी देर बाद फिर प्रयास करें।",
+  },
+  generic: {
+    en: "Something went wrong. Please try again.",
+    hi: "कुछ गड़बड़ हो गई। कृपया फिर प्रयास करें।",
+  },
+} as const;
+
+function fallbackMessage(status: number): string {
+  const kind = status === 404 ? "unavailable" : status >= 500 ? "server" : "generic";
+  return MESSAGES[kind][apiLanguage];
+}
 
 /**
  * The one place the app talks to the server. It adds the access token, and when the server answers
@@ -81,7 +109,7 @@ export function createApiClient(opts: ApiClientOptions) {
         signal: controller.signal,
       });
     } catch {
-      throw new ApiError(NETWORK_MESSAGE, 0);
+      throw new ApiError(MESSAGES.network[apiLanguage], 0);
     } finally {
       clearTimeout(timer);
     }
@@ -98,7 +126,7 @@ export function createApiClient(opts: ApiClientOptions) {
       let message =
         data && typeof data === "object" && typeof (data as { error?: unknown }).error === "string"
           ? (data as { error: string }).error
-          : "Something went wrong. Please try again.";
+          : fallbackMessage(res.status);
       // The website's validation answer lists the faulty fields; show the first reason instead of "Validation failed"
       const details = data && typeof data === "object" ? (data as { details?: unknown }).details : null;
       if (details && typeof details === "object") {
