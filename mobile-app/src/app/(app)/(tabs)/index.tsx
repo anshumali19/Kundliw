@@ -133,7 +133,8 @@ const styles = StyleSheet.create({
     ...shadow.strong,
   },
   tileIcon: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.goldSoft, alignItems: "center", justifyContent: "center" },
-  tileLabel: { fontSize: 12, fontWeight: "600", color: colors.heading, textAlign: "center" },
+  // Full tile width and its own line height: Hindi words were measured too narrow and cut off
+  tileLabel: { alignSelf: "stretch", fontSize: 12, lineHeight: 18, fontWeight: "600", color: colors.heading, textAlign: "center" },
   seeAll: { fontSize: 13, fontWeight: "600", color: colors.primary },
   note: { fontSize: 14, color: colors.textMuted },
 });
