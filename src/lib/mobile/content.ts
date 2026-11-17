@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getActiveSocialLinks, getSection } from "@/lib/siteConfig/service";
 import { isSafeImageSrc, normalizeBlocks, normalizeLinks } from "@/lib/content/media";
+import { kendraEmail } from "@/lib/content/contact";
 
 /**
  * The public pages of the website, shaped for the app. Everything is read from the same places
@@ -9,7 +10,7 @@ import { isSafeImageSrc, normalizeBlocks, normalizeLinks } from "@/lib/content/m
  * adds the website address in front of the ones that start with "/".
  */
 
-const image = (v: string | null | undefined) => (isSafeImageSrc(v) ? (v as string).trim() : null);
+const image = (v: string | null | undefined) => (isSafeImageSrc(v) && !/placehold.co/i.test(v) ? (v as string).trim() : null);
 const text = (v: unknown) => (typeof v === "string" ? v : "");
 const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
 
@@ -228,7 +229,7 @@ async function contact() {
     siteNameHi: s?.siteNameHi ?? null,
     phone1: s?.phone1 ?? null,
     phone2: s?.phone2 ?? null,
-    email: s?.email ?? null,
+    email: kendraEmail(s?.email),
     addressEn: s?.addressEn ?? null,
     addressHi: s?.addressHi ?? null,
     city: s?.city ?? null,
