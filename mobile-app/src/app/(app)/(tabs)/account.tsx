@@ -138,8 +138,7 @@ function AboutApp() {
   };
 
   const share = () => {
-    Share.share({ message: `${t("shareAppText")}
-${config.playStoreUrl || siteUrl("/app", lang)}` }).catch(() => undefined);
+    Share.share({ message: `${t("shareAppText")}\n${config.playStoreUrl || siteUrl("/app", lang)}` }).catch(() => undefined);
   };
 
   const note = state === "none" ? t("upToDate") : state === "error" ? t("updateCheckFailed") : state === "disabled" ? t("updatesOff") : "";

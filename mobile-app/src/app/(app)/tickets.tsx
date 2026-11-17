@@ -60,7 +60,7 @@ export default function TicketsScreen() {
       {home.data ? (
         <View style={styles.contactRow}>
           <View style={{ flex: 1 }}>
-            <Button label={t("callUs")} variant="outline" onPress={() => Linking.openURL(`tel:${home.data!.contact.phone.replace(/[^+d]/g, "")}`).catch(() => undefined)} />
+            <Button label={t("callUs")} variant="outline" onPress={() => Linking.openURL(`tel:${home.data!.contact.phone.replace(/[^+\d]/g, "")}`).catch(() => undefined)} />
           </View>
           <View style={{ flex: 1 }}>
             <Button label={t("whatsappUs")} variant="outline" onPress={() => Linking.openURL(whatsappUrl(home.data!.contact.whatsapp, t("waHello"))).catch(() => undefined)} />
