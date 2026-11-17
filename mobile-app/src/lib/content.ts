@@ -202,6 +202,13 @@ export function useContent<T>(path: string) {
   return { data, error, reload, loading: data === null && !error };
 }
 
+/** The questions matching a search text, in question or answer, in either language. */
+export function filterFaq<T extends { questionEn: string; questionHi: string; answerEn: string; answerHi: string }>(items: T[], query: string): T[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return items;
+  return items.filter((i) => [i.questionEn, i.questionHi, i.answerEn, i.answerHi].some((v) => (v ?? "").toLowerCase().includes(q)));
+}
+
 /** An excerpt without the simple markup, for a short preview. */
 export function plainText(text: string | null | undefined): string {
   return (text || "").replace(/\*\*/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").trim();

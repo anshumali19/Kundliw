@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import { Hero } from "@/components/Hero";
 import { LangChip } from "@/components/LangChip";
 import { ServiceCard } from "@/components/ServiceCard";
@@ -17,7 +18,8 @@ export default function ServicesScreen() {
   const { catalog, error, reload, loading } = useCatalog();
   const { saved } = useSaved();
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState<ServiceFilter>("ALL");
+  const params = useLocalSearchParams<{ filter?: string }>();
+  const [filter, setFilter] = useState<ServiceFilter>(params.filter === "saved" ? "SAVED" : "ALL");
   const [query, setQuery] = useState("");
   const shown = useMemo(() => filterServices(catalog?.services ?? [], filter, query, saved), [catalog, filter, query, saved]);
 

@@ -21,6 +21,7 @@ import {
   type Gender,
 } from "@/lib/booking";
 import { useLanguage } from "@/lib/i18n";
+import { useMyDetails } from "@/lib/myDetails";
 import { useSession } from "@/lib/session";
 import { useCatalog } from "@/lib/useCatalog";
 import { formatPaise } from "@/lib/validation";
@@ -39,6 +40,7 @@ export default function BookScreen() {
   const { user, api } = useSession();
   const { t, lang, pick } = useLanguage();
   const { catalog, error: loadError, reload, loading } = useCatalog();
+  const { details: saved } = useMyDetails();
 
   const [form, setForm] = useState<BookingForm>(() =>
     emptyForm({ name: user?.name ?? "", phone: user?.phone?.replace(/^\+?91/, "") ?? "", email: user?.email ?? "", language: lang }),
@@ -98,6 +100,12 @@ export default function BookScreen() {
   const removeOffer = () => {
     setOffer(null);
     set("offerCode", "");
+  };
+
+  const fillSaved = () => {
+    if (!saved) return;
+    setForm((f) => ({ ...f, name: saved.name || f.name, gender: saved.gender, dob: saved.dob, tob: saved.tob, timeUnknown: saved.timeUnknown, pob: saved.pob }));
+    setErrors({});
   };
 
   const submit = async () => {
@@ -160,6 +168,7 @@ export default function BookScreen() {
 
         <Card>
           <Text style={styles.section}>{t("yourDetails")}</Text>
+          {saved ? <Button label={t("fillSaved")} variant="outline" onPress={fillSaved} /> : null}
           {text("name", t("fullName"), { autoCapitalize: "words" })}
           <Text style={styles.label}>{t("gender")}</Text>
           <Segmented options={genderOptions} value={form.gender} onChange={(v) => set("gender", v)} />
