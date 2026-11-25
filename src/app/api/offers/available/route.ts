@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { hiddenFor } from "@/lib/audience";
 import { prisma } from "@/lib/prisma";
 import { applyOffer, pickBestAutoOffer } from "@/lib/offers/apply";
 import { formatPaiseToInr } from "@/lib/billing/gst";
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     const offers = await prisma.offer.findMany({
-      where: { isActive: true, showOnPlan: true },
+      where: { isActive: true, showOnPlan: true, id: { notIn: await hiddenFor("offer", "web") } },
       orderBy: { createdAt: "desc" },
       take: 20,
     });

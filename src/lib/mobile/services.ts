@@ -3,6 +3,7 @@ import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/package
 import { activePlanWhere } from "@/lib/content/packages";
 import { isSafeImageSrc, normalizeLinks } from "@/lib/content/media";
 import { normalizeDemos } from "@/lib/content/demos";
+import { hiddenFor } from "@/lib/audience";
 
 /**
  * The full page of one service (and of one "other service" card) for the app, read from the same
@@ -43,7 +44,7 @@ export async function getServiceDetail(slug: string) {
       },
     })
     .catch(() => null);
-  if (!s) return null;
+  if (!s || (await hiddenFor("service", "app")).includes(s.id)) return null;
   const booked = await bookedSeatsByPackage(s.packages.map((k) => k.id)).catch(() => ({}) as Record<string, number>);
   const packageIds = new Set(s.packages.map((k) => k.id));
   return {
@@ -118,7 +119,7 @@ export async function getServiceDetail(slug: string) {
 
 export async function getOtherServiceDetail(slug: string) {
   const o = await prisma.otherService.findFirst({ where: { slug, isActive: true } }).catch(() => null);
-  if (!o) return null;
+  if (!o || (await hiddenFor("otherService", "app")).includes(o.id)) return null;
   const actionUrl = o.actionUrl && /^https:\/\//i.test(o.actionUrl) ? o.actionUrl : null;
   const social = (u: string | null | undefined) => (u && /^https:\/\//i.test(u) ? u : null);
   return {

@@ -1,4 +1,5 @@
 import { activePlanWhere } from "@/lib/content/packages";
+import { hiddenIds, loadAudience } from "@/lib/audience";
 import type { Metadata } from "next";
 import { Poppins, Noto_Sans, Cormorant_Garamond, Noto_Serif_Devanagari } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
@@ -169,24 +170,27 @@ export default async function LocaleLayout(
   // Tells next-intl the language without reading request headers, so the page can be saved and reused
   setRequestLocale(locale);
 
+  // Banners and notices the admin chose to show in the app only (Admin > Show where) are left out of the website
+  const aud = await loadAudience();
+  const hide = (k: Parameters<typeof hiddenIds>[1]) => ({ notIn: hiddenIds(aud, k, "web") });
   // All of the layout's database reads run together instead of one after another
   const [messages, topBanners, bottomBanners, marqueeItems, features, panchang, activeSocial, toolsCfg, menuPages, settings, catalogue, themeCfg, topbarCfg, floatCfg, introCfg, menuRows] = await Promise.all([
     getMessages(),
     prisma.banner
         .findMany({
-          where: { isActive: true, position: "TOP" },
+          where: { isActive: true, id: hide("banner"), position: "TOP" },
           orderBy: { orderIndex: "asc" },
         })
         .catch(() => []),
     prisma.banner
         .findMany({
-          where: { isActive: true, position: "BOTTOM" },
+          where: { isActive: true, id: hide("banner"), position: "BOTTOM" },
           orderBy: { orderIndex: "asc" },
         })
         .catch(() => []),
     prisma.marqueeItem
         .findMany({
-          where: { isActive: true },
+          where: { isActive: true, id: hide("marquee") },
           orderBy: { orderIndex: "asc" },
           select: {
             id: true,

@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { hiddenFor } from "@/lib/audience";
 import { stripRich } from "@/lib/content/richText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
@@ -43,7 +44,7 @@ export default async function BlogsPage(props: BlogsPageProps) {
   const isHindi = locale === "hi";
 
   const posts = await prisma.blogPost.findMany({
-    where: { isPublished: true },
+    where: { isPublished: true, id: { notIn: await hiddenFor("blog", "web") } },
     orderBy: { createdAt: "desc" },
   });
 

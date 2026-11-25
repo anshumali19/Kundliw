@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { hiddenFor } from "@/lib/audience";
 import { Link } from "@/i18n/routing";
 import { formatPaiseToInr } from "@/lib/billing/gst";
 import { Check } from "lucide-react";
@@ -14,9 +15,10 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
   const name = (x: { titleEn: string; titleHi: string }) => (isHindi ? x.titleHi || x.titleEn : x.titleEn);
   const now = new Date();
 
+  const [hiddenServices, hiddenOffers] = await Promise.all([hiddenFor("service", "web"), hiddenFor("offer", "web")]);
   const [services, offers, orders] = await Promise.all([
     prisma.service.findMany({
-      where: { isActive: true },
+      where: { isActive: true, id: { notIn: hiddenServices } },
       orderBy: { orderIndex: "asc" },
       include: {
         packages: { where: { isActive: true }, orderBy: { orderIndex: "asc" } },
@@ -24,7 +26,7 @@ export async function ServiceExplorer({ userId, locale }: { userId: string; loca
       },
     }),
     prisma.offer.findMany({
-      where: { isActive: true, validFrom: { lte: now }, OR: [{ validUntil: null }, { validUntil: { gte: now } }] },
+      where: { isActive: true, id: { notIn: hiddenOffers }, validFrom: { lte: now }, OR: [{ validUntil: null }, { validUntil: { gte: now } }] },
       orderBy: { createdAt: "desc" },
     }),
     prisma.order.findMany({

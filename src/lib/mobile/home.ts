@@ -3,6 +3,7 @@ import { getSection } from "@/lib/siteConfig/service";
 import { HERO_SLIDES_KEY, normalizeHeroSlides, slideIsShowable } from "@/lib/content/heroSlides";
 import { isSafeImageSrc } from "@/lib/content/media";
 import { kendraEmail } from "@/lib/content/contact";
+import { hiddenIds, loadAudience } from "@/lib/audience";
 
 /**
  * Everything the app's Home screen shows, from the same settings the website's home page uses
@@ -55,28 +56,32 @@ export async function loadHome() {
   ]);
 
   const now = new Date();
+  // What the admin chose to show on the website only (Admin > Show where) is left out of the app
+  const aud = await loadAudience();
+  const hide = (k: Parameters<typeof hiddenIds>[1]) => ({ notIn: hiddenIds(aud, k, "app") });
   const [services, slidesRaw, marquee, offers, others, testimonials, posts, faqs, gallery, settings] = await Promise.all([
     prisma.service.findMany({ where: { isActive: true }, select: { slug: true, imageUrl: true } }).catch(() => []),
     prisma.siteConfig.findUnique({ where: { key: HERO_SLIDES_KEY } }).then((r) => normalizeHeroSlides(r?.value)).catch(() => []),
-    prisma.marqueeItem.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.marqueeItem.findMany({ where: { isActive: true, id: hide("marquee") }, orderBy: { orderIndex: "asc" } }).catch(() => []),
     prisma.offer
       .findMany({
-        where: { isActive: true, showInPopup: true, validFrom: { lte: now }, OR: [{ validUntil: null }, { validUntil: { gte: now } }] },
+        where: { isActive: true, id: hide("offer"), showInPopup: true, validFrom: { lte: now }, OR: [{ validUntil: null }, { validUntil: { gte: now } }] },
         orderBy: { createdAt: "desc" },
         take: 6,
       })
       .catch(() => []),
-    prisma.otherService.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" } }).catch(() => []),
-    prisma.testimonial.findMany({ where: { isActive: true, isVerified: true }, orderBy: { orderIndex: "asc" }, take: 6 }).catch(() => []),
-    prisma.blogPost.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 4 }).catch(() => []),
-    prisma.faqItem.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, take: 6 }).catch(() => []),
-    prisma.mediaGalleryItem.findMany({ where: { isActive: true, mediaType: "IMAGE" }, orderBy: { orderIndex: "asc" }, take: 8 }).catch(() => []),
+    prisma.otherService.findMany({ where: { isActive: true, id: hide("otherService") }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.testimonial.findMany({ where: { isActive: true, isVerified: true, id: hide("testimonial") }, orderBy: { orderIndex: "asc" }, take: 6 }).catch(() => []),
+    prisma.blogPost.findMany({ where: { isPublished: true, id: hide("blog") }, orderBy: { createdAt: "desc" }, take: 4 }).catch(() => []),
+    prisma.faqItem.findMany({ where: { isActive: true, id: hide("faq") }, orderBy: { orderIndex: "asc" }, take: 6 }).catch(() => []),
+    prisma.mediaGalleryItem.findMany({ where: { isActive: true, mediaType: "IMAGE", id: hide("gallery") }, orderBy: { orderIndex: "asc" }, take: 8 }).catch(() => []),
     prisma.adminSettings.findFirst({ select: { phone1: true, phone2: true, email: true, whatsappNumber: true, socialWhatsapp: true } }).catch(() => null),
   ]);
 
   const serviceImage = new Map(services.map((s) => [s.slug, s.imageUrl]));
+  const hiddenSlides = new Set(hiddenIds(aud, "slide", "app"));
   const slides = slidesRaw
-    .filter((s) => slideIsShowable(s, serviceImage.get(s.serviceSlug)))
+    .filter((s) => !hiddenSlides.has(s.id) && slideIsShowable(s, serviceImage.get(s.serviceSlug)))
     .map((s) => ({
       id: s.id,
       imageUrl: image(s.imageUrl) || image(serviceImage.get(s.serviceSlug)),

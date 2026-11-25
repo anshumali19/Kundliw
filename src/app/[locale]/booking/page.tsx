@@ -1,4 +1,5 @@
 import { BackBar } from "@/components/layout/BackBar";
+import { hiddenFor } from "@/lib/audience";
 import { BookingSteps } from "@/components/booking/BookingSteps";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
@@ -58,7 +59,7 @@ export default async function BookingPage(props: BookingPageProps) {
 
   // Fetch all active services with their active plans
   const services = await prisma.service.findMany({
-    where: { isActive: true },
+    where: { isActive: true, id: { notIn: await hiddenFor("service", "web") } },
     include: {
       plans: {
         where: activePlanWhere,

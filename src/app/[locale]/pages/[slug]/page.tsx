@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { hiddenFor } from "@/lib/audience";
 import { RichText } from "@/components/content/RichText";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -16,7 +17,8 @@ async function loadPage(slug: string) {
   // Built-in pages have their own routes; only custom pages are served here.
   if (isCorePageSlug(slug)) return null;
   const page = await prisma.staticPage.findUnique({ where: { slug } }).catch(() => null);
-  return page && page.isActive ? page : null;
+  if (!page || !page.isActive || (await hiddenFor("page", "web")).includes(page.id)) return null;
+  return page;
 }
 
 export async function generateMetadata(props: CustomPageProps): Promise<Metadata> {

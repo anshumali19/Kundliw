@@ -94,8 +94,9 @@ describe("Phase 17 - FAQ System", () => {
   it("public GET /api/faq filters by category parameter", async () => {
     const req = new NextRequest("http://localhost:3000/api/faq?category=puja");
     await publicFaq.GET(req);
+    // The website also leaves out what the admin chose to show in the app only (empty here)
     expect(prisma.faqItem.findMany).toHaveBeenCalledWith({
-      where: { isActive: true, category: "PUJA" },
+      where: { isActive: true, category: "PUJA", id: { notIn: [] } },
       orderBy: [{ category: "asc" }, { orderIndex: "asc" }, { createdAt: "desc" }],
     });
   });

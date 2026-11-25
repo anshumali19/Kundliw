@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import { activePlanWhere } from "@/lib/content/packages";
 import { getGstSettings } from "@/lib/billing/gstSettings";
+import { hiddenFor } from "@/lib/audience";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export async function GET() {
   try {
     const services = await prisma.service.findMany({
       // Services paid on a partner website cannot be booked here, so the app does not list them
-      where: { isActive: true, externalPayUrl: null },
+      where: { isActive: true, externalPayUrl: null, id: { notIn: await hiddenFor("service", "app") } },
       orderBy: { orderIndex: "asc" },
       include: {
         plans: { where: activePlanWhere, orderBy: { orderIndex: "asc" } },

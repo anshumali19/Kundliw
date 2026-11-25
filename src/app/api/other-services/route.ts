@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { hiddenFor } from "@/lib/audience";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const items = await prisma.otherService.findMany({
-      where: { isActive: true },
+      where: { isActive: true, id: { notIn: await hiddenFor("otherService", "web") } },
       orderBy: { orderIndex: "asc" },
     });
     return NextResponse.json({ success: true, items });

@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/routing";
+import { hiddenFor } from "@/lib/audience";
 import { prisma } from "@/lib/prisma";
 import { getSection } from "@/lib/siteConfig/service";
 import { RichText } from "@/components/content/RichText";
@@ -118,7 +119,7 @@ export async function HomeMoreBands({ locale }: { locale: string }) {
 
   const [creds, posts, founder] = await Promise.all([
     showCred ? prisma.credential.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, take: 8 }).catch(() => []) : Promise.resolve([]),
-    showBlog ? prisma.blogPost.findMany({ where: { isPublished: true }, orderBy: { publishedAt: "desc" }, take: 3 }).catch(() => []) : Promise.resolve([]),
+    showBlog ? prisma.blogPost.findMany({ where: { isPublished: true, id: { notIn: await hiddenFor("blog", "web") } }, orderBy: { publishedAt: "desc" }, take: 3 }).catch(() => []) : Promise.resolve([]),
     showFounder ? prisma.founderProfile.findUnique({ where: { id: "default" } }).catch(() => null) : Promise.resolve(null),
   ]);
 

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getActiveSocialLinks, getSection } from "@/lib/siteConfig/service";
 import { isSafeImageSrc, normalizeBlocks, normalizeLinks } from "@/lib/content/media";
 import { kendraEmail } from "@/lib/content/contact";
+import { hiddenFor } from "@/lib/audience";
 import { CREDENTIAL_LABEL, type CredentialKind } from "@/lib/content/credentials";
 
 /**
@@ -92,7 +93,7 @@ async function founder() {
 
 async function faq() {
   const items = await prisma.faqItem
-    .findMany({ where: { isActive: true }, orderBy: [{ category: "asc" }, { orderIndex: "asc" }, { createdAt: "desc" }] })
+    .findMany({ where: { isActive: true, id: { notIn: await hiddenFor("faq", "app") } }, orderBy: [{ category: "asc" }, { orderIndex: "asc" }, { createdAt: "desc" }] })
     .catch(() => []);
   return {
     items: items.map((i) => ({
@@ -107,7 +108,7 @@ async function faq() {
 }
 
 async function gallery() {
-  const items = await prisma.mediaGalleryItem.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" } }).catch(() => []);
+  const items = await prisma.mediaGalleryItem.findMany({ where: { isActive: true, id: { notIn: await hiddenFor("gallery", "app") } }, orderBy: { orderIndex: "asc" } }).catch(() => []);
   return {
     items: items.map((i) => ({
       id: i.id,
@@ -124,7 +125,7 @@ async function gallery() {
 }
 
 async function blogs() {
-  const posts = await prisma.blogPost.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" } }).catch(() => []);
+  const posts = await prisma.blogPost.findMany({ where: { isPublished: true, id: { notIn: await hiddenFor("blog", "app") } }, orderBy: { createdAt: "desc" } }).catch(() => []);
   return {
     posts: posts.map((p) => ({
       slug: p.slug,
@@ -141,7 +142,7 @@ async function blogs() {
 /** One full article */
 export async function getBlogPost(slug: string) {
   const p = await prisma.blogPost.findUnique({ where: { slug } }).catch(() => null);
-  if (!p || !p.isPublished) return null;
+  if (!p || !p.isPublished || (await hiddenFor("blog", "app")).includes(p.id)) return null;
   return {
     slug: p.slug,
     titleEn: p.titleEn,
@@ -159,7 +160,7 @@ export async function getBlogPost(slug: string) {
 
 async function testimonials() {
   const items = await prisma.testimonial
-    .findMany({ where: { isActive: true, isVerified: true }, orderBy: { orderIndex: "asc" } })
+    .findMany({ where: { isActive: true, isVerified: true, id: { notIn: await hiddenFor("testimonial", "app") } }, orderBy: { orderIndex: "asc" } })
     .catch(() => []);
   return {
     items: items.map((t) => ({
@@ -183,7 +184,7 @@ async function offers() {
   const now = new Date();
   const list = await prisma.offer
     .findMany({
-      where: { isActive: true, validFrom: { lte: now }, OR: [{ validUntil: null }, { validUntil: { gte: now } }] },
+      where: { isActive: true, id: { notIn: await hiddenFor("offer", "app") }, validFrom: { lte: now }, OR: [{ validUntil: null }, { validUntil: { gte: now } }] },
       orderBy: { createdAt: "desc" },
     })
     .catch(() => []);

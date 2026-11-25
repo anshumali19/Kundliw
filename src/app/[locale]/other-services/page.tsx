@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { hiddenFor } from "@/lib/audience";
 import { Link } from "@/i18n/routing";
 import { RichText } from "@/components/content/RichText";
 import { pageAlternates } from "@/lib/seo";
@@ -60,7 +61,7 @@ export default async function OtherServicesPage(
 
   const dbItems = await prisma.otherService
     .findMany({
-      where: { isActive: true },
+      where: { isActive: true, id: { notIn: await hiddenFor("otherService", "web") } },
       orderBy: { orderIndex: "asc" },
     })
     .catch(() => []);

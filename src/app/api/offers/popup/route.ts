@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { hiddenFor } from "@/lib/audience";
 import { prisma } from "@/lib/prisma";
 import { getSection } from "@/lib/siteConfig/service";
 import { formatPaiseToInr } from "@/lib/billing/gst";
@@ -17,6 +18,7 @@ export async function GET() {
       where: {
         isActive: true,
         showInPopup: true,
+        id: { notIn: await hiddenFor("offer", "web") },
         validFrom: { lte: now },
         OR: [{ validUntil: null }, { validUntil: { gt: now } }],
       },

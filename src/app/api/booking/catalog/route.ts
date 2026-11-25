@@ -1,4 +1,5 @@
 import { bookedSeatsByPackage, computeAvailability, type PackageAvailability } from "@/lib/booking/packageAvailability";
+import { hiddenFor } from "@/lib/audience";
 import { activePlanWhere } from "@/lib/content/packages";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const services = await prisma.service.findMany({
-      where: { isActive: true },
+      where: { isActive: true, id: { notIn: await hiddenFor("service", "web") } },
       orderBy: { orderIndex: "asc" },
       select: {
         slug: true,

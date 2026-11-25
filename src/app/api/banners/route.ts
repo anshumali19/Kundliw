@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { hiddenFor } from "@/lib/audience";
 import { prisma } from "@/lib/prisma";
 import { BannerPosition } from "@prisma/client";
 
@@ -9,8 +10,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const position = searchParams.get("position") as BannerPosition | null;
 
-    const where: { isActive: boolean; position?: BannerPosition } = {
+    const where: { isActive: boolean; position?: BannerPosition; id: { notIn: string[] } } = {
       isActive: true,
+      id: { notIn: await hiddenFor("banner", "web") },
     };
 
     if (position && ["TOP", "BOTTOM", "LEFT", "RIGHT"].includes(position)) {

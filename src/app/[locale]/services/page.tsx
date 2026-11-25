@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { hiddenFor } from "@/lib/audience";
 import { activePlanWhere } from "@/lib/content/packages";
 import { bookedSeatsByPackage, computeAvailability } from "@/lib/booking/packageAvailability";
 import type { Metadata } from "next";
@@ -48,7 +49,7 @@ export default async function ServicesListingPage(
 
   // Query only active services and their active plans
   const services = await prisma.service.findMany({
-    where: { isActive: true },
+    where: { isActive: true, id: { notIn: await hiddenFor("service", "web") } },
     include: {
       plans: {
         where: activePlanWhere,

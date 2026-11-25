@@ -15,6 +15,7 @@ import {
   FileSpreadsheet,
   FileText,
   Globe,
+  Smartphone,
   HelpCircle,
   Image as ImageIcon,
   Inbox,
@@ -94,6 +95,7 @@ const GROUPS: Array<{ en: string; hi: string; items: Item[] }> = [
     hi: "वेबसाइट",
     items: [
       { href: "/admin/website", en: "Website settings", hi: "वेबसाइट सेटिंग", icon: Globe },
+      { href: "/admin/audience", en: "Show where (website / app)", hi: "कहाँ दिखे (वेबसाइट / ऐप)", icon: Smartphone },
       { href: "/admin/hero-slides", en: "Home hero slides", hi: "होम हीरो स्लाइड", icon: ImageIcon },
       { href: "/admin/banners", en: "Banners", hi: "बैनर", icon: ImageIcon },
       { href: "/admin/marquee", en: "Scrolling notice", hi: "स्क्रॉलिंग सूचना", icon: Megaphone },

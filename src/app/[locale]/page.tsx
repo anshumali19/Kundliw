@@ -1,4 +1,5 @@
 import { WatchVideoBadge } from "@/components/content/WatchVideoBadge";
+import { hiddenIds, loadAudience } from "@/lib/audience";
 import { activePlanWhere } from "@/lib/content/packages";
 import { kendraEmail } from "@/lib/content/contact";
 import type { Metadata } from "next";
@@ -65,6 +66,9 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const on = (k: string) => secCfg[k] !== false;
   const link = (v: unknown, fallback: string) => safeHref(String(v || ""))?.href ?? fallback;
 
+  // What the admin chose to show in the app only (Admin > Show where) is left out of the website
+  const aud = await loadAudience();
+  const hide = (k: Parameters<typeof hiddenIds>[1]) => ({ notIn: hiddenIds(aud, k, "web") });
   const [settings, services, others, gallery, faqs, testimonials, leftBanners, rightBanners, activeServiceSlugs, savedSlides] = await Promise.all([
     prisma.adminSettings
       .findUnique({
@@ -79,16 +83,16 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         include: { plans: { where: activePlanWhere, orderBy: { pricePaise: "asc" } } },
       })
       .catch(() => []),
-    prisma.otherService.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" } }).catch(() => []),
-    prisma.mediaGalleryItem.findMany({ where: { isActive: true, mediaType: "IMAGE" }, orderBy: { orderIndex: "asc" }, take: 5 }).catch(() => []),
-    prisma.faqItem.findMany({ where: { isActive: true }, orderBy: { orderIndex: "asc" }, take: 8 }).catch(() => []),
-    prisma.testimonial.findMany({ where: { isActive: true, isVerified: true }, orderBy: { orderIndex: "asc" }, take: 3 }).catch(() => []),
-    prisma.banner.findMany({ where: { isActive: true, position: "LEFT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
-    prisma.banner.findMany({ where: { isActive: true, position: "RIGHT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.otherService.findMany({ where: { isActive: true, id: hide("otherService") }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.mediaGalleryItem.findMany({ where: { isActive: true, mediaType: "IMAGE", id: hide("gallery") }, orderBy: { orderIndex: "asc" }, take: 5 }).catch(() => []),
+    prisma.faqItem.findMany({ where: { isActive: true, id: hide("faq") }, orderBy: { orderIndex: "asc" }, take: 8 }).catch(() => []),
+    prisma.testimonial.findMany({ where: { isActive: true, isVerified: true, id: hide("testimonial") }, orderBy: { orderIndex: "asc" }, take: 3 }).catch(() => []),
+    prisma.banner.findMany({ where: { isActive: true, id: hide("banner"), position: "LEFT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
+    prisma.banner.findMany({ where: { isActive: true, id: hide("banner"), position: "RIGHT" }, orderBy: { orderIndex: "asc" } }).catch(() => []),
     prisma.service.findMany({ where: { isActive: true }, select: { slug: true } }).catch(() => []),
     prisma.siteConfig
       .findUnique({ where: { key: HERO_SLIDES_KEY } })
-      .then((r) => normalizeHeroSlides(r?.value))
+      .then((r) => normalizeHeroSlides(r?.value).filter((s) => !hiddenIds(aud, "slide", "web").includes(s.id)))
       .catch(() => []),
   ]);
 

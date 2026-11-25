@@ -133,6 +133,10 @@ export const PAGE_HELP: Record<string, PageHelp> = {
     what: ["Team members and assistants shown on the site.", "साइट पर दिखने वाले टीम सदस्य और सहायक।"],
     why: ["To introduce the people behind the Kendra.", "केंद्र के पीछे के लोगों से परिचय कराने के लिए।"],
   },
+  "/admin/audience": {
+    what: ["Choose for each service, offer, photo, article, notice, banner, slide or page whether it shows on the website only, in the app only, or in both.", "हर सेवा, ऑफ़र, फोटो, लेख, सूचना, बैनर, स्लाइड या पेज के लिए चुनें कि वह सिर्फ वेबसाइट पर, सिर्फ ऐप में या दोनों में दिखे।"],
+    why: ["To keep website-only and app-only things apart without touching code.", "बिना कोड छुए वेबसाइट और ऐप की चीज़ें अलग रखने के लिए।"],
+  },
   "/admin/credentials": {
     what: ["Certificates and credentials shown on the site.", "साइट पर दिखने वाले प्रमाणपत्र।"],
     why: ["Proof of training and recognition.", "प्रशिक्षण और मान्यता का प्रमाण।"],

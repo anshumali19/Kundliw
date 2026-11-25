@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { hiddenFor } from "@/lib/audience";
 import { stripRich } from "@/lib/content/richText";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
@@ -43,7 +44,7 @@ export default async function TestimonialsPage(props: TestimonialsPageProps) {
 
   const isHindi = locale === "hi";
   const testimonials = await prisma.testimonial.findMany({
-    where: { isActive: true, isVerified: true },
+    where: { isActive: true, isVerified: true, id: { notIn: await hiddenFor("testimonial", "web") } },
     orderBy: { orderIndex: "asc" },
   });
 

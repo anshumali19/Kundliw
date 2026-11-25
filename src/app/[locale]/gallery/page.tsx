@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { hiddenFor } from "@/lib/audience";
 import { pageAlternates } from "@/lib/seo";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -42,7 +43,7 @@ export default async function GalleryPage(props: GalleryPageProps) {
 
   const isHindi = locale === "hi";
   const items = await prisma.mediaGalleryItem.findMany({
-    where: { isActive: true },
+    where: { isActive: true, id: { notIn: await hiddenFor("gallery", "web") } },
     orderBy: { orderIndex: "asc" },
   });
 
