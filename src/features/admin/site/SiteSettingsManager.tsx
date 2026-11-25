@@ -8,12 +8,27 @@ import { LinkTextarea } from "@/components/admin/LinkTextarea";
 
 const NAV_GROUPS: Array<{ en: string; hi: string; ids: string[] }> = [
   { en: "Home page", hi: "होम पेज", ids: ["homeHero", "homeSections", "homeCards", "homeServices", "homeProcess", "homeContact", "homeExtras", "home", "hero", "heroAnimation"] },
-  { en: "Android app", hi: "एंड्रॉइड ऐप", ids: ["appSettings", "mobileApp"] },
   { en: "Menus, links and buttons", hi: "मेन्यू, लिंक और बटन", ids: ["menu", "footerLinks", "usefulLinks", "social", "topbar", "floating", "offerPopup"] },
   { en: "Look of the site", hi: "साइट का रूप", ids: ["theme", "logo", "intro", "general"] },
   { en: "Pages and content", hi: "पेज और कंटेंट", ids: ["contact", "mapPage", "content", "features", "tools", "technology", "legal"] },
   { en: "Business, Google and notes", hi: "व्यवसाय, गूगल और नोट", ids: ["business", "invoice", "ticket", "seo", "analytics", "admin"] },
 ];
+
+/** Settings only the Android app reads */
+const APP_ONLY = ["appSettings", "mobileApp"];
+/** Settings the app reads as well as the website: changing one of these changes the app too. */
+const IN_APP = new Set(["homeHero", "homeSections", "homeCards", "homeServices", "homeProcess", "homeContact", "homeExtras", "floating", "social", "contact", "content", "tools", "invoice"]);
+
+type Scope = "WEBSITE" | "APP";
+
+/** The groups shown for a scope: website changes (everything of the website), or app changes (the app's own settings, then the ones it shares with the website). */
+const groupsFor = (scope: Scope): typeof NAV_GROUPS =>
+  scope === "WEBSITE"
+    ? NAV_GROUPS
+    : [
+        { en: "App only", hi: "सिर्फ ऐप के लिए", ids: APP_ONLY },
+        { en: "Shared with the website (also shows in the app)", hi: "वेबसाइट के साथ साझा (ऐप में भी दिखता है)", ids: Array.from(IN_APP) },
+      ];
 
 const field = "w-full min-h-[44px] px-3 py-2 bg-surface-container-low border border-outline-variant rounded text-sm";
 const btn =
@@ -24,6 +39,7 @@ type Msg = { type: "ok" | "err"; text: string } | null;
 export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
   const tr = (en: string, hi: string) => (isHindi ? hi : en);
   const [active, setActive] = useState("social");
+  const [scope, setScope] = useState<Scope>("WEBSITE");
   const [sections, setSections] = useState<Record<string, SectionValues>>({});
   const [social, setSocial] = useState<SocialLink[]>([]);
   const [lists, setLists] = useState<Record<string, LinkRow[]>>({ menu: [], footerLinks: [], usefulLinks: [] });
@@ -181,9 +197,33 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
         </p>
       </div>
 
+      <div role="tablist" aria-label={tr("Where the change shows", "बदलाव कहाँ दिखे")} className="flex flex-wrap gap-2">
+        {(["WEBSITE", "APP"] as const).map((sc) => (
+          <button
+            key={sc}
+            type="button"
+            role="tab"
+            aria-selected={scope === sc}
+            onClick={() => {
+              setScope(sc);
+              setActive(groupsFor(sc)[0].ids[0]);
+              setMsg(null);
+            }}
+            className={`min-h-[44px] px-5 rounded text-sm font-bold border ${scope === sc ? "bg-brand text-on-brand border-maroon" : "bg-surface text-secondary border-outline-variant/60 hover:bg-surface-container-high"}`}
+          >
+            {sc === "WEBSITE" ? tr("Website changes", "वेबसाइट के बदलाव") : tr("Android app changes", "ऐप के बदलाव")}
+          </button>
+        ))}
+      </div>
+      <p className="text-xs text-on-surface-variant -mt-3">
+        {scope === "WEBSITE"
+          ? tr("Settings of the website. Those marked 'App too' also change the app. Content you add in the other Admin pages (services, offers, gallery, articles, questions, notices) shows in both.", "वेबसाइट की सेटिंग। जिन पर 'ऐप में भी' लिखा है वे ऐप को भी बदलते हैं। अन्य एडमिन पेज (सेवाएँ, ऑफ़र, गैलरी, लेख, प्रश्न, सूचनाएँ) में जो जोड़ें वह दोनों में दिखता है।")
+          : tr("Settings of the app: what its Home shows, switches, maintenance and the update message. The ones shared with the website change both.", "ऐप की सेटिंग: होम पर क्या दिखे, स्विच, रखरखाव और अपडेट संदेश। वेबसाइट के साथ साझा सेटिंग दोनों को बदलती हैं।")}
+      </p>
+
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
         <nav aria-label="Sections" data-lenis-prevent className="lg:max-h-[75vh] lg:overflow-y-auto overscroll-contain lg:pr-1 space-y-4">
-          {NAV_GROUPS.map((g) => {
+          {groupsFor(scope).map((g) => {
             const items = g.ids.map((id) => SECTIONS.find((x) => x.id === id)).filter((x): x is (typeof SECTIONS)[number] => !!x);
             if (items.length === 0) return null;
             return (
@@ -203,6 +243,9 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
                       }`}
                     >
                       {tr(sec.en, sec.hi)}
+                      {scope === "WEBSITE" && IN_APP.has(sec.id) && (
+                        <span className="ml-2 align-middle text-[10px] font-bold uppercase tracking-wider rounded-full bg-gold/60 text-maroon-deep px-2 py-0.5">{tr("App too", "ऐप में भी")}</span>
+                      )}
                     </button>
                   ))}
                 </div>
