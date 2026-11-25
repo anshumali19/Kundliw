@@ -31,6 +31,8 @@ export interface HomeContent {
   notices: { id: string; textEn: string; textHi: string }[];
   /** the running strip at the bottom of the screen */
   ticker?: { items: { id: string; textEn: string; textHi: string }[]; speedSec: number; fontSize: number; bgColor: string; textColor: string; allowClose: boolean };
+  /** the website's banners (Admin > Banners), for the app too unless limited to the website */
+  banners?: { id: string; position: "TOP" | "BOTTOM" | "LEFT" | "RIGHT"; titleEn: string; titleHi: string; subtitleEn: string; subtitleHi: string; imageUrl: string | null; linkUrl: string | null }[];
   /** the website's Floating buttons settings (Admin > Settings) */
   floating?: Values;
   offers: {

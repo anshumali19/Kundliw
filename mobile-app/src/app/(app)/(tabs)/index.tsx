@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Hero } from "@/components/Hero";
 import { LangChip } from "@/components/LangChip";
+import { Banners } from "@/components/Banners";
 import { PanchangCard } from "@/components/PanchangCard";
 import { ServiceCard } from "@/components/ServiceCard";
 import { Text } from "@/components/Text";
@@ -70,6 +71,7 @@ export default function HomeScreen() {
     { key: "pageContact", icon: "call", label: t("contactTitle"), path: "/explore/contact" },
     { key: "pageGuide", icon: "reader", label: t("guideTitle"), path: "/explore/guide" },
     { key: "pageCredentials", icon: "ribbon", label: t("credentialsTitle"), path: "/explore/credentials" },
+    { key: "pageMore", icon: "albums", label: t("morePages"), path: "/explore/pages" },
   ];
   const explore = exploreAll.filter((e) => isOn(app, e.key));
 
@@ -124,9 +126,11 @@ export default function HomeScreen() {
         {data && on("showSlides") ? <SlideShow data={data} /> : null}
 
         <View style={styles.body}>
+          {data && on("showBanners") ? <Banners banners={data.banners} positions={["TOP"]} /> : null}
           {data && on("showAnnouncement") ? <NoticeStrip notices={data.notices} /> : null}
           {data && on("showPanchangCard") ? <PanchangCard /> : null}
           {data && on("showOffers") ? <OffersRow data={data} /> : null}
+          {data && on("showBanners") ? <Banners banners={data.banners} positions={["LEFT", "RIGHT"]} /> : null}
 
           {on("showFeaturedServices") || !data ? (
             <>
@@ -174,6 +178,7 @@ export default function HomeScreen() {
           {data && on("showGalleryBlock") ? <GalleryStrip data={data} /> : null}
           {data && on("showBlogBlock") ? <PostsBlock data={data} /> : null}
           {data && on("showFaqBlock") ? <FaqBlock data={data} /> : null}
+          {data && on("showBanners") ? <Banners banners={data.banners} positions={["BOTTOM"]} /> : null}
           {data && on("showContactBlock") ? <ContactBlock data={data} /> : null}
         </View>
       </ScrollView>

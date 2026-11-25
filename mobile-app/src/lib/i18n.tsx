@@ -463,6 +463,11 @@ const STRINGS = {
   chatEnquiry: { en: "Submit enquiry", hi: "संदेश भेजें" },
   chatClose: { en: "Close", hi: "बंद करें" },
   chatSend: { en: "Send", hi: "भेजें" },
+  bannerBadge: { en: "Special", hi: "विशेष" },
+  pagesTitle: { en: "More from the Kendra", hi: "केंद्र की और जानकारी" },
+  morePages: { en: "More", hi: "और जानकारी" },
+  adminPanel: { en: "Admin panel", hi: "एडमिन पैनल" },
+  adminPanelNote: { en: "For the Kendra's administrator. Sign in on the page that opens to change the website and the app.", hi: "केंद्र के एडमिन के लिए। वेबसाइट और ऐप बदलने के लिए खुलने वाले पेज पर साइन इन करें।" },
 } as const;
 
 const TICKET_STATUS = {

@@ -49,3 +49,11 @@ describe("button links", () => {
     expect(whatsappUrl("9827991224", "")).toBe("https://wa.me/919827991224");
   });
 });
+
+describe("links to the new screens", () => {
+  it("opens custom pages, credentials and other-service cards inside the app", () => {
+    expect(resolveLink("/hi/pages/gemstones")).toEqual({ type: "route", path: "/explore/page/gemstones" });
+    expect(resolveLink("/credentials")).toEqual({ type: "route", path: "/explore/credentials" });
+    expect(resolveLink("/en/other-services/char-dham")).toEqual({ type: "route", path: "/explore/other/char-dham" });
+  });
+});

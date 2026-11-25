@@ -217,7 +217,7 @@ export function SiteSettingsManager({ isHindi }: { isHindi: boolean }) {
       </div>
       <p className="text-xs text-on-surface-variant -mt-3">
         {scope === "WEBSITE"
-          ? tr("Settings of the website. Those marked 'App too' also change the app. Content you add in the other Admin pages (services, offers, gallery, articles, questions, notices) shows in both.", "वेबसाइट की सेटिंग। जिन पर 'ऐप में भी' लिखा है वे ऐप को भी बदलते हैं। अन्य एडमिन पेज (सेवाएँ, ऑफ़र, गैलरी, लेख, प्रश्न, सूचनाएँ) में जो जोड़ें वह दोनों में दिखता है।")
+          ? tr("Settings of the website. Those marked 'App too' also change the app. Content you add in the other Admin pages (services, offers, gallery, articles, questions, notices) shows in both. To show an item on the website only, in the app only or in both, use Admin > Show where.", "वेबसाइट की सेटिंग। जिन पर 'ऐप में भी' लिखा है वे ऐप को भी बदलते हैं। अन्य एडमिन पेज (सेवाएँ, ऑफ़र, गैलरी, लेख, प्रश्न, सूचनाएँ) में जो जोड़ें वह दोनों में दिखता है। किसी चीज़ को सिर्फ वेबसाइट, सिर्फ ऐप या दोनों में दिखाने के लिए एडमिन > कहाँ दिखे में जाएँ।")
           : tr("Settings of the app: what its Home shows, switches, maintenance and the update message. The ones shared with the website change both.", "ऐप की सेटिंग: होम पर क्या दिखे, स्विच, रखरखाव और अपडेट संदेश। वेबसाइट के साथ साझा सेटिंग दोनों को बदलती हैं।")}
       </p>
 

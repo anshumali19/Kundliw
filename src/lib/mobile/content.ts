@@ -3,6 +3,7 @@ import { getActiveSocialLinks, getSection } from "@/lib/siteConfig/service";
 import { isSafeImageSrc, normalizeBlocks, normalizeLinks } from "@/lib/content/media";
 import { kendraEmail } from "@/lib/content/contact";
 import { hiddenFor } from "@/lib/audience";
+import { isCorePageSlug } from "@/lib/content/pages";
 import { CREDENTIAL_LABEL, type CredentialKind } from "@/lib/content/credentials";
 
 /**
@@ -16,7 +17,7 @@ const image = (v: string | null | undefined) => (isSafeImageSrc(v) && !/placehol
 const text = (v: unknown) => (typeof v === "string" ? v : "");
 const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
 
-export const CONTENT_SECTIONS = ["about", "founder", "faq", "gallery", "blogs", "testimonials", "offers", "contact", "credentials"] as const;
+export const CONTENT_SECTIONS = ["about", "founder", "faq", "gallery", "blogs", "testimonials", "offers", "contact", "credentials", "pages"] as const;
 export type ContentSection = (typeof CONTENT_SECTIONS)[number];
 
 const isTemplate = (value?: string | null) => !value || /admin panel|एडमिन पैनल/i.test(value);
@@ -269,7 +270,21 @@ async function credentials() {
   };
 }
 
-const LOADERS: Record<ContentSection, () => Promise<unknown>> = { about, founder, faq, gallery, blogs, testimonials, offers, contact, credentials };
+/** The custom pages the admin made (Admin > Pages): only the ones meant for the app. */
+async function pages() {
+  const rows = await prisma.staticPage.findMany({ where: { isActive: true, id: { notIn: await hiddenFor("page", "app") } }, orderBy: { slug: "asc" } }).catch(() => []);
+  return { items: rows.filter((r) => !isCorePageSlug(r.slug)).map((r) => ({ slug: r.slug, titleEn: r.titleEn, titleHi: r.titleHi })) };
+}
+
+/** One custom page with its words and blocks, or null when it is off, a built-in page, or for the website only. */
+export async function getCustomPage(slug: string) {
+  if (isCorePageSlug(slug)) return null;
+  const p = await prisma.staticPage.findUnique({ where: { slug } }).catch(() => null);
+  if (!p || !p.isActive || (await hiddenFor("page", "app")).includes(p.id)) return null;
+  return { slug: p.slug, titleEn: p.titleEn, titleHi: p.titleHi, contentEn: p.contentEn, contentHi: p.contentHi, blocks: shapeBlocks(p.blocks) };
+}
+
+const LOADERS: Record<ContentSection, () => Promise<unknown>> = { about, founder, faq, gallery, blogs, testimonials, offers, contact, credentials, pages };
 
 export function isContentSection(v: string): v is ContentSection {
   return (CONTENT_SECTIONS as readonly string[]).includes(v);

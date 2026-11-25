@@ -59,7 +59,8 @@ export async function loadHome() {
   // What the admin chose to show on the website only (Admin > Show where) is left out of the app
   const aud = await loadAudience();
   const hide = (k: Parameters<typeof hiddenIds>[1]) => ({ notIn: hiddenIds(aud, k, "app") });
-  const [services, slidesRaw, marquee, offers, others, testimonials, posts, faqs, gallery, settings] = await Promise.all([
+  const [banners, services, slidesRaw, marquee, offers, others, testimonials, posts, faqs, gallery, settings] = await Promise.all([
+    prisma.banner.findMany({ where: { isActive: true, id: hide("banner") }, orderBy: { orderIndex: "asc" } }).catch(() => []),
     prisma.service.findMany({ where: { isActive: true }, select: { slug: true, imageUrl: true } }).catch(() => []),
     prisma.siteConfig.findUnique({ where: { key: HERO_SLIDES_KEY } }).then((r) => normalizeHeroSlides(r?.value)).catch(() => []),
     prisma.marqueeItem.findMany({ where: { isActive: true, id: hide("marquee") }, orderBy: { orderIndex: "asc" } }).catch(() => []),
@@ -122,6 +123,16 @@ export async function loadHome() {
     notices: marquee.map((m) => ({ id: m.id, textEn: m.textEn, textHi: m.textHi })),
     ticker,
     floating: pickValues(floating),
+    banners: banners.map((b) => ({
+      id: b.id,
+      position: b.position,
+      titleEn: b.titleEn,
+      titleHi: b.titleHi,
+      subtitleEn: b.subtitleEn ?? "",
+      subtitleHi: b.subtitleHi ?? "",
+      imageUrl: image(b.imageUrl),
+      linkUrl: b.linkUrl ?? null,
+    })),
     offers: offers.map((o) => ({
       id: o.id,
       code: o.code,

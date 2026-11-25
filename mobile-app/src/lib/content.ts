@@ -132,6 +132,17 @@ export interface GuideContent {
   contentHi: string;
   visuals: { kind: "image" | "video"; labelEn: string; labelHi: string; url: string }[];
 }
+export interface PagesContent {
+  items: { slug: string; titleEn: string; titleHi: string }[];
+}
+export interface CustomPageContent {
+  slug: string;
+  titleEn: string;
+  titleHi: string;
+  contentEn: string;
+  contentHi: string;
+  blocks: Block[];
+}
 export interface CredentialsContent {
   items: {
     id: string;

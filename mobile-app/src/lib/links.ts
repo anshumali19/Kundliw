@@ -25,6 +25,9 @@ const ROUTES: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^\/testimonials\/?$/, () => "/explore/testimonials"],
   [/^\/faq\/?$/, () => "/explore/faq"],
   [/^\/contact\/?$/, () => "/explore/contact"],
+  [/^\/credentials\/?$/, () => "/explore/credentials"],
+  [/^\/pages\/([\w-]+)\/?$/, (m) => `/explore/page/${m[1]}`],
+  [/^\/other-services\/([\w-]+)\/?$/, (m) => `/explore/other/${m[1]}`],
   [/^\/vault\/?$/, () => "/vault"],
   [/^\/(?:tickets|help)\/?$/, () => "/tickets"],
 ];

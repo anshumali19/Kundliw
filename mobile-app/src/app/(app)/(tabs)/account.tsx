@@ -148,8 +148,9 @@ function AboutApp() {
       <SectionTitle>{t("aboutApp")}</SectionTitle>
       <Card style={{ gap: 0, paddingVertical: space.xs }}>
         <Row label={t("appVersionIs")} value={installedVersion()} />
-        <Link icon="share-social-outline" label={t("shareApp")} onPress={share} last={!config.playStoreUrl} />
-        {config.playStoreUrl ? <Link icon="star-outline" label={t("rateApp")} onPress={() => Linking.openURL(config.playStoreUrl as string).catch(() => undefined)} last /> : null}
+        <Link icon="share-social-outline" label={t("shareApp")} onPress={share} />
+        {config.playStoreUrl ? <Link icon="star-outline" label={t("rateApp")} onPress={() => Linking.openURL(config.playStoreUrl as string).catch(() => undefined)} /> : null}
+        <Link icon="shield-checkmark-outline" label={t("adminPanel")} onPress={() => router.push("/admin" as never)} last />
       </Card>
       {state === "ready" ? (
         <Card>
