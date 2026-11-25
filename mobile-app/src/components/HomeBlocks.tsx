@@ -495,34 +495,6 @@ export function ContactBlock({ data }: { data: HomeContent }) {
   );
 }
 
-/** Round Call and WhatsApp buttons floating at the bottom corner of Home, each switched on or off by the admin. */
-export function FloatingButtons({ data }: { data: HomeContent }) {
-  const { lang, t } = useLanguage();
-  const l = lang1(lang);
-  const showCall = isOn(data.app, "showCallButton");
-  const showWa = isOn(data.app, "showWhatsappButton");
-  if (!showCall && !showWa) return null;
-  return (
-    <View style={styles.fabs} pointerEvents="box-none">
-      {showWa ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="WhatsApp"
-          onPress={() => Linking.openURL(whatsappUrl(data.contact.whatsapp, pickText(data.app, "whatsappMessage", l, t("waHello")))).catch(() => undefined)}
-          style={[styles.fab, { backgroundColor: "#25A244" }]}
-        >
-          <Ionicons name="logo-whatsapp" size={26} color="#fff" />
-        </Pressable>
-      ) : null}
-      {showCall ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={t("callUs")} onPress={() => Linking.openURL(`tel:${data.contact.phone.replace(/[^\d+]/g, "")}`).catch(() => undefined)} style={[styles.fab, { backgroundColor: colors.brand }]}>
-          <Ionicons name="call" size={24} color="#fff" />
-        </Pressable>
-      ) : null}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   slide: { height: 260, borderRadius: radius.xl, overflow: "hidden", backgroundColor: colors.maroon, justifyContent: "flex-end", ...shadow.strong },
   slideBody: { padding: space.lg, gap: space.sm },
@@ -566,6 +538,4 @@ const styles = StyleSheet.create({
   contactTitle: { fontSize: 28, color: colors.onMaroon, lineHeight: 33 },
   contactText: { fontSize: 13, color: colors.onMaroon, opacity: 0.85, lineHeight: 20 },
   contactPhone: { fontSize: 26, fontWeight: "700", color: colors.gold },
-  fabs: { position: "absolute", right: space.lg, bottom: space.lg, gap: space.md, alignItems: "center" },
-  fab: { width: 54, height: 54, borderRadius: 27, alignItems: "center", justifyContent: "center", ...shadow.strong },
 });

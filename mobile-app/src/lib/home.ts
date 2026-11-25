@@ -29,6 +29,10 @@ export interface HomeContent {
   sections: Values;
   slides: HomeSlide[];
   notices: { id: string; textEn: string; textHi: string }[];
+  /** the running strip at the bottom of the screen */
+  ticker?: { items: { id: string; textEn: string; textHi: string }[]; speedSec: number; fontSize: number; bgColor: string; textColor: string; allowClose: boolean };
+  /** the website's Floating buttons settings (Admin > Settings) */
+  floating?: Values;
   offers: {
     id: string;
     code: string;
@@ -44,7 +48,7 @@ export interface HomeContent {
   posts: { slug: string; titleEn: string; titleHi: string; excerptEn: string | null; excerptHi: string | null; coverImage: string | null }[];
   faqs: { id: string; questionEn: string; questionHi: string; answerEn: string; answerHi: string }[];
   gallery: { id: string; titleEn: string; titleHi: string; imageUrl: string | null }[];
-  contact: { phone: string; phone2: string | null; email: string | null; whatsapp: string };
+  contact: { phone: string; phone2: string | null; email: string | null; whatsapp: string; call?: string };
 }
 
 /** A switch from the admin panel; blocks are on unless the admin turned them off. */

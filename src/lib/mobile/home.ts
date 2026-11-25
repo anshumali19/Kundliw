@@ -91,6 +91,18 @@ export async function loadHome() {
 
   const phone = settings?.phone1 || "+91 98279 91224";
   const whatsapp = str(floating.whatsappNumber).trim() || settings?.whatsappNumber || settings?.socialWhatsapp || phone;
+  const call = str(floating.callNumber).trim() || phone;
+
+  // The running strip at the bottom: the BOTTOM notices, styled by the first one (as on the website)
+  const bottom = marquee.filter((m) => m.position === "BOTTOM");
+  const ticker = {
+    items: bottom.map((m) => ({ id: m.id, textEn: m.textEn, textHi: m.textHi })),
+    speedSec: bottom[0]?.speedSec ?? 30,
+    fontSize: bottom[0]?.fontSize ?? 14,
+    bgColor: bottom[0]?.bgColor ?? "",
+    textColor: bottom[0]?.textColor ?? "",
+    allowClose: bottom[0]?.allowClose ?? true,
+  };
 
   return {
     app: pickValues(app),
@@ -103,6 +115,8 @@ export async function loadHome() {
     sections: pickValues(sections),
     slides,
     notices: marquee.map((m) => ({ id: m.id, textEn: m.textEn, textHi: m.textHi })),
+    ticker,
+    floating: pickValues(floating),
     offers: offers.map((o) => ({
       id: o.id,
       code: o.code,
@@ -143,6 +157,6 @@ export async function loadHome() {
     })),
     faqs: faqs.map((f) => ({ id: f.id, questionEn: f.questionEn, questionHi: f.questionHi, answerEn: f.answerEn, answerHi: f.answerHi })),
     gallery: gallery.map((g) => ({ id: g.id, titleEn: g.titleEn, titleHi: g.titleHi, imageUrl: image(g.imageUrl) })),
-    contact: { phone, phone2: settings?.phone2 ?? null, email: kendraEmail(settings?.email), whatsapp },
+    contact: { phone, phone2: settings?.phone2 ?? null, email: kendraEmail(settings?.email), whatsapp, call },
   };
 }

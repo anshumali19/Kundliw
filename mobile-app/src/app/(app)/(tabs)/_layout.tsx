@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { BottomOverlay, TICKER_HEIGHT } from "@/components/BottomOverlay";
 import { Text } from "@/components/Text";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,7 +26,9 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const isAssociate = user?.role === "ASSOCIATE";
 
+  const barHeight = 60 + insets.bottom;
   return (
+    <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -37,8 +40,9 @@ export default function TabsLayout() {
             {children}
           </Text>
         ),
-        tabBarStyle: [styles.bar, { height: 60 + insets.bottom, paddingBottom: insets.bottom + 6 }],
-        sceneStyle: { backgroundColor: colors.surface },
+        tabBarStyle: [styles.bar, { height: barHeight, paddingBottom: insets.bottom + 6 }],
+        // Room for the running strip, which sits just above the tab bar
+        sceneStyle: { backgroundColor: colors.surface, paddingBottom: TICKER_HEIGHT },
       }}
     >
       <Tabs.Screen name="index" options={{ title: t("tabHome"), tabBarIcon: icon("home", "home-outline") }} />
@@ -48,6 +52,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="vault" options={{ title: t("tabVault"), tabBarIcon: icon("folder-open", "folder-open-outline") }} />
       <Tabs.Screen name="account" options={{ title: t("tabAccount"), tabBarIcon: icon("person", "person-outline") }} />
     </Tabs>
+    <BottomOverlay bottom={barHeight} />
+    </View>
   );
 }
 

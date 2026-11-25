@@ -12,7 +12,6 @@ import {
   AboutBlock,
   ContactBlock,
   FaqBlock,
-  FloatingButtons,
   GalleryStrip,
   NoticeStrip,
   OffersRow,
@@ -178,7 +177,6 @@ export default function HomeScreen() {
           {data && on("showContactBlock") ? <ContactBlock data={data} /> : null}
         </View>
       </ScrollView>
-      {data ? <FloatingButtons data={data} /> : null}
     </View>
   );
 }
